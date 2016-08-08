@@ -54,6 +54,7 @@ public:
   double SetsigPrecision(double x1) { return sigDiff = x1; }
   double SetInitTempDop(double t1) { return doppTemp1 = t1; }
   double SetOutTempDop(double t2) { return doppTemp2 = t2; }
+  int SetPreProcess(int x1) {return  prepro = x1; }
   std::fstream out, outtotal;
   std::string outstring, outstringTotal;
 
@@ -181,62 +182,45 @@ private:
   rowd cosFile4;
   rowd cosPdfFile4;
   rowd cosCdfFile4;
-  rowint MtLct;                	// LCT numbers
-  rowint l;                    	// l values
-  rowint NRS;                  	// no. of resolved resonances
-  rowint NRJ;                  	// no. of URR J
-  rowint JSM;                  	// URR J
-  rowd Er;                     	// resolved resonance energy
-  rowd J;                      	// associated J
-  rowd GJ;                     	// spin multiplication factor
-  rowd Gamma_r;                	// total width = Gamma_n + Gamma_g + Gamma_f
-  rowd Gamma_n;                	// neutron scattering width
-  rowd Gamma_g;                	// Capture width
-  rowd Gamma_f;                	// fission width
-  rowd Gamma_x;                	// Inelastic width
-  rowd Gamma_fa, Gamma_fasq;   	// fission width 1
-  rowd Gamma_fb, Gamma_fbsq;   	// fission width 2
-  rowd at1;                    	// 1 background constant (Reich-Moore)
-  rowd at2;                    	// 2 background constant (Reich-Moore)
-  rowd at3;                    	// 3 background constant (Reich-Moore)
-  rowd at4;                    	// 4 background constant (Reich-Moore)
-  rowd bt1;                    	// 5 background constant (Reich-Moore)
-  rowd bt2;                    	// 6 background constant (Reich-Moore)
-  rowd det1;                   	// 1 resonance energy (Reich-Moore)
-  rowd dwt1;                   	// 2 half width (Reich-Moore)
-  rowd grt1;                   	// 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd git1;                   	// 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd def1;                   	// 5 background constant (Reich-Moore)
-  rowd dwf1;                   	// 6 background constant (Reich-Moore)
-  rowd grf1;                   	// 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd gif1;                   	// 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd dec1;                   	// 5 background constant (Reich-Moore)
-  rowd dwc1;                   	// 6 background constant (Reich-Moore)
-  rowd grc1;                   	// 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd gic1;                   	// 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd amux, amun, amug, amuf; 	// standard ENDF parameters
-  rowd Es;                     	// energy URR
-  rowd D, GX, GNO, GG, GF;     	// URR parameters
-  rowd PhiEr, ShiftEr;         	// penetration and shift factors
-  rowd eneTemp, sigTemp;       	// temporary vectors to store energy and sigma
-  rowd eneUniP, sigUniP;       	// unionization of energy and total cross-section for n,p
-  rowd eneUniD, sigUniD;       	// unionization of energy and total cross-section for n,d
-  rowd eneUniT, sigUniT;      	// unionization of energy and total cross-section for n,t
-  rowd eneUniHe3, sigUniHe3;  	// unionization of energy and total cross-section for n,He3
-  rowd eneUniHe4, sigUniHe4;   	// unionization of energy and total cross-section for n,He4  
-  rowint eneLocP, eneLocD, eneLocT, eneLocHe3, eneLocHe4;   	// location of the first energy grid point   
-  matrixd2 sigUniOfP, sigUniOfD, sigUniOfT, sigUniOfHe3, sigUniOfHe4;
-  rowd eneUniPAll, sigUniPAll;       	// unionization of energy and total cross-section for n,p + n,pX
-  rowd eneUniDAll, sigUniDAll;       	// unionization of energy and total cross-section for n,d + n,dX
-  rowd eneUniTAll, sigUniTAll;      	// unionization of energy and total cross-section for n,t + n,tX
-  rowd eneUniHe3All, sigUniHe3All;  	// unionization of energy and total cross-section for n,He3 + n,He3X
-  rowd eneUniHe4All, sigUniHe4All;   	// unionization of energy and total cross-section for n,He4 + n,He4X 
-  rowint eneLocPAll, eneLocDAll, eneLocTAll, eneLocHe3All, eneLocHe4All;   	// location of the first energy grid point   
-  matrixd2 sigUniOfPAll, sigUniOfDAll, sigUniOfTAll, sigUniOfHe3All, sigUniOfHe4All;
-  int MTChargeFlag[10] ; 	// flag if charge particle production is added in MT = 103-107
+  rowint MtLct;                // LCT numbers
+  rowint l;                    // l values
+  rowint NRS;                  // no. of resolved resonances
+  rowint NRJ;                  // no. of URR J
+  rowint JSM;                  // URR J
+  rowd Er;                     // resolved resonance energy
+  rowd J;                      // associated J
+  rowd GJ;                     // spin multiplication factor
+  rowd Gamma_r;                // total width = Gamma_n + Gamma_g + Gamma_f
+  rowd Gamma_n;                // neutron scattering width
+  rowd Gamma_g;                // Capture width
+  rowd Gamma_f;                // fission width
+  rowd Gamma_x;                // Inelastic width
+  rowd Gamma_fa, Gamma_fasq;   // fission width 1
+  rowd Gamma_fb, Gamma_fbsq;   // fission width 2
+  rowd at1;                    // 1 background constant (Reich-Moore)
+  rowd at2;                    // 2 background constant (Reich-Moore)
+  rowd at3;                    // 3 background constant (Reich-Moore)
+  rowd at4;                    // 4 background constant (Reich-Moore)
+  rowd bt1;                    // 5 background constant (Reich-Moore)
+  rowd bt2;                    // 6 background constant (Reich-Moore)
+  rowd det1;                   // 1 resonance energy (Reich-Moore)
+  rowd dwt1;                   // 2 half width (Reich-Moore)
+  rowd grt1;                   // 3 symmetrical cross-section parameter G (Reich-Moore)
+  rowd git1;                   // 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
+  rowd def1;                   // 5 background constant (Reich-Moore)
+  rowd dwf1;                   // 6 background constant (Reich-Moore)
+  rowd grf1;                   // 3 symmetrical cross-section parameter G (Reich-Moore)
+  rowd gif1;                   // 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
+  rowd dec1;                   // 5 background constant (Reich-Moore)
+  rowd dwc1;                   // 6 background constant (Reich-Moore)
+  rowd grc1;                   // 3 symmetrical cross-section parameter G (Reich-Moore)
+  rowd gic1;                   // 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
+  rowd amux, amun, amug, amuf; // standard ENDF parameters
+  rowd Es;                     // energy URR
+  rowd D, GX, GNO, GG, GF;     // URR parameters
+  rowd PhiEr, ShiftEr;         // penetration and shift factors
+  rowd eneTemp, sigTemp;       // temporary vectors to store energy and sigma
   int prepro = 0 ;
-  rowint nSecNeutron, nSecPhoton;   // counter for neutron, photon producing reactions
-  rowint nReacNeutron, nDelayFamily; // number of neutron reactions, delayed neutron families
   TNudyEndfDoppler *doppler;
   TNudyEndfAng *recoAng;
   TNudyEndfEnergy *recoEnergy;
