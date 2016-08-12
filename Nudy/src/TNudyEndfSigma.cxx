@@ -916,6 +916,15 @@ void TNudyEndfSigma::ReadFile3(TNudyEndfFile *file)
 	  recursionLinearFile3(eLinearFile3[cr], eLinearFile3[cr + 1], xLinearFile3[cr], xLinearFile3[cr + 1],
 			      eLinearFile3, xLinearFile3);
 	}
+	double enehigh     = 1E+3 ;
+	       eneLow      = 1E+3 ;
+	int multifac       = 2 ;
+	do {
+	  eneLow += multifac * enehigh ;
+	  eneExtra.push_back(eneLow);
+	  multifac += 1;
+	} while (eneLow < eneTemp[NP - 1]);
+
 	for (unsigned long ie = 0; ie < eneExtra.size(); ie++) {
 	  double sigExtra =
 	      TNudyCore::Instance()->Interpolate(nbt1, int1, NR, eLinearFile3, xLinearFile3, NP, eneExtra[ie]);
@@ -1765,7 +1774,7 @@ int TNudyEndfSigma::widthFluctuation(double GNR, double gx, double gg, double gf
   RF      = 0.0;
   int mux = (int)amux[jval];
   int mun = (int)amun[jval];
-  int muf = (int)amuf[jval];
+  int muf = (int)amuf[jval];  
   if (GNR <= 0.0 || gg <= 0.0) {
     return 0;
   }
@@ -2112,70 +2121,6 @@ void TNudyEndfSigma::GetSigma(int lrfa, double x, double &siga, double &sigb, do
         nrs = nrstemp;
         nrs += nrsl;
         sumCrsElastic += pibyk2 * (fac1 + sumElastic) ;
-        sumCrsCapture += pibyk2 * (sumCapture);
-        sumCrsFission += pibyk2 * (sumFission);
-      }
-      siga = sumCrsElastic;
-      sigb = sumCrsCapture;
-      sigc = sumCrsFission;
-    } break;
-    case 2: {
-      int nrsj = 0;
-      nrs      = 0;
-      for (int lcnt = 0; lcnt < NLS2; lcnt++) {
-        sumElastic  = 0.0;
-        sumCapture  = 0.0;
-        sumFission  = 0.0;
-        sumElasticM = 0.0;
-        lVal        = l[lcnt];
-        phil        = calcPhi(x, lVal);
-        sfil        = sin(phil);
-        cfil        = cos(phil);
-        sfil2       = sfil * sfil;
-        s2fil       = 2. * sfil * cfil;
-        fac1        = 4.0 * (2.0 * lVal + 1.0) * sfil2;
-        NJS         = NRJ[lcnt];
-        for (int jVal = 0; jVal < NJS; jVal++) {
-          nrsl        = JSM[nrsj];
-          facElastic  = 0.0;
-          facCapture  = 0.0;
-          facFission  = 0.0;
-          facElasticM = 0.0;
-          int min     = 0;
-          int max     = nrsl - 1;
-          int mid     = 0;
-          if (x <= Es[min])
-            min = 0;
-          else if (x >= Es[max])
-            min = max - 1;
-          else {
-            while (max - min > 1) {
-              mid = (min + max) / 2;
-              if (x < Es[mid])
-                max = mid;
-              else
-                min = mid;
-            }
-          }
-          double gnr = GNO[nrs + min];
-          double gx  = GX[nrs + min];
-          double gg  = GG[nrs + min];
-          double gf  = GF[nrs + min];
-          double dr  = D[nrs + min];
-          GNR        = gnr * calcPene(x, lVal) * sqrt(x) / GetRho(x, lVal);
-          widthFluctuation(GNR, gx, gg, gf, nrsj);
-          double temp1 = 2. * PI * GNR * GJ[nrsj] / dr;
-          facElastic   = amun[nrsj] * (GNR * RN - 2. * sfil2) * temp1;
-          facCapture   = amun[nrsj] * gg * temp1 * RG;
-          facFission   = amun[nrsj] * gf * temp1 * RF;
-
-          sumElastic += facElastic;
-          sumCapture += facCapture;
-          sumFission += facFission;
-          nrs += nrsl;
-          nrsj += 1;
-        }
-        sumCrsElastic += pibyk2 * (fac1 + sumElastic);
         sumCrsCapture += pibyk2 * (sumCapture);
         sumCrsFission += pibyk2 * (sumFission);
       }
@@ -2546,9 +2491,19 @@ void TNudyEndfSigma::recoPlusBroad(int flagNer)
         ei += 0.01;
         additionalSigma(LRF, ei);
       } else {
-        additionalSigma(LRF, Es[l]);
+	double gape =( Es[l] - Es[l - 1] ) / 20 ;
+	ei = Es[l - 1] + gape ;
+	do
+	{ 
+	  if ( ei >= Es[l] ){
+	    ei = Es[l];
+	  }
+	  additionalSigma( LRF, ei );
+	  ei += gape ;
+	} while( ei <= Es[l] );
       }
     }
+    additionalSigma( LRF, eHi2);
   }
 }
 //------------------------------------------------------------------------------------------------------
@@ -2579,7 +2534,6 @@ void TNudyEndfSigma::Linearize(int flagNer)
 //******************** Get Resonant PArameter and cross-section data from ENDF file **********
 void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 {
-  TFile *junk = TFile::Open("junk.root", "recreate");
   sigDiff = isigDiff;
   TFile *rEND = TFile::Open(rENDF, "UPDATE");
   if (!rEND || rEND->IsZombie()) printf("Error: TFile :: Cannot open file %s\n", rENDF);
@@ -2588,8 +2542,6 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
   TNudyEndfMat *tMat      = 0;
   TList *mats             = (TList *)rENDFVol->GetMats();
   int nmats               = mats->GetEntries();
-  mats->Write();
-  junk->Close();
   for (int iMat = 0; iMat < nmats; iMat++) {
     tMat = (TNudyEndfMat *)mats->At(iMat);
     TIter iter(tMat->GetFiles());
@@ -2647,15 +2599,17 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
         }
         break;
       case 2:
-        ReadFile2(file);
-        if (LRU != 0) {
-          TNudyCore::Instance()->Sort(eLinElastic, xLinElastic);
-          TNudyCore::Instance()->Sort(eLinCapture, xLinCapture);
-          TNudyCore::Instance()->Sort(eLinFission, xLinFission);
-          TNudyCore::Instance()->ThinningDuplicate(eLinElastic, xLinElastic);
-          TNudyCore::Instance()->ThinningDuplicate(eLinCapture, xLinCapture);
-          TNudyCore::Instance()->ThinningDuplicate(eLinFission, xLinFission);
-        }
+	if(prepro == 0){
+	  ReadFile2(file);
+	  if (LRU != 0) {
+	    TNudyCore::Instance()->Sort(eLinElastic, xLinElastic);
+	    TNudyCore::Instance()->Sort(eLinCapture, xLinCapture);
+	    TNudyCore::Instance()->Sort(eLinFission, xLinFission);
+	    TNudyCore::Instance()->ThinningDuplicate(eLinElastic, xLinElastic);
+	    TNudyCore::Instance()->ThinningDuplicate(eLinCapture, xLinCapture);
+	    TNudyCore::Instance()->ThinningDuplicate(eLinFission, xLinFission);
+	  }
+	}
         	std::cout<<"file 2 OK "<< std::endl;
         break;
       case 3: {
@@ -2665,17 +2619,8 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
         sigma.clear();
         std::cout << "file 3 OK " << std::endl;
         fixupTotal(energyUni, sigmaUniTotal);
-//          std::cout << "before elstic Doppler begins " << std::endl;
-//         std::cout << eLinElastic.size() << std::endl;
-//         for (unsigned long j = 0; j < eLinElastic.size(); j++)
-//           std::cout << std::setprecision(12) << eLinElastic[j] << "  " << xLinElastic[j] << std::endl;
-//         std::cout << eLinCapture.size() << std::endl;
-//         for (unsigned long j = 0; j < eLinCapture.size(); j++)
-//           std::cout << std::setprecision(12) << eLinCapture[j] << "  " << xLinCapture[j] << std::endl;
-//         std::cout << eLinFission.size() << std::endl;
-//         for (unsigned long j = 0; j < eLinFission.size(); j++)
-//           std::cout << std::setprecision(12) << eLinFission[j] << "  " << xLinFission[j] << std::endl;
 	
+//         std::cout << "before elstic Doppler begins " << std::endl;
         broadSigma(eLinElastic, xLinElastic, xBroadElastic);
 	//Thinning(eLinElastic, xBroadElastic);
         // std::cout << eLinElastic.size() << std::endl;
@@ -2692,21 +2637,21 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
         std::cout<<"Doppler done "<<outstring << std::endl;
         dopplerBroad = 0;
 
-        out << eLinElastic.size() << std::endl;
-        for (unsigned long j = 0; j < eLinElastic.size(); j++)
-          out << std::setprecision(12) << eLinElastic[j] << "  " << xBroadElastic[j] << std::endl;
+//         out << eLinElastic.size() << std::endl;
+//         for (unsigned long j = 0; j < eLinElastic.size(); j++)
+//           out << std::setprecision(12) << eLinElastic[j] << "  " << xBroadElastic[j] << std::endl;
         eLinElastic.clear();
         xLinElastic.clear();
         xBroadElastic.clear();
-        out << eLinCapture.size() << std::endl;
-        for (unsigned long j = 0; j < eLinCapture.size(); j++)
-          out << std::setprecision(12) << eLinCapture[j] << "  " << xBroadCapture[j] << std::endl;
+//         out << eLinCapture.size() << std::endl;
+//         for (unsigned long j = 0; j < eLinCapture.size(); j++)
+//           out << std::setprecision(12) << eLinCapture[j] << "  " << xBroadCapture[j] << std::endl;
         eLinCapture.clear();
         xLinCapture.clear();
         xBroadCapture.clear();
-        out << eLinFission.size() << std::endl;
-        for (unsigned long j = 0; j < eLinFission.size(); j++)
-          out << std::setprecision(12) << eLinFission[j] << "  " << xBroadFission[j] << std::endl;
+//         out << eLinFission.size() << std::endl;
+//         for (unsigned long j = 0; j < eLinFission.size(); j++)
+//           out << std::setprecision(12) << eLinFission[j] << "  " << xBroadFission[j] << std::endl;
         eLinFission.clear();
         xLinFission.clear();
         xBroadFission.clear();
@@ -2841,10 +2786,10 @@ void TNudyEndfSigma::fixupTotal(TNudyEndfFile *file1, std::vector<double> &x1, s
       }
     }
   }
-  outtotal << x1.size() << std::endl;
-  for (unsigned long j = 0; j < x1.size(); j++) {
-    outtotal << x1[j] << "  " << x2[j] << std::endl;
-  }
+//   outtotal << x1.size() << std::endl;
+//   for (unsigned long j = 0; j < x1.size(); j++) {
+//     outtotal << x1[j] << "  " << x2[j] << std::endl;
+//   }
 }
 //------------------------------------------------------------------------------------------------------
 void TNudyEndfSigma::dopplerAll()
