@@ -51,7 +51,6 @@ void TNudyEndfRecoPoint::ReadFile3(TNudyEndfFile *file)
   int mt1multi = -1;
   while ((sec = (TNudyEndfSec *)secIter.Next())) {
     int MT = sec->GetMT();
-//      std::cout <<"MT  "<<sec->GetMT() <<std::endl;
     if (MT != 1 && MT != 3 && MT != 4 && MT != 27 && MT != 19 && MT != 20 && MT != 21 && MT != 38 && MT != 101 &&
         (MT < 120 || MT >= 600) ) {
       MtNumbers.push_back(MT);
@@ -77,7 +76,7 @@ void TNudyEndfRecoPoint::ReadFile3(TNudyEndfFile *file)
     } if (MT==1){
       TIter recIter(sec->GetRecords());
       TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
-       NR = header->GetN1();
+      NR = header->GetN1();
       NP = header->GetN2();
       TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)(sec->GetRecords()->At(0));
       for (int crs = 0; crs < NP; crs++) {
@@ -167,15 +166,12 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 	    if (MT == 1) {
 		eneUni.push_back (energyMts);
 		sigUniT.push_back (sigmaMts);
-	      continue;
+	      break;
 	    }
-              if (MT != 3 && MT != 4 && MT != 27 && MT != 19 && MT != 20 && MT != 21 && MT != 38 && MT != 101 && MT < 250) {
-               fixupTotal(energyMts);
-	       break;
-              }
-          }
-                 energyMts.clear();
-                 sigmaMts.clear();
+	  }
+	  fixupTotal(energyMts);
+	  energyMts.clear();
+	  sigmaMts.clear();
         }break;
       case 4:
         std::cout << "before file 4 " << std::endl;
@@ -207,11 +203,11 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 // // 	recoPhProd = new TNudyEndfPhProd(file);
 // // 	std::cout<<"file 13 OK "<<std::endl;
 // // 	break;
-//        case 14:
-//          std::cout << "before file 14 " << std::endl;
-//  	recoPhAng = new TNudyEndfPhAng(file);
-//  	std::cout<<"file 14 OK "<<std::endl;
-//  	break;
+       case 14:
+         std::cout << "before file 14 " << std::endl;
+ 	recoPhAng = new TNudyEndfPhAng(file);
+ 	std::cout<<"file 14 OK "<<std::endl;
+ 	break;
 // //       case 15:
 // //         std::cout << "before file 15 " << std::endl;
 // // 	recoPhEnergy = new TNudyEndfPhEnergy(file);
@@ -289,7 +285,7 @@ double TNudyEndfRecoPoint::GetSigmaTotal(int ielemId, double energyK)
 //------------------------------------------------------------------------------------------------------
 double TNudyEndfRecoPoint::GetSigmaPartial(int ielemId, int i, double energyK)
 {
-  std::cout<< eneUni[ielemId].size() <<std::endl;
+  //std::cout<< eneUni[ielemId].size() <<std::endl;
   int min = 0;
   int max = eneUni[ielemId].size() - 1;
   int mid = 0;
@@ -307,9 +303,9 @@ double TNudyEndfRecoPoint::GetSigmaPartial(int ielemId, int i, double energyK)
     }
   }
   int minp = min - energyLocMtId[ielemId][i];
-//     for (unsigned int j1 = 0; j1 < eneUni[ielemId].size(); j1++)
-//       std::cout << eneUni[ielemId][j1] <<"  "<< sigUniOfMt[ielemId][i][j1] <<"  "<< sigUniOfMt[ielemId][i].size() << std::endl;
-  if (minp <= 0) return 0;
+//    for (unsigned int j1 = 0; j1 < eneUni[ielemId].size(); j1++)
+//    std::cout << eneUni[ielemId][j1] <<"  "<<  sigUniOfMt[ielemId][i][j1] << std::endl;
+  if (minp < 0) return 0;
   if (minp >= (int)sigUniOfMt[ielemId][i].size()) return 0;
   return sigUniOfMt[ielemId][i][minp] +
          (sigUniOfMt[ielemId][i][minp + 1] - sigUniOfMt[ielemId][i][minp]) * (energyK - eneUni[ielemId][min]) /

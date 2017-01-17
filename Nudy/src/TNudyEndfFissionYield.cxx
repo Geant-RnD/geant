@@ -36,22 +36,19 @@ TNudyEndfFissionYield::TNudyEndfFissionYield(TNudyEndfFile *file)
         ein.push_back(list1->GetC1());
         // int NN   = list1->GetN1();
         int NFP = list1->GetN2();
-        //std::cout<<"energy i " <<ein[i] << std::endl;
+        // std::cout<<"energy i " <<ein[i] << std::endl;
 	double sum = 0;
         for (int j = 0; j < NFP; j++) {
-	  if (list1->GetLIST(4 * j + 2) > 0) {
-	    zafp1.push_back(10*list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1));
-	    fps1.push_back(list1->GetLIST(4 * j + 1));
-	    yi1.push_back(list1->GetLIST(4 * j + 2)/2);
-	    dyi1.push_back(list1->GetLIST(4 * j + 3));
-	    sum += list1->GetLIST(4 * j + 2) ;
-	    cyi1.push_back( sum/2 );
-	  }
+          zafp1.push_back(10*list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1));
+          fps1.push_back(list1->GetLIST(4 * j + 1));
+          yi1.push_back(list1->GetLIST(4 * j + 2)/2);
+          dyi1.push_back(list1->GetLIST(4 * j + 3));
+	  sum += list1->GetLIST(4 * j + 2) ;
+	  cyi1.push_back( sum/2 );
           // divr = div(zafp1[j],1000);
-          // std::cout<< 10*list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1) <<"  "<<  list1->GetLIST(4 * j + 2)/2 << std::endl;
+//           std::cout<< list1->GetLIST(4 * j + 0) <<"  "<<  list1->GetLIST(4 * j + 2) << std::endl;
         }
-//        TNudyCore::Instance()->cdfGenerateT(zafp1, yi1, cyi1);
-        //std::cout << "sum fission yield \t" << sum << std::endl;
+//         std::cout << "sum fission yield \t" << sum << std::endl;
         zafp.push_back(zafp1);
         fps.push_back(fps1);
         yi.push_back(yi1);
