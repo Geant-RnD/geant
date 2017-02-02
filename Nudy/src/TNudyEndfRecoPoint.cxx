@@ -73,7 +73,8 @@ void TNudyEndfRecoPoint::ReadFile3(TNudyEndfFile *file)
       xLinearFile3.clear();
       sigmaOfMts.push_back (eneTemp);
       eneTemp.clear();
-    } if (MT==1){
+    } if (MT==1 && mt1multi==-1){
+      mt1multi = 0;
       TIter recIter(sec->GetRecords());
       TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
       NR = header->GetN1();
@@ -303,7 +304,8 @@ double TNudyEndfRecoPoint::GetSigmaPartial(int ielemId, int i, double energyK)
     }
   }
   int minp = min - energyLocMtId[ielemId][i];
-//    for (unsigned int j1 = 0; j1 < eneUni[ielemId].size(); j1++)
+//     for (unsigned int j1 = 0; j1 < eneUni[ielemId].size(); j1++)
+//       std::cout << eneUni[ielemId][j1] <<"  "<< sigUniOfMt[ielemId][i][j1] <<"  "<< sigUniOfMt[ielemId][i].size() << std::endl;
   if (minp <= 0) return 0;
   if (minp >= (int)sigUniOfMt[ielemId][i].size()) return 0;
   return sigUniOfMt[ielemId][i][minp] +
