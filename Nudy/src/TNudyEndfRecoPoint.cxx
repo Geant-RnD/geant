@@ -171,6 +171,34 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 	    }
 	  }
 	  fixupTotal(energyMts);
+	  double sigfis, sigcap;
+	  std::vector<double> energ, etavalue;
+	  std::vector<double> energjunk, etajunk;
+	  eta->Branch("energy",&energ);
+	  eta->Branch("eta",&etavalue);
+	  std::cout<<"hello rrebin  "<<energyMts.size()<<std::endl;
+	    for (unsigned int j1 = 1; j1 < energyMts.size() ; j1++){
+	       for(unsigned int j2 = 0; j2 < MtValues[0].size(); j2++){
+	          if(MtValues[0][j2] ==18)sigfis = GetSigmaPartial(0, j2, energyMts[j1]);
+	          if(MtValues[0][j2] ==102)sigcap = GetSigmaPartial(0, j2, energyMts[j1]);
+	       }
+// 	       if (recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis)>0){
+// 		h1->Fill(log10(energyMts[j1]),recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis));
+// 		h2->Fill(log10(energyMts[j1]));
+// 	       }
+// 	       energ.push_back(energyMts[j1]);
+// 	       etavalue.push_back(recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis));
+//	      std::cout<< energyMts[j1] <<"  "<< recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis) << std::endl;
+	    }
+// 	    for(int j = 0; j < 150; j++){
+// 	      double num = h1->GetBinContent(j);
+// 	      int    num2 = h2->GetBinContent(j);
+// 	      if ( num >0 && num2 > 0)h3->SetBinContent(j,num/num2);
+// 	      std::cout<<j<<"  "<<num<<"  "<<num2<<"  "<<num/num2 << std::endl;
+// 	    }
+// 	  std::cout<<"hello eta "<<std::endl;
+// 	       eta->Fill();
+ 	       f->Write();
 	  energyMts.clear();
 	  sigmaMts.clear();
         }break;
@@ -204,11 +232,11 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 // // 	recoPhProd = new TNudyEndfPhProd(file);
 // // 	std::cout<<"file 13 OK "<<std::endl;
 // // 	break;
-       case 14:
-         std::cout << "before file 14 " << std::endl;
- 	recoPhAng = new TNudyEndfPhAng(file);
- 	std::cout<<"file 14 OK "<<std::endl;
- 	break;
+//        case 14:
+//          std::cout << "before file 14 " << std::endl;
+//  	recoPhAng = new TNudyEndfPhAng(file);
+//  	std::cout<<"file 14 OK "<<std::endl;
+//  	break;
 // //       case 15:
 // //         std::cout << "before file 15 " << std::endl;
 // // 	recoPhEnergy = new TNudyEndfPhEnergy(file);
