@@ -255,6 +255,7 @@ int main(int argc, char** argv) {
     //  G4EmParameters::Instance()->Dump();
     // create models
     G4PEEffectFluoModel photoelectricFluo;
+    //G4LivermorePhotoElectricModel_new photoelectricLiv;
     G4LivermorePhotoElectricModel photoelectricLiv;
     
     // Set particle change object
