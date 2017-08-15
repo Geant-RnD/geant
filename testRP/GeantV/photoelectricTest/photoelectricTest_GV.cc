@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
     EMModel *emModel_rej = new SauterGavrilaPhotoElectricModel(photoElectricModelName, false); //true to use Alias Sampling method
     // - Set low/high energy usage limits to their min/max possible values
     emModel->SetLowEnergyUsageLimit ( 0.01*geant::keV);
-
+    
     emModel->SetHighEnergyUsageLimit(100.0*geant::GeV);
 
 

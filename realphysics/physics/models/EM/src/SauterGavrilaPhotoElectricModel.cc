@@ -156,8 +156,10 @@ namespace geantphysics {
                 for (int j=0; j<numElems; ++j) {
                     double zet = theElements[j]->GetZ();
                     int elementIndx = std::lrint(zet);
-                    //std::cout<<"\n***Calling ReadData on: "<<elementIndx<<" ....\n";
+                    std::cout<<"\n***Calling ReadData on: "<<elementIndx<<" ....\n";
                     ReadData(elementIndx);
+
+                    
                 }
             }
         }
@@ -175,10 +177,8 @@ namespace geantphysics {
             << std::endl;
         }
         
-        if(  (fCrossSection[Z]) && ( (fCrossSectionLE[Z] && Z>2) || (!fCrossSectionLE[Z] && Z<3)) )
-        {//std::cout<<"Data loaded before!\n";
-            return;}
-        //else std::cout<<"Data not loaded before!\n";
+        if( ( (fCrossSection[Z] && Z<23) || (!fCrossSection[Z] && Z>22 )) && ( (fCrossSectionLE[Z] && Z>2) || (!fCrossSectionLE[Z] && Z<3)) ) {std::cout<<"Data loaded before!\n"; return;}
+        else std::cout<<"Data not loaded before!\n";
         
         // get the path to the main physics data directory
         char *path = std::getenv("GEANT_PHYSICS_DATA");
@@ -602,30 +602,57 @@ namespace geantphysics {
         
         // (***) Tabulated values above k-shell ionization energy
         else if(energy >= (*(fParamHigh[Z]))[1]) {
-            //this is an extra-check - if energy<fCSVector[Z]->edgeMin it should go to the next else (****)
-            if(energy<fCSVector[Z]->fEdgeMin)
-                cs=x3*fCSVector[Z]->fDataVector[0];
-            else
+    
+            //TO DO: CREATE A GET VALUE METHOD
+            size_t index=0;
+            double value;
+            /*
+            if(energy <= fCSVector[Z]->edgeMin)
             {
-                size_t idx=0;
-                idx=fCSVector[Z]->FindCSBinLocation(energy, idx);
-                cs=x3*fCSVector[Z]->fSplineInt->GetValueAt(energy, idx);
-            }
+                index = 0;
+                value = fCSVector[Z]->fDataVector[0];
+            } else if(energy >= fCSVector[Z]->edgeMax) {
+                index = fCSVector[Z]->numberOfNodes-1;
+                value = fCSVector[Z]->fDataVector[index];
+                
+            } else {
+                
+                index=FindCSBinLocation(energy, index, fCSVector[Z]->numberOfNodes, fCSVector[Z]->fBinVector);
+              */
+                
+            index= GetIndex(energy,fCSVector, Z);
+            ///THIS MUST BE SUBSTITUTED WITH SPLINE INTERPOLATOR
+            value = LinearInterpolation(energy, fCSVector[Z]->fBinVector, fCSVector[Z]->fDataVector,  index);
+                
+            //}
+            cs=x3*value;
             
         }
         
         //(****) Tabulated values below k-shell ionization energy
         else
         {
-            //this check is needed to have a constant cross-section(cs) value for energies below the lowest cs point.
-            //in this way the gamma is always absorbed - instead of giving zero cs -
-            if(energy<fLECSVector[Z]->fEdgeMin)
-                cs=x3*fLECSVector[Z]->fDataVector[0];
-            else
+            
+            //TO DO  ::: CREATE A GET VALUE METHOD
+            size_t index=0;
+            double value;
+            /*
+            if(energy <= fLECSVector[Z]->edgeMin)
             {
-                size_t idx=0;
-                cs=x3*fLECSVector[Z]->GetValue(energy, idx);
-            }
+                index = 0;
+                value = fLECSVector[Z]->fDataVector[0];
+            } else if(energy >= fLECSVector[Z]->edgeMax) {
+                index = fLECSVector[Z]->numberOfNodes-1;
+                value = fLECSVector[Z]->fDataVector[index];
+                
+            } else {
+                
+                index=FindCSBinLocation(energy, index, fLECSVector[Z]->numberOfNodes, fLECSVector[Z]->fBinVector);*/
+            index= GetIndex(energy,fLECSVector, Z);
+            value = LinearInterpolation(energy, fLECSVector[Z]->fBinVector, fLECSVector[Z]->fDataVector,  index);
+            //}
+            cs=x3*value;
+            
         }
         if (verboseLevel > 1) {
             std::cout << "LivermorePhotoElectricModel: E(keV)= " << energy/keV
@@ -658,7 +685,7 @@ namespace geantphysics {
     }
     
     
-    size_t SauterGavrilaPhotoElectricModel::SampleTargetElementIndex (const MaterialCuts *matCut, double gammaekin0, Geant::GeantTaskData *td) const
+    int SauterGavrilaPhotoElectricModel::SampleTargetElementIndex (const MaterialCuts *matCut, double gammaekin0, Geant::GeantTaskData *td)
     {
         size_t index =0;
         std::vector<double> mxsec(20,0.);
@@ -739,15 +766,63 @@ namespace geantphysics {
             xsecSampled[i]/=1000000000;
         }
         
+            const Material *mat =  matCut->GetMaterial();
+            const double* theAtomicNumDensityVector = mat->GetMaterialProperties()->GetNumOfAtomsPerVolumeVect();
+            double cumxsec=0.;
+            for(; index<num-1; ++index)
+            {
+                double xsec = theAtomicNumDensityVector[index]* ComputeXSectionPerAtom(theElements[index]->GetZ(), gammaekin0);
+                cumxsec += xsec;
+                if (rnd <= cumxsec)
+                {
+                    //index = i;
+                    break;
+                }
+            }
+        }
+        //std::cout<<"DEB index: "<<index<<std::endl;
+        return index;
+    }
+    
+    void SauterGavrilaPhotoElectricModel::testSampleTargetElementIndex(const MaterialCuts *matcut, double energy, Geant::GeantTaskData *td){
+    
+        std::cout<<"testSampleTargetElementIndex\n";
+        int index=0;
+        double sum=0;
+        //retrieve the elements vector
+        const Vector_t<Element*> theElements = matcut->GetMaterial()->GetElementVector();
+        //retrieve the number of elements in the material
+        int num    = matcut->GetMaterial()->GetNumberOfElements();
+        double xsec[num];
+        double xsecSampled[num];
+
+        const Material *mat =  matcut->GetMaterial();
+        const double* theAtomicNumDensityVector = mat->GetMaterialProperties()->GetNumOfAtomsPerVolumeVect();
+        for (int i=0; i<num; i++)
+        {
+            xsec[i] = theAtomicNumDensityVector[i]* ComputeXSectionPerAtom(theElements[i]->GetZ(), energy);
+            xsecSampled[i]=0.;
+            sum+=xsec[i];
+        }
+        for (int i=0; i<1000000000; i++){
+            index= SampleTargetElementIndex(matcut, energy, td);
+            xsecSampled[index]++;
+        }
+        for (int i=0; i<num; i++)
+        {
+            xsec[i]/=sum;
+            xsecSampled[i]/=1000000000;
+        }
+
         char filename[521];
         sprintf(filename,"SampleTargetElementIndexTest_%s", (matcut->GetMaterial()->GetName()).c_str() );
         FILE *f     = fopen(filename,"w");
-        
+
         for (int i=0; i<num; ++i) {
             fprintf(f,"%d\t%.8g\t%.8g\n",i,xsec[i],xsecSampled[i]);
         }
         fclose(f);
-        
+    
     }
     
     
@@ -865,25 +940,55 @@ namespace geantphysics {
                 size_t idx= 0;
                 // (***) Tabulated values above k-shell ionization energy
                 if(gammaekin0 >= (*(fParamHigh[Z]))[1]) {
-                    //this is an extra-check - if energy<fCSVector[Z]->edgeMin it should go to the next else (****)
-                    if(gammaekin0<fCSVector[Z]->fEdgeMin)
-                        cs*=fCSVector[Z]->fDataVector[0];
-                    else
+                    //above K-shell binding energy
+                    
+                    //TO DO:: CREATE A METHOD
+                    size_t index=0;
+                    double value;
+                    
+                    /*if(gammaekin0 <= fCSVector[Z]->edgeMin)
                     {
-                        idx=fCSVector[Z]->FindCSBinLocation(gammaekin0, idx);
-                        cs*=fCSVector[Z]->fSplineInt->GetValueAt(gammaekin0, idx);
-                    }
+                        index = 0;
+                        value = fCSVector[Z]->fDataVector[0];
+                    } else if(gammaekin0 >= fCSVector[Z]->edgeMax) {
+                        index = fCSVector[Z]->numberOfNodes-1;
+                        value = fCSVector[Z]->fDataVector[index];
+                        
+                    } else {
+                        
+                        
+                        index=FindCSBinLocation(gammaekin0, index, fCSVector[Z]->numberOfNodes, fCSVector[Z]->fBinVector);*/
+                    index= GetIndex(gammaekin0,fCSVector, Z);
+                        //THIS MUST BE SUBSTITUTED WITH THE SPLINE INTERPOLATION
+                    value = LinearInterpolation(gammaekin0, fCSVector[Z]->fBinVector, fCSVector[Z]->fDataVector,  index);
+                    //}
+                    cs*=value;
+                    
                 }
                 //(****) Tabulated values below k-shell ionization energy
                 else
                 {
-                    //this check is needed to have a constant cross-section(cs) value for energies below the lowest cs point.
-                    //in this way the gamma is always absorbed - instead of giving zero cs -
-                    if(gammaekin0<fLECSVector[Z]->fEdgeMin)
-                        cs*=fLECSVector[Z]->fDataVector[0];
-                    else
-                        //cs*=fLECSVector[Z]->GetValueAt(gammaekin0);
-                        cs*=fLECSVector[Z]->GetValue(gammaekin0, idx);
+                    //below K-shell binding energy
+                    //TO DO:: BETTER TO CREATE A METHOD
+                    size_t index=0;
+                    double value;
+                    
+                    /*if(gammaekin0 <= fLECSVector[Z]->edgeMin)
+                    {
+                        index = 0;
+                        value = fLECSVector[Z]->fDataVector[0];
+                    } else if(gammaekin0 >= fLECSVector[Z]->edgeMax) {
+                        index = fLECSVector[Z]->numberOfNodes-1;
+                        value = fLECSVector[Z]->fDataVector[index];
+                        
+                    } else {
+                        
+                        index=FindCSBinLocation(gammaekin0, index, fLECSVector[Z]->numberOfNodes, fLECSVector[Z]->fBinVector);*/
+                    index= GetIndex(gammaekin0,fLECSVector, Z);
+                    value = LinearInterpolation(gammaekin0, fLECSVector[Z]->fBinVector, fLECSVector[Z]->fDataVector,  index);
+                    //}
+                    
+                    cs*=value;
                 }
                 //size_t j=0;
                 for(size_t j=0; j<nn; ++j)
@@ -891,9 +996,29 @@ namespace geantphysics {
                     
                     shellIdx=(size_t)fShellVector[Z][j]->fCompID;
                     if(gammaekin0 > (*(fParamLow[Z]))[7*shellIdx+1]) {
-                        size_t idx=0;
-                        //cs-=fShellVector[Z][j]->GetValueAt(gammaekin0);
-                        cs-=fShellVector[Z][j]->GetValue(gammaekin0, idx);
+                        
+                        //FINDING THE BIN LOCATION---> TO DO: use find bin!
+                        size_t numberofnodes=(fShellCrossSection[Z]->fCompLength[shellIdx]);
+                        size_t bin=0;
+                        
+                        /*
+                        if(gammaekin0 < fShellCrossSection[Z]->fCompBinVector[shellIdx][1]) {
+                            bin = 0;
+                        } else if(gammaekin0 >= fShellCrossSection[Z]->fCompBinVector[shellIdx][numberofnodes-2]) {
+                            bin = numberofnodes - 2;
+                        } else if(bin >= numberofnodes || gammaekin0 < fShellCrossSection[Z]->fCompBinVector[shellIdx][bin]
+                                  || gammaekin0 > fShellCrossSection[Z]->fCompBinVector[shellIdx][bin+1])
+                        {
+                            // Bin location proposed by K.Genser (FNAL) from G4
+                            bin = std::lower_bound(fShellCrossSection[Z]->fCompBinVector[shellIdx].begin(), fShellCrossSection[Z]->fCompBinVector[shellIdx].end(), gammaekin0) - fShellCrossSection[Z]->fCompBinVector[shellIdx].begin() - 1;
+                        }
+                        size_t minV= std::min(bin, numberofnodes-2);*/
+                        
+                        bin= FindCSBinLocation(gammaekin0, bin, numberofnodes,fShellCrossSection[Z]->fCompBinVector[shellIdx]);
+                        double value = LinearInterpolation (gammaekin0, fShellCrossSection[Z]->fCompBinVector[shellIdx], fShellCrossSection[Z]->fCompDataVector[shellIdx],  bin);
+                        
+                        //double value = LinearInterpolation (gammaekin0, fShellCrossSection[Z]->fCompBinVector[shellIdx], fShellCrossSection[Z]->fCompDataVector[shellIdx],  minV);
+                        cs-=value;
                     }
                     
                     if(cs <= 0.0 || j+1 == nn)
