@@ -40,6 +40,9 @@
 #include "GammaPhotoElectricProcess.h"
 #include "SauterGavrilaPhotoElectricModel.h"
 
+#include "GammaPhotoElectricProcess.h"
+#include "SauterGavrilaPhotoElectricModel.h"
+
 #include "MSCProcess.h"
 #include "MSCModel.h"
 #include "GSMSCModel.h"
@@ -226,18 +229,20 @@ void UserPhysicsList::Initialize() {
       //
       // create photoelectric effect process for gamma with 1 model:
       //
-      geantphysics::EMPhysicsProcess *photoelectricProc = new geantphysics::GammaPhotoElectricProcess();
+      geantphysics::EMPhysicsProcess *photoelectricProc = new geantphysics::GammaPhotoElectricProcess("gPhotoElectric");
       // create the Sauter-Gavrila model for photoelectric effect
       geantphysics::EMModel           *sgModel = new geantphysics::SauterGavrilaPhotoElectricModel();
       // set min/max energies of the model
-      sgModel->SetLowEnergyUsageLimit (  1.0*geant::eV);
+      sgModel->SetLowEnergyUsageLimit (  2.0*geant::keV);
+      // the parametrized cross sections works only up t0 80-90 GeV but we will use it now up to 1 TeV
+        
       sgModel->SetHighEnergyUsageLimit(  1.0*geant::TeV);
       // add the model to the process
       photoelectricProc->AddModel(sgModel);
       //
       // add the process to the gamma particle
       AddProcessToParticle(particle, photoelectricProc);
-
+      
     }
     if (particle==geantphysics::Proton::Definition()    || particle==geantphysics::Neutron::Definition()   ||
 	      particle==geantphysics::PionPlus::Definition()  || particle==geantphysics::PionMinus::Definition() ||
