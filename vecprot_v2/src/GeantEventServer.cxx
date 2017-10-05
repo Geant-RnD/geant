@@ -36,8 +36,7 @@ using namespace vecgeom;
 GeantEventServer::GeantEventServer(int event_capacity, GeantRunManager *runmgr)
   :fNevents(event_capacity), fNactive(0), fNserved(0), fLastActive(-1), fCurrentEvent(0),
    fNload(0), fNstored(0), fNcompleted(0), fRunMgr(runmgr),
-   fFreeSlots(AdjustSize(runmgr->GetConfig()->fNbuff)),
-   fPendingEvents(4096)
+   fFreeSlots(AdjustSize(runmgr->GetConfig()->fNbuff)), fPendingEvents(4096), fEmptyEvents(4096)
 {
 // Constructor
   assert(nactive_max > 0 && nactive_max < 4096);
@@ -52,12 +51,15 @@ GeantEventServer::GeantEventServer(int event_capacity, GeantRunManager *runmgr)
 
   // Create empty events
   bool generate = fRunMgr->GetConfig()->fRunMode == GeantConfig::kGenerator;
-  int nthreads = runmgr->GetNthreadsTotal();
+  int nthreads = runmgr->GetNthreadsTotal();  
   int ngen = vecCore::math::Max(fNactiveMax, nthreads);
   if (generate) {
     fNevents = fRunMgr->GetConfig()->fNtotal;
     ngen = vecCore::math::Min(ngen, fNevents);
   }
+
+  for (int i = 0; i < ngen + nthreads; ++i)
+    fEmptyEvents.enqueue(new GeantEvent());
 
   unsigned int error = 0;
   if (generate) {
@@ -83,29 +85,53 @@ GeantEventServer::~GeantEventServer()
     delete fEvents[i];
   }
   GeantEvent *event;
-  while (fDoneEvents.dequeue(event)) delete event;
+  while (fEmptyEvents.dequeue(event)) delete event;
 }
 
 //______________________________________________________________________________
-GeantEvent *GeantEventServer::GenerateNewEvent(GeantEvent *event, GeantTaskData *td)
+GeantEvent *GeantEventServer::GenerateNewEvent(GeantTaskData *td, unsigned int &error)
 {
-// Generates a new event in standalone GeantV mode.
-  if (!fRunMgr->GetPrimaryGenerator())
-    return nullptr;
-  // The method has to be locked since thread safety not yet required in the generator.
+// Generates a new event in standalone GeantV mode by filling an empty one and 
+// putting it in the pending events queue.
+//
+// The method may fail due to:
+// - the method is in use by another thread (error = 1)
+// - all events were generated already generated (error = 2)
+// - queue of empty events is empty. Should not happen. (error = 3)
+// - event could not be added to the pending queue. Should not happen (error = 4)
+
+  // The method has to be locked since thread safety not yet required for the generator.
   // Policy: if someone else working here, just return
-  if (fGenLock.test_and_set(std::memory_order_acquire)) return nullptr;
+  if (fGenLock.test_and_set(std::memory_order_acquire)) {
+    error = 1;
+    return nullptr;
+  }
+  int nload = fNload.load();
+  if (nload >= fNevents) {
+    error = 2;
+    fGenLock.clear(std::memory_order_release);
+    return nullptr;
+  }
+  error = 0;
   // Now just get next event from the generator
   GeantEventInfo eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent();
   int ntracks = eventinfo.ntracks;
-  if (!ntracks) return nullptr;
+  int nloadtmp = nload;
+  while (!ntracks) {
+    Error("GenerateNewEvent", "### Problem with generator: event %d has no tracks", nloadtmp++);
+    eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent();
+    ntracks = eventinfo.ntracks;
+  }
   
-  if (!event)
-    event = new GeantEvent();
-  else
-    event->Clear();
-  int evt = fNload.fetch_add(1);
-  event->SetEvent(evt);
+  GeantEvent *event = nullptr;
+  if (!fEmptyEvents.dequeue(event)) {
+    Error("GenerateNewEvent", "### Problem with empty queue!!!");
+    error = 3;
+    fGenLock.clear(std::memory_order_release);
+    return nullptr;
+  }
+  // Clear the event. At this point the event must not be in use anywhere
+  event->Clear();
   event->SetNprimaries(ntracks);
   event->SetVertex(eventinfo.xvert, eventinfo.yvert, eventinfo.zvert);
 
@@ -163,7 +189,6 @@ bool GeantEventServer::AddEvent(GeantEvent *event)
 {
 // Adds one event into the queue of pending events.
   int evt = fNload.fetch_add(1);
-
   if (fRunMgr->GetConfig()->fRunMode == GeantConfig::kExternalLoop) {
     // The vertex must be defined
     vecgeom::Vector3D<double> vertex = event->GetVertex();
@@ -210,84 +235,6 @@ bool GeantEventServer::AddEvent(GeantEvent *event)
   }
     
   if (!fPendingEvents.enqueue(event)) {
-    Error("AddEvent", "Event pool is full");
-    return false;
-  }
-  // Update number of stored events
-  fNstored++;
-  return true;
-}
-
-//______________________________________________________________________________
-int GeantEventServer::AddEvent(GeantTaskData *td)
-{
-// Adds one event into the queue of pending events.
-  bool external_loop = fRunMgr->GetConfig()->fRunMode == GeantConfig::kExternalLoop;
-  int evt = fNload.fetch_add(1);
-  if (evt >= fNevents) {
-    fNload--;
-    Error("AddEvent", "Event pool is full");
-    return 0;
-  }
-  GeantEventInfo eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent();
-  int ntracks = eventinfo.ntracks;
-  if (!ntracks) {
-    Error("AddEvent", "Event is empty");
-    return 0;
-  }
-  fEvents[evt]->SetEvent(evt);
-  fEvents[evt]->SetNprimaries(ntracks);
-  fEvents[evt]->SetVertex(eventinfo.xvert, eventinfo.yvert, eventinfo.zvert);
-
-  // start new event in MCTruthMgr
-  if(fRunMgr->GetMCTruthMgr()) fRunMgr->GetMCTruthMgr()->OpenEvent(evt);
-  
-  // Initialize navigation path for the vertex
-  //Volume_t *vol = 0;
-  // Initialize the start path
-  VolumePath_t *startpath = VolumePath_t::MakeInstance(fRunMgr->GetConfig()->fMaxDepth);
-#ifdef USE_VECGEOM_NAVIGATOR
-  vecgeom::SimpleNavigator nav;
-  startpath->Clear();
-  nav.LocatePoint(GeoManager::Instance().GetWorld(), vertex, *startpath, true);
-  //vol = const_cast<Volume_t *>(startpath->Top()->GetLogicalVolume());
-  //VBconnector *link = static_cast<VBconnector *>(vol->GetBasketManagerPtr());
-#else
-  TGeoNavigator *nav = gGeoManager->GetCurrentNavigator();
-  if (!nav)
-    nav = gGeoManager->AddNavigator();
-  //TGeoNode *geonode = nav->FindNode(vertex.x(), vertex.y(), vertex.z());
-  //vol = geonode->GetVolume();
-  //VBconnector *link = static_cast<VBconnector *>(vol->GetFWExtension());
-  startpath->InitFromNavigator(nav);
-#endif
-  // There are needed for v2 only
-  fBindex = link->index;
-  td->fVolume = vol;
-
-  // Check and fix tracks
-  for (int itr=0; itr<ntracks; ++itr) {
-    GeantTrack &track = *event->GetPrimary(itr);
-    track.SetPrimaryParticleIndex(itr);
-    track.SetPath(startpath);
-    track.SetNextPath(startpath);
-    track.SetEvent(evt);
-    if (!track.IsNormalized()) {
-      track.Print("Not normalized");
-      track.Normalize();
-    }
-    if (track.GVcode() < 0) {
-      Error("AddEvent", "GeantV particle codes not initialized. Looks like primary generator was not initialized !!!");
-      return false;
-    }
-    track.SetBoundary(false);
-    track.SetStatus(kNew);
-    event->fNfilled++;
-    if (fRunMgr->GetMCTruthMgr()) fRunMgr->GetMCTruthMgr()->AddTrack(track);
-  }
-  VolumePath_t::ReleaseInstance(startpath);
-
-  if (!fPendingEvents.enqueue(event)) {
     // Should never happen
     Error("AddEvent", "Event pool is full");
     return false;
@@ -306,11 +253,8 @@ int GeantEventServer::AddEvent(GeantTaskData *td)
     if (fNtracksInit % basket_size > 0) fNbasketsInit++;
     printf("=== Imported %d primaries from %d buffered events\n", fNtracksInit, fNactiveMax);
     printf("=== Buffering %d baskets of size %d feeding %d threads\n", fNbasketsInit, basket_size, nthreads);
-    if (fNbasketsInit < nthreads || fNactiveMax < nthreads) {
-      if (fNbasketsInit < nthreads)
-        printf("### \e[5mWARNING!    Concurrency settings are not optimal. Not enough baskets to feed all threads.\e[m\n###\n");
-      if (fNactiveMax < nthreads)
-        printf("### \e[5mWARNING!    Increase number of buffered events to minimum %d\e[m\n###\n", nthreads);
+    if (fNbasketsInit < nthreads) {
+      printf("### \e[5mWARNING!    Concurrency settings are not optimal. Not enough baskets to feed all threads.\e[m\n###\n");
       printf("###                          Rule of thumb:\n");
       printf("###  ==================================================================\n");
       printf("### ||  Nbuff_events * Nprimaries_per_event > Nthreads * basket_size  ||\n");
@@ -357,21 +301,21 @@ GeantEvent *GeantEventServer::ActivateEvent(GeantEvent *event, unsigned int &err
 
   // Move old event from slot to queue of empty events
   if (fEvents[slot]) {
-    fDoneEvents.enqueue(fEvents[slot]);
+    fEmptyEvents.enqueue(fEvents[slot]);
     fEvents[slot] = nullptr;
   }
-
+  
   // Get a new generated event from pending queue
   if (!fPendingEvents.dequeue(fEvents[slot])) {
     fFreeSlots.enqueue(slot);
     error = kCEvents;
     return nullptr;
   }
-
+  
   // Pre-activate slot and event number
   fEvents[slot]->SetSlot(slot);
   int nactive = fNactive.fetch_add(1) + 1;
-  //fEvents[slot]->SetEvent(nactive - 1);
+  fEvents[slot]->SetEvent(nactive - 1);
   
   
   // Try to replace the active event with the new one
@@ -386,7 +330,7 @@ GeantEvent *GeantEventServer::ActivateEvent(GeantEvent *event, unsigned int &err
     error = kNoerr;
     return event;
   }
-
+  
   // Check if all events were served
   if (fRunMgr->GetConfig()->fRunMode == GeantConfig::kGenerator) {
     if (nactive == fNevents) fEventsServed = true;
@@ -404,7 +348,7 @@ void GeantEventServer::CompletedEvent(GeantEvent *event, GeantTaskData *td)
 // Signals that event 'evt' was fully transported.
   size_t slot = event->GetSlot();
   fNcompleted++;
-
+  
   assert(event->Transported());
   assert(event == fEvents[slot]);
 
@@ -420,7 +364,7 @@ void GeantEventServer::CompletedEvent(GeantEvent *event, GeantTaskData *td)
 }
 
 //______________________________________________________________________________
-GeantTrack *GeantEventServer::GetNextTrack(GeantTaskData *td, unsigned int &error)
+GeantTrack *GeantEventServer::GetNextTrack(unsigned int &error)
 {
 // Fetch next track of the current event. Increments current event if no more
 // tracks. If current event matches last activated one, resets fHasTracks flag.

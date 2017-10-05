@@ -72,7 +72,7 @@ private:
   int  fBindex = 0;                    /** Basket manager index */
   queue_slots fFreeSlots;              /** Queue of free event slots */
   queue_events fPendingEvents;         /** Queue of pending events */
-  queue_events fDoneEvents;            /** Queue of transported events */
+  queue_events fEmptyEvents;           /** Queue of empty events */
 
 protected:
   GeantTrack *GetNextTrack(GeantTaskData *td, unsigned int &error);
@@ -151,7 +151,7 @@ public:
   /** @brief Add one event to the server */
   bool AddEvent(GeantEvent *event);
 
-  GeantEvent *GenerateNewEvent(GeantEvent *event, GeantTaskData *td);
+  GeantEvent *GenerateNewEvent(GeantTaskData *td, unsigned int &error);
   
   GeantEvent *ActivateEvent(GeantEvent *expected, unsigned int &error);
   
