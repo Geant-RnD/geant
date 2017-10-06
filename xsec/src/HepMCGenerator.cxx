@@ -152,7 +152,7 @@ void HepMCGenerator::GetTrack(int n, Geant::GeantTrack &gtrack, Geant::GeantTask
 
     gtrack.SetGVcode(TPartIndex::I()->PartIndex(gtrack.PDG()));
 #ifdef USE_VECGEOM_NAVIGATOR
-    const Particle_t *const &part = &Particle_t::GetParticle(gtrack.PDG());
+    const Particle_t *const &part = &Particle_t::GetParticle(gtrack.fPDG);
     gtrack.SetCharge(part->Charge());
 #else
     TParticlePDG *part = TDatabasePDG::Instance()->GetParticle(gtrack.PDG());

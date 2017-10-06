@@ -951,18 +951,30 @@ int TTabPhysMgr::SampleFinalStates(int imat, int ntracks, GeantTrack_v &tracks, 
 #ifndef USE_VECGEOM_NAVIGATOR
 	        track.SetCharge(track.Charge()/3.);
 #endif
-          track.SetStatus(kNew);           // status of this particle
-          track.SetMass(secMass);          // mass of this particle
-          track.SetPosition(tracks.fXposV[t], tracks.fYposV[t], tracks.fZposV[t]);
-          track.SetDirection(px / secPtot, py / secPtot, pz / secPtot);
-          track.SetP(secPtot);             // momentum of this particle
-          track.SetE(secEtot);             // total E of this particle
-          track.SetTime(tracks.fTimeV[t]); // global time
-          track.SetSafety(tracks.fSafetyV[t]);
-          track.SetBoundary(tracks.fBoundaryV[t]);
+          track.fProcess = 0;
+          track.fNsteps = 0;
+          //          track.fSpecies  = 0;
+          track.fStatus = kNew;           // status of this particle
+          track.fMass = secMass;          // mass of this particle
+          track.fXpos = tracks.fXposV[t]; // rx of this particle (same as parent)
+          track.fYpos = tracks.fYposV[t]; // ry of this particle (same as parent)
+          track.fZpos = tracks.fZposV[t]; // rz of this particle (same as parent)
+          track.fXdir = px / secPtot;     // dirx of this particle (before transform.)
+          track.fYdir = py / secPtot;     // diry of this particle before transform.)
+          track.fZdir = pz / secPtot;     // dirz of this particle before transform.)
+          track.fP = secPtot;             // momentum of this particle
+          track.fE = secEtot;             // total E of this particle
+          track.fTime = tracks.fTimeV[t]; // global time
+          track.fEdep = 0.;
+          track.fPstep = 0.;
+          track.fStep = 0.;
+          track.fSnext = 0.;
+          track.fSafety = tracks.fSafetyV[t];
+          track.fBoundary = tracks.fBoundaryV[t];
+          track.fPending = false;
           track.SetPath(tracks.fPathV[t]);
           track.SetNextPath(tracks.fPathV[t]);
-          track.SetMother(tracks.fParticleV[t]);
+          track.fMother = tracks.fParticleV[t];
 
           // Rotate new track to parent track's frame
           RotateNewTrack(oldXdir, oldYdir, oldZdir, track);
@@ -1189,19 +1201,28 @@ int TTabPhysMgr::SampleFinalStates(GeantTrack *track, TrackVec_t &output, GeantT
 #endif
         track1.SetGeneration(track->GetGeneration() + 1);
         //          track1.fSpecies  = 0;
-        track1.SetStatus(kNew);           // status of this particle
-        track1.SetStage(int(kPreStepStage));
-        track1.SetMass(secMass);          // mass of this particle
-        track1.SetPosition(track->X(), track->Y(), track->Z());
-        track1.SetDirection(px / secPtot, py / secPtot, pz / secPtot);
-        track1.SetP(secPtot);             // momentum of this particle
-        track1.SetE(secEtot);             // total E of this particle
-        track1.SetTime(track->Time()); // global time
-        track1.SetSafety(track->GetSafety());
-        track1.SetBoundary(track->Boundary());
-        track1.SetPath(track->Path());
-        track1.SetNextPath(track->Path());
-	      track1.SetMother(track->Particle());
+        track1.fStatus = kNew;           // status of this particle
+        track1.fStage = int(kPreStepStage);
+        track1.fMass = secMass;          // mass of this particle
+        track1.fXpos = track->fXpos; // rx of this particle (same as parent)
+        track1.fYpos = track->fYpos; // ry of this particle (same as parent)
+        track1.fZpos = track->fZpos; // rz of this particle (same as parent)
+        track1.fXdir = px / secPtot;     // dirx of this particle (before transform.)
+        track1.fYdir = py / secPtot;     // diry of this particle before transform.)
+        track1.fZdir = pz / secPtot;     // dirz of this particle before transform.)
+        track1.fP = secPtot;             // momentum of this particle
+        track1.fE = secEtot;             // total E of this particle
+        track1.fTime = track->fTime; // global time
+        track1.fEdep = 0.;
+        track1.fPstep = 0.;
+        track1.fStep = 0.;
+        track1.fSnext = 0.;
+        track1.fSafety = track->fSafety;
+        track1.fBoundary = track->fBoundary;
+        track1.fPending = false;
+        track1.SetPath(track->GetPath());
+        track1.SetNextPath(track->GetPath());
+	      track1.fMother = track->fParticle;
 
         // Rotate new track to parent track's frame
         RotateNewTrack(oldXdir, oldYdir, oldZdir, track1);
@@ -1304,19 +1325,35 @@ void TTabPhysMgr::GetRestFinStates(int partindex, TMXsec *mxs, double energyLimi
       // 1. gamma
       GeantTrack &track1 = td->GetNewTrack();
       // set the new track properties: 2 gamma with m_{e}*c*c
-      track1.SetEvent(tracks.fEventV[iintrack]);
-      track1.SetEvslot(tracks.fEvslotV[iintrack]);
-      track1.SetPDG(22);                                    // gamma PDG code
-      track1.SetGVcode(TPartIndex::I()->GetSpecGVIndex(2)); // gamma GV index
-      track1.SetStatus(kNew);                  // status of this particle
-      track1.SetStage(int(kPreStepStage));
-      track1.SetPosition(tracks.fXposV[iintrack], tracks.fYposV[iintrack], tracks.fZposV[iintrack]);
-      track1.SetDirection(randDirX, randDirY, randDirZ);
-      track1.SetP(mecc);                       // momentum of this particle
-      track1.SetE(mecc);                       // total E of this particle
-      track1.SetTime(tracks.fTimeV[iintrack]); // total time of this particle
-      track1.SetSafety(tracks.fSafetyV[iintrack]);
-      track1.SetBoundary(tracks.fBoundaryV[iintrack]);
+      track1.fEvent = tracks.fEventV[iintrack];
+      track1.fEvslot = tracks.fEvslotV[iintrack];
+      //       track.fParticle = nTotSecPart;          //index of this particle
+      track1.fPDG = 22;                                    // gamma PDG code
+      track1.fGVcode = TPartIndex::I()->GetSpecGVIndex(2); // gamma GV index
+      track1.fEindex = 0;
+      track1.fCharge = 0.; // charge
+      track1.fProcess = 0;
+      track1.fNsteps = 0;
+      //       track.fSpecies  = 0;
+      track1.fStatus = kNew;                  // status of this particle
+      track1.fStage = int(kPreStepStage);
+      track1.fMass = 0.;                      // mass of this particle
+      track1.fXpos = tracks.fXposV[iintrack]; // rx of this particle (same as parent)
+      track1.fYpos = tracks.fYposV[iintrack]; // ry of this particle (same as parent)
+      track1.fZpos = tracks.fZposV[iintrack]; // rz of this particle (same as parent)
+      track1.fXdir = randDirX;
+      track1.fYdir = randDirY;
+      track1.fZdir = randDirZ;
+      track1.fP = mecc;                       // momentum of this particle
+      track1.fE = mecc;                       // total E of this particle
+      track1.fTime = tracks.fTimeV[iintrack]; // total time of this particle
+      track1.fEdep = 0.;
+      track1.fPstep = 0.;
+      track1.fStep = 0.;
+      track1.fSnext = 0.;
+      track1.fSafety = tracks.fSafetyV[iintrack];
+      track1.fBoundary = tracks.fBoundaryV[iintrack];
+      track1.fPending = false;
       track1.SetPath(tracks.fPathV[iintrack]);
       track1.SetNextPath(tracks.fPathV[iintrack]);
 
@@ -1415,15 +1452,27 @@ void TTabPhysMgr::GetRestFinStates(int partindex, TMXsec *mxs, double energyLimi
 #ifndef USE_VECGEOM_NAVIGATOR
       track.SetCharge(track.Charge()/3.);
 #endif
-      track.SetStatus(kNew);                  // status of this particle
-      track.SetMass(secMass);                 // mass of this particle
-      track.SetPosition(tracks.fXposV[iintrack], tracks.fYposV[iintrack], tracks.fZposV[iintrack]);
-      track.SetDirection(px / secPtot, py / secPtot, pz / secPtot);
-      track.SetP(secPtot);                    // momentum of this particle
-      track.SetE(secEtot);                    // total E of this particle
-      track.SetTime(tracks.fTimeV[iintrack]); // global time for this particle
-      track.SetSafety(tracks.fSafetyV[iintrack]);
-      track.SetBoundary(tracks.fBoundaryV[iintrack]);
+      track.fProcess = 0;
+      track.fNsteps = 0;
+      //       track.fSpecies  = 0;
+      track.fStatus = kNew;                  // status of this particle
+      track.fMass = secMass;                 // mass of this particle
+      track.fXpos = tracks.fXposV[iintrack]; // rx of this particle (same as parent)
+      track.fYpos = tracks.fYposV[iintrack]; // ry of this particle (same as parent)
+      track.fZpos = tracks.fZposV[iintrack]; // rz of this particle (same as parent)
+      track.fXdir = px / secPtot;            // dirx of this particle (before transform.)
+      track.fYdir = py / secPtot;            // diry of this particle before transform.)
+      track.fZdir = pz / secPtot;            // dirz of this particle before transform.)
+      track.fP = secPtot;                    // momentum of this particle
+      track.fE = secEtot;                    // total E of this particle
+      track.fTime = tracks.fTimeV[iintrack]; // global time for this particle
+      track.fEdep = 0.;
+      track.fPstep = 0.;
+      track.fStep = 0.;
+      track.fSnext = 0.;
+      track.fSafety = tracks.fSafetyV[iintrack];
+      track.fBoundary = tracks.fBoundaryV[iintrack];
+      track.fPending = false;
       track.SetPath(tracks.fPathV[iintrack]);
       track.SetNextPath(tracks.fPathV[iintrack]);
 
@@ -1484,22 +1533,38 @@ void TTabPhysMgr::GetRestFinStates(int partindex, TMXsec *mxs, double energyLimi
     // 1. gamma
     GeantTrack &track1 = td->GetNewTrack();
     // set the new track properties: 2 gamma with m_{e}*c*c
-    track1.SetEvent(track->Event());
-    track1.SetEvslot(track->EventSlot());
-    track1.SetPDG(22);                                    // gamma PDG code
-    track1.SetGVcode(TPartIndex::I()->GetSpecGVIndex(2)); // gamma GV index
-    track1.SetGeneration(track->GetGeneration() + 1);
-    track1.SetStatus(kNew);                  // status of this particle
-    track1.SetStage(int(kPreStepStage));
-    track1.SetPosition(track->X(), track->Y(), track->Z());
-    track1.SetDirection(randDirX, randDirY, randDirZ);
-    track1.SetP(mecc);                       // momentum of this particle
-    track1.SetE(mecc);                       // total E of this particle
-    track1.SetTime(track->Time()); // total time of this particle
-    track1.SetSafety(track->GetSafety());
-    track1.SetBoundary(track->Boundary());
-    track1.SetPath(track->Path());
-    track1.SetNextPath(track->Path());
+    track1.fEvent = track->fEvent;
+    track1.fEvslot = track->fEvslot;
+    //       track1.fParticle = nTotSecPart;          //index of this particle
+    track1.fPDG = 22;                                    // gamma PDG code
+    track1.fGVcode = TPartIndex::I()->GetSpecGVIndex(2); // gamma GV index
+    track1.fEindex = 0;
+    track1.fCharge = 0.; // charge
+    track1.fProcess = 0;
+    track1.fNsteps = 0;
+    track1.fGeneration = track->fGeneration + 1;
+    //       track.fSpecies  = 0;
+    track1.fStatus = kNew;                  // status of this particle
+    track1.fStage = int(kPreStepStage);
+    track1.fMass = 0.;                      // mass of this particle
+    track1.fXpos = track->fXpos; // rx of this particle (same as parent)
+    track1.fYpos = track->fYpos; // ry of this particle (same as parent)
+    track1.fZpos = track->fZpos; // rz of this particle (same as parent)
+    track1.fXdir = randDirX;
+    track1.fYdir = randDirY;
+    track1.fZdir = randDirZ;
+    track1.fP = mecc;                       // momentum of this particle
+    track1.fE = mecc;                       // total E of this particle
+    track1.fTime = track->fTime; // total time of this particle
+    track1.fEdep = 0.;
+    track1.fPstep = 0.;
+    track1.fStep = 0.;
+    track1.fSnext = 0.;
+    track1.fSafety = track->fSafety;
+    track1.fBoundary = track->fBoundary;
+    track1.fPending = false;
+    track1.SetPath(track->GetPath());
+    track1.SetNextPath(track->GetPath());
 
     td->fPropagator->AddTrack(track1);
     output.push_back(&track1);
@@ -1595,19 +1660,31 @@ void TTabPhysMgr::GetRestFinStates(int partindex, TMXsec *mxs, double energyLimi
 #ifndef USE_VECGEOM_NAVIGATOR
       track3.SetCharge(track3.Charge()/3.);
 #endif
-      track3.SetGeneration(track->GetGeneration() + 1);
-      track3.SetStatus(kNew);                  // status of this particle
-      track3.SetStage(int(kPreStepStage));
-      track3.SetMass(secMass);                 // mass of this particle
-      track3.SetPosition(track->X(), track->Y(), track->Z());
-      track3.SetDirection(px / secPtot, py / secPtot, pz / secPtot);
-      track3.SetP(secPtot);                    // momentum of this particle
-      track3.SetE(secEtot);                    // total E of this particle
-      track3.SetTime(track->Time()); // global time for this particle
-      track3.SetSafety(track->GetSafety());
-      track3.SetBoundary(track->Boundary());
-      track3.SetPath(track->Path());
-      track3.SetNextPath(track->Path());
+      track3.fProcess = 0;
+      track3.fNsteps = 0;
+      track3.fGeneration = track->fGeneration + 1;
+      //       track.fSpecies  = 0;
+      track3.fStatus = kNew;                  // status of this particle
+      track3.fStage = int(kPreStepStage);
+      track3.fMass = secMass;                 // mass of this particle
+      track3.fXpos = track->fXpos; // rx of this particle (same as parent)
+      track3.fYpos = track->fYpos; // ry of this particle (same as parent)
+      track3.fZpos = track->fZpos; // rz of this particle (same as parent)
+      track3.fXdir = px / secPtot;            // dirx of this particle (before transform.)
+      track3.fYdir = py / secPtot;            // diry of this particle before transform.)
+      track3.fZdir = pz / secPtot;            // dirz of this particle before transform.)
+      track3.fP = secPtot;                    // momentum of this particle
+      track3.fE = secEtot;                    // total E of this particle
+      track3.fTime = track->fTime; // global time for this particle
+      track3.fEdep = 0.;
+      track3.fPstep = 0.;
+      track3.fStep = 0.;
+      track3.fSnext = 0.;
+      track3.fSafety = track->fSafety;
+      track3.fBoundary = track->fBoundary;
+      track3.fPending = false;
+      track3.SetPath(track->GetPath());
+      track3.SetNextPath(track->GetPath());
 
       // rotate at-rest secondary by a common random theta and random phi
       RotateNewTrack(randDirX, randDirY, randDirZ, track3);
@@ -1698,15 +1775,27 @@ void TTabPhysMgr::SampleDecayInFlight(int partindex, TMXsec *mxs, double energyL
 #ifndef USE_VECGEOM_NAVIGATOR
 	      track.SetCharge(track.Charge()/3.);
 #endif
-        track.SetStatus(kNew);                  // status of this particle
-        track.SetMass(secMass);                 // mass of this particle
-        track.SetPosition(tracks.fXposV[iintrack], tracks.fYposV[iintrack], tracks.fZposV[iintrack]);
-        track.SetDirection(px / secPtot, py / secPtot, pz / secPtot);
-        track.SetP(secPtot);                    // momentum of this particle
-        track.SetE(secEtot);                    // total E of this particle
-        track.SetTime(tracks.fTimeV[iintrack]); // global time for this track
-        track.SetSafety(tracks.fSafetyV[iintrack]);
-        track.SetBoundary(tracks.fBoundaryV[iintrack]);
+        track.fProcess = -1;
+        track.fNsteps = 0;
+        //         track.fSpecies  = 0;
+        track.fStatus = kNew;                  // status of this particle
+        track.fMass = secMass;                 // mass of this particle
+        track.fXpos = tracks.fXposV[iintrack]; // rx of this particle (same as parent)
+        track.fYpos = tracks.fYposV[iintrack]; // ry of this particle (same as parent)
+        track.fZpos = tracks.fZposV[iintrack]; // rz of this particle (same as parent)
+        track.fXdir = px / secPtot;            // dirx of this particle (before transform.)
+        track.fYdir = py / secPtot;            // diry of this particle before transform.)
+        track.fZdir = pz / secPtot;            // dirz of this particle before transform.)
+        track.fP = secPtot;                    // momentum of this particle
+        track.fE = secEtot;                    // total E of this particle
+        track.fTime = tracks.fTimeV[iintrack]; // global time for this track
+        track.fEdep = 0.;
+        track.fPstep = 0.;
+        track.fStep = 0.;
+        track.fSnext = 0.;
+        track.fSafety = tracks.fSafetyV[iintrack];
+        track.fBoundary = tracks.fBoundaryV[iintrack];
+        track.fPending = false;
         track.SetPath(tracks.fPathV[iintrack]);
         track.SetNextPath(tracks.fPathV[iintrack]);
 
@@ -1798,19 +1887,31 @@ void TTabPhysMgr::SampleDecayInFlight(int partindex, TMXsec *mxs, double energyL
 #ifndef USE_VECGEOM_NAVIGATOR
 	      track1.SetCharge(track1.Charge()/3.);
 #endif
-        track1.SetGeneration(track->GetGeneration() + 1);
-        track1.SetStatus(kNew);                  // status of this particle
-        track1.SetStage(int(kPreStepStage));
-        track1.SetMass(secMass);                 // mass of this particle
-        track1.SetPosition(track->X(), track->Y(), track->Z());
-        track1.SetDirection(px / secPtot, py / secPtot, pz / secPtot);
-        track1.SetP(secPtot);                    // momentum of this particle
-        track1.SetE(secEtot);                    // total E of this particle
-        track1.SetTime(track->Time()); // global time for this track
-        track1.SetSafety(track->GetSafety());
-        track1.SetBoundary(track->Boundary());
-        track1.SetPath(track->Path());
-        track1.SetNextPath(track->Path());
+        track1.fProcess = -1;
+        track1.fNsteps = 0;
+        track1.fGeneration = track->fGeneration + 1;
+        //         track.fSpecies  = 0;
+        track1.fStatus = kNew;                  // status of this particle
+        track1.fStage = int(kPreStepStage);
+        track1.fMass = secMass;                 // mass of this particle
+        track1.fXpos = track->fXpos; // rx of this particle (same as parent)
+        track1.fYpos = track->fYpos; // ry of this particle (same as parent)
+        track1.fZpos = track->fZpos; // rz of this particle (same as parent)
+        track1.fXdir = px / secPtot;            // dirx of this particle (before transform.)
+        track1.fYdir = py / secPtot;            // diry of this particle before transform.)
+        track1.fZdir = pz / secPtot;            // dirz of this particle before transform.)
+        track1.fP = secPtot;                    // momentum of this particle
+        track1.fE = secEtot;                    // total E of this particle
+        track1.fTime = track->fTime; // global time for this track
+        track1.fEdep = 0.;
+        track1.fPstep = 0.;
+        track1.fStep = 0.;
+        track1.fSnext = 0.;
+        track1.fSafety = track->fSafety;
+        track1.fBoundary = track->fBoundary;
+        track1.fPending = false;
+        track1.SetPath(track->GetPath());
+        track1.SetNextPath(track->GetPath());
 
         td->fPropagator->AddTrack(track1);
         output.push_back(&track1);
