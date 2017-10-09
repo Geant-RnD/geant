@@ -400,9 +400,17 @@ void WorkloadManager::TransportTracksV3(GeantPropagator *prop) {
   } else {
     Geant::Print("","=== Worker thread %d created for propagator %p ===", tid, prop);
   }
+  td->fBvector = prop->fConfig->fUseNuma ? new Basket(256, 0, node) : new Basket(256, 0);
+  for (int i=0; i<=int(kSteppingActionsStage); ++i)
+    td->fStageBuffers.push_back(prop->fConfig->fUseNuma ? new Basket(1000, 0, node) : new Basket(1000, 0));
+  td->fStackBuffer = new StackLikeBuffer(propagator->fConfig->fNstackLanes, td);
+  td->fStackBuffer->SetStageBuffer(td->fStageBuffers[0]);
 
+//  int nworkers = propagator->fNthreads;
+//  WorkloadManager *wm = propagator->fWMgr;
   GeantEventServer *evserv = runmgr->GetEventServer();
-
+//  bool firstTime = true;
+//  bool multiPropagator = runmgr->GetNpropagators() > 1;
   // IO handling
   #ifdef USE_ROOT
   bool concurrentWrite = prop->fConfig->fConcurrentWrite && prop->fConfig->fFillTree;
@@ -441,7 +449,7 @@ void WorkloadManager::TransportTracksV3(GeantPropagator *prop) {
     auto feedres = PreloadTracksForStep(td); 
     if (feedres == FeederResult::kStop) break;
     if (flush) {
-      if ((feedres == FeederResult::kNone) | (feedres == FeederResult::kError)) {
+      if (feedres == FeederResult::kError) {
         if (!evserv->EventsServed())
           Geant::Warning("","=== Task %d exited due to missing workload", tid);
         break;
