@@ -399,12 +399,7 @@ public:
   GEANT_FORCE_INLINE
   double Dx() const { return fXdir; }
 
-  /** @brief Getter for the Y direction value */
-  VECCORE_ATT_HOST_DEVICE
-  GEANT_FORCE_INLINE
-  double Dy() const { return fYdir; }
-
-  /** @brief Getter for the Z direction value */
+  /** @brief Function that return number of physical step made */
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
   double Dz() const { return fZdir; }

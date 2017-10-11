@@ -72,6 +72,9 @@ public:
   /** @brief User FinishRun function */
   virtual void FinishRun() {}
 
+  /** @brief User FinishRun function */
+  virtual void FinishRun() {}
+
   /** @brief Begin new track(s). */
   virtual void BeginTrack(GeantTrack &/*track*/, GeantTaskData */*td*/) {}
   virtual void BeginTrack(TrackVec_t &/*tracks*/, GeantTaskData */*td*/);

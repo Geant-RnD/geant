@@ -64,7 +64,11 @@ extern VECCORE_ATT_DEVICE TPartIndex *fgPartIndexDev;
 extern TPartIndex *fgPartIndexHost;
 #endif
 
+#if defined(USE_VECGEOM_NAVIGATOR)
 typedef geant::ParticleOld Particle_t;
+#else
+typedef TParticlePDG Particle_t;
+#endif
 
 class TPartIndex {
 public:

@@ -93,7 +93,7 @@ public:
   virtual void SteppingActions(GeantTrack &/*track*/, GeantTaskData */*td*/);
 
   /** @brief  User FinishEvent function.*/
-  virtual void FinishEvent(GeantEvent *event);
+  virtual void FinishEvent(int evt, int slot);
 
   /** @brief User FinishRun function */
   virtual void FinishRun() {}
