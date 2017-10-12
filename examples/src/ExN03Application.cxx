@@ -127,7 +127,7 @@ void ExN03Application::FinishEvent(int evt, int slot) {
   // Merge the digits for the event
   ExN03ScoringData *digits = fRunMgr->GetTDManager()->MergeUserData(event->GetSlot(), *fDigitsHandle);
   if (digits) {
-    printf("=== Merged digits for event %d\n", evt);
+    printf("=== Merged digits for event %d\n", event->GetEvent());
     //digits->PrintDigits(event);
     digits->Clear(slot);
   }
