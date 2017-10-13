@@ -33,9 +33,9 @@ inline namespace GEANT_IMPL_NAMESPACE {
 using namespace vecgeom;
 
 //______________________________________________________________________________
-GeantEventServer::GeantEventServer(int event_capacity, GeantRunManager *runmgr)
-  :fNevents(event_capacity), fNactive(0), fNserved(0), fLastActive(-1), fCurrentEvent(0),
-   fNload(0), fNstored(0), fNcompleted(0), fRunMgr(runmgr),
+GeantEventServer::GeantEventServer(int nactive_max, GeantRunManager *runmgr)
+  :fNevents(0), fNactiveMax(nactive_max), fNactive(0), fNserved(0), fLastActive(-1), fCurrentEvent(0),
+   fNload(0), fNstored(0), fNcompleted(0), fEvent(nullptr), fRunMgr(runmgr),
    fFreeSlots(AdjustSize(runmgr->GetConfig()->fNbuff)), fPendingEvents(4096), fDoneEvents(4096)
 {
 // Constructor
