@@ -20,6 +20,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/HAD/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
   )
 
 #----------------------------------------------------------------------------------------------
@@ -28,7 +29,7 @@ include_directories(
 # add the clear model-level version of the test
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/testRP/elasticTest/GeantV)
 add_executable(elasticTest_GV ${CMAKE_SOURCE_DIR}/testRP/GeantV/elasticTest/elasticTest_GV.cc ${sources})
-target_link_libraries(elasticTest_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Geant_v)
+target_link_libraries(elasticTest_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Geant_v Nudy)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX

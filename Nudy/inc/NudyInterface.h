@@ -19,6 +19,8 @@
 
 #include "SystemOfUnits.h"
 #include "PhysicalConstants.h"
+#include "HadronicProcess.h"
+
 
 #ifdef USE_ROOT
 #include "TNudyDB.h"
@@ -87,6 +89,9 @@ using NudyPhysics::TNudyEndfSigma;
 namespace geantphysics {
   class LightTrack;
   class HadronicCrossSection;
+  class HadronicProcess;
+//  class HadronicProcessType;
+
   // class HadronicProcess;
   inline namespace GEANT_IMPL_NAMESPACE {
     class Isotope;
@@ -96,32 +101,34 @@ namespace geantphysics {
 }
 
 namespace NudyPhysics{
-  class NudyInterface {
 
+  class NudyInterface {
   public:
-    NudyInterface () ;  
+    NudyInterface () ;
     NudyInterface( const int projCode, const double projKE, const double temp, const std::string isoName,
-      const int tZ, const int tN );
+      const int tZ, const int tA, geantphysics::HadronicProcessType  processType );
     virtual ~NudyInterface ();
 
-    std::vector<double> GetXS( int projCode, double projKE, double temp, std::string isoName, int tZ, int tN ) ;
-    std::string  SetDataFileNameENDF( int projCode, std::string isoName, double projKE, int tZ, int tN );
-    std::string findENDFFileName( std::string ele, int tZ, int tN ) ;
+  public:
+    double GetXS( int projCode, double projKE, double temp, std::string isoName,
+      int tZ, int tA, geantphysics::HadronicProcessType pType
+    ) ;
+    std::string  SetDataFileNameENDF( int projCode, std::string isoName, double projKE, int tZ, int tA );
+    std::string findENDFFileName( std::string ele, int tZ, int tA ) ;
     std::string GetDataFileName( std::string str1, std::string str2 ); // projID, isoName
     std::string FixRootDataFile( std::string str1 );                   // ENDF filename without path and extension
-    std::string SetDataFileNameROOT( std::string isoName, int tZ, int tN );
-    std::string SetDataFileNameENDFSUB( std::string isoName, int tZ, int tN );
+    std::string SetDataFileNameROOT( std::string isoName, int tZ, int tA );
+    std::string SetDataFileNameENDFSUB( std::string isoName, int tZ, int tA );
     std::string GetCWD();
-    void SetProjIDFn( int projCode, double projKE, unsigned int channel);
-    void ComputeCrossSection(  unsigned int channel );
-    void InitializeXSChannel();
     bool GetFisCha(int inKey);
-
+    void SetProjIDFn( int projCode, double projKE);
+    double ComputeCrossSection( );
+    void SetMTValues(geantphysics::HadronicProcessType pType);
   public:
     inline std::string GetIsotopeName ();
     inline int GetProjectileCode ();
     inline int GetZ ();
-    inline int GetN ();
+    inline int GetA ();
     inline double GetProjectileKE ();
     inline double GetTemp();
     inline double GetCrossSection ();
@@ -132,8 +139,7 @@ namespace NudyPhysics{
     inline void SetIsotopeName (const std::string &isoName );
     inline void SetProjectileCode ( const int projCode );
     inline void SetZ ( const int tZValue );
-    inline void SetN ( const int tNValue ) ;
-    inline void SetA ( const int tNvalue, const int tZvalue );
+    inline void SetA ( const int tAvalue );
     inline void SetProjectileKE ( const double projKE );
     inline void SetTemp ( const double temp );
     inline void SetCrossSection ( const double XSvalue );
@@ -143,13 +149,16 @@ namespace NudyPhysics{
     inline void SetIsFissKey( const bool theKey);
     inline void SetProjID (const std::string &theID);
     inline void AppendXS ( const double xsvalue );
+    inline void SetProcessType ( const geantphysics::HadronicProcessType ptype );
+
 
   private :
     unsigned int fNumberOfReactionChannels = 895;
+    geantphysics::HadronicProcessType fProcType;
     std::string fIsoName;
+    unsigned int fMTValue;
     int fProjCode;
     int ftZ;
-    int ftN;
     int ftA;
     double fProjKE;
     double fTemperature;
@@ -169,7 +178,7 @@ namespace NudyPhysics{
   inline std::string NudyInterface::GetIsotopeName () { return fIsoName; }
   inline int NudyInterface::GetProjectileCode () { return fProjCode; }
   inline int NudyInterface::GetZ () { return ftZ; }
-  inline int NudyInterface::GetN () { return ftN; }
+  inline int NudyInterface::GetA () { return ftA; }
   inline double NudyInterface::GetProjectileKE () { return fProjKE; }
   inline double NudyInterface::GetTemp () { return fTemperature; }
   inline bool NudyInterface::GetIsFissKey() { return fIsFiss; }
@@ -180,8 +189,7 @@ namespace NudyPhysics{
   inline void NudyInterface::SetIsotopeName ( const std::string &isoName ) { fIsoName = isoName; }
   inline void NudyInterface::SetProjectileCode ( const int projCode ) { fProjCode = projCode; }
   inline void NudyInterface::SetZ ( const int tZValue ) { ftZ = tZValue; }
-  inline void NudyInterface::SetN ( const int tNValue ) { ftN = tNValue; }
-  inline void NudyInterface::SetA ( const int tNvalue, const int tZvalue ) { ftA = tNvalue + tZvalue; }
+  inline void NudyInterface::SetA ( const int tAvalue ) { ftA = tAvalue; }
   inline void NudyInterface::SetProjectileKE ( const double projKE ) { fProjKE = projKE; }
   inline void NudyInterface::SetTemp (const double temp ) { fTemperature = temp; }
   inline void NudyInterface::SetCrossSection ( const double XSvalue ) { fXS = XSvalue; }
@@ -191,7 +199,7 @@ namespace NudyPhysics{
   inline void NudyInterface::SetIsFissKey( const bool theKey ) { fIsFiss = theKey; }
   inline void NudyInterface::SetProjID (const std::string &theID ) { fProjID = theID; }
   inline void NudyInterface::AppendXS ( const double xsvalue ) { fChannelFiss.push_back(xsvalue); }
-
+  inline void NudyInterface::SetProcessType ( const geantphysics::HadronicProcessType ptype ) { fProcType = ptype; }
  } // namespace NudyPhysics
 
 #endif

@@ -16,6 +16,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
   )
 
 #----------------------------------------------------------------------------------------------
@@ -25,7 +26,7 @@ set(OUTPUT bin/testRP/comptonTest/GeantV)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 add_executable(comptonTest_GV ${CMAKE_SOURCE_DIR}/testRP/GeantV/comptonTest/comptonTest_GV.cc ${sources})
-target_link_libraries(comptonTest_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Geant_v)
+target_link_libraries(comptonTest_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Geant_v Nudy)
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build/install directory.
