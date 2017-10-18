@@ -7,7 +7,8 @@
 // motion of a particle in a field.
 
 // History:
-// - Created. J.Apostolakis     Dec 2014/Jan 2015
+// - Created:  Ananya  January 2016
+//     ( based on GUVEquationOfMotion by J.Apostolakis )
 // -------------------------------------------------------------------
 
 #ifndef GUV_VectorEquationOfMotion_H

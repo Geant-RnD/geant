@@ -33,7 +33,7 @@ class GUVVectorMagneticField :  public GUVVectorField
     void  GetFieldValue( const Double_v  Point[4],     // The old interface
                                Double_v* Field );
     ****/
-    VECGEOM_CUDA_HEADER_BOTH
+    VECCORE_ATT_HOST_DEVICE
     virtual void GetFieldValue( vecgeom::Vector3D<double> const &Position,
                                 vecgeom::Vector3D<float>        &FieldValue ) = 0;
 

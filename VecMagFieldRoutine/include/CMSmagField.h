@@ -436,7 +436,7 @@ INLINE_CHOICE
 //Sidenote: For theta =0; xyzField = rzField. 
 //theta =0 corresponds to y=0
 
-void CMSmagField::GetFieldValue(const vecgeom::Vector3D<typename Backend::precision_v>      &pos, 
+void CMSmagField::GetFieldValue(const vecgeom::Vector3D<typename Backend::precision_v>      &pos,
                                       vecgeom::Vector3D<typename Backend::precision_v> &xyzField)
 {
 
@@ -465,7 +465,7 @@ void CMSmagField::GetFieldValue(const vecgeom::Vector3D<typename Backend::precis
 #else
     using vecCore::Mask_v;
     // using vecCore::Float_v;
-    Mask_v<float> nonZero = (cyl[0] != 0.0f ); // Float_v(0.0f) );     
+    Mask_v<Float_v> nonZero = (cyl[0] != 0.0f ); // Float_v(0.0f) );     
     Float_v rInv     = vecCore::Blend(nonZero, 1.0f / cyl[0],  Float_v(0.0f) );
     Float_v sinTheta = pos.y() * rInv;
     Float_v cosTheta = vecCore::Blend(nonZero, pos.x() * rInv, Float_v(1.0f) );
