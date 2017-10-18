@@ -41,4 +41,7 @@
 
 #pragma link C++ class NudyPhysics::NudyInterface+;
 
+#pragma link C++ class geantphysics::PhysicsProcess+;
+#pragma link C++ class geantphysics::HadronicProcess+;
+
 #endif

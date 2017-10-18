@@ -13,6 +13,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/HAD/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/HAD/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
   ${CMAKE_SOURCE_DIR}/material/inc
   ${CMAKE_SOURCE_DIR}/base/inc
   ${CMAKE_SOURCE_DIR}/vecprot_v2/inc
@@ -78,7 +79,7 @@ endif()
 #
 add_library(GeantExamplesRP SHARED ${sources})
 
-target_link_libraries(GeantExamplesRP -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Geant_v RealPhysics Material
+target_link_libraries(GeantExamplesRP -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Geant_v RealPhysics Nudy Material
   ${TBB_LIBRARIES})
 
 if (USE_ROOT)
@@ -89,7 +90,7 @@ if (KNC)
   target_link_libraries(GeantExamplesRP ${Vc_MIC_LIBRARIES})
 endif()
 
-add_dependencies(GeantExamplesRP Geant_v RealPhysics Material)
+add_dependencies(GeantExamplesRP Geant_v RealPhysics Nudy Material)
 add_custom_target(ExamplesRPlib DEPENDS GeantExamplesRP)
 
 #----------------------------------------------------------------------------------------------

@@ -115,8 +115,10 @@
 /********************
  * We try to resolve linking issue for Nudy
  ********************/
- #ifdef __CINT__
+#ifdef __CINT__
+#pragma link C++ class geantphysics::NudyCrossSection+;
+#pragma link C++ class geantphysics::NudyCrossSectionStore+;
+#pragma link C++ class geantphysics::NudyProcess+;
+#pragma link C++ class NudyPhysics::NudyInterface+;
 
- #pragma link C++ class NudyPhysics::NudyInterface;
-
- #endif
+#endif

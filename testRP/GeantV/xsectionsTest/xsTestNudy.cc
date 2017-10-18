@@ -23,7 +23,8 @@ using geantphysics::KaonMinus;
 
 using namespace Nudy;
 using NudyPhysics::NudyInterface;
-
+using geantphysics::HadronicProcess;
+using geantphysics::HadronicProcessType;
 
 int main(int /*argc*/, char** /*argv*/) {
 
@@ -38,14 +39,12 @@ int main(int /*argc*/, char** /*argv*/) {
 //  double nxSH; // thermal
 //  double nxValue;
 
-  std::vector<double> xsPerReactionChannel;
 
   int projectileCode = 2112; // example :: neutron ??
   std::string eleName =  "Pu"; // "Be"; //
   //std::string reactType = "Elastic" ; // "Fission"; // "Elastic, Inelastic, Total, Fission, Thermal......"
-  int Zvalue =  94; // 4; //
-  int Massvalue = 241; // 7;   //
-  int Nvalue = Massvalue - Zvalue;
+  int AtomicNumber  =  94; // 4; //
+  int MassNumber = 241; // 7;   //
   double temperature = 293.60608;
   /*  This is showing energy as 0.004 and not as 4.0E=6 and so
   for the time being I am testing using raw number.
@@ -53,18 +52,22 @@ int main(int /*argc*/, char** /*argv*/) {
   */
   double EnergyValue = 4.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
 
+  geantphysics::HadronicProcessType pType ;
+  pType = geantphysics::HadronicProcessType::kElastic;
+
 // @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
 // @brief Then we provide temperature which is required for fission etc.
 // @brief Then we provide element name like Pu , U etc. for which cross section is required
 // @brief Z for element name
-// @brief N for neutron number for the element.
+// @brief A for Mass number for the element.
 
 NudyPhysics::NudyInterface *nudyxs = new NudyPhysics::NudyInterface(
-  projectileCode, EnergyValue, temperature, eleName, Zvalue, Nvalue
+  projectileCode, EnergyValue, temperature, eleName, AtomicNumber, MassNumber, pType
 );
 
-xsPerReactionChannel = nudyxs->GetXS(projectileCode, EnergyValue, temperature, eleName, Zvalue, Nvalue);
+double xs = nudyxs->GetXS(projectileCode, EnergyValue, temperature, eleName, AtomicNumber, MassNumber, pType);
 
+std::cout << "cross section = " << xs << std::endl;
 
 /*
   double kinEnergy = 10.* geant::MeV;
