@@ -25,10 +25,12 @@
 // #include "GUVTypes.h"
 #include "GUVVectorEquationOfMotion.h"
 // class GUVVectorEquationOfMotion;
+#include <Geant/VectorTypes.h>
  
 class GUVVectorIntegrationStepper
 {
-    typedef typename vecgeom::kVc::precision_v Double_v;
+
+  using Double_v = Geant::Double_v;
 
   public:
         // GUVVectorIntegrationStepper();   // DELET
@@ -122,9 +124,9 @@ class GUVVectorIntegrationStepper
 // #include  "GUVVectorIntegrationStepper.icc"
 inline
 void GUVVectorIntegrationStepper::
-RightHandSideVIS( const  typename vecgeom::kVc::precision_v y[], 
-                         typename vecgeom::kVc::precision_v charge,
-                         typename vecgeom::kVc::precision_v dydx[] )
+RightHandSideVIS( const  Double_v y[], 
+                         Double_v charge,
+                         Double_v dydx[] )
 {
    fAbstrEquation-> RightHandSide(y, charge, dydx);
 }

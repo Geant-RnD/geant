@@ -34,9 +34,9 @@
 
 // #include <vector>
 
-#include "base/Global.h"     //  Defines Force_Inline, VectorBackend, .. 
-#include "backend/Backend.h"
-#include "base/Vector3D.h"
+#include <base/Global.h>     //  Defines Force_Inline, VectorBackend, .. 
+#include <base/Vector3D.h>
+#include <Geant/VectorTypes.h>
 // #include "base/SOA3D.h"
 
 // #include "GUVField.h"
@@ -50,15 +50,15 @@ VECCORE_DEVICE_DECLARE_CONV(class, GUVVectorField);
 inline namespace VECFIELD_IMPL_NAMESPACE {
 */
 
-// using VectorBackend = vecCore::backend::VcVector;
-// using VectorType = VectorBackend::double;
-
 class GUVVectorField //  : public GUVField
 {
    public:
-      using Double_v = vecgeom::VectorBackend::Double_v;
-      using Float_v  = vecgeom::VectorBackend::Float_v;
-      // using Vector3D = vecgeom::VectorBackend::Float_v;
+
+      using Double_v = Geant::Double_v;
+      using Float_v = Geant::Float_v;
+   
+      template <typename T>
+      using Vector3D = vecgeom::Vector3D<T>;
    
       inline
       GUVVectorField( int NumberOfComponents, bool changesEnergy );
@@ -67,18 +67,18 @@ class GUVVectorField //  : public GUVField
       virtual ~GUVVectorField();
 
       VECCORE_ATT_HOST_DEVICE
-      virtual void GetFieldValue( vecgeom::Vector3D<double> const &Position,
-                                  vecgeom::Vector3D<float>        &FieldValue ) = 0;
+      virtual void GetFieldValue( Vector3D<double> const &Position,
+                                  Vector3D<float>        &FieldValue ) = 0;
 
-      //Vector interface - chosen backend type (defined globally)
-      virtual void GetFieldValueSIMD( vecgeom::Vector3D<Double_v> const &Position,
-                                      vecgeom::Vector3D<Float_v>      &FieldValue ) = 0;
+      //Vector interface
+      virtual void GetFieldValueSIMD( Vector3D<Double_v> const &Position,
+                                      Vector3D<Float_v>      &FieldValue ) = 0;
 
       // a helper tramponline to dispatch to DistanceToOut if type is not scalar
       template <typename S, typename T>
       VECCORE_FORCE_INLINE
       VECCORE_ATT_HOST_DEVICE
-      void GetFieldValue(vecgeom::Vector3D<S> const &position, vecgeom::Vector3D<T> &fieldValue)
+      void GetFieldValue(Vector3D<S> const &position, Vector3D<T> &fieldValue)
       {
          return GetFieldValueSIMD(position, fieldValue);
       }

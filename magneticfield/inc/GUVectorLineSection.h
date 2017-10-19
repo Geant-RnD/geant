@@ -15,14 +15,15 @@
 
 
 #include <base/Vector3D.h> 
+#include <Geant/VectorTypes.h>
 
 
 class GUVectorLineSection
 {
   public:  // with description
 
-    typedef vecgeom::Vector3D<typename vecgeom::kVc::precision_v>  ThreeVectorSimd; 
-    typedef typename vecgeom::kVc::precision_v Double_v;
+    using Vector3D = vecgeom::Vector3D;
+    typedef Vector3D<Double_v>  ThreeVectorSimd; 
 
     inline GUVectorLineSection( const ThreeVectorSimd& PntA, 
                                 const ThreeVectorSimd& PntB );
@@ -52,28 +53,28 @@ GUVectorLineSection::GUVectorLineSection( const ThreeVectorSimd& PntA,
 }
 
 inline
-typename vecgeom::kVc::precision_v GUVectorLineSection::GetABdistanceSq() const
+Double_v GUVectorLineSection::GetABdistanceSq() const
 {
   return fABdistanceSq;
 }
 
 inline
-typename vecgeom::kVc::precision_v GUVectorLineSection::Distline
-              ( const vecgeom::Vector3D<typename vecgeom::kVc::precision_v> & OtherPnt, 
-                const vecgeom::Vector3D<typename vecgeom::kVc::precision_v> & LinePntA, 
-                const vecgeom::Vector3D<typename vecgeom::kVc::precision_v> & LinePntB )
+Double_v GUVectorLineSection::Distline
+              ( const ThreeVectorSimd& OtherPnt, 
+                const ThreeVectorSimd& LinePntA, 
+                const ThreeVectorSimd& LinePntB )
 {
   GUVectorLineSection LineAB( LinePntA, LinePntB );  // Line from A to B
   return LineAB.Dist( OtherPnt );
 }
 
 
-typename vecgeom::kVc::precision_v GUVectorLineSection::Dist
-             ( vecgeom::Vector3D<typename vecgeom::kVc::precision_v> OtherPnt ) const
+Double_v GUVectorLineSection::Dist
+             ( ThreeVectorSimd OtherPnt ) const
 {
-  typename vecgeom::kVc::precision_v  dist_sq;  
-  vecgeom::Vector3D<typename vecgeom::kVc::precision_v>  VecAZ;
-  typename vecgeom::kVc::precision_v sq_VecAZ, inner_prod, unit_projection(10.0) ; 
+  Double_v  dist_sq;  
+  ThreeVectorSimd  VecAZ;
+  Double_v sq_VecAZ, inner_prod, unit_projection(10.0) ; 
 
   VecAZ= OtherPnt - EndpointA;
   sq_VecAZ = VecAZ.Mag2();
@@ -119,6 +120,6 @@ typename vecgeom::kVc::precision_v GUVectorLineSection::Dist
 
   vecgeom::MaskedAssign( dist_sq < 0.0, 0.0, &dist_sq );
 
-  return Vc::sqrt(dist_sq) ;  
+  return vecCore::math::Sqrt(dist_sq) ;
 }
 #endif

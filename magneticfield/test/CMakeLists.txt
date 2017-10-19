@@ -98,6 +98,12 @@ add_custom_target(testMagEq DEPENDS testMagFieldEquation)
 #
 #install(TARGETS testFieldPropagator DESTINATION bin)
 install(TARGETS testMagFieldEquation DESTINATION bin)
+install(TARGETS testStepperFixedCashKarp DESTINATION bin)
+install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
+install(TARGETS testStepperFixed DESTINATION bin)
+install(TARGETS testIntegrationDriver DESTINATION bin)
+install(TARGETS testGUPropagateField DESTINATION bin)
+install(TARGETS testConstVecFieldStepper DESTINATION bin)
 
 #----------------------------------------------------------------------------------------------
 # Add this directory to Doxygen

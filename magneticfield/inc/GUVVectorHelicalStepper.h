@@ -26,14 +26,15 @@
 
 // #include "ThreeVector.h"
 #include <base/Vector3D.h> 
-// typedef vecgeom::Vector3D<double>  ThreeVector; 
+#include <Geant/VectorTypes.h>
 
 class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
 {
-  public:  // with description
+  using Double_v = Geant::Double_v;
+  using Bool_v = Geant::MaskD_v;
+  using ThreeVectorSimd = vecgeom::Vector3D<Double_v>;
 
-    typedef Vc::Vector<double> Double_v;
-    typedef vecgeom::Vector3D<Double_v>  ThreeVectorSimd; 
+  public:  // with description
 
     GUVVectorHelicalStepper(GUVVectorEquationOfMotion *EqRhs, // OR TMagFieldEquation *EqRhs,
                             unsigned int order              );
@@ -130,12 +131,11 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
 
 
 inline 
-void GUVVectorHelicalStepper::LinearStep( const Vc::Vector<double> yIn[],
-                                           double  h,
-                                           Vc::Vector<double> yLinear[]) const
+void GUVVectorHelicalStepper::LinearStep( const Double_v yIn[],
+                                          double  h,
+                                          Double_v yLinear[]) const
 {
 
-  typedef Vc::Vector<double> Double_v;
   Double_v  momentum_val = Vc::sqrt(yIn[3]*yIn[3] + yIn[4]*yIn[4] + yIn[5]*yIn[5]) ;
   Double_v  inv_momentum = 1.0 / momentum_val ;
   Double_v  yDir[3];
@@ -149,64 +149,63 @@ void GUVVectorHelicalStepper::LinearStep( const Vc::Vector<double> yIn[],
   }
 }
 
-inline 
-void GUVVectorHelicalStepper::MagFieldEvaluate(const Vc::Vector<double> y[],
-                                                     vecgeom::Vector3D<Vc::Vector<double> > &Bfield )   
+inline
+void GUVVectorHelicalStepper::MagFieldEvaluate(const Double_v y[],
+                                               ThreeVectorSimd &Bfield )
 {
-  Vc::Vector<double> B[3];
+  Double_v B[3];
   GetEquationOfMotion()->  GetFieldValue(y, B);
 
-  typedef vecgeom::Vector3D<Vc::Vector<double> > ThreeVectorSimd;
-  Bfield= ThreeVectorSimd( B[0], B[1], B[2] );
+  Bfield.Set(B[0], B[1], B[2]);
 }
 
 inline 
-Vc::Vector<double> GUVVectorHelicalStepper::GetInverseCurve(const Vc::Vector<double> Momentum,
-                                                            const Vc::Vector<double> Bmag    )   
+Geant::Double_v GUVVectorHelicalStepper::GetInverseCurve(const Double_v Momentum,
+                                                  const Double_v Bmag    )   
 {
    // define EquationType = TMagFieldEquation<>;
-   Vc::Vector<double>  inv_momentum = 1.0 / Momentum ;
+   Double_v  inv_momentum = 1.0 / Momentum ;
    // double particleCharge
    //    = (dynamic_cast<EquationType*>(fPtrMagEqOfMot))->GetParticleCharge(); 
    //     = fPtrMagEqOfMot->FCof() / (CLHEP::eplus*CLHEP::c_light); 
-   Vc::Vector<double> fCoefficient = -fUnitConstant * fParticleCharge *inv_momentum;
+   Double_v coefficient = -fUnitConstant * fParticleCharge *inv_momentum;
  
-  return  fCoefficient*Bmag;
+  return  coefficient*Bmag;
 }
 
 
 inline 
-void GUVVectorHelicalStepper:: SetAngCurve(const Vc::Vector<double> Ang)
+void GUVVectorHelicalStepper:: SetAngCurve(const Double_v Ang)
 {                                                
    fAngCurve=Ang; 
 }
 
 inline 
-Vc::Vector<double> GUVVectorHelicalStepper:: GetAngCurve() const 
+Geant::Double_v GUVVectorHelicalStepper:: GetAngCurve() const 
 {
   return fAngCurve;  
 }
 
 inline 
-void GUVVectorHelicalStepper:: SetCurve(const Vc::Vector<double> Curve)
+void GUVVectorHelicalStepper:: SetCurve(const Double_v Curve)
 {
   frCurve=Curve;  
 }
 
 inline 
-Vc::Vector<double> GUVVectorHelicalStepper:: GetCurve() const 
+Geant::Double_v GUVVectorHelicalStepper:: GetCurve() const 
 {
   return frCurve;  
 }
 
 inline 
-void GUVVectorHelicalStepper:: SetRadHelix(const Vc::Vector<double> Rad)
+void GUVVectorHelicalStepper:: SetRadHelix(const Double_v Rad)
 {
   frHelix=Rad;  
 }
 
 inline 
-Vc::Vector<double> GUVVectorHelicalStepper:: GetRadHelix() const 
+Geant::Double_v GUVVectorHelicalStepper:: GetRadHelix() const 
 {
 return frHelix;  
 
@@ -214,6 +213,3 @@ return frHelix;
 
 
 #endif  /* GUVVectorHelicalStepper_h */
-
-
-

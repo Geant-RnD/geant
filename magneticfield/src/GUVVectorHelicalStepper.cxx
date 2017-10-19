@@ -42,12 +42,11 @@ GUVVectorHelicalStepper::~GUVVectorHelicalStepper()
 }
 
 void
-GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
-                                             vecgeom::Vector3D<Vc::Vector<double> > Bfld,
-                                       //                              const Vc::Vector<double>  h,
-                                       double h,
-                                             Vc::Vector<double>  yHelix[],
-                                             Vc::Vector<double>  yHelix2[] )
+GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
+                                             ThreeVectorSimd Bfld,
+                                       double h,   // Double_v g
+                                             Double_v  yHelix[],
+                                             Double_v  yHelix2[] )
 {
   // const G4int    nvar = 6;
  
@@ -56,11 +55,6 @@ GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
   // NEW  approc_limit = 0.005 gives max.error=x^5/5!=2.6*e-14
 
   const double approc_limit = 0.005;
-
-
-  typedef Vc::Vector<double> Double_v;
-  typedef vecgeom::Vector3D<Vc::Vector<double> > ThreeVectorSimd;
-  typedef typename vecgeom::kVc::bool_v Bool_v;
 
   // using vecCore::MaskedAssign;
 
@@ -85,7 +79,7 @@ GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
   Double_v        B_d_P = Bnorm.Dot(initTangent); // this is the fraction of P parallel to B
   ThreeVectorSimd vpar  = B_d_P * Bnorm;       // the component parallel      to B
   ThreeVectorSimd vperp = initTangent - vpar;  // the component perpendicular to B
-  Double_v        B_v_P = Vc::sqrt( 1 - B_d_P * B_d_P); // Fraction of P perp to B
+  Double_v        B_v_P = vecCore::math::Sqrt( 1 - B_d_P * B_d_P); // Fraction of P perp to B
   Double_v        Theta = R_1 * h; // * B_v_P;
 
   //else inside else
@@ -96,11 +90,11 @@ GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
   CosT     = 1 - 0.5 * Theta2 + 1.0/24.0 * Theta4;
 
   //if inside else
-  Bool_v trigCond = Vc::abs(Theta) > approc_limit;
-  // vecCore::MaskedAssign(&SinT, trigCond, Vc::sin(Theta));
-  vecCore__MaskedAssignFunc(SinT, trigCond, Vc::sin(Theta));
-  // vecCore::MaskedAssign(&CosT, trigCond, Vc::cos(Theta));
-  vecCore__MaskedAssignFunc(CosT, trigCond, Vc::cos(Theta));
+  Bool_v trigCond = vecCore::math::Abs(Theta) > approc_limit;
+  // vecCore::MaskedAssign(&SinT, trigCond, vecCore::math::Sin(Theta));
+  vecCore__MaskedAssignFunc(SinT, trigCond, vecCore::math::Sin(Theta));
+  // vecCore::MaskedAssign(&CosT, trigCond, vecCore::math::Cos(Theta));
+  vecCore__MaskedAssignFunc(CosT, trigCond, vecCore::math::Cos(Theta));
   
   Double_v R = 1.0 / R_1;
 
@@ -143,7 +137,7 @@ GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
 
   R_Helix =Abs( ptan/(fUnitConstant  * fParticleCharge*Bmag));
   // Was: 
-  //    R_Helix =Vc::abs( ptan/(fUnitConstant  * fParticleCharge*Bmag));
+  //    R_Helix =vecCore::math::Abs( ptan/(fUnitConstant  * fParticleCharge*Bmag));
   
   // for too small magnetic fields there is no curvature
   // (include momentum here) FIXME
@@ -161,8 +155,8 @@ GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
   // R       = vecCore::Blend( noCurvatureCond, h  );  
   // R_Helix = vecCore::Blend( noCurvatureCond, 0, Abs( ptan/(fUnitConstant  * fParticleCharge*Bmag)) );
   
-  SetAngCurve( Vc::abs(Theta) );
-  SetCurve(    Vc::abs(R) );
+  SetAngCurve( vecCore::math::Abs(Theta) );
+  SetCurve(    vecCore::math::Abs(R) );
   SetRadHelix( R_Helix    );
 }
 
@@ -173,17 +167,15 @@ GUVVectorHelicalStepper::AdvanceHelix( const Vc::Vector<double>  yIn[],
 //
 
 void
-GUVVectorHelicalStepper::StepWithErrorEstimate( const Vc::Vector<double> yInput[],
-                                                const Vc::Vector<double>*,
+GUVVectorHelicalStepper::StepWithErrorEstimate( const Double_v yInput[],
+                                                const Double_v*,
                                                       double hstep,
-                                                      Vc::Vector<double> yOut[],
-                                                      Vc::Vector<double> yErr[]  )
+                                                      Double_v yOut[],
+                                                      Double_v yErr[]  )
 {  
    const int nvar = 6;
 
-   Vc::Vector<double>  yTemp[7], yIn[7] ;
-
-   typedef vecgeom::Vector3D<Vc::Vector<double> > ThreeVectorSimd;
+   Double_v  yTemp[7], yIn[7] ;
 
    ThreeVectorSimd Bfld_initial, Bfld_midpoint;
    
@@ -217,17 +209,17 @@ GUVVectorHelicalStepper::StepWithErrorEstimate( const Vc::Vector<double> yInput[
 }
 
 
-Vc::Vector<double> 
+Geant::Double_v 
 GUVVectorHelicalStepper::DistChord() const 
 {
   // Check whether h/R >  pi  !!
   // Method DistLine is good only for <  pi
 
-  Vc::Vector<double> Ang=GetAngCurve();
-  Vc::Vector<double> returnValue;
+  Double_v Ang=GetAngCurve();
+  Double_v returnValue;
 
-  vecCore__MaskedAssignFunc( returnValue, Ang<=pi,             GetRadHelix()*(1-Vc::cos(0.5*Ang)) );
-  vecCore__MaskedAssignFunc( returnValue, Ang>pi && Ang<twopi, GetRadHelix()*(1+Vc::cos(0.5*(twopi-Ang))) ); 
+  vecCore__MaskedAssignFunc( returnValue, Ang<=pi,             GetRadHelix()*(1-vecCore::math::Cos(0.5*Ang)) );
+  vecCore__MaskedAssignFunc( returnValue, Ang>pi && Ang<twopi, GetRadHelix()*(1+vecCore::math::Cos(0.5*(twopi-Ang))) ); 
   vecCore__MaskedAssignFunc( returnValue, Ang>= twopi,         2*GetRadHelix() ); 
 
   return returnValue;
