@@ -88,7 +88,7 @@ GUVEquationOfMotion* CreateFieldAndEquation(const char* filename)
 }
 #endif
 
-int gVerbose = 0;
+int gVerbose = 1;
 
 bool TestEquation(GUVEquationOfMotion *equation)
 {

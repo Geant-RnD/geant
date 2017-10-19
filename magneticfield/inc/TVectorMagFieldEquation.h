@@ -2,6 +2,7 @@
 //
 
 #include <cmath>
+#include <Geant/VectorTypes.h>
 
 #include "GUVEquationOfMotion.h"
 #include "GUVVectorEquationOfMotion.h"
