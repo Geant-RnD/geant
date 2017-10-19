@@ -16,7 +16,7 @@ using namespace NudyPhysics;
 NudyCrossSection::NudyCrossSection(): fIsoName("Fe"), fTargetA(56), fTargetZ(26), fProjEnergy(4.0) {}
 
 NudyCrossSection::NudyCrossSection( const std::string isoName, const int Aval,
-	const int Zval, const double projectileKE, const geantphysics::HadronicProcessType pType
+	const int Zval, const double projectileKE
 ) : fIsoName(isoName), fTargetA(Aval), fTargetZ(Zval), fProjEnergy(projectileKE) {}
 
 NudyCrossSection::NudyCrossSection( const NudyCrossSection &other ) :

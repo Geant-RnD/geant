@@ -23,15 +23,14 @@ NudyInterface::NudyInterface(
 )
   // : fProjCode(projCode), fProjKE(projKE), fIsoName(isoName), ftZ(tZ), ftN(tN) {
   {
-    std::string newReact;
-    NudyInterface::SetProjectileCode (projCode);
-    NudyInterface::SetProjectileKE (projKE);
-    NudyInterface::SetTemp (temp);
-    NudyInterface::SetIsotopeName (isoName);
-    NudyInterface::SetZ (tZ);
-    NudyInterface::SetA (tA);
-    NudyInterface::SetProcessType ( ProcessType );
-    NudyInterface::SetMTValues (ProcessType);
+    SetProjectileCode (projCode);
+    SetProjectileKE (projKE);
+    SetTemp (temp);
+    SetIsotopeName (isoName);
+    SetZ (tZ);
+    SetA (tA);
+    SetProcessType ( ProcessType );
+    SetMTValues (ProcessType);
   };
 
 NudyInterface::~NudyInterface() {}
@@ -40,24 +39,31 @@ NudyInterface::~NudyInterface() {}
 double NudyInterface::GetXS( int projCode, double projKE, double temp,
   std::string isoName, int tZ, int tA, geantphysics::HadronicProcessType pType
 ) {
-  NudyInterface::SetProcessType (pType);
-  NudyInterface::SetMTValues ( pType );
-  NudyInterface::SetA (tA);
-  NudyInterface::SetProjectileKE (projKE);
-  NudyInterface::SetTemp(temp);
-  NudyInterface::SetIsotopeName(isoName);
-  NudyInterface::SetIsFissKey(false); // initializing to false first
+  SetProcessType (pType);
+  SetMTValues ( pType );
+  SetA (tA);
+  SetZ (tZ);
+  SetProjectileKE (projKE);
+  SetTemp(temp);
+  SetIsotopeName(isoName);
+  SetIsFissKey(false); // initializing to false first
 
   Nudy::TNudyENDF *proc;
 
   //  Fix the name of the ENDF, ROOT and ENDFSUB filenames here
-  std::string fileENDF1 = NudyInterface::SetDataFileNameENDF(projCode, isoName, projKE, tZ, tA);
+  std::string fileENDF1 = SetDataFileNameENDF(projCode, isoName, projKE);
   SetEndfDataFileName(fileENDF1.c_str());
-  std::string fileENDF2 = NudyInterface::SetDataFileNameROOT(isoName, tZ, tA);
+  std::string fileENDF2 = SetDataFileNameROOT(isoName);
   SetRootFileName (fileENDF2.c_str());
-  std::string fileENDF3 = NudyInterface::SetDataFileNameENDFSUB( isoName, tZ, tA);
-  NudyInterface::SetEndfSubDataFileName (fileENDF3.c_str());
+  std::string fileENDF3 = SetDataFileNameENDFSUB( isoName);
+  SetEndfSubDataFileName (fileENDF3.c_str());
 
+/*
+  std::cout << "1. ENDF      --> " << fEndfDataFileName    << "\n"
+            << "2. ENDFSUB   --> " << fEndfSubDataFileName << "\n"
+            << "3. ROOT      --> " << fRootFileName        << std::endl;
+
+*/
   // Create and process with NUDY with keywords
   proc = new Nudy::TNudyENDF (fEndfDataFileName, fRootFileName, "recreate");
   proc->Process();
@@ -66,40 +72,42 @@ double NudyInterface::GetXS( int projCode, double projKE, double temp,
   proc->SetEndfSub(fEndfSubDataFileName);
   proc->Process();
 
-  SetProjIDFn(projCode, projKE);
-  double XSvalue = NudyInterface::ComputeCrossSection();  // call routines from Nudy
-
+  //SetProjIDFn(projCode, projKE,"");
+  double XSvalue = ComputeCrossSection();  // call routines from Nudy
   return XSvalue;
 }
 
-std::string NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName, double projKE, int tZ, int tA ){
-  NudyInterface::SetProjIDFn( projCode, projKE);
-  std::string DataFileNameString = NudyInterface::findENDFFileName( isoName, tZ, tA);
-  std::string fileENDFName1 = NudyInterface::GetDataFileName(fProjID, DataFileNameString);
+std::string NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName, double projKE){
+  std::string fstyle = "ENDF";
+  SetProjIDFn( projCode, projKE, fstyle);
+  std::string DataFileNameString = findENDFFileName( isoName);
+  std::string fileENDFName1 = GetDataFileName(fProjID, DataFileNameString);
+  std::cout << DataFileNameString << "  " << fileENDFName1 << std::endl;
+
   return fileENDFName1;
 }
 
-std::string NudyInterface::SetDataFileNameROOT( std::string isoName, int tZ, int tA ){
-  std::string DataFileNameString = NudyInterface::findENDFFileName(isoName, tZ, tA);
-  std::string fileENDFName2 = NudyInterface::FixRootDataFile(DataFileNameString);
+std::string NudyInterface::SetDataFileNameROOT( std::string isoName){
+  std::string DataFileNameString = findENDFFileName(isoName);
+  std::string fileENDFName2 = FixRootDataFile(DataFileNameString);
   return fileENDFName2;
 }
 
 // This method is to be modified
-void NudyInterface::SetProjIDFn(int projCode, double projKE) {
-  bool isChFiss = NudyInterface::GetFisCha(fMTValue);
-  if ( projKE < 0.03*geant::eV && projCode == 2112 ) NudyInterface::SetProjID("thermal_scatt");
-  if ( projKE > 0.03*geant::eV && projCode == 2112 ) NudyInterface::SetProjID("neutrons");
-  if (isChFiss) NudyInterface::SetProjID("nfy");
+void NudyInterface::SetProjIDFn(int projCode, double projKE, std::string fstyle) {
+  bool isChFiss = GetFisCha(fMTValue);
+  if ( projKE < 0.03*geant::eV && projCode == 2112 ) SetProjID("thermal_scatt");
+  if ( projKE > 0.03*geant::eV && projCode == 2112 ) SetProjID("neutrons");
+  if (isChFiss && fstyle.compare("ENDFSUB")==0) SetProjID("nfy");
 }
 
-std::string NudyInterface::SetDataFileNameENDFSUB( std::string isoName, int tZ, int tA ){
+std::string NudyInterface::SetDataFileNameENDFSUB( std::string isoName){
   std::string fileENDFName3;
   std::string DataFileNameString;
-  NudyInterface::SetProjID("nfy");
-  std::string prjId = NudyInterface::GetProjID();
-  DataFileNameString = NudyInterface::findENDFFileName(isoName, tZ, tA);
-  fileENDFName3 = NudyInterface::GetDataFileName(prjId, DataFileNameString);
+  SetProjID("nfy");
+  std::string prjId = GetProjID();
+  DataFileNameString = findENDFFileName(isoName);
+  fileENDFName3 = GetDataFileName(prjId, DataFileNameString);
   return fileENDFName3;
 }
 
@@ -107,18 +115,24 @@ std::string NudyInterface::SetDataFileNameENDFSUB( std::string isoName, int tZ, 
 double NudyInterface::ComputeCrossSection() {
   int iElementID = 0;  //<------------- confusing testing by Abhijit 419 ?
   double xsvalue = 0.0;
-  double iSigDiff = 0.001;   // trial value for test documentation reqd.
+  //double iSigDiff = 0.001;   // trial value for test documentation reqd.
 
-  NudyPhysics::TNudyEndfSigma();
-  NudyPhysics::TNudyEndfSigma xsec;
-  xsec.GetData(fRootFileName, iSigDiff);
+  //NudyPhysics::TNudyEndfSigma();
+  //TNudyEndfSigma  *xsec;
+  //xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
+  //xsec.GetData(fRootFileName, iSigDiff);
 
-  NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(iElementID, fRootFileName);
+
+//NudyPhysics::TNudyEndfRecoPoint();
+  NudyPhysics::TNudyEndfRecoPoint *recoPoint; // = new NudyPhysics::TNudyEndfRecoPoint(iElementID, fRootFileName);
+  recoPoint = new TNudyEndfRecoPoint(iElementID, fRootFileName);
   // This is  under testing to check Harphool code for interfacing to GV :: Abhijit
+
 
   for ( unsigned int crsp = 0; crsp < recoPoint->MtValues[iElementID].size(); crsp++) {
     if ( fMTValue == recoPoint->MtValues[iElementID][crsp] ) {
       xsvalue = recoPoint->GetSigmaTotal(iElementID, fProjKE);
+      std::cout << "MT-> " << recoPoint->MtValues[iElementID][crsp] << " XS --> " << xsvalue << std::endl;
       break;
     }
   }
@@ -133,7 +147,7 @@ std::string NudyInterface::GetDataFileName(std::string str1, std::string str2) {
     std::string ENDFDataString = EndfDataPath + "/" + str1 + "/" + str2 + ".endf";
     return ENDFDataString;
   } else {
-    std::cout << " Please set environment ENDFDATADIR pointing to ENDF data directory." << std::endl;
+    std::cout << " Please set environment ENDFDATADIR pointing to root of ENDF data directory ." << std::endl;
     exit(99);
   }
   return EndfDataPath;
@@ -141,7 +155,7 @@ std::string NudyInterface::GetDataFileName(std::string str1, std::string str2) {
 
 // selects name of root data file in the current working directory
 std::string NudyInterface::FixRootDataFile(std::string str1){
-  std::string cwdPath = NudyInterface::GetCWD();
+  std::string cwdPath = GetCWD();
   std::string rootENDFFile = cwdPath + "/" + str1 + ".root";
   return rootENDFFile;
 }
@@ -155,7 +169,7 @@ std::string NudyInterface::GetCWD() {
   return cwdPath;
 }
 
-std::string NudyInterface::findENDFFileName(std::string elementName, int tZ, int tA) {
+std::string NudyInterface::findENDFFileName(std::string elementName){
   std::stringstream ss;
   std::string fName = "";
   if (fProjID == "thermal_scatt") {
@@ -166,10 +180,10 @@ std::string NudyInterface::findENDFFileName(std::string elementName, int tZ, int
     fName = fProjID + "-";
   }
 
-  ss << tZ;
+  ss << ftZ;
   std::string stZ = ss.str();
   ss.str("");
-  ss << tA;
+  ss << ftA;
   std::string stA = ss.str();
   ss.str("");
 
@@ -180,7 +194,7 @@ std::string NudyInterface::findENDFFileName(std::string elementName, int tZ, int
     case 3: stZ = stZ;
   }
 
-  if (tZ == 12) {
+  if (ftZ == 12) {
     stA = "000";
   } else {
     switch(stA.length()) {
@@ -196,7 +210,7 @@ std::string NudyInterface::findENDFFileName(std::string elementName, int tZ, int
 
 // Depending on the process type set the MT value for cross section
 void NudyInterface::SetMTValues (geantphysics::HadronicProcessType pType) {
-  NudyInterface::SetProcessType ( pType );
+  SetProcessType ( pType );
   switch (pType) {
     case geantphysics::HadronicProcessType::kElastic          : fMTValue = 2;   break;
     case geantphysics::HadronicProcessType::kInelastic        : fMTValue = 3;   break;
@@ -213,6 +227,6 @@ void NudyInterface::SetMTValues (geantphysics::HadronicProcessType pType) {
 bool NudyInterface::GetFisCha(int inKey) {
   bool isIn = false;
   isIn = std::find(
-  NudyInterface::fChannelFiss.begin(), NudyInterface::fChannelFiss.end(), inKey ) != NudyInterface::fChannelFiss.end();
+  fChannelFiss.begin(), NudyInterface::fChannelFiss.end(), inKey ) != fChannelFiss.end();
   return isIn;
 }

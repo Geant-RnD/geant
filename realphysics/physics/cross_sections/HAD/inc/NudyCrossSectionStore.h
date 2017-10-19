@@ -43,33 +43,28 @@ namespace geantphysics {
 
     //@brief return index of the applicable cross section that was registered last
     int GetIndexFirstApplicableXsec( const int projectileCode,
-      const double projectileEnergy, const Element* targetElement,
-      const Material* targetMaterial
-    );
+      const double projectileEnergy );
 
     // @brief get microscopic cross section for target isotope
     double GetIsotopeCrossSection( const int projectileCode,
-      const double projectileEnergy, const double projectileMass,
-      const Isotope* targetIsotope, const Element* targetElement,
-      const Material* targetMaterial, HadronicProcessType pType
+      const double projectileEnergy, const Isotope* targetIsotope,
+       HadronicProcessType pType
     );
 
     // @brief get cross section for element
     double GetElementCrossSection( const int projectileCode,
-      const double projectileEnergy, const double projectileMass,
-      const Element* targetElement, const Material* targetMaterial, HadronicProcessType pType
+      const double projectileEnergy, const Element* targetElement,
+      HadronicProcessType pType
     );
 
     // @brief get macroscopic cross section for target
     double GetMacroscopicCrossSection( const int projectileCode,
-      const double projectileEnergy, const double projectileMass,
-      const Material* targetMaterial, HadronicProcessType pType
+      const double projectileEnergy, const Material* targetMaterial, HadronicProcessType pType
     );
 
     // @brief Method that returns a target neucleus as a pair of Z and A
     std::pair< int, int > SampleTarget( const int projectileCode,
-      const double projectileEnergy, const double projectileMass,
-      const Material* targetMaterial, HadronicProcessType pType
+      const double projectileEnergy,const Material* targetMaterial, HadronicProcessType pType
     );
 
     // @brief Method returns vector of NudyCrossSection

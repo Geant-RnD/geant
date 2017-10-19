@@ -113,15 +113,15 @@ namespace NudyPhysics{
     double GetXS( int projCode, double projKE, double temp, std::string isoName,
       int tZ, int tA, geantphysics::HadronicProcessType pType
     ) ;
-    std::string  SetDataFileNameENDF( int projCode, std::string isoName, double projKE, int tZ, int tA );
-    std::string findENDFFileName( std::string ele, int tZ, int tA ) ;
-    std::string GetDataFileName( std::string str1, std::string str2 ); // projID, isoName
+    std::string  SetDataFileNameENDF( int projCode, std::string isoName, double projKE); //, int tZ, int tA );
+    std::string findENDFFileName( std::string ele);//, int tZ, int tA ) ;
+    std::string GetDataFileName( std::string str1, std::string str2 );
     std::string FixRootDataFile( std::string str1 );                   // ENDF filename without path and extension
-    std::string SetDataFileNameROOT( std::string isoName, int tZ, int tA );
-    std::string SetDataFileNameENDFSUB( std::string isoName, int tZ, int tA );
+    std::string SetDataFileNameROOT( std::string isoName); //, int tZ, int tA );
+    std::string SetDataFileNameENDFSUB( std::string isoName); //, int tZ, int tA );
     std::string GetCWD();
     bool GetFisCha(int inKey);
-    void SetProjIDFn( int projCode, double projKE);
+    void SetProjIDFn( int projCode, double projKE, std::string style);
     double ComputeCrossSection( );
     void SetMTValues(geantphysics::HadronicProcessType pType);
   public:
@@ -156,7 +156,7 @@ namespace NudyPhysics{
     unsigned int fNumberOfReactionChannels = 895;
     geantphysics::HadronicProcessType fProcType;
     std::string fIsoName;
-    unsigned int fMTValue;
+    int fMTValue;
     int fProjCode;
     int ftZ;
     int ftA;
