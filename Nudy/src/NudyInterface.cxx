@@ -117,8 +117,8 @@ double NudyInterface::ComputeCrossSection() {
   double xsvalue = 0.0;
   //double iSigDiff = 0.001;   // trial value for test documentation reqd.
 
-  //NudyPhysics::TNudyEndfSigma();
-  //TNudyEndfSigma  *xsec;
+  NudyPhysics::TNudyEndfSigma();
+  TNudyEndfSigma  xsec;
   //xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
   //xsec.GetData(fRootFileName, iSigDiff);
 
@@ -128,13 +128,18 @@ double NudyInterface::ComputeCrossSection() {
   recoPoint = new TNudyEndfRecoPoint(iElementID, fRootFileName);
   // This is  under testing to check Harphool code for interfacing to GV :: Abhijit
 
-
   for ( unsigned int crsp = 0; crsp < recoPoint->MtValues[iElementID].size(); crsp++) {
-    if ( fMTValue == recoPoint->MtValues[iElementID][crsp] ) {
-      xsvalue = recoPoint->GetSigmaTotal(iElementID, fProjKE);
-      std::cout << "MT-> " << recoPoint->MtValues[iElementID][crsp] << " XS --> " << xsvalue << std::endl;
+    int mtNow = recoPoint->MtValues[iElementID][crsp];
+    if ( mtNow == fMTValue) { 
+      xsvalue = recoPoint->GetSigmaPartial(iElementID, crsp, fProjKE) ;
       break;
     }
+/*
+    else if (mtNow == fMTValue) {
+      xsvalue = recoPoint->GetSigmaTotal(iElementID, fProjKE) ;
+      break;
+    }
+    */
   }
   return xsvalue;
 }
