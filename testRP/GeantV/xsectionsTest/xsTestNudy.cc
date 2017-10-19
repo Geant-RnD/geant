@@ -26,23 +26,23 @@ using NudyPhysics::NudyInterface;
 using geantphysics::HadronicProcess;
 using geantphysics::HadronicProcessType;
 
+
+
+template<typename T>
+std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::ostream>::type& stream, const T& e)
+{
+    return stream << static_cast<typename std::underlying_type<T>::type>(e);
+}
+
+
 int main(int /*argc*/, char** /*argv*/) {
 
   std::ofstream writef("sumXsc.dat", std::ios::out ) ;
 
   writef.setf( std::ios::scientific, std::ios::floatfield );
 
-//  double nxST; // total
-//  double nxSE; // elastic
-//  double nxSI; // inelastic
-//  double nxSF; // fission
-//  double nxSH; // thermal
-//  double nxValue;
-
-
-  int projectileCode = 2112; // example :: neutron ??
-  std::string eleName =  "Pu"; // "Be"; //
-  //std::string reactType = "Elastic" ; // "Fission"; // "Elastic, Inelastic, Total, Fission, Thermal......"
+  int projectileCode = 2112;
+  std::string eleName =  "Pu";
   int AtomicNumber  =  94; // 4; //
   int MassNumber = 241; // 7;   //
   double temperature = 293.60608;
@@ -50,10 +50,13 @@ int main(int /*argc*/, char** /*argv*/) {
   for the time being I am testing using raw number.
   double EnergyValue = 4.0 * geant::MeV;
   */
-  double EnergyValue = 4.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
+  double EnergyValue = 1.0e+5; // 2.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
 
   geantphysics::HadronicProcessType pType ;
-  pType = geantphysics::HadronicProcessType::kFission;
+  //pType = geantphysics::HadronicProcessType::kElastic;  // kFission;
+  // pType = geantphysics::HadronicProcessType::kFission;  // kElastic;
+  //pType = geantphysics::HadronicProcessType::kCapture;
+  pType = geantphysics::HadronicProcessType::kRadioactiveDecay;
 
 // @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
 // @brief Then we provide temperature which is required for fission etc.
@@ -65,9 +68,11 @@ NudyPhysics::NudyInterface *nudyxs = new NudyPhysics::NudyInterface(
   projectileCode, EnergyValue, temperature, eleName, AtomicNumber, MassNumber, pType
 );
 
-double xs = nudyxs->GetXS(projectileCode, EnergyValue, temperature, eleName, AtomicNumber, MassNumber, pType);
-
-std::cout << "cross section = " << xs << std::endl;
+double xs = nudyxs->GetXS(projectileCode, EnergyValue, temperature,
+  eleName, AtomicNumber, MassNumber, pType);
+std::cout << "Neutron Energy = " << EnergyValue << " Isotope "
+          << AtomicNumber << "-" << eleName << "-" << MassNumber << "  type: "
+          << pType << " cross section = " << xs << std::endl;
 
 /*
   double kinEnergy = 10.* geant::MeV;
