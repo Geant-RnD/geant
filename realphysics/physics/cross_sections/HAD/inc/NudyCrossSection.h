@@ -47,7 +47,7 @@ namespace geantphysics {
 
     NudyCrossSection();
     NudyCrossSection( const std::string isoName, const int Aval, const int Zval,
-      const double projectileKE, const HadronicProcessType IntType );
+      const double projectileKE);
     NudyCrossSection( const NudyCrossSection &other );
     NudyCrossSection& operator=( const NudyCrossSection &other );
     virtual ~NudyCrossSection();    // destructor

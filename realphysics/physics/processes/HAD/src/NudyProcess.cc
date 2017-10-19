@@ -31,7 +31,7 @@ NudyProcess::~NudyProcess() {}
 
 double NudyProcess::ComputeMacroscopicXSection(
     const MaterialCuts *matCuts, double kEnergy,  const Particle *particle,
-    double mass, HadronicProcessType pType
+    HadronicProcessType pType
   ) const {
     double xsec = 0.0;
     const Material* mat = matCuts->GetMaterial();
@@ -41,19 +41,19 @@ double NudyProcess::ComputeMacroscopicXSection(
 
     for (int iel = 0; iel < numElems; ++iel) {
       xsec += theAtomicNumDensityVector[iel] * GetAtomicCrossSection(
-        particle->GetInternalCode(), kEnergy, mass, theElements[iel], mat, pType
+        particle->GetInternalCode(), kEnergy,theElements[iel], pType
       );
     }
     return xsec;
   }
 
   double NudyProcess::GetAtomicCrossSection( const int particlecode,
-    const double particlekineticenergy, const double particlemass,
-    const Element* targetelement, const Material* targetmaterial, HadronicProcessType pType ) const {
+    const double particlekineticenergy, const Element* targetelement,
+    HadronicProcessType pType ) const {
     double xsec = -1.0;
     if ( fXsecStore ) {
       xsec = fXsecStore->GetElementCrossSection( particlecode,
-        particlekineticenergy, particlemass, targetelement, targetmaterial, pType
+        particlekineticenergy, targetelement, pType
       );
     }
     return xsec;
@@ -69,7 +69,7 @@ double NudyProcess::ComputeMacroscopicXSection(
 
     if ( fXsecStore ) {
       std::pair< int, int > pairZandN = fXsecStore->SampleTarget( particleCode,
-        eKin, track.GetMass(), material, pType );
+        eKin, material, pType );
       track.SetTargetZ( pairZandN.first );
       track.SetTargetN( pairZandN.second );
       targetIsotope = Isotope::GetIsotope( pairZandN.first, pairZandN.second );

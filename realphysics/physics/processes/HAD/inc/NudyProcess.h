@@ -63,12 +63,11 @@ public:
 public:
   virtual double ComputeMacroscopicXSection(
     const MaterialCuts *matCuts, double kEnergy,  const Particle *particle,
-    double mass, HadronicProcessType pType
+    HadronicProcessType pType
   ) const;
 
   virtual double GetAtomicCrossSection(
-    const int projCode, const double projectileEnergy, double mass,
-    const Element* targetElement, const Material* targetMaterial, HadronicProcessType pType
+    const int projCode, const double projectileEnergy, const Element* targetElement,  HadronicProcessType pType
   ) const;
 
   Isotope* SampleTarget ( LightTrack &track, HadronicProcessType pType ) const;

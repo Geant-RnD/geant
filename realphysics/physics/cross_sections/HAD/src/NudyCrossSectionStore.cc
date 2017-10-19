@@ -47,13 +47,12 @@ void NudyCrossSectionStore::RegisterNudyCrossSection( NudyCrossSection* ptrnudyx
 }
 
 int NudyCrossSectionStore::GetIndexFirstApplicableXsec (
-  const int projectileCode, const double projectileEnergy,
-  const Element* targetElement, const Material* targetMaterial
+  const int projectileCode, const double projectileEnergy
+  //, const Element* targetElement, const Material* targetMaterial
 ) {
     int index = -1;
     for (int i = fNudyXsecVec.size() -1; i >= 0; i-- ) {
       if ( fNudyXsecVec[i] && fNudyXsecVec[i]->IsApplicable( projectileCode, projectileEnergy ) ) {
-        //, targetElement->GetZ(), targetElement->GetA() / (geant::g/geant::mole) ) ) {
           index = i;
           break;
         }
@@ -62,13 +61,10 @@ int NudyCrossSectionStore::GetIndexFirstApplicableXsec (
 }
 
 double NudyCrossSectionStore::GetIsotopeCrossSection( const int projectileCode,
-  const double projEnergy, const double projMass,
-  const Isotope* targetIsotope, const Element* targetElement,
-  const Material* targetMaterial, HadronicProcessType pType
+  const double projEnergy, const Isotope* targetIsotope,  HadronicProcessType pType
 ) {
   double xsec = -1.0;
-  int index = GetIndexFirstApplicableXsec ( projectileCode, projEnergy,
-  targetElement, targetMaterial );
+  int index = GetIndexFirstApplicableXsec ( projectileCode, projEnergy );
   if ( index >= 0 ) {
     xsec = fNudyXsecVec[index]->GetIsotopeCrossSection ( projectileCode,
       projEnergy, -99.99, targetIsotope->GetName(), targetIsotope->GetZ(), targetIsotope->GetA(), pType );
@@ -78,12 +74,11 @@ double NudyCrossSectionStore::GetIsotopeCrossSection( const int projectileCode,
 
 
 double NudyCrossSectionStore::GetElementCrossSection(
-  const int projectileCode, const double projEnergy, const double projMass,
-  const Element* targetElement, const Material* targetMaterial, HadronicProcessType pType
+  const int projectileCode, const double projEnergy, const Element* targetElement, HadronicProcessType pType
 ) {
   double xsec = -1.0;
   int index = GetIndexFirstApplicableXsec(
-    projectileCode, projEnergy, targetElement, targetMaterial
+    projectileCode, projEnergy
   );
 
   if ( index >= 0 ) {
@@ -107,7 +102,7 @@ double NudyCrossSectionStore::GetElementCrossSection(
 
 double NudyCrossSectionStore::GetMacroscopicCrossSection(
   const int projectileCode, const double projectileEnergy,
-  const double projectileMass, const Material* targetMaterial, HadronicProcessType pType
+  const Material* targetMaterial, HadronicProcessType pType
 ) {
   double xsec = -1.0;
   if ( targetMaterial ) {
@@ -116,7 +111,7 @@ double NudyCrossSectionStore::GetMacroscopicCrossSection(
     xsec = 0.0;
     for ( size_t i = 0; i < elementVector.size(); i++ ) {
       double elementXsec = GetElementCrossSection( projectileCode,
-        projectileEnergy, projectileMass, elementVector[i], targetMaterial, pType );
+        projectileEnergy, elementVector[i], pType );
         if ( elementXsec < 0.0 ) {
           xsec = -1.0;
           continue;
@@ -129,7 +124,7 @@ double NudyCrossSectionStore::GetMacroscopicCrossSection(
 
 std::pair< int, int > NudyCrossSectionStore::SampleTarget(
   const int projectileCode, const double projectileEnergy,
-  const double projectileMass, const Material* targetMaterial, HadronicProcessType pType
+  const Material* targetMaterial, HadronicProcessType pType
 ) {
   int tZ = 0;
   int tA = 0;
@@ -140,7 +135,8 @@ std::pair< int, int > NudyCrossSectionStore::SampleTarget(
     double xsec = 0.0;
     for ( size_t i = 0; i < elementVector.size(); i++ ) {
       double elementXsec = GetElementCrossSection( projectileCode,
-        projectileEnergy, projectileMass, elementVector[i], targetMaterial, pType );
+        projectileEnergy, elementVector[i],
+         pType );
       if ( elementXsec < 0.0 ) break;
         xsec += elementXsec * numOfAtomsPerVolumeVector[i];
         sumElementXsecVector.push_back( xsec );
@@ -160,8 +156,7 @@ std::pair< int, int > NudyCrossSectionStore::SampleTarget(
         xsec = 0.0;
         for ( size_t i = 0; i < isotopeVector.size(); i++ ) {
           double isotopeXsec = GetIsotopeCrossSection( projectileCode,
-            projectileEnergy, projectileMass, isotopeVector[i],
-            elementVector[iEle], targetMaterial, pType
+            projectileEnergy, isotopeVector[i], pType
           );
           if ( isotopeXsec < 0.0 ) break;
           xsec += abundanceIsotopeVector[i] * isotopeXsec;

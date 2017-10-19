@@ -53,7 +53,7 @@ int main(int /*argc*/, char** /*argv*/) {
   double EnergyValue = 4.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
 
   geantphysics::HadronicProcessType pType ;
-  pType = geantphysics::HadronicProcessType::kElastic;
+  pType = geantphysics::HadronicProcessType::kFission;
 
 // @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
 // @brief Then we provide temperature which is required for fission etc.
