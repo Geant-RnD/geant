@@ -195,7 +195,7 @@ TVectorMagFieldEquation<Field,Size>
 {
     vecgeom::Vector3D<typename vecgeom::kVc::precision_v> Position( y[0], y[1], y[2] );
 
-    fPtrField->T_Field::GetFieldValue( Position, Bfield );
+    fPtrField->Field::GetFieldValue( Position, Bfield );
 }
 
 
