@@ -132,7 +132,6 @@ set(headers
    ${CMAKE_CURRENT_SOURCE_DIR}/inc/GeantConfig.h
    ${CMAKE_CURRENT_SOURCE_DIR}/inc/TrackStat.h
    ${CMAKE_CURRENT_SOURCE_DIR}/inc/Region.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/inc/ExternalFramework.h
 )
 
 # Add codes that describes some stages (and handlers) that are different when real-physics is used
