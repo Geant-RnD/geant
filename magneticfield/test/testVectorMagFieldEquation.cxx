@@ -97,17 +97,30 @@ GUVVectorEquationOfMotion* CreateFieldAndEquation(const char* filename)
 }
 #endif
 
+// Auxiliary methods (define below) to check results & report problems.
+// 
+bool SanityCheckMagFieldEquation(  double         charge,
+                                   ThreeVector_d  Momentum,
+                                   ThreeVector_d  Field,
+                                   ThreeVector_d  ForceVec,
+                                   int            lane );
+
+bool CheckDerivativeInLanesAndReport( const Double_v & chargeVec,
+                                      const Double_v   PositionMomentum[gNposmom],
+                                      vecgeom::Vector3D<Float_v>& FieldVec,
+                                      const Double_v   dydxVec[gNposmom],                                      
+                                      bool printContents= false );
+
 int gVerbose = 0;
 
 bool TestEquation(GUVVectorEquationOfMotion *equation)
 {
    
-  constexpr double perMillion = 1e-6;
   bool   hasError = false;  // Return value
   
   ThreeVector_d Position( 1., 2.,  3.);  // initial
   ThreeVector_d Momentum( 0., 0.1, 1.);
-  ThreeVector_f FieldVecVal( 0., 0., 1.);  // Magnetic field value (constant)
+  ThreeVector_f BFieldValue( 0., 0., 1.);  // Magnetic field value (constant)
 
   // double PositionTime[4] = { Position.x(), Position.y(), Position.z(), 0.0};
   Double_v PositionMomentum[gNposmom];
@@ -145,9 +158,14 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
      cout << "Charge Vec = " << chargeVec << "  expected  -1, 1, -2, 2. "  << endl;
   }
   
-  vecgeom::Vector3D<Float_v> FieldVec = { Float_v( FieldVecVal[0] ),
-                                          Float_v( FieldVecVal[1] ),
-                                          Float_v( FieldVecVal[2] ) };
+  vecgeom::Vector3D<Float_v> FieldVec = { Float_v( BFieldValue[0] ),
+                                          Float_v( BFieldValue[1] ),
+                                          Float_v( BFieldValue[2] ) };
+
+  bool printContents= false; // Verbose output of  dy/dx, y, etc. 
+  
+  // 1.) Simple case: Use the equation with a given field value
+  // ------------------------------------------------------------
   
   equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, chargeVec, dydxVec );
 
@@ -161,17 +179,58 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   cout << " dy/dx Vec [5] : "  << dydxVec[5] << endl;
   cout << " ============================================ " << endl;
   ****/
-  
-  // 1. Test each output individually first
+     
+  // a.) Test each output individually first
   // ======================================
+  bool laneError1=
+     CheckDerivativeInLanesAndReport( chargeVec, PositionMomentum, FieldVec, dydxVec, printContents);
+
+  hasError = laneError1;
+
+  // b.) Check lanes against each other ( know relations from charge, momentum etc. )
+  //  TO DO
+
+  // 2.) Regular case: Use the full equation -- allow it to obtain the field too !
+  // -------------------------------------------------------------------------
+  Double_v dydxVecRegular[gNposmom];
+  equation->RightHandSide( PositionMomentum, chargeVec, dydxVecRegular );
+  
+  //  Note: Check below assumes that 'FieldVec' is the result of obtaining the field
+  bool laneError2=
+     CheckDerivativeInLanesAndReport( chargeVec, PositionMomentum, FieldVec, dydxVecRegular, printContents);
+
+  hasError = hasError || laneError2;
+
+  // 3.) Full case: Use the full equation, and even get back the value of the field
+  // ------------------------------------------------------------------------------
+  Double_v dydxVecFull[gNposmom];  
+  vecgeom::Vector3D<Float_v> FieldVecEval;
+  equation->EvaluateRhsReturnB( PositionMomentum, dydxVecFull, chargeVec, FieldVecEval );
+  bool laneError3=
+     CheckDerivativeInLanesAndReport( chargeVec, PositionMomentum, FieldVecEval, dydxVecFull, printContents);
+
+  hasError = hasError || laneError3;
+
+  return hasError;
+}
+
+bool CheckDerivativeInLanesAndReport( const Double_v & chargeVec,
+                                      const Double_v   PositionMomentum[gNposmom],
+                                      vecgeom::Vector3D<Float_v>& FieldVec,
+                                      const Double_v   dydxVec[gNposmom],                                      
+                                      bool printContents )
+{
+  bool hasError= false;
+   
   const unsigned int laneWidth= 4;
-  bool printContents= false;
   
   for( unsigned int lane= 0; lane < laneWidth; lane++ )
   // int lane= 0; 
   {
-     double   dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };   // To ensure zeroes at each iteration
-     double      yArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+     double     dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };   // To ensure zeroes at each iteration
+     double        yArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+     double MomentumArr[3] = { 0.0, 0.0, 0.0 };
+     double    fieldVal[3] = { 0.0, 0.0, 0.0 };
      
      for( int i= 0; i< 6; i++ ) { 
         dydxArr[i] = vecCore::Get ( dydxVec[i],          lane );
@@ -179,6 +238,13 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
      }
      ThreeVector_d  ForceVec( dydxArr[3], dydxArr[4], dydxArr[5]);
 
+     for( int i= 0; i< 3; i++ ) {      
+        fieldVal[i] = vecCore::Get( FieldVec[i], lane );
+        MomentumArr[i] = vecCore::Get( PositionMomentum[3+i], lane );
+     }
+     ThreeVector_d BFieldVal( fieldVal[0], fieldVal[2], fieldVal[2] );
+     ThreeVector_d Momentum3v( MomentumArr[0], MomentumArr[1], MomentumArr[2] );
+     
      // PositionMomentum[3+i] = Double_v( Momentum[i] );
 
      if( printContents ) { 
@@ -189,18 +255,35 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
                 << " " << setw(10) << dydxArr[i] << endl;
         }
      }
-
-     // if( lane >= 0 ) continue;
-     
      double charge= vecCore::Get( chargeVec, lane );
 
+     bool badLane= SanityCheckMagFieldEquation( charge,
+                                                Momentum3v,
+                                                BFieldVal,
+                                                ForceVec,
+                                                lane );
+     hasError = hasError || badLane;
+  }
+  return hasError;
+}
+
+bool SanityCheckMagFieldEquation(  double         charge,
+                                   ThreeVector_d  Momentum,
+                                   ThreeVector_d  Field,
+                                   ThreeVector_d  ForceVec,
+                                   int            lane     //  To print (if error)
+   )
+{
+     bool hasError;
+     constexpr double perMillion = 1e-6;
+     
      // Check result
      double MdotF = Momentum.Dot(ForceVec);
-     double BdotF = FieldVecVal.Dot(ForceVec);
+     double BdotF = Field.Dot(ForceVec);
      
      double momentumMag = Momentum.Mag();
-     double fieldMag =    FieldVecVal.Mag();
-     double sineAngle =   FieldVecVal.Cross( Momentum ).Mag() / ( momentumMag  * fieldMag );
+     double fieldMag =    Field.Mag();
+     double sineAngle =   Field.Cross( Momentum ).Mag() / ( momentumMag  * fieldMag );
      
      double ForceMag =   ForceVec.Mag();
      const double c = Constants::c_light;
@@ -208,7 +291,7 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
      // Tolerance of difference in values (used below)
      double tolerance = perMillion;
   
-     if ( gVerbose ) { cout << "Test output:  "  << endl; }
+     if ( gVerbose ) { cout << "Test output: ( lane = " << lane << " ). " << endl; }
      if( std::fabs(ForceMag - c * std::fabs(charge) * fieldMag * sineAngle) >  tolerance * ForceMag ) {
         cerr << "ERROR: Force magnitude is not equal to   c * |charge| * |field| * sin( p, B )."  << endl;     
         cerr << "       Force magnitude = " << ForceMag << endl;
@@ -223,20 +306,21 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
      if( std::fabs(MdotF) > tolerance * Momentum.Mag() * ForceVec.Mag() )
      { 
         cerr << "ERROR: Force due to magnetic field is not perpendicular to momentum!!"  << endl;
+        cerr << "       Lane = " << lane << endl;
         hasError= true;
      }
      else if ( gVerbose )
      {
         cout << " Success:  Good (near zero) dot product momentum . force " << endl;
      }
-     if( std::fabs(BdotF) > tolerance * FieldVecVal.Mag() * ForceVec.Mag() )
+     if( std::fabs(BdotF) > tolerance * Field.Mag() * ForceVec.Mag() )
      { 
         cerr << "ERROR: Force due to magnetic field is not perpendicular to B field!"
              << std::endl; 
         cerr << " Vectors:  BField   Momentum   Force " << std::endl;
         for ( int i = 0; i < 3; i ++ )
            cerr << "  [" << i << "] "
-                << " " << setw(10) << FieldVecVal[i]
+                << " " << setw(10) << Field[i]
                 << " " << setw(10) << Momentum[i]              
                 << " " << setw(10) << ForceVec[i] << std::endl;
         
@@ -246,7 +330,6 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
      {
         cout << " Success:  Good (near zero) dot product magnetic-field . force " << std::endl;
      }
-  }
   
-  return hasError;
+     return hasError;
 }

@@ -27,7 +27,7 @@ class GUVVectorMagneticField :  public GUVVectorField
   
     GUVVectorMagneticField():
      GUVVectorField( sNumFieldComponents, sFieldChangesEnergy) 
-    {std::cout<<"--- GUVVectorMagneticField def c-tor called ---"<<std::endl;}
+    { /* std::cout<<"--- GUVVectorMagneticField def c-tor called ---"<<std::endl; */ }
 
     virtual ~GUVVectorMagneticField(){}; 
 
