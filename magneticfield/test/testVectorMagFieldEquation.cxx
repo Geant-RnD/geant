@@ -97,7 +97,7 @@ GUVVectorEquationOfMotion* CreateFieldAndEquation(const char* filename)
 }
 #endif
 
-int gVerbose = 1;
+int gVerbose = 0;
 
 bool TestEquation(GUVVectorEquationOfMotion *equation)
 {
@@ -114,11 +114,6 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   Double_v dydxVec[gNposmom];
   Double_v chargeVec= Double_v(0.0);  // { -1.0, 1.0, 2.0, -2.0 } ; 
 
-  for ( int i = 0; i < 3; i ++ ) {
-     PositionMomentum[i]   = Double_v( Position[i] );
-     PositionMomentum[3+i] = Double_v( Momentum[i] );
-  }
-
   // Revise the values, so that they are no longer equal
   vecCore::Set( chargeVec, 0, -1.0 );
   vecCore::Set( chargeVec, 1,  1.0 );
@@ -134,23 +129,68 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   }
   ***/ 
 
+  // Input check
+  //
+  const bool printInput= false;
+  if( printInput ) { 
+     for ( int i = 0; i < 3; i ++ ) {
+        PositionMomentum[i]   = Double_v( Position[i] );
+        PositionMomentum[3+i] = Double_v( Momentum[i] );
+     }
+     for ( int i= 0; i<3; i++ )  
+        cout << " pos["<<i<<"] = " << setw(6) << Position[i] << " PositionMomentum[] = " << PositionMomentum[i] << endl;
+     for ( int i= 0; i<3; i++ )
+        cout << " mom["<<i<<"] = " << setw(6) << Momentum[i] << " PositionMomentum[] = " << PositionMomentum[3+i] << endl;  
+  
+     cout << "Charge Vec = " << chargeVec << "  expected  -1, 1, -2, 2. "  << endl;
+  }
+  
   vecgeom::Vector3D<Float_v> FieldVec = { Float_v( FieldVecVal[0] ),
                                           Float_v( FieldVecVal[1] ),
                                           Float_v( FieldVecVal[2] ) };
   
   equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, chargeVec, dydxVec );
 
+  /****
+  //   Simple printing for visual cross check of output
+  cout << endl;
+  cout << " ============================================ " << endl;
+  cout << " Output - dy/dx Vec " << endl;
+  cout << " dy/dx Vec [3] : "  << dydxVec[3] << endl;
+  cout << " dy/dx Vec [4] : "  << dydxVec[4] << endl;
+  cout << " dy/dx Vec [5] : "  << dydxVec[5] << endl;
+  cout << " ============================================ " << endl;
+  ****/
+  
   // 1. Test each output individually first
   // ======================================
-  double   dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  const unsigned int laneWidth= 4;
+  bool printContents= false;
   
-  // for( int lane= 0; lane < Width; lane++ )
-  int lane= 0; 
+  for( unsigned int lane= 0; lane < laneWidth; lane++ )
+  // int lane= 0; 
   {
+     double   dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };   // To ensure zeroes at each iteration
+     double      yArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+     
      for( int i= 0; i< 6; i++ ) { 
-        dydxArr[i] = vecCore::Get ( dydxVec[lane], i );
+        dydxArr[i] = vecCore::Get ( dydxVec[i],          lane );
+        yArr[i]    = vecCore::Get ( PositionMomentum[i], lane );
      }
      ThreeVector_d  ForceVec( dydxArr[3], dydxArr[4], dydxArr[5]);
+
+     // PositionMomentum[3+i] = Double_v( Momentum[i] );
+
+     if( printContents ) { 
+        cout << " Vectors:      Y   dy/dx   ( lane = " << lane << " ) " << endl;
+        for ( int i = 0; i < 6; i ++ ) {
+           cout << "  [" << i << "] "
+                << " " << setw(10) << yArr[i]  // PositionMomentum[i]
+                << " " << setw(10) << dydxArr[i] << endl;
+        }
+     }
+
+     // if( lane >= 0 ) continue;
      
      double charge= vecCore::Get( chargeVec, lane );
 
@@ -168,13 +208,13 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
      // Tolerance of difference in values (used below)
      double tolerance = perMillion;
   
-     if ( gVerbose ) { std::cout << "Test output:  "  << std::endl; }
+     if ( gVerbose ) { cout << "Test output:  "  << endl; }
      if( std::fabs(ForceMag - c * std::fabs(charge) * fieldMag * sineAngle) >  tolerance * ForceMag ) {
         cerr << "ERROR: Force magnitude is not equal to   c * |charge| * |field| * sin( p, B )."  << endl;     
         cerr << "       Force magnitude = " << ForceMag << endl;
         cerr << "         other side =    " <<  c * std::fabs(charge) * fieldMag * sineAngle ; 
         cerr << " charge = " << charge 
-             << " field-Mag= " << fieldMag  << std::endl;     
+             << " field-Mag= " << fieldMag  << endl;     
         cerr << "       Force = " << ForceVec[0] << " " << ForceVec[1] << " " << ForceVec[2] << " "  << endl;
      }
      
