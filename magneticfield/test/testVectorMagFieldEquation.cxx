@@ -108,7 +108,7 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   // double PositionTime[4] = { PositionVec.x(), PositionVec.y(), PositionVec.z(), 0.0};
   Double_v PositionMomentum[gNposmom];
   Double_v dydxVec[gNposmom];
-  Double_v charge= Double_v(0.0);  // { -1.0, 1.0, 2.0, -2.0 } ; 
+  Double_v chargeVec= Double_v(0.0);  // { -1.0, 1.0, 2.0, -2.0 } ; 
 
   for ( int i = 0; i < 3; i ++ ) {
      PositionMomentum[i]   = Double_v( PositionVec[i] );
@@ -116,30 +116,35 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   }
 
   // Revise the values, so that they are no longer equal
-  vecCore::Set( &charge, 0, -1.0 );
-  vecCore::Set( &charge, 1,  1.0 );
-  vecCore::Set( &charge, 2, -2.0 );
-  vecCore::Set( &charge, 3,  2.0 );
+  // Set( &chargeVec, 0, -1.0 );
+  vecCore::Set( chargeVec, 0, -1.0 );
+  vecCore::Set( chargeVec, 1,  1.0 );
+  vecCore::Set( chargeVec, 2, -2.0 );
+  vecCore::Set( chargeVec, 3,  2.0 );
 /***
   // Try to make the code portable - how to find width ?  ( number of lanes ) 
   if( Double_v::Width() >= 8 ) { 
-    vecCore::Set( &charge, 4, -3.0);
-    vecCore::Set( &charge, 5, -3.0);
-    vecCore::Set( &charge, 6, -3.0);
-    vecCore::Set( &charge, 7, -3.0);    
+    vecCore::Set( chargeVec, 4, -3.0);
+    vecCore::Set( chargeVec, 5, -3.0);
+    vecCore::Set( chargeVec, 6, -3.0);
+    vecCore::Set( chargeVec, 7, -3.0);    
   }
   ***/ 
 
-  equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, charge, dydxVec );
+  equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, chargeVec, dydxVec );
 
   // Test one output first
   //
-  double         dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  int      lane= 0;
+  double   dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  
   for( int i= 0; i< 6; i++ ) { 
-     dydxArr[i] = vecCore::Get ( &dydxVec, i );
+     dydxArr[i] = vecCore::Get ( dydxVec[lane], i );
   }
   ThreeVector_d  ForceVec( dydxArr[3], dydxArr[4], dydxArr[5]);
 
+  double charge= vecCore::Get( chargeVec, lane );
+  
   // Check result
   double MdotF = MomentumVec.Dot(ForceVec);
   double BdotF = FieldVec.Dot(ForceVec);
