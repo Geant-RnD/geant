@@ -37,7 +37,7 @@ TNudyEndfPhEnergy::TNudyEndfPhEnergy(TNudyEndfFile *file)
       int NC              = sec->GetN1();
       MtNumbers.push_back(MT);
       int LF = tab1->GetL2();
-      std::cout << " LF = " << LF << " MT " << MT << "  NC " << NC << std::endl;
+      //std::cout << " LF = " << LF << " MT " << MT << "  NC " << NC << std::endl;
       NR = tab1->GetN1();
       NP = tab1->GetN2();
       //****************************************************************************
@@ -88,7 +88,7 @@ TNudyEndfPhEnergy::TNudyEndfPhEnergy(TNudyEndfFile *file)
         fE1.clear();
         //****************************************************************************
         // general evaporation spectrum
-      } 
+      }
     }
     ein2d.push_back(ein);
     frac2d.push_back(fP1);

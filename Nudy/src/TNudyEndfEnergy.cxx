@@ -42,7 +42,7 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
       }
       MtNumbers.push_back(MT);
       int LF = tab1->GetL2();
-      std::cout << " LF = " << LF << " MT " << MT << "  k " << k << "  " << sec->GetN1() << std::endl;
+      //std::cout << " LF = " << LF << " MT " << MT << "  k " << k << "  " << sec->GetN1() << std::endl;
       NR = tab1->GetN1();
       NP = tab1->GetN2();
       //****************************************************************************
@@ -131,7 +131,7 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         double energy, eout;
         for (int i = 0; i < np2; i++) {
           energy = fE2[i];
-           std::cout<<"energy "<<energy<<std::endl;
+           //std::cout<<"energy "<<energy<<std::endl;
           double sumprob = 0.0;
           eout           = fE3[1]/100;
 	  if(eout < 1E-05) eout = 1E-05;
@@ -581,7 +581,7 @@ double TNudyEndfEnergy::recursionLinearFile5Prob(double x1, double x2, double pd
 
 double TNudyEndfEnergy::recursionLinearFile5GenEva(double x1, double x2, double pdf1, double pdf2, double energy)
 {
-//   std::cout << std::setprecision(12) << x1 <<"  "<< std::setprecision(12) << x2 <<"  "<< 
+//   std::cout << std::setprecision(12) << x1 <<"  "<< std::setprecision(12) << x2 <<"  "<<
 //   std::setprecision(12) << pdf1 <<"  "<< std::setprecision(12) << pdf2 << std::endl;
   double pdf = 1.0;
   double mid = 0.5 * (x1 + x2);

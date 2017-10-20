@@ -41,7 +41,7 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
     int LTT 		 = sec->GetL2();
     int LI  		 = sec->GetL1();
     int NK  		 = sec->GetN1();
-   printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
+   //printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {
       TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();

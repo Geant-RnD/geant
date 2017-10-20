@@ -185,7 +185,7 @@ TNudyLibrary *TNudyManager::LoadLibrary(const char *memLibName, const char *disk
       }
       //      printf("Changing dir to %d",newSubLib);
       gDirectory->cd(newSubLib->GetName());
-      printf("Listof keys\n");
+      //printf("Listof keys\n");
       TList *models = gDirectory->GetListOfKeys();
       TIter iter(models);
       models->Print();

@@ -51,7 +51,7 @@ double NudyInterface::GetXS( int projCode, double projKE, double temp,
   Nudy::TNudyENDF *proc;
 
   //  Fix the name of the ENDF, ROOT and ENDFSUB filenames here
-  std::string fileENDF1 = SetDataFileNameENDF(projCode, isoName, projKE);
+  std::string fileENDF1 = SetDataFileNameENDF(projCode, isoName);
   SetEndfDataFileName(fileENDF1.c_str());
   std::string fileENDF2 = SetDataFileNameROOT(isoName);
   SetRootFileName (fileENDF2.c_str());
@@ -66,6 +66,7 @@ double NudyInterface::GetXS( int projCode, double projKE, double temp,
 */
   // Create and process with NUDY with keywords
   proc = new Nudy::TNudyENDF (fEndfDataFileName, fRootFileName, "recreate");
+  proc->SetLogLev(0);
   proc->Process();
   bool LFIval = proc->GetLFI();
   SetIsFissKey(LFIval);
@@ -77,13 +78,11 @@ double NudyInterface::GetXS( int projCode, double projKE, double temp,
   return XSvalue;
 }
 
-std::string NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName, double projKE){
+std::string NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName){
   std::string fstyle = "ENDF";
-  SetProjIDFn( projCode, projKE, fstyle);
+  SetProjIDFn( projCode, fstyle);
   std::string DataFileNameString = findENDFFileName( isoName);
   std::string fileENDFName1 = GetDataFileName(fProjID, DataFileNameString);
-  std::cout << DataFileNameString << "  " << fileENDFName1 << std::endl;
-
   return fileENDFName1;
 }
 
@@ -94,10 +93,10 @@ std::string NudyInterface::SetDataFileNameROOT( std::string isoName){
 }
 
 // This method is to be modified
-void NudyInterface::SetProjIDFn(int projCode, double projKE, std::string fstyle) {
+void NudyInterface::SetProjIDFn(int projCode, std::string fstyle) {
   bool isChFiss = GetFisCha(fMTValue);
-  if ( projKE < 0.03*geant::eV && projCode == 2112 ) SetProjID("thermal_scatt");
-  if ( projKE > 0.03*geant::eV && projCode == 2112 ) SetProjID("neutrons");
+//  if ( projKE < 0.03*geant::eV && projCode == 2112 ) SetProjID("thermal_scatt");
+  if ( projCode == 2112 ) SetProjID("neutrons");
   if (isChFiss && fstyle.compare("ENDFSUB")==0) SetProjID("nfy");
 }
 
@@ -130,7 +129,7 @@ double NudyInterface::ComputeCrossSection() {
 
   for ( unsigned int crsp = 0; crsp < recoPoint->MtValues[iElementID].size(); crsp++) {
     int mtNow = recoPoint->MtValues[iElementID][crsp];
-    if ( mtNow == fMTValue) { 
+    if ( mtNow == fMTValue) {
       xsvalue = recoPoint->GetSigmaPartial(iElementID, crsp, fProjKE) ;
       break;
     }
@@ -152,7 +151,7 @@ std::string NudyInterface::GetDataFileName(std::string str1, std::string str2) {
     std::string ENDFDataString = EndfDataPath + "/" + str1 + "/" + str2 + ".endf";
     return ENDFDataString;
   } else {
-    std::cout << " Please set environment ENDFDATADIR pointing to root of ENDF data directory ." << std::endl;
+    std::cout << " Please set environment ENDFDATADIR pointing to root of ENDF-B-VII data directory ." << std::endl;
     exit(99);
   }
   return EndfDataPath;
