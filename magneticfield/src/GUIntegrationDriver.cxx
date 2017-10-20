@@ -205,7 +205,7 @@ GUIntegrationDriver::AccurateAdvance(const GUFieldTrack& yInput,
   int  noFullIntegr=0, noSmallIntegr = 0 ;
   // G4ThreadLocal
   static int  noGoodSteps =0 ;  // Bad = chord > curve-len 
-  const  int  nvar= fNoVars;
+  const  int  nvar=  fNoIntegrationVariables;  // 6; // fpStepper-> ... 
 
   // GUFieldTrack yStartFT(yInput);
 
