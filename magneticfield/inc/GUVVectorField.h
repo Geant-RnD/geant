@@ -2,7 +2,11 @@
 /**
  * @file GUVVectorField.h
  * @brief  Abstract field class for Geant-V prototype
- * @author John Apostolakis
+ * @author Ananya
+ * @author John Apostolakis 
+ * 
+ * - Created:  Ananya  January 2016
+ *     ( based on GUVField by J.Apostolakis )
  */
 //===----------------------------------------------------------------------===//
 
@@ -93,7 +97,7 @@ class GUVVectorField //  : public GUVField
       virtual GUVVectorField* Clone() const;
 
   private:
-      const int  fNumberOfComponents; 
+      const int  fNumberOfComponents;
       bool       fChangesEnergy; 
 };
 

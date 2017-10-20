@@ -32,9 +32,9 @@ target_link_libraries(testMagFieldEquation Vmagfield Geant_v ${VECGEOM_LIBRARIES
 
 message(STATUS "Created target for testMagFieldEquation")
 
-#add_executable(testVectorMagFieldEquation testVectorMagFieldEquation.cxx)
-# $target_link_libraries(testVectorMagFieldEquation Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-##message(STATUS "Created target for testVectorMagFieldEquation")
+add_executable(testVectorMagFieldEquation testVectorMagFieldEquation.cxx)
+target_link_libraries(testVectorMagFieldEquation Vmagfield Geant_v ${VECGEOM_LIBRARIES} ${VECGEOM_LIBRARIES_EXTERNAL} ${USERKERNELLIB} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+message(STATUS "Created target for testVectorMagFieldEquation")
 
 add_executable(testStepperFixedCashKarp testStepperFixedCashKarp.cxx)
 target_link_libraries(testStepperFixedCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})

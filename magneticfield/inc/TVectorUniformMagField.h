@@ -19,6 +19,7 @@
 class TVectorUniformMagField : public GUVVectorMagneticField
 {
    using Double_v = Geant::Double_v;
+   using Float_v = Geant::Float_v;
    
    template <typename T>
    using Vector3D = vecgeom::Vector3D<T>;
