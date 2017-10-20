@@ -113,7 +113,7 @@ namespace NudyPhysics{
     double GetXS( int projCode, double projKE, double temp, std::string isoName,
       int tZ, int tA, geantphysics::HadronicProcessType pType
     ) ;
-    std::string  SetDataFileNameENDF( int projCode, std::string isoName, double projKE); //, int tZ, int tA );
+    std::string  SetDataFileNameENDF( int projCode, std::string isoName); //, int tZ, int tA );
     std::string findENDFFileName( std::string ele);//, int tZ, int tA ) ;
     std::string GetDataFileName( std::string str1, std::string str2 );
     std::string FixRootDataFile( std::string str1 );                   // ENDF filename without path and extension
@@ -121,7 +121,7 @@ namespace NudyPhysics{
     std::string SetDataFileNameENDFSUB( std::string isoName); //, int tZ, int tA );
     std::string GetCWD();
     bool GetFisCha(int inKey);
-    void SetProjIDFn( int projCode, double projKE, std::string style);
+    void SetProjIDFn( int projCode, std::string style);
     double ComputeCrossSection( );
     void SetMTValues(geantphysics::HadronicProcessType pType);
   public:

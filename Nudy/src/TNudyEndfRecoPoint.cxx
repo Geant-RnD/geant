@@ -155,7 +155,7 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
         if (flagRead != 1) {
           recoNuPh = new TNudyEndfNuPh(file);
           flagRead = 1;
-          std::cout << "file 1 OK: Should be printed only one time " << std::endl;
+          // std::cout << "file 1 OK: Should be printed only one time " << std::endl;
         }
         break;
       case 2:
@@ -206,24 +206,24 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 	  sigmaMts.clear();
         }break;
       case 4:
-        std::cout << "before file 4 " << std::endl;
+        //std::cout << "before file 4 " << std::endl;
         recoAng = new TNudyEndfAng(file);
-        std::cout << "file 4 OK " << std::endl;
+        //std::cout << "file 4 OK " << std::endl;
         break;
       case 5:
-        std::cout << "before file 5 " << std::endl;
+        //std::cout << "before file 5 " << std::endl;
         recoEnergy = new TNudyEndfEnergy(file);
-        std::cout << "file 5 OK " << std::endl;
+        //std::cout << "file 5 OK " << std::endl;
         break;
       case 6:
-        std::cout << "before file 6 " << std::endl;
+        //std::cout << "before file 6 " << std::endl;
         recoEnergyAng = new TNudyEndfEnergyAng(file, QValue);
-        std::cout << "file 6 OK " << std::endl;
+        //std::cout << "file 6 OK " << std::endl;
         break;
       case 8:
-        std::cout << "before file 8 " << std::endl;
+        //std::cout << "before file 8 " << std::endl;
         recoFissY = new TNudyEndfFissionYield(file);
-        std::cout << "file 8 OK " << std::endl;
+        //std::cout << "file 8 OK " << std::endl;
         break;
 // //       case 12:
 // //         std::cout << "before file 12 " << std::endl;
@@ -236,9 +236,9 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 // // 	std::cout<<"file 13 OK "<<std::endl;
 // // 	break;
         case 14:
-          std::cout << "before file 14 " << std::endl;
+          //std::cout << "before file 14 " << std::endl;
   	recoPhAng = new TNudyEndfPhAng(file);
-  	std::cout<<"file 14 OK "<<std::endl;
+  	//std::cout<<"file 14 OK "<<std::endl;
   	break;
 // //       case 15:
 // //         std::cout << "before file 15 " << std::endl;
