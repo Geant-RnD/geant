@@ -71,7 +71,7 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
      void EvaluateRhsGivenB( const Double_v y[],
                              const Vector3D<Float_v> B,  // Was const double B[3],
                              const Double_v charge,
-                                   Double_v dydx[] ) const override
+                                   Double_v dydx[] ) const override final
      { TEvaluateRhsGivenB( y, B, charge, dydx); }
 
      REALLY_INLINE
@@ -86,16 +86,6 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
      void PrintInputFieldAndDyDx(const Double_v y[],  
                                  const Double_v charge,  
                                        Double_v dydx[] ) const;
-
-     //Discuss
-     //Function needed? probably not if we don't care about particleCharge
-     //or not take any input but just do InformReady?
-     REALLY_INLINE
-     void InitializeCharge(double particleCharge) final 
-      {  fParticleCharge= particleCharge; GUVVectorEquationOfMotion::InformReady();  }
-
-      //should get this func. from inheritance
-      void InvalidateParameters() final { GUVVectorEquationOfMotion::InformDone();}
 
    private:
      enum { G4maximum_number_of_field_components = 24 };
@@ -138,10 +128,10 @@ template <class Field, unsigned int Size>
 template <class Field, unsigned int Size>
 REALLY_INLINE
    void  TVectorMagFieldEquation<Field, Size>
-   ::TEvaluateRhsGivenB( const Double_v                   y[],
-                         const Vector3D<Float_v> Bfloat,  
-                         const Double_v                   charge,
-                         Double_v                         dydx[]  ) const
+   ::TEvaluateRhsGivenB( const Double_v             y[],
+                         const Vector3D<Float_v>    Bfloat,
+                         const Double_v             charge,
+                         Double_v                   dydx[]  ) const
 {
   
     Double_v momentum_mag_square = y[3]*y[3] + y[4]*y[4] + y[5]*y[5];
@@ -149,7 +139,7 @@ REALLY_INLINE
 
     Vector3D<Double_v> B( (Double_v) Bfloat[0], (Double_v) Bfloat[1], (Double_v) Bfloat[2] );
 
-    Double_v cof = charge * (Constants::c_light)   // Was fCof
+    Double_v cof = charge * ((Double_v) Constants::c_light)   // Was fCof
                    * inv_momentum_magnitude;
 
     dydx[0] = y[3]*inv_momentum_magnitude;       //  (d/ds)x = Vx/V

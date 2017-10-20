@@ -60,14 +60,6 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
     Double_v DistChord()const ;
       // Estimate maximum distance of curved solution and chord ... 
 
-    virtual void InitializeCharge(double particleCharge)
-    {
-       fParticleCharge= particleCharge;
-       
-       // Pass it along as expected 
-       GUVVectorIntegrationStepper::InitializeCharge(particleCharge);
-    }
-       //  GetEquationOfMotion()->InitializeCharge(particleCharge); }
   protected:  // with description
 
     inline void LinearStep( const Double_v  yIn[],

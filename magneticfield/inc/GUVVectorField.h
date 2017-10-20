@@ -106,7 +106,7 @@ inline GUVVectorField::GUVVectorField( int numberOfComponents, bool changesEnerg
      fChangesEnergy(changesEnergy)
      //GUVField(numberOfComponents, changesEnergy)
 {
-  std::cout<<"-- entered GUVVectorField  constructor--"<<std::endl;
+   // std::cout<<"-- entered GUVVectorField  constructor--"<<std::endl;
 }
 
 

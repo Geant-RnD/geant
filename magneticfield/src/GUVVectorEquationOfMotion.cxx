@@ -13,7 +13,6 @@ unsigned int GUVVectorEquationOfMotion::fNumObjectsDeleted= 0;
 
 GUVVectorEquationOfMotion::~GUVVectorEquationOfMotion()
 {
-  CheckDone();
   fNumObjectsDeleted++;
 }
 

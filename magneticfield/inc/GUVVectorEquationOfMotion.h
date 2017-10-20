@@ -7,7 +7,7 @@
 // motion of a particle in a field.
 
 // History:
-// - Created:  Ananya  January 2016
+
 //     ( based on GUVEquationOfMotion by J.Apostolakis )
 // -------------------------------------------------------------------
 
@@ -50,26 +50,10 @@ class GUVVectorEquationOfMotion //: public GUVEquationOfMotion
        // --------------------------------------------------------
        // This is the _only_ function a subclass must define.
        // The other two functions use Rhs_givenB.
-
-      
-      virtual void InitializeCharge(double particleCharge)=0;
-       // Must be called to correctly initialise and provide charge
-      virtual void InvalidateParameters()=0;
-      
-      inline void InformReady(); // All parameters have been set (charge+)
-      inline void InformDone();  // Invalidate charge, other parameters
-      inline void CheckInitialization() const; // Ensure initialization
-      inline void CheckDone() const;
-
-     // virtual void SetChargeMomentumMass(double particleCharge,
-     //                                    double MomentumXc,
-     //                                    double MassXc2) = 0;
-     //   // Set the charge, momentum and mass of the current particle
-     //   // --> used to set the equation's coefficients ...
-
-      inline void RightHandSide( const  Double_v y[],
-                                        Double_v charge ,
-                                        Double_v dydx[] ) const;
+     
+     inline void RightHandSide( const  Double_v y[],
+                                       Double_v charge ,
+                                       Double_v dydx[] ) const;
        // This calculates the value of the derivative dydx at y.
        // It is the usual enquiry function.
        // ---------------------------
@@ -139,6 +123,7 @@ GUVVectorEquationOfMotion::GUVVectorEquationOfMotion(GUVVectorField* pField, uns
    }
 }
 
+/*****
 inline
 void GUVVectorEquationOfMotion::InformReady() // was Initialize()
 {
@@ -156,6 +141,7 @@ void GUVVectorEquationOfMotion::InformDone()  // was Clear() and before Finished
    assert( fInitialised );
    fInitialised= false;
 }
+****/
 
 inline
 void GUVVectorEquationOfMotion::GetFieldValue( const Double_v Point[4],
@@ -195,7 +181,7 @@ GUVVectorEquationOfMotion::RightHandSide( const Double_v y[],
 {
    using ThreeVectorF = Vector3D<Float_v>;
    using ThreeVectorD = Vector3D<Double_v>;
-   CheckInitialization();
+   // CheckInitialization();
 
    ThreeVectorF  Field_3vf;
    ThreeVectorD  Position( y[0], y[1], y[2] );
@@ -203,28 +189,5 @@ GUVVectorEquationOfMotion::RightHandSide( const Double_v y[],
    GetFieldValue( Position, Field_3vf );
    EvaluateRhsGivenB( y, Field_3vf, charge, dydx );
 }
-
-#include <iostream>
-
-void GUVVectorEquationOfMotion::CheckInitialization() const
-{
-#ifdef GUVERBOSE
-   if( fVerbose && !fInitialised ){
-      std::cerr << "GUVVectorEquationOfMotion is not Initialised" << std::endl;
-   }
-#endif
-   assert( fInitialised );
-}
-
-void GUVVectorEquationOfMotion::CheckDone() const
-{
-#ifdef GUVERBOSE
-   if( fVerbose && fInitialised ){
-      std::cerr << "GUVVectorEquationOfMotion was NOT told it is Done!" << std::endl;
-   }
-#endif
-   assert( !fInitialised );
-}
-
 
 #endif /* GUV_VectorEquationOfMotion_DEF */
