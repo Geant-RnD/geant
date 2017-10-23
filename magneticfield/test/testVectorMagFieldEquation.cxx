@@ -65,6 +65,9 @@ main( int, char** )
   good = good && okCMSfield;
 #endif
   
+  if (good) cout << "*** TEST PASSED ***\n";
+  else      cout << "*** TEST PASSED ***\n";
+  
   return good;
 }
 
@@ -137,22 +140,22 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
                                            Double_v( BFieldValue[2] ) };
   // Input check
   //
-  const bool printInput= true;
-  if( printInput ) { 
-     for ( int i = 0; i < 3; i ++ ) {
-        PositionMomentum[i]   = Double_v( Position[i] );
-        PositionMomentum[3+i] = Double_v( Momentum[i] );
-     }
-     for ( int i= 0; i<3; i++ )  
-        cout << " pos["<<i<<"] = " << setw(6) << Position[i] << " PositionMomentum[] = " << PositionMomentum[i] << endl;
-     for ( int i= 0; i<3; i++ )
-        cout << " mom["<<i<<"] = " << setw(6) << Momentum[i] << " PositionMomentum[] = " << PositionMomentum[3+i] << endl;  
+  const bool printInput= false;
+  for ( int i = 0; i < 3; i ++ ) {
+    PositionMomentum[i]   = Double_v( Position[i] );
+    PositionMomentum[3+i] = Double_v( Momentum[i] );
+  }
+  if( printInput ) {
+    for ( int i= 0; i<3; i++ )  
+       cout << " pos["<<i<<"] = " << setw(6) << Position[i] << " PositionMomentum[] = " << PositionMomentum[i] << endl;
+    for ( int i= 0; i<3; i++ )
+       cout << " mom["<<i<<"] = " << setw(6) << Momentum[i] << " PositionMomentum[] = " << PositionMomentum[3+i] << endl;  
   
-     cout << "Charge Vec = " << chargeVec << "  expected  -1, 1, -2, 2. "  << endl;
-     cout << "Field Vec = " << FieldVec << endl;
+    cout << "Charge Vec = " << chargeVec << "  expected  -1, 1, -2, 2. "  << endl;
+    cout << "Field Vec = " << FieldVec << endl;
   }
   
-  bool printContents= true; // Verbose output of  dy/dx, y, etc. 
+  bool printContents= false; // Verbose output of  dy/dx, y, etc. 
   
   // 1.) Simple case: Use the equation with a given field value
   // ------------------------------------------------------------
@@ -160,13 +163,15 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, chargeVec, dydxVec );
 
   //   Simple printing for visual cross check of output
-  cout << endl;
-  cout << " ============================================ " << endl;
-  cout << " Output - dy/dx Vec " << endl;
-  cout << " dy/dx Vec [3] : "  << dydxVec[3] << endl;
-  cout << " dy/dx Vec [4] : "  << dydxVec[4] << endl;
-  cout << " dy/dx Vec [5] : "  << dydxVec[5] << endl;
-  cout << " ============================================ " << endl;
+  if (printContents) {
+    cout << endl;
+    cout << " ============================================ " << endl;
+    cout << " Output - dy/dx Vec " << endl;
+    cout << " dy/dx Vec [3] : "  << dydxVec[3] << endl;
+    cout << " dy/dx Vec [4] : "  << dydxVec[4] << endl;
+    cout << " dy/dx Vec [5] : "  << dydxVec[5] << endl;
+    cout << " ============================================ " << endl;
+  }
      
   // a.) Test each output individually first
   // ======================================
@@ -228,7 +233,7 @@ bool CheckDerivativeInLanesAndReport( const Double_v & chargeVec,
         fieldVal[i] = vecCore::Get( FieldVec[i], lane );
         MomentumArr[i] = vecCore::Get( PositionMomentum[3+i], lane );
      }
-     ThreeVector_d BFieldVal( fieldVal[0], fieldVal[2], fieldVal[2] );
+     ThreeVector_d BFieldVal( fieldVal[0], fieldVal[1], fieldVal[2] );
      ThreeVector_d Momentum3v( MomentumArr[0], MomentumArr[1], MomentumArr[2] );
      
      // PositionMomentum[3+i] = Double_v( Momentum[i] );
