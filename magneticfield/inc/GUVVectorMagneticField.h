@@ -40,7 +40,7 @@ class GUVVectorMagneticField :  public GUVVectorField
                                 Vector3D<float>        &FieldValue ) = 0;
 
     virtual void GetFieldValueSIMD( Vector3D<Double_v>  const &Position, 
-                                    Vector3D<Float_v>         &FieldValue ) = 0;
+                                    Vector3D<Double_v>         &FieldValue ) = 0;
 
     GUVVectorMagneticField& operator = (const GUVVectorMagneticField &p);
     //  Copy 'standard' components ...

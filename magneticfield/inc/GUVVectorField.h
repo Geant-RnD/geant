@@ -76,7 +76,7 @@ class GUVVectorField //  : public GUVField
 
       //Vector interface
       virtual void GetFieldValueSIMD( Vector3D<Double_v> const &Position,
-                                      Vector3D<Float_v>      &FieldValue ) = 0;
+                                      Vector3D<Double_v>       &FieldValue ) = 0;
 
       // a helper tramponline to dispatch to DistanceToOut if type is not scalar
       template <typename S, typename T>

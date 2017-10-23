@@ -98,6 +98,7 @@ add_custom_target(testMagEq DEPENDS testMagFieldEquation)
 #
 #install(TARGETS testFieldPropagator DESTINATION bin)
 install(TARGETS testMagFieldEquation DESTINATION bin)
+install(TARGETS testVectorMagFieldEquation DESTINATION bin)
 install(TARGETS testStepperFixedCashKarp DESTINATION bin)
 install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
 install(TARGETS testStepperFixed DESTINATION bin)

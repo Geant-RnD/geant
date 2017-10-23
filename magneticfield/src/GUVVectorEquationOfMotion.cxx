@@ -21,7 +21,7 @@ GUVVectorEquationOfMotion::
 EvaluateRhsReturnB( const Double_v  y[],
                           Double_v  dydx[],
                           Double_v  charge,
-                          vecgeom::Vector3D<Float_v> &Field
+                          vecgeom::Vector3D<Double_v> &Field
    ) const
 {
    Double_v  PositionAndTime[4];

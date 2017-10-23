@@ -26,11 +26,11 @@
 #endif
 
 
-using ThreeVector_f = vecgeom::Vector3D<float>;  // vecgeom::Vector3D<float>;
+//using ThreeVector_f = vecgeom::Vector3D<float>;  // vecgeom::Vector3D<float>;
 using ThreeVector_d = vecgeom::Vector3D<double>; // vecgeom::Vector3D<double>;
 
 using Double_v = Geant::Double_v;
-using Float_v  = Geant::Float_v;
+//using Float_v  = Geant::Float_v;
 
 // using ThreeVec_DblV = vecgeom::Vector3D<Double_v>;
 // using ThreeVec_FltV = vecgeom::Vector3D<Float_v>; 
@@ -40,7 +40,7 @@ using std::cerr;
 using std::endl;
 using std::setw;
 
-GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_f constFieldValue);
+GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_d constFieldValue);
 GUVVectorEquationOfMotion* CreateFieldAndEquation(const char* filename);
 
 bool  TestEquation(GUVVectorEquationOfMotion* );
@@ -52,7 +52,7 @@ const char *defaultFieldFileName= "cmsmagfield2015.txt";
 int
 main( int, char** )
 {
-  ThreeVector_f  FieldValue(0.0, 0.0, 1.0);
+  ThreeVector_d  FieldValue(0.0, 0.0, 1.0);
    
   GUVVectorEquationOfMotion* eq = CreateUniformFieldAndEquation( FieldValue );
   bool okUniform = TestEquation(eq);
@@ -68,7 +68,7 @@ main( int, char** )
   return good;
 }
 
-GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_f FieldValue)
+GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_d FieldValue)
 {
   // using Field_t = TUniformMagField;
 
@@ -107,7 +107,7 @@ bool SanityCheckMagFieldEquation(  double         charge,
 
 bool CheckDerivativeInLanesAndReport( const Double_v & chargeVec,
                                       const Double_v   PositionMomentum[gNposmom],
-                                      vecgeom::Vector3D<Float_v>& FieldVec,
+                                      vecgeom::Vector3D<Double_v>& FieldVec,
                                       const Double_v   dydxVec[gNposmom],                                      
                                       bool printContents= false );
 
@@ -120,31 +120,24 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   
   ThreeVector_d Position( 1., 2.,  3.);  // initial
   ThreeVector_d Momentum( 0., 0.1, 1.);
-  ThreeVector_f BFieldValue( 0., 0., 1.);  // Magnetic field value (constant)
+  ThreeVector_d BFieldValue( 0., 0., 1.);  // Magnetic field value (constant)
 
   // double PositionTime[4] = { Position.x(), Position.y(), Position.z(), 0.0};
   Double_v PositionMomentum[gNposmom];
   Double_v dydxVec[gNposmom];
-  Double_v chargeVec= Double_v(0.0);  // { -1.0, 1.0, 2.0, -2.0 } ; 
+  int chargeVecScalar[8] = { -1, 1, 2, -2, -3, -3, -3, -3 };
 
   // Revise the values, so that they are no longer equal
-  vecCore::Set( chargeVec, 0, -1.0 );
-  vecCore::Set( chargeVec, 1,  1.0 );
-  vecCore::Set( chargeVec, 2, -2.0 );
-  vecCore::Set( chargeVec, 3,  2.0 );
-/***
-  // Try to make the code portable - how to find width ?  ( number of lanes ) 
-  if( Double_v::Width() >= 8 ) { 
-    vecCore::Set( chargeVec, 4, -3.0);
-    vecCore::Set( chargeVec, 5, -3.0);
-    vecCore::Set( chargeVec, 6, -3.0);
-    vecCore::Set( chargeVec, 7, -3.0);    
-  }
-  ***/ 
+  Double_v chargeVec= Double_v(0.0);  // { -1.0, 1.0, 2.0, -2.0 } ; 
+  for (size_t lane = 0; lane < Geant::kVecLenD; ++lane)
+    vecCore::Set( chargeVec, lane, (double)chargeVecScalar[lane % 8] );
 
+  vecgeom::Vector3D<Double_v> FieldVec = { Double_v( BFieldValue[0] ),
+                                           Double_v( BFieldValue[1] ),
+                                           Double_v( BFieldValue[2] ) };
   // Input check
   //
-  const bool printInput= false;
+  const bool printInput= true;
   if( printInput ) { 
      for ( int i = 0; i < 3; i ++ ) {
         PositionMomentum[i]   = Double_v( Position[i] );
@@ -156,20 +149,16 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
         cout << " mom["<<i<<"] = " << setw(6) << Momentum[i] << " PositionMomentum[] = " << PositionMomentum[3+i] << endl;  
   
      cout << "Charge Vec = " << chargeVec << "  expected  -1, 1, -2, 2. "  << endl;
+     cout << "Field Vec = " << FieldVec << endl;
   }
   
-  vecgeom::Vector3D<Float_v> FieldVec = { Float_v( BFieldValue[0] ),
-                                          Float_v( BFieldValue[1] ),
-                                          Float_v( BFieldValue[2] ) };
-
-  bool printContents= false; // Verbose output of  dy/dx, y, etc. 
+  bool printContents= true; // Verbose output of  dy/dx, y, etc. 
   
   // 1.) Simple case: Use the equation with a given field value
   // ------------------------------------------------------------
   
   equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, chargeVec, dydxVec );
 
-  /****
   //   Simple printing for visual cross check of output
   cout << endl;
   cout << " ============================================ " << endl;
@@ -178,7 +167,6 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   cout << " dy/dx Vec [4] : "  << dydxVec[4] << endl;
   cout << " dy/dx Vec [5] : "  << dydxVec[5] << endl;
   cout << " ============================================ " << endl;
-  ****/
      
   // a.) Test each output individually first
   // ======================================
@@ -204,7 +192,7 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   // 3.) Full case: Use the full equation, and even get back the value of the field
   // ------------------------------------------------------------------------------
   Double_v dydxVecFull[gNposmom];  
-  vecgeom::Vector3D<Float_v> FieldVecEval;
+  vecgeom::Vector3D<Double_v> FieldVecEval;
   equation->EvaluateRhsReturnB( PositionMomentum, dydxVecFull, chargeVec, FieldVecEval );
   bool laneError3=
      CheckDerivativeInLanesAndReport( chargeVec, PositionMomentum, FieldVecEval, dydxVecFull, printContents);
@@ -216,15 +204,13 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
 
 bool CheckDerivativeInLanesAndReport( const Double_v & chargeVec,
                                       const Double_v   PositionMomentum[gNposmom],
-                                      vecgeom::Vector3D<Float_v>& FieldVec,
+                                      vecgeom::Vector3D<Double_v>& FieldVec,
                                       const Double_v   dydxVec[gNposmom],                                      
                                       bool printContents )
 {
   bool hasError= false;
-   
-  const unsigned int laneWidth= 4;
-  
-  for( unsigned int lane= 0; lane < laneWidth; lane++ )
+     
+  for( unsigned int lane= 0; lane < Geant::kVecLenD; lane++ )
   // int lane= 0; 
   {
      double     dydxArr[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };   // To ensure zeroes at each iteration

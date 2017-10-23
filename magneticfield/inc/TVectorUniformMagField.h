@@ -61,12 +61,12 @@ class TVectorUniformMagField : public GUVVectorMagneticField
         }
 
         void GetFieldValueSIMD( Vector3D<Double_v> const &, // Position,
-                                Vector3D<Float_v> &FieldValue ) override final
+                                Vector3D<Double_v> &FieldValue ) override final
         {
            // for (int i=0; i<3; i++) FieldValue[i] = Float_v( fFieldComponents[i] );
-           FieldValue[0] = Float_v( fFieldComponents[0] );
-           FieldValue[1] = Float_v( fFieldComponents[1] );
-           FieldValue[2] = Float_v( fFieldComponents[2] );           
+           FieldValue[0] = Double_v( fFieldComponents[0] );
+           FieldValue[1] = Double_v( fFieldComponents[1] );
+           FieldValue[2] = Double_v( fFieldComponents[2] );           
            // FieldValue= Vector3D<Float_v> (fFieldComponents);
         }
 

@@ -31,7 +31,7 @@ template <class Field, unsigned int Size>
 class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
 {
    using Double_v = Geant::Double_v;
-   using Float_v  = Geant::Float_v;
+   //using Float_v  = Geant::Float_v;
 
    template <typename T>
    using Vector3D = vecgeom::Vector3D<T>;
@@ -63,13 +63,13 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
 
      REALLY_INLINE
      void TEvaluateRhsGivenB( const Double_v y[],
-                              const Vector3D<Float_v> B,  // Was double B[3],
+                              const Vector3D<Double_v> B,  // Was double B[3],
                               const Double_v charge,
                                     Double_v dydx[] ) const;
 
      // virtual
      void EvaluateRhsGivenB( const Double_v y[],
-                             const Vector3D<Float_v> B,  // Was const double B[3],
+                             const Vector3D<Double_v> B,  // Was const double B[3],
                              const Double_v charge,
                                    Double_v dydx[] ) const override final
      { TEvaluateRhsGivenB( y, B, charge, dydx); }
@@ -80,7 +80,7 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
 
      REALLY_INLINE
      void FieldFromY(const Double_v y[], 
-                           Vector3D<Float_v> &Bfield ) const;
+                           Vector3D<Double_v> &Bfield ) const;
 
      REALLY_INLINE
      void PrintInputFieldAndDyDx(const Double_v y[],  
@@ -129,15 +129,13 @@ template <class Field, unsigned int Size>
 REALLY_INLINE
    void  TVectorMagFieldEquation<Field, Size>
    ::TEvaluateRhsGivenB( const Double_v             y[],
-                         const Vector3D<Float_v>    Bfloat,
+                         const Vector3D<Double_v>   B,
                          const Double_v             charge,
                          Double_v                   dydx[]  ) const
 {
   
     Double_v momentum_mag_square = y[3]*y[3] + y[4]*y[4] + y[5]*y[5];
     Double_v inv_momentum_magnitude = 1. / vecCore::math::Sqrt( momentum_mag_square );
-
-    Vector3D<Double_v> B( (Double_v) Bfloat[0], (Double_v) Bfloat[1], (Double_v) Bfloat[2] );
 
     Double_v cof = charge * ((Double_v) Constants::c_light)   // Was fCof
                    * inv_momentum_magnitude;
@@ -150,7 +148,6 @@ REALLY_INLINE
     dydx[4] = cof*(y[5]*B[0] - y[3]*B[2]) ;  // Ay = a*(Vz*Bx - Vx*Bz)
     dydx[5] = cof*(y[3]*B[1] - y[4]*B[0]) ;  // Az = a*(Vx*By - Vy*Bx)
 
-    return ;
 }
 
 template <class Field, unsigned int Size>
@@ -175,7 +172,7 @@ REALLY_INLINE
 void
 TVectorMagFieldEquation<Field,Size>
    ::FieldFromY(const Double_v             y[],  
-                      Vector3D<Float_v>   &Bfield ) const
+                      Vector3D<Double_v>   &Bfield ) const
 {
     Vector3D<Double_v> Position( y[0], y[1], y[2] );
 
@@ -191,7 +188,7 @@ TVectorMagFieldEquation<Field,Size>
                    const Double_v charge, 
                          Double_v dydx[] ) const
 {
-    Vector3D<Float_v> BfieldVec;
+    Vector3D<Double_v> BfieldVec;
 
     FieldFromY( y, BfieldVec );
     TEvaluateRhsGivenB( y, BfieldVec, charge, dydx );
