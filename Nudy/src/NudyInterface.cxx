@@ -118,12 +118,12 @@ double NudyInterface::ComputeCrossSection() {
   double iSigDiff = 0.001;   // trial value for test documentation reqd.
 
   NudyPhysics::TNudyEndfSigma();
-  TNudyEndfSigma  xsec;
+  TNudyEndfSigma  *xsec;
   xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
   xsec->SetPreProcess (0) ;
   xsec->SetInitTempDop(0.0);
   xsec->SetOutTempDop(293.6);
-  xsec.GetData(fRootFileName, iSigDiff);
+  xsec->GetData(fRootFileName, iSigDiff);
 
 
 //NudyPhysics::TNudyEndfRecoPoint();
