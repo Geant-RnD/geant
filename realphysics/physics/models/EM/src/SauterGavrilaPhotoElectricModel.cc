@@ -52,8 +52,11 @@ namespace geantphysics {
     SauterGavrilaPhotoElectricModel::SauterGavrilaPhotoElectricModel(const std::string &modelname, bool aliasActive)
     : EMModel(modelname){
         
-        SetUseSamplingTables(aliasActive);
-        fMinPrimEnergy           =  1.e-12*geant::eV;  // Minimum of the gamma kinetic energy grid, used to sample the photoelectron direction
+        //TO DO: all these values need to be seen and set with the optimal values
+        fNumSamplingPrimEnergiesPerDecade = 20;    // Number of primary gamma kinetic energy grid points per decade. It should be set/get and must be done before init
+        fNumSamplingPrimEnergies = 60;
+        fNumSamplingAngles = 60;                       // at each energy grid points
+        fMinPrimEnergy           =  1*geant::eV;       // Minimum of the gamma kinetic energy grid, used to sample the photoelectron direction
         fMaxPrimEnergy           =  100*geant::MeV;    // Maximum of the gamma kinetic energy grid (after this threshold the e- is considered to follow the same direction as the incident gamma)
         
         fPrimEnLMin              = 0.;       // will be set in InitSamplingTables if needed
@@ -234,9 +237,6 @@ namespace geantphysics {
             std::cout << "Calling ReadData() of SauterGavrilaPhotoElectricModel"
             << std::endl;
         }
-        //to change
-        //if( ( (fCrossSection[Z] && Z<23) || (!fCrossSection[Z] && Z>22 )) && ( (fCrossSectionLE[Z] && Z>2) || (!fCrossSectionLE[Z] && Z<3)) ) {std::cout<<"Data loaded before!\n"; return;}
-        //else std::cout<<"Data not loaded before!\n";
         
         if(  (fCrossSection[Z]) && ( (fCrossSectionLE[Z] && Z>2) || (!fCrossSectionLE[Z] && Z<3)) )
         {//std::cout<<"Data loaded before!\n";
@@ -253,7 +253,6 @@ namespace geantphysics {
             exit(1);
         }
         
-        fCrossSection[Z] =true;
         std::ostringstream ost;
         ost << path << "/livermore/phot_epics2014/pe-cs-" << Z <<".dat";
         std::ifstream fin(ost.str().c_str());
@@ -263,10 +262,11 @@ namespace geantphysics {
             
             return;
         } else {
-            if(fVerboseLevel > 3) { std::cout << "File " << ost.str().c_str()
+            
+            fCrossSection[Z] =true;
+            if(fVerboseLevel > 2) { std::cout << "File " << ost.str().c_str()
                 << " is opened by SauterGavrilaPhotoElectricModel" << std::endl;}
-            
-            
+        
             fCSVector[Z]= new XSectionsVector;
             fin >> fCSVector[Z]->edgeMin >> fCSVector[Z]->edgeMax >> fCSVector[Z]->numberOfNodes;
             
@@ -309,8 +309,6 @@ namespace geantphysics {
             fCSVector[Z]->sp= new Spline((fCSVector[Z]->fBinVector.data()),(fCSVector[Z]->fDataVector.data()),fCSVector[Z]->numberOfNodes);
             fin.close();
         }
-        
-        //}
         
         // read high-energy fit parameters
         fParamHigh[Z] = new std::vector<double>;
@@ -484,7 +482,7 @@ namespace geantphysics {
                     << " is opened by SauterGavrilaPhotoElectricModel" << std::endl;
                 }
                 
-                // binning
+                fCrossSectionLE[Z] = true;
                 fLECSVector[Z]= new XSectionsVector;
                 
                 fin3 >> fLECSVector[Z]->edgeMin >> fLECSVector[Z]->edgeMax >> fLECSVector[Z]->numberOfNodes;
