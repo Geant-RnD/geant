@@ -35,7 +35,7 @@ namespace geantphysics {
     std::vector<double>*  SauterGavrilaPhotoElectricModel::fParamHigh[] = {nullptr};
     std::vector<double>*  SauterGavrilaPhotoElectricModel::fParamLow[] = {nullptr};
     
-    SauterGavrilaPhotoElectricModel::ShellData  ** SauterGavrilaPhotoElectricModel::fShellCrossSection = {nullptr};
+    //SauterGavrilaPhotoElectricModel::ShellData  ** SauterGavrilaPhotoElectricModel::fShellCrossSection = {nullptr};
     
     int                   SauterGavrilaPhotoElectricModel::fNShells[] = {0};
     int                   SauterGavrilaPhotoElectricModel::fNShellsUsed[] = {0};
@@ -67,7 +67,7 @@ namespace geantphysics {
         fAliasData                = nullptr;    // will be set in InitSamplingTables if needed
         fAliasSampler             = nullptr;
         
-        fShellCrossSection        = nullptr;
+        //fShellCrossSection        = nullptr;
         fCrossSection             = nullptr;
         fCrossSectionLE           = nullptr;
         
@@ -84,7 +84,7 @@ namespace geantphysics {
         }
         
         //CLEANING fShellCrossSection
-        if (fShellCrossSection) {
+        /*if (fShellCrossSection) {
             for(int i=0; i<gMaxSizeData; i++){
                 if(fShellCrossSection[i])
                 {
@@ -101,7 +101,7 @@ namespace geantphysics {
             }
             
             delete [] fShellCrossSection;
-        }
+        }*/
         
         
         if (fSamplingPrimEnergies)
@@ -166,7 +166,7 @@ namespace geantphysics {
         }
         
         //ALLOCATION fShellCrossSection
-        if (fShellCrossSection) {
+        /*if (fShellCrossSection) {
             for (int i=0; i<gMaxSizeData; ++i)
                 for (int j=0; j<gNShellLimit; ++j){
                     if (fShellCrossSection[i]) {
@@ -192,7 +192,7 @@ namespace geantphysics {
                 fShellCrossSection[i]->fCompLength=nullptr;
                 
             }
-        
+        */
         fVerboseLevel=1;
         LoadData();
         //NOT NEEDED FOR THE MOMENT - NO ALIAS USED
@@ -406,15 +406,29 @@ namespace geantphysics {
             n2 = gNShellLimit;
         }
         fNShellsUsed[Z]=n2;
+        
+        //NEW
         fShellVector[Z] = new XSectionsVector*[n2];
         for(int i=0; i<n2; i++)
             fShellVector[Z][i]=new XSectionsVector;
         
+        //OLD
+        //fShellCrossSection[Z] = new ShellData;
+        //fShellCrossSection[Z]->fCompDataVector= new std::vector<double>[n2];
+        //fShellCrossSection[Z]->fCompBinVector= new std::vector<double>[n2];
+        //fShellCrossSection[Z]->fCompID=new int[n2];
+        //fShellCrossSection[Z]->fCompLength = new size_t [n2];
+        
         for (int i=0 ; i<n2 ; i++)
         {
+            //NEW
             fShellVector[Z][i]->fDataVector.clear();
             fShellVector[Z][i]->fBinVector.clear();
-            fShellVector[Z][i]->fNumberOfNodes=0;
+            fShellVector[Z][i]->numberOfNodes=0;
+            //OLD
+            //fShellCrossSection[Z]->fCompDataVector[i].clear();
+            //fShellCrossSection[Z]->fCompBinVector[i].clear();
+            //fShellCrossSection[Z]->fCompLength[i] = 0;
         }
         
         fNShellsUsed[Z] = n2;
@@ -441,23 +455,34 @@ namespace geantphysics {
                 {
                     fin2 >> x >> y >> n3 >> n4;
                     
+                    //NEW
                     fShellVector[Z][i]->fBinVector.clear();
                     fShellVector[Z][i]->fDataVector.clear();
                     fShellVector[Z][i]->fBinVector.reserve(n3);
                     fShellVector[Z][i]->fDataVector.reserve(n3);
-                    fShellVector[Z][i]->fEdgeMin=x*MeV;
-                    fShellVector[Z][i]->fEdgeMax=y*MeV;
-                    if(fVerboseLevel>3) std::cout<<"fShellVector["<<Z<<"]["<<i<<"]->fEdgeMin: "<<fShellVector[Z][i]->fEdgeMin<<"\t fShellVector["<<Z<<"]["<<i<<"]->fEdgeMax: "<<fShellVector[Z][i]->fEdgeMax<<std::endl;
+                   
+                    //OLD
+                    //fShellCrossSection[Z]->fCompBinVector[i].clear();
+                    //fShellCrossSection[Z]->fCompDataVector[i].clear();
+                    //fShellCrossSection[Z]->fCompBinVector[i].reserve(n3);
+                    //fShellCrossSection[Z]->fCompDataVector[i].reserve(n3);
                     
                     for(int j=0; j<n3; ++j)
                     {
                         fin2 >> x >> y;
+                        //NEW
                         fShellVector[Z][i]->fBinVector.push_back(x*MeV);
                         fShellVector[Z][i]->fDataVector.push_back(y*barn);
-                        fShellVector[Z][i]->fNumberOfNodes++;
+                        fShellVector[Z][i]->numberOfNodes++;
+                        //OLD
+                        //fShellCrossSection[Z]->fCompBinVector[i].push_back(x*MeV);
+                        //fShellCrossSection[Z]->fCompDataVector[i].push_back(y*barn);
+                        //++fShellCrossSection[Z]->fCompLength[i];
                     }
-                    
-                    fShellCrossSection[Z]->fCompID[i]=n4;
+                    //NEW
+                    fShellVector[Z][i]->fCompID=n4;
+                    //OLD
+                    //fShellCrossSection[Z]->fCompID[i]=n4;
                     
                 }
                 
@@ -931,10 +956,18 @@ namespace geantphysics {
                 
                 for(j=0; j<nn; ++j)
                 {
-                    shellIdx = (size_t)fShellCrossSection[Z]->fCompID[j];
+                    //NEW
+                    size_t shellIdx=(size_t)fShellVector[Z][j]->fCompID; //new
+                    //OLD
+                    //shellIdx = (size_t)fShellCrossSection[Z]->fCompID[j]; //old
+                    //std::cout<< "Old: "<<shellIdx<<" - new: "<<new_shellIdx<<std::endl;
+                    
                     if(gammaekin0 > (*(fParamLow[Z]))[7*shellIdx+1]) {
                         //TO DO: CHECK HERE
-                        cs-=GetValue(gammaekin0, Z, shellIdx);
+                        //cs-=GetValue(gammaekin0, Z, shellIdx);
+                        //double newvalue=fShellVector[Z][j]->GetValueAt(gammaekin0);
+                        //std::cout<<" - nanui: fShellVector["<<Z<<"]["<<j<<"] "<<newvalue<<std::endl;
+                        cs-=fShellVector[Z][j]->GetValueAt(gammaekin0); //changed!
                     }
                     
                     if(cs <= 0.0 || j+1 == nn)
