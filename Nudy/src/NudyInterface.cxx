@@ -66,6 +66,7 @@ double NudyInterface::GetXS( int projCode, double projKE, double temp,
 */
   // Create and process with NUDY with keywords
   proc = new Nudy::TNudyENDF (fEndfDataFileName, fRootFileName, "recreate");
+  proc->SetPreProcess (0) ;
   proc->SetLogLev(0);
   proc->Process();
   bool LFIval = proc->GetLFI();
@@ -114,12 +115,15 @@ std::string NudyInterface::SetDataFileNameENDFSUB( std::string isoName){
 double NudyInterface::ComputeCrossSection() {
   int iElementID = 0;  //<------------- confusing testing by Abhijit 419 ?
   double xsvalue = 0.0;
-  //double iSigDiff = 0.001;   // trial value for test documentation reqd.
+  double iSigDiff = 0.001;   // trial value for test documentation reqd.
 
   NudyPhysics::TNudyEndfSigma();
   TNudyEndfSigma  xsec;
-  //xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
-  //xsec.GetData(fRootFileName, iSigDiff);
+  xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
+  xsec->SetPreProcess (0) ;
+  xsec->SetInitTempDop(0.0);
+  xsec->SetOutTempDop(293.6);
+  xsec.GetData(fRootFileName, iSigDiff);
 
 
 //NudyPhysics::TNudyEndfRecoPoint();
