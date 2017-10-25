@@ -29,12 +29,11 @@
  
 class GUVVectorIntegrationStepper
 {
-
   using Double_v = Geant::Double_v;
 
   public:
         // GUVVectorIntegrationStepper();   // DELET
-        GUVVectorIntegrationStepper( GUVVectorEquationOfMotion* equation, 
+        GUVVectorIntegrationStepper( GUVVectorEquationOfMotion* equation,
                                      unsigned int IntegrationOrder,
                                      unsigned int numIntegrationVariables,
                                      int          numStateVariables      ); // = -1 same? or  unsigned ?    // in G4 =12
@@ -93,10 +92,10 @@ class GUVVectorIntegrationStepper
         // inline void NormalisePolarizationVector( double vec[12] ); // TODO - add polarisation
         // Simple utility function to (re)normalise 'unit spin' vector.
 
-        inline GUVVectorEquationOfMotion *GetEquationOfMotion() { return  fAbstrEquation; }
-        inline const GUVVectorEquationOfMotion *GetEquationOfMotion() const { return  fAbstrEquation; }        
+        inline GUVVectorEquationOfMotion *GetABCEquationOfMotion() { return  fAbstrEquation; }
+        inline const GUVVectorEquationOfMotion *GetABCEquationOfMotion() const { return  fAbstrEquation; }        
         // As some steppers require access to other methods of Eq_of_Mot
-        void SetEquationOfMotion(GUVVectorEquationOfMotion* newEquation); 
+        void SetABCEquationOfMotion(GUVVectorEquationOfMotion* newEquation); 
 
     private:
 

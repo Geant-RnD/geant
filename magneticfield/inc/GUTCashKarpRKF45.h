@@ -28,6 +28,8 @@ template
 <class T_Equation, unsigned int Nvar>
 class GUTCashKarpRKF45 : public GUVIntegrationStepper
 {
+   using ThreeVector = vecgeom::Vector3D<double>;
+   
   public:
     static constexpr unsigned int sOrderMethod= 4;
     static constexpr unsigned int sNstore = (GUIntegrationNms::NumVarBase > Nvar) ? GUIntegrationNms::NumVarBase : Nvar;

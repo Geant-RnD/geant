@@ -27,7 +27,6 @@
 
 class GUVVectorEquationOfMotion //: public GUVEquationOfMotion 
 {
-  
   using Double_v = Geant::Double_v;
   //using Float_v = Geant::Float_v;
    
