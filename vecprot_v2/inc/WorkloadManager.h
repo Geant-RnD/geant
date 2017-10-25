@@ -41,7 +41,6 @@ class GeantScheduler;
 class TaskBroker;
 class GeantVTaskMgr;
 class EventSet;
-class GeantRunManager;
 
 /**
  * @brief WorkloadManager class
@@ -307,7 +306,7 @@ public:
    * @return True if workload completed. If false, the work will be completed
    *         by other task.
    */
-  static bool TransportTracksTask(EventSet *workload, GeantTaskData *td);
+  static bool TransportTracksTask(GeantTaskData *td, EventSet *workload);
   
   static
   FeederResult PreloadTracksForStep(GeantTaskData *td);

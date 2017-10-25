@@ -321,19 +321,13 @@ int WorkloadManager::ShareBaskets(WorkloadManager *other)
 }
 
 //______________________________________________________________________________
-bool WorkloadManager::TransportTracksTask(EventSet *workload, GeantTaskData *td) {
+bool WorkloadManager::TransportTracksTask(GeantTaskData *td, EventSet *workload) {
 // Re-entrant main transport method. This will co-operate with other identical
 // concurrent tasks (basketizing + transporting tracks for all events available
 // in the event server). The method will exit if it triggered finishing any of
 // the event sets registered in the event server.
 // Remarks:
 //   - this is a task mode, NUMA not enabled
-//   - the task data has to be pre-booked using RunManager::BookTransportTask
-   if (!td) {
-    Error("TransportTracksTask", "No task data object available!!!");
-    return false;
-  }
-
   GeantPropagator *propagator = td->fPropagator;
   GeantRunManager *runmgr = propagator->fRunMgr;
 #ifndef USE_VECGEOM_NAVIGATOR
@@ -354,22 +348,15 @@ bool WorkloadManager::TransportTracksTask(EventSet *workload, GeantTaskData *td)
     if (workload->IsDone()) break;
     if (flush) {
       // There is no more work in the server but the workload is not yet
-      // completed. We cannot return as the workload is not done, so we need to
-      // put the thread on hold. This should not be significant overhead given
-      // that it can only happen if the worker has finished its own work and there
-      // is no other work from the server.
-      
-      workload->SleepUntilDone();
-      assert(workload->IsDone());
-      continue;
+      // completed. We return false, notifying the caller that the result will come
+      // later on. If the caller is a task, it could spawn a pause task checking
+      // regularly the state of the dataset.
+      break;
     }
   }
-  
-  delete workload;
-
   // Release the task data
   runmgr->GetTDManager()->ReleaseTaskData(td);
-  return true;
+  return workload->IsDone();
 }
 
 //______________________________________________________________________________
