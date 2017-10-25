@@ -48,7 +48,7 @@ public:
   }
   std::string GetEndfSubName() const { return ENDFSUB; }
   void SetLogLev(unsigned char loglev) { fLogLev = loglev; }
-  int SetPreProcess(int x1) {return  prepro = x1; }
+  void SetPreProcess(int x1) { prepro = x1; }
   unsigned char GetLogLev() const { return fLogLev; }
 	bool GetLFI() { return fLFI;}
 	void SetLFI(bool keywd) {fLFI = keywd;}

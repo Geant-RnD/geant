@@ -60,10 +60,12 @@ public:
   TNudyEndfSigma(const char *irENDF, double isigDiff);
   virtual ~TNudyEndfSigma();
   void GetData(const char *irENDF, double isigDiff);
-  double SetsigPrecision(double x1) { return sigDiff = x1; }
-  double SetInitTempDop(double t1) { return doppTemp1 = t1; }
-  double SetOutTempDop(double t2) { return doppTemp2 = t2; }
-  int SetPreProcess(int x1) {return  prepro = x1; }
+  void SetsigPrecision(double x1) { sigDiff = x1; }
+  void SetInitTempDop(double t1) { doppTemp1 = t1; }
+  void SetOutTempDop(double t2) { doppTemp2 = t2; }
+  double GetsigPrecision() const {return sigDiff;}
+  double GetOutTempDop() const {return doppTemp2;}
+  void SetPreProcess(int x1) { prepro = x1; }
   std::fstream out, outtotal;
   std::string outstring, outstringTotal;
 	bool GetIsFiss() { return IsFission; }

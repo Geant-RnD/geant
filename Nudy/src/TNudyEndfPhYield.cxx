@@ -30,7 +30,7 @@ TNudyEndfPhYield::TNudyEndfPhYield(TNudyEndfFile *file)
   while ((sec = (TNudyEndfSec *)secIter.Next())) {
     TIter recIter(sec->GetRecords());
     // double ZA   = sec->GetC1();
-     double AWR  = sec->GetC2();
+    // double AWR  = sec->GetC2();
     // div_t divr;
 //     int MT = sec->GetMT();
 //     int LE = sec->GetL1();
@@ -99,7 +99,7 @@ TNudyEndfPhYield::TNudyEndfPhYield(TNudyEndfFile *file)
     case 2: //Transition Probability Arrays
     {
       int LG = sec->GetL2();
-      int NS = sec->GetN1();
+     // int NS = sec->GetN1();
       TNudyEndfList *list1 = (TNudyEndfList *)recIter.Next();
       es.push_back(list1->GetC1());
       lp.push_back(list1->GetL1());

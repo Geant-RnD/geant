@@ -120,11 +120,12 @@ double NudyInterface::ComputeCrossSection() {
   NudyPhysics::TNudyEndfSigma();
   TNudyEndfSigma  *xsec;
   xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
+  xsec->SetsigPrecision(0.001) ;
+  iSigDiff = xsec->GetsigPrecision ();
   xsec->SetPreProcess (0) ;
-  xsec->SetInitTempDop(0.0);
-  xsec->SetOutTempDop(293.6);
-  xsec->GetData(fRootFileName, iSigDiff);
-
+  xsec->SetInitTempDop(0.0) ;
+  xsec->SetOutTempDop(293.6) ;
+  xsec->GetData(fRootFileName, iSigDiff) ;
 
 //NudyPhysics::TNudyEndfRecoPoint();
   NudyPhysics::TNudyEndfRecoPoint *recoPoint; // = new NudyPhysics::TNudyEndfRecoPoint(iElementID, fRootFileName);

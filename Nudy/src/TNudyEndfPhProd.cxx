@@ -29,10 +29,10 @@ TNudyEndfPhProd::TNudyEndfPhProd(TNudyEndfFile *file)
   while ((sec = (TNudyEndfSec *)secIter.Next())) {
     TIter recIter(sec->GetRecords());
     // double ZA   = sec->GetC1();
-     double AWR  = sec->GetC2();
+    // double AWR  = sec->GetC2();
     // div_t divr;
-    int MT = sec->GetMT();
-    int LE = sec->GetL1();
+    //int MT = sec->GetMT();
+    //int LE = sec->GetL1();
     int NK = sec->GetN1();
 //       std::cout << " LO = " << LO <<" NK "<< NK << std::endl;
     TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)recIter.Next();
@@ -95,10 +95,12 @@ TNudyEndfPhProd::TNudyEndfPhProd(TNudyEndfFile *file)
 TNudyEndfPhProd::~TNudyEndfPhProd()
 {
 }
-
+/*
 double TNudyEndfPhProd::GetFisYield(int ielemId, double energyK)
 {
   fRnd = new TRandom3(0);
   // std::cout<<"element "<< einfId.size() << std::endl;
   // std::cout<<"energies "<< einfId[ielemId].size() << std::endl;
+  return fRnd;
 }
+*/

@@ -45,7 +45,7 @@ TNudyEndfSigma::TNudyEndfSigma()
 }
 TNudyEndfSigma::TNudyEndfSigma(const char *irENDF, double isigDiff) : rENDF(irENDF), sigDiff(isigDiff)
 {
-  GetData(irENDF, isigDiff);
+//  GetData(irENDF, isigDiff);
 }
 
 //____________________________________________________________________________________________________________________
@@ -2835,9 +2835,9 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 		divr       = div(sec1->GetC1(), 1000);
 		double ZA  = divr.quot;
 		double AA  = divr.rem;
-		double NA1 = AA - ZA;
+//		double NA1 = AA - ZA;
 		int ZAP    = tab1->GetC1();
-		double AWP = tab1->GetC2();
+//		double AWP = tab1->GetC2();
 		// std::cout<<" ZAP = \t"<< ZAP <<" MT "<< MT <<  std::endl;
 		// int LIP =tab1->GetL1();
 		int LAW = tab1->GetL2();

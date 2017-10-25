@@ -26,7 +26,7 @@ class TNudyEndfPhProd : public NudyPhysics::TNudyEndfRecoPoint {
 public:
   TNudyEndfPhProd();
   TNudyEndfPhProd(Nudy::TNudyEndfFile *file);
-  virtual double GetFisYield(int elemid, double energyK);
+//  virtual double GetFisYield(int elemid, double energyK);
   virtual ~TNudyEndfPhProd();
 
 private:
