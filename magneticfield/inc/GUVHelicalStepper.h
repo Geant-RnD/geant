@@ -144,11 +144,9 @@ GUVHelicalStepper::LinearStep( const double  yIn[],
 
 inline void
 GUVHelicalStepper::MagFieldEvaluate(const double y[],
-                                      ThreeVector& Bfield )   
+                                    ThreeVector& Bfield )   
 {
-  double B[3];
-  GetEquationOfMotion()->  GetFieldValue(y, B);
-  Bfield= ThreeVector( B[0], B[1], B[2] );
+  GetEquationOfMotion()->GetFieldValue(ThreeVector(y[0], y[1], y[2]), Bfield);
 }
 
 inline double

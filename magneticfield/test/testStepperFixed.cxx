@@ -10,7 +10,6 @@
 // #include "G4UniformMagField.hh"
 // #include "G4SystemOfUnits.hh"
 #include "Units.h"
-#include <cfloat>
 
 // using fieldUnits::meter;
 using fieldUnits::millimeter;   
@@ -159,7 +158,7 @@ int main(int argc, char *args[])
     // double position[3] = { 0.0, 0.0, 0.0 }; 
     // double fieldArr[3] = { 0.0, 0.0, 0.0 };
     ThreeVectorD positionVec( 0.0, 0.0, 0.0 );
-    ThreeVectorF fieldVec( 0.0, 0.0, 0.0 );
+    ThreeVectorD fieldVec( 0.0, 0.0, 0.0 );
     
     gvField->GetFieldValue( positionVec, fieldVec );
     cout << "#DEBUG> Field value from TUniformMagField = " << fieldVec[0] / fieldUnits::kilogauss

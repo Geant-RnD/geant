@@ -6,11 +6,8 @@
 #include <Geant/VectorTypes.h>
 
 #include "GUVVectorEquationOfMotion.h"
-#include "GUVVectorField.h"
 #include "TVectorMagFieldEquation.h"
-#include "GUVMagneticField.h"
-#include "GUVVectorMagneticField.h"
-#include "TVectorUniformMagField.h"
+#include "TUniformMagField.h"
 
 #include "GUVField.h"
 #include "TMagFieldEquation.h"
@@ -26,7 +23,7 @@
 #endif
 
 
-//using ThreeVector_f = vecgeom::Vector3D<float>;  // vecgeom::Vector3D<float>;
+using ThreeVector_f = vecgeom::Vector3D<float>;  // vecgeom::Vector3D<float>;
 using ThreeVector_d = vecgeom::Vector3D<double>; // vecgeom::Vector3D<double>;
 
 using Double_v = Geant::Double_v;
@@ -40,7 +37,7 @@ using std::cerr;
 using std::endl;
 using std::setw;
 
-GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_d constFieldValue);
+GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_f constFieldValue);
 GUVVectorEquationOfMotion* CreateFieldAndEquation(const char* filename);
 
 bool  TestEquation(GUVVectorEquationOfMotion* );
@@ -52,9 +49,9 @@ const char *defaultFieldFileName= "cmsmagfield2015.txt";
 int
 main( int, char** )
 {
-  ThreeVector_d  FieldValue(0.0, 0.0, 1.0);
+  ThreeVector_f  fieldValue(0.0, 0.0, 1.0);
    
-  GUVVectorEquationOfMotion* eq = CreateUniformFieldAndEquation( FieldValue );
+  GUVVectorEquationOfMotion* eq = CreateUniformFieldAndEquation( fieldValue );
   bool okUniform = TestEquation(eq);
   bool good = okUniform;
   
@@ -71,14 +68,14 @@ main( int, char** )
   return good;
 }
 
-GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_d FieldValue)
+GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_f fieldValue)
 {
   // using Field_t = TUniformMagField;
 
-  auto *pConstBfield = new TVectorUniformMagField( FieldValue );
+  auto *pConstBfield = new TUniformMagField( fieldValue );
 
   // 1. Original way of creating an equation
-  using EquationType = TVectorMagFieldEquation<TVectorUniformMagField, gNposmom>;
+  using EquationType = TVectorMagFieldEquation<TUniformMagField, gNposmom>;
   auto   magEquation = new EquationType(pConstBfield);
   return magEquation;
 

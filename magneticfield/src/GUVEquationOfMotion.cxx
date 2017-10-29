@@ -23,19 +23,13 @@ GUVEquationOfMotion::
 EvaluateRhsReturnB( const double           y[],
                           double          dydx[],
                        // double          charge,
-                 vecgeom::Vector3D<float> &Field
+                    vecgeom::Vector3D<double> &field
                   ) const
 {
-   double  PositionAndTime[4];
-   // Position
-   PositionAndTime[0] = y[0];
-   PositionAndTime[1] = y[1];
-   PositionAndTime[2] = y[2];
-   // Global Time
-   PositionAndTime[3] = y[7];  // See GUVFieldTrack::LoadFromArray
-
-   GetFieldValue( PositionAndTime, Field) ;
-   EvaluateRhsGivenB( y, Field, /*charge,*/ dydx );
+   using ThreeVector = vecgeom::Vector3D<double>;
+   
+   GetFieldValue( ThreeVector(y[0], y[1], y[2]), field) ;
+   EvaluateRhsGivenB( y, field, /*charge,*/ dydx );
 }
 
 std::ostream&  operator<<( std::ostream& os, const GUVEquationOfMotion& eq)

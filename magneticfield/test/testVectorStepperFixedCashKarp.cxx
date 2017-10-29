@@ -10,9 +10,6 @@
 #include "base/Vector3D.h"
 
 #include "TVectorUniformMagField.h"
-// #include "GUVVectorMagneticField.h"
-// #include "GUVVectorField.h"
-#include "GUVMagneticField.h"
 
 #include "GUVVectorEquationOfMotion.h"
 #include "TVectorMagFieldEquation.h"

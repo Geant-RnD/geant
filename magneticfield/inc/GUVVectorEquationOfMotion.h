@@ -22,7 +22,7 @@
 
 // #include "GUVTypes.hh"      // "globals.hh"
 #include "GUVField.h"   // required in inline method implementations
-#include "GUVVectorField.h"
+#include "GUVField.h"
 #include "GUVEquationOfMotion.h"
 
 class GUVVectorEquationOfMotion //: public GUVEquationOfMotion 
@@ -35,7 +35,7 @@ class GUVVectorEquationOfMotion //: public GUVEquationOfMotion
 
   public:  // with description
 
-     GUVVectorEquationOfMotion( GUVVectorField *Field, unsigned int verbose=0 );
+     GUVVectorEquationOfMotion( GUVField *field, unsigned int verbose=0 );
      virtual ~GUVVectorEquationOfMotion();     
        // Constructor and virtual destructor. No operations, just checks
 
@@ -61,25 +61,25 @@ class GUVVectorEquationOfMotion //: public GUVEquationOfMotion
      void EvaluateRhsReturnB( const Double_v y[],
                                     Double_v dydx[],
                                     Double_v charge,
-                                    Vector3D<Double_v> &Field ) const;
+                                    Vector3D<Double_v> &field ) const;
        // Same as RHS above, but also returns the value of B.
        // Should be made the new default ? after putting dydx & B in a class.
 
-     void GetFieldValue( const Double_v Point[4],
-                               Double_v Field[] )  const;
+     void GetFieldValue( const Double_v point[4],
+                               Double_v field[] )  const;
        // Obtain only the field - the stepper assumes it is pure Magnetic.
        // Not protected, because GUVRKG3_Stepper uses it directly.
      inline
-     void GetFieldValue( const  Double_v                    Point[4],
-                                Vector3D<Double_v>  &FieldValue ) const;
+     void GetFieldValue( const  Double_v             point[4],
+                                Vector3D<Double_v>  &fieldValue ) const;
 
      inline
-     void GetFieldValue( const Vector3D<Double_v> &Position,
-                               Vector3D<Double_v>  &FieldValue ) const;
+     void GetFieldValue( const Vector3D<Double_v> &position,
+                               Vector3D<Double_v> &fieldValue ) const;
 
-     const GUVVectorField* GetFieldObj() const {return fField;}
-           GUVVectorField* GetFieldObj()       {return fField;}
-     void                  SetFieldObj(GUVVectorField* pField){fField=pField;}
+     const GUVField* GetFieldObj() const {return fField;}
+           GUVField* GetFieldObj()       {return fField;}
+     void            SetFieldObj(GUVField* pField){fField=pField;}
 
      bool         Initialised() const { return fInitialised; } 
      unsigned int GetId() const       { return fEquationId; }
@@ -100,7 +100,7 @@ class GUVVectorEquationOfMotion //: public GUVEquationOfMotion
      // const int GUVmaximum_number_of_field_components = 24;
      enum { GUVmaximum_number_of_field_components = 24 } ;
 
-     GUVVectorField *     fField;
+     GUVField *     fField;
      unsigned int   fEquationId;  //
      unsigned short fVerbose;
      bool           fInitialised;
@@ -108,7 +108,7 @@ class GUVVectorEquationOfMotion //: public GUVEquationOfMotion
 
 
 inline
-GUVVectorEquationOfMotion::GUVVectorEquationOfMotion(GUVVectorField* pField, unsigned int verbose)
+GUVVectorEquationOfMotion::GUVVectorEquationOfMotion(GUVField* pField, unsigned int verbose)
    : // GUVEquationOfMotion(pField, verbose),
      fField(pField), 
      fEquationId(fNumObjectsCreated++),
@@ -144,32 +144,32 @@ void GUVVectorEquationOfMotion::InformDone()  // was Clear() and before Finished
 
 // !!!! INTERFACE TO BE CHANGED - INEFFICIENT !!!
 inline
-void GUVVectorEquationOfMotion::GetFieldValue( const Double_v Point[4],
-                                                     Double_v Field[] ) const
+void GUVVectorEquationOfMotion::GetFieldValue( const Double_v point[4],
+                                                     Double_v field[] ) const
 {
-   vecgeom::Vector3D<Double_v> Position( Point[0], Point[1], Point[2] );   
-   vecgeom::Vector3D<Double_v>  FieldVec;
-   fField-> GetFieldValueSIMD( Position, FieldVec );
-   Field[0] = FieldVec[0];
-   Field[1] = FieldVec[1];
-   Field[2] = FieldVec[2];
+   vecgeom::Vector3D<Double_v> position( point[0], point[1], point[2] );   
+   vecgeom::Vector3D<Double_v>  fieldVec;
+   fField-> GetFieldValueSIMD( position, fieldVec );
+   field[0] = fieldVec[0];
+   field[1] = fieldVec[1];
+   field[2] = fieldVec[2];
 }
 
 inline
-void GUVVectorEquationOfMotion::GetFieldValue( const Double_v     Point[4], // Was: const vecgeom::Vector3D<double> &Position,
-                                               Vector3D<Double_v> &FieldValue                                               
+void GUVVectorEquationOfMotion::GetFieldValue( const Double_v      point[4], // Was: const vecgeom::Vector3D<double> &Position,
+                                               Vector3D<Double_v> &fieldValue                                               
    ) const   
 {
-   vecgeom::Vector3D<Double_v> Position( Point[0], Point[1], Point[2] );
-   fField-> GetFieldValueSIMD( Position, FieldValue );
+   vecgeom::Vector3D<Double_v> position( point[0], point[1], point[2] );
+   fField-> GetFieldValueSIMD( position, fieldValue );
 }
 
 inline
-void GUVVectorEquationOfMotion::GetFieldValue( const Vector3D<Double_v>  &Position,
-                                                     Vector3D<Double_v> &FieldValue
+void GUVVectorEquationOfMotion::GetFieldValue( const Vector3D<Double_v> &position,
+                                                     Vector3D<Double_v> &fieldValue
    ) const
 {
-   fField-> GetFieldValue( Position, FieldValue );
+   fField->GetFieldValueSIMD( position, fieldValue );
 }
 
 inline
@@ -182,11 +182,11 @@ GUVVectorEquationOfMotion::RightHandSide( const Double_v y[],
    using ThreeVectorD = Vector3D<Double_v>;
    // CheckInitialization();
 
-   ThreeVectorD  Field;
-   ThreeVectorD  Position( y[0], y[1], y[2] );
+   ThreeVectorD  field;
+   ThreeVectorD  position( y[0], y[1], y[2] );
 
-   GetFieldValue( Position, Field );
-   EvaluateRhsGivenB( y, Field, charge, dydx );
+   GetFieldValue( position, field );
+   EvaluateRhsGivenB( y, field, charge, dydx );
 }
 
 #endif /* GUV_VectorEquationOfMotion_DEF */

@@ -5,11 +5,7 @@
 #include "GUVEquationOfMotion.h"
 
 #include "GUVVectorEquationOfMotion.h"
-#include "GUVVectorField.h"
 #include "TVectorMagFieldEquation.h"
-#include "GUVMagneticField.h"
-#include "GUVVectorMagneticField.h"
-#include "TVectorUniformMagField.h"
 
 #include "GUVField.h"
 #include "TMagFieldEquation.h"

@@ -53,7 +53,7 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
      void GetFieldValue(const Double_v Point[4],
                               Double_v Value[]) const
      {
-        fPtrField->Field::GetFieldValue(Point, Value);
+        fPtrField->GetFieldValue(Point, Value);
      }
 
      inline 
@@ -96,7 +96,7 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
 template <class Field, unsigned int Size>
    TVectorMagFieldEquation<Field,Size>
    ::TVectorMagFieldEquation(const TVectorMagFieldEquation& right)
-   :  GUVVectorEquationOfMotion( (GUVVectorField*) 0 ),
+   :  GUVVectorEquationOfMotion( (GUVField*) 0 ),
       fPtrField( right.fPtrField->CloneOrSafeSelf( (bool *)0 ) )
       // fPtrField( new Field(right.fPtrField) )
 {
