@@ -19,7 +19,7 @@
 
 class GULineSection
 {
-   using ThreeVector  vecgeom::Vector3D<double>;
+   using ThreeVector = vecgeom::Vector3D<double>;
    
   public:  // with description
 
