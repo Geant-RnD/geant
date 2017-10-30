@@ -28,7 +28,7 @@ class  GUFieldTrack
      GUFieldTrack( const ThreeVector& pPosition, 
                    const ThreeVector& pMomentum,
                          // double       restMass_c2,
-                         // double       charge,
+                         double       charge,
                          // double       laboratoryTimeOfFlight= 0.0,
                          double       curve_length= 0.0); 
 
@@ -46,7 +46,7 @@ class  GUFieldTrack
         //  Update four-vectors for space/time and momentum/energy
         //    Also resets curve length.
 
-     // void SetCharge(double charge) { fCharge= charge; }
+     void SetCharge(double charge) { fCharge= charge; }
 
      inline GUFieldTrack& operator = ( const GUFieldTrack & rStVec );
        // Assignment operator
@@ -80,7 +80,7 @@ class  GUFieldTrack
      // inline void SetRestMass(double Mass_c2) { fRestMass_c2= Mass_c2; }
 
        // Access
-     // inline double GetCharge() const { return fCharge; } 
+     inline double GetCharge() const { return fCharge; } 
    
      inline void SetCurveLength(double nCurve_s);
        // Distance along curve.
@@ -117,7 +117,7 @@ class  GUFieldTrack
      // double  fInitialMomentumMag;  // At 'track' creation.
      // double  fLastMomentumMag;     // From last Update (for checking.)
 
-     // double fCharge;
+     double fCharge;
 
 
 }; 
@@ -132,7 +132,7 @@ class  GUFieldTrack
 inline
 GUFieldTrack::GUFieldTrack( const GUFieldTrack&  rStVec  )
  : fDistanceAlongCurve( rStVec.fDistanceAlongCurve),
-   fMomentumMag( rStVec.fMomentumMag ) // ,
+   fMomentumMag( rStVec.fMomentumMag ),
    // fKineticEnergy( rStVec.fKineticEnergy ),
    // fRestMass_c2( rStVec.fRestMass_c2),
    // fLabTimeOfFlight( rStVec.fLabTimeOfFlight ), 
@@ -140,7 +140,7 @@ GUFieldTrack::GUFieldTrack( const GUFieldTrack&  rStVec  )
    // fMomentumModulus( rStVec.fMomentumModulus ),
    // fPolarization( rStVec.fPolarization ), 
    // fMomentumDir( rStVec.fMomentumDir ), 
-   // fCharge( rStVec.fCharge )
+   fCharge( rStVec.fCharge )
 {
   SixVector[0]= rStVec.SixVector[0];
   SixVector[1]= rStVec.SixVector[1];
@@ -328,7 +328,7 @@ GUFieldTrack & GUFieldTrack::operator = ( const GUFieldTrack& rStVec )
   // SetPolarization( rStVec.GetPolarization() );
   // fMomentumDir= rStVec.fMomentumDir;
 
-  // fCharge= rStVec.fCharge;
+  fCharge= rStVec.fCharge;
   // (*Fpchargestate)= *(rStVec.fpChargeState);
   // fpChargeState= rStVec.fpChargeState; // Handles!!
   return *this;

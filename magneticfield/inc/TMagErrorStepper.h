@@ -41,10 +41,11 @@ class TMagErrorStepper : public GUVIntegrationStepper
 
         virtual ~TMagErrorStepper() {delete fEquation_Rhs;}
 
-        inline void RightHandSide(double y[], double dydx[]) 
-          { assert(fEquation_Rhs); fEquation_Rhs->T_Equation::RightHandSide(y, dydx); }
+        inline void RightHandSide(double y[], double charge, double dydx[]) 
+          { assert(fEquation_Rhs); fEquation_Rhs->T_Equation::RightHandSide(y, charge, dydx); }
 
         inline void StepWithErrorEstimate( const double yInput[],
+                                           double charge,
                                            const double dydx[],
                                            double hstep,
                                            double yOutput[],
@@ -184,6 +185,7 @@ template<class T_Stepper, class T_Equation, unsigned int Nvar>
 void
    TMagErrorStepper<T_Stepper, T_Equation, Nvar>::
 StepWithErrorEstimate( const double yInput[],
+                double charge,
                 const double dydx[],
                 double hstep,
                 double yOutput[],
@@ -221,7 +223,7 @@ StepWithErrorEstimate( const double yInput[],
    // Do two half steps
    
    static_cast<T_Stepper*>(this)->T_Stepper::StepWithoutErrorEst (yInitial,  dydx,   halfStep, yMiddle);
-   this->RightHandSide(yMiddle, dydxMid);    
+   this->RightHandSide(yMiddle, charge, dydxMid);
    static_cast<T_Stepper*>(this)->T_Stepper::StepWithoutErrorEst (yMiddle, dydxMid, halfStep, yOutput); 
 
    // Store midpoint, chord calculation

@@ -184,7 +184,7 @@ GUIntegrationDriver::AccurateAdvance(const GUFieldTrack& yInput,
 
   int nstp, i, no_warnings=0;
   double x, hnext, hdid, h;
-  // double charge= y_current.GetCharge(); 
+  double charge= yInput.GetCharge(); 
 
 #ifdef GUDEBUG_FIELD
   static int dbg=1;
@@ -279,7 +279,7 @@ GUIntegrationDriver::AccurateAdvance(const GUFieldTrack& yInput,
     // fpStepper->ComputeRightHandSide( y, charge, dydx );
 
     // Back to simple, old method   - JA. 16 Oct 2015
-    fpStepper->RightHandSideVIS( y, /*charge,*/ dydx );   // TODO: change to inline
+    fpStepper->RightHandSideVIS( y, charge, dydx );   // TODO: change to inline
     fNoTotalSteps++;
 
     // Perform the Integration
@@ -287,7 +287,7 @@ GUIntegrationDriver::AccurateAdvance(const GUFieldTrack& yInput,
     if( h > fMinimumStep )
     { 
       // std::cout << "Calling       OneGoodStep " << std::endl;
-      OneGoodStep(y,dydx,x,h,epsilon,hdid,hnext) ;
+      OneGoodStep(y,charge,dydx,x,h,epsilon,hdid,hnext) ;
       // std::cout << "Returned from OneGoodStep" << std::endl;
 
       //--------------------------------------
@@ -301,7 +301,8 @@ GUIntegrationDriver::AccurateAdvance(const GUFieldTrack& yInput,
     else
     {
       GUFieldTrack yFldTrk( ThreeVector(0,0,0), 
-                            ThreeVector(0,0,0) );
+                            ThreeVector(0,0,0),
+                            charge );
       // double dchord_step;
       double dyerr_len_sq, dyerr_mom_rel_sq;   // What to do with these ?
       yFldTrk.LoadFromArray(y, fNoIntegrationVariables); 
@@ -612,6 +613,7 @@ GUIntegrationDriver::WarnEndPointTooFar (double endPointDist,
 
 void
 GUIntegrationDriver::OneGoodStep(  double y[],        // InOut
+                                   double charge,
                              const double dydx[],
                                    double& x,         // InOut
                                    double htry,
@@ -661,7 +663,7 @@ GUIntegrationDriver::OneGoodStep(  double y[],        // InOut
   for (iter=0; iter<max_trials ;iter++)
   {
     tot_no_trials++;
-    fpStepper-> StepWithErrorEstimate(y,dydx,h,ytemp,yerr);
+    fpStepper-> StepWithErrorEstimate(y,charge,dydx,h,ytemp,yerr);
     // fStepperCalls++;
     //          *********************
     double eps_pos = eps_rel_max * std::max(h, fMinimumStep);  // Uses remaining step 'h'
@@ -776,6 +778,7 @@ bool  GUIntegrationDriver::QuickAdvance(
            yarrin[GUFieldTrack::ncompSVEC], yarrout[GUFieldTrack::ncompSVEC]; 
   double s_start;
   double dyerr_mom_sq, vel_mag_sq, inv_vel_mag_sq;
+  double charge = y_posvel.GetCharge();
 
   static int no_call=0;  // thread_local 
   no_call ++; 
@@ -785,7 +788,7 @@ bool  GUIntegrationDriver::QuickAdvance(
   s_start = y_posvel.GetCurveLength();
 
   // Do an Integration Step
-  fpStepper-> StepWithErrorEstimate(yarrin, dydx, hstep, yarrout, yerr_vec) ; 
+  fpStepper-> StepWithErrorEstimate(yarrin, charge, dydx, hstep, yarrout, yerr_vec) ; 
   //          *********************
 
 #ifdef USE_DCHORD  

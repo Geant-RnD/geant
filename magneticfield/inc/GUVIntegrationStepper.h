@@ -44,6 +44,7 @@ class GUVIntegrationStepper
         // Core methods
         // ---------------------
         virtual void StepWithErrorEstimate( const double y[],
+                                                  double charge,
                                             const double dydx[],
                                                   double h,
                                                   double yout[],
@@ -66,7 +67,7 @@ class GUVIntegrationStepper
         virtual  GUVIntegrationStepper* Clone() const = 0;
         // Create an independent copy of the current object -- including independent 'owned' objects
         
-        inline void RightHandSideVIS( const double y[], /*double charge,*/ double dydx[] );   
+        inline void RightHandSideVIS( const double y[], double charge, double dydx[] );   
         // Utility method to supply the standard Evaluation of the
         // Right Hand side of the associated equation.
 
@@ -120,9 +121,9 @@ class GUVIntegrationStepper
 // #include  "GUVIntegrationStepper.icc"
 inline
 void GUVIntegrationStepper::
-RightHandSideVIS( const  double y[], /*double charge,*/ double dydx[] )
+RightHandSideVIS( const  double y[], double charge, double dydx[] )
 {
-   fAbstrEquation-> RightHandSide(y, /*charge,*/ dydx);
+   fAbstrEquation-> RightHandSide(y, charge, dydx);
 }
 
 inline

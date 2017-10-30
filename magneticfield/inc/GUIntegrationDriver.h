@@ -76,7 +76,7 @@ class GUIntegrationDriver
      inline double GetErrcon()      const { return fErrcon; }
      
      inline void   GetDerivatives( const GUFieldTrack &y_curr,     // const, INput
-                                     // double    charge, 
+                                        double    charge,
                                         double    dydx[]   );  //       OUTput
         // Accessors.
 
@@ -103,6 +103,7 @@ class GUIntegrationDriver
      inline GUVIntegrationStepper* GetStepper();
 
      void  OneGoodStep(       double  ystart[], // Like old RKF45step()
+                              double  charge,
                         const double  dydx[],
                               double& x,
                               double htry,
@@ -315,11 +316,11 @@ void GUIntegrationDriver::SetMaxNoSteps(int val)
 
 inline
 void GUIntegrationDriver::GetDerivatives(const GUFieldTrack &y_curr, // const, INput
-                                             /*double       charge, */
+                                               double       charge,
                                                double       dydx[])  // OUTput
 { 
   double  tmpValArr[GUFieldTrack::ncompSVEC];
   y_curr.DumpToArray( tmpValArr  );
-  fpStepper -> RightHandSideVIS( tmpValArr , /*charge,*/ dydx );
+  fpStepper -> RightHandSideVIS( tmpValArr , charge, dydx );
 }
 #endif /* GUIntegrationDriver_Def */

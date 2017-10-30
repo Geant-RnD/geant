@@ -37,7 +37,7 @@ class TVectorMagFieldEquation :  public GUVVectorEquationOfMotion
    using Vector3D = vecgeom::Vector3D<T>;
    
    public:
-     static const unsigned int  N   = Size;
+//     static const unsigned int  N   = Size;
      // static const double fCof   = Constants::c_light;   // Was constexpr
 
      TVectorMagFieldEquation(Field* pF) : GUVVectorEquationOfMotion(pF) { fPtrField = pF; }

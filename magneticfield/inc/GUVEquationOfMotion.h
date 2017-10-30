@@ -31,8 +31,8 @@ class GUVEquationOfMotion
        // Constructor and virtual destructor. No operations, just checks
 
      virtual void EvaluateRhsGivenB( const  double     yVec[],
-                                     const  vecgeom::Vector3D<double> B,  // Was double B[3],
-                                        /*  double     charge, */
+                                     const  vecgeom::Vector3D<double> &B,
+                                            double     charge,
                                             double     dydx[] ) const = 0;
        // Given the value of the  field "B", this function 
        // calculates the value of the derivative dydx.
@@ -56,7 +56,7 @@ class GUVEquationOfMotion
      //   // --> used to set the equation's coefficients ...
 
       inline void RightHandSide( const  double y[],
-                                     // double charge ,
+                                        double charge ,
                                         double dydx[] ) const;
        // This calculates the value of the derivative dydx at y.
        // It is the usual enquiry function.
@@ -65,7 +65,7 @@ class GUVEquationOfMotion
 
      void EvaluateRhsReturnB( const double y[],
                               double       dydx[],
-                           // double       charge,
+                              double       charge,
                   vecgeom::Vector3D<double> &field ) const;
        // Same as RHS above, but also returns the value of B.
        // Should be made the new default ? after putting dydx & B in a class.
@@ -149,7 +149,7 @@ void GUVEquationOfMotion::GetFieldValue( const vecgeom::Vector3D<double> &Positi
 inline
 void
 GUVEquationOfMotion::RightHandSide( const  double y[],
-                                       //  double charge,
+                                           double charge,
                                            double dydx[]  ) const
 {
    using ThreeVectorD = vecgeom::Vector3D<double>;
@@ -169,7 +169,7 @@ GUVEquationOfMotion::RightHandSide( const  double y[],
 
    GetFieldValue( position, field );
    // GetFieldValue( y, Field_3vf );   
-   EvaluateRhsGivenB( y, field, /*charge,*/ dydx );
+   EvaluateRhsGivenB( y, field, charge, dydx );
 }
 
 #include <iostream>

@@ -9,7 +9,7 @@ GUFieldTrack::
 GUFieldTrack( const ThreeVector& pPosition, 
               const ThreeVector& pMomentum,
               // double       restMass_c2,
-              // double       charge, 
+              double       charge, 
               // double       LaboratoryTimeOfFlight,
               double       curve_length )
         // const ThreeVector& vecPolarization,
@@ -28,7 +28,8 @@ GUFieldTrack( const ThreeVector& pPosition,
 {
   SetMomentum( pMomentum ); 
 
-  SetPosition( pPosition ); 
+  SetPosition( pPosition );
+  SetCharge(charge);
   // SetPolarization( vecPolarization ); 
 }
 
@@ -44,6 +45,7 @@ GUFieldTrack::GUFieldTrack( char )                  //  Nothing is set !!
   ThreeVector Zero(0.0, 0.0, 0.0);
 
   SetCurvePnt( Zero, Zero, 0.0 );
+  SetCharge(0.0);
   // SetMomentum( Zero );  // Sets momentum direction as well.
   // SetPosition( Zero ); 
 

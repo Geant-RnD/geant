@@ -51,6 +51,7 @@ public:
 
   REALLY_INLINE
   void StepWithErrorEstimate(const double* yInput,    // Consider __restrict__
+                                   double   charge,
                              const double*  dydx,
                                    double   Step,
                                    double*  yOut,
@@ -234,7 +235,8 @@ GUVIntegrationStepper*
 template <class T_Equation, unsigned int Nvar>
 inline void
 GUTCashKarpRKF45<T_Equation,Nvar>::
-   StepWithErrorEstimate(const double*  yInput, // [],    
+   StepWithErrorEstimate(const double*  yInput, // [],
+                         double /*charge*/,
                          const double*  dydx, // [],
                          double Step,
                          double*  yOut, // [],
@@ -377,6 +379,7 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
 
   fAuxStepper->GUTCashKarpRKF45::StepWithErrorEstimate( 
           fLastInitialVector, 
+          charge,
           fLastDyDx, 
           0.5 * fLastStepLength, 
           fMidVector,   
