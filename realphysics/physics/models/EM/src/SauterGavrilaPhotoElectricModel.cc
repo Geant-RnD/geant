@@ -42,14 +42,14 @@ namespace geantphysics {
     double                SauterGavrilaPhotoElectricModel::fWaterEnergyLimit = 0.0;
     
     
-    SauterGavrilaPhotoElectricModel::SauterGavrilaPhotoElectricModel(const std::string &modelname)
+    SauterGavrilaPhotoElectricModel::SauterGavrilaPhotoElectricModel(const std::string &modelname, bool aliasActive)
     : EMModel(modelname){
         
-        //TO DO: all these values need to be seen and set with the optimal values
-        fNumSamplingPrimEnergiesPerDecade = 20;    // Number of primary gamma kinetic energy grid points per decade. It should be set/get and must be done before init
+        fAliasActive = aliasActive;
+        fNumSamplingPrimEnergiesPerDecade = 40;    // Number of primary gamma kinetic energy grid points per decade. It should be set/get and must be done before init
         fNumSamplingPrimEnergies = 60;
-        fNumSamplingAngles = 60;                       // at each energy grid points
-        fMinPrimEnergy           =  1*geant::eV;       // Minimum of the gamma kinetic energy grid, used to sample the photoelectron direction
+        fNumSamplingAngles = 80;                   // At each energy grid points
+        fMinPrimEnergy           =  1.e-12*geant::eV;  // Minimum of the gamma kinetic energy grid, used to sample the photoelectron direction
         fMaxPrimEnergy           =  100*geant::MeV;    // Maximum of the gamma kinetic energy grid (after this threshold the e- is considered to follow the same direction as the incident gamma)
         
         fPrimEnLMin              = 0.;       // will be set in InitSamplingTables if needed
@@ -80,7 +80,6 @@ namespace geantphysics {
         if (fLSamplingPrimEnergies)
             delete [] fLSamplingPrimEnergies;
         
-        // NO ALIAS FOR THE MOMENT
         if (fAliasData) {
             for (int i=0; i<fNumSamplingPrimEnergies; ++i) {
                 if (fAliasData[i]) {
@@ -106,9 +105,6 @@ namespace geantphysics {
     }
     
     void SauterGavrilaPhotoElectricModel::InitializeModel() {
-        
-        fMinPrimEnergy                    = GetLowEnergyUsageLimit();
-        fMaxPrimEnergy                    = GetHighEnergyUsageLimit();
         
         //ALLOCATION fCrossSection
         if (fCrossSection) {
@@ -138,8 +134,8 @@ namespace geantphysics {
         
         fVerboseLevel=1;
         LoadData();
-        //NOT NEEDED FOR THE MOMENT - NO ALIAS USED
-        //InitSamplingTables();
+        if(fAliasActive)
+            InitSamplingTables();
         
     }
     
@@ -481,7 +477,7 @@ namespace geantphysics {
         td->fRndm->uniform_array(1, rndArray);
         phi     = geant::kTwoPi * rndArray[0];
         
-        if (gammaEnIn > 1*geant::GeV) {
+        if (gammaEnIn > 100*geant::MeV) {
             
             sinTheta = std::sqrt((1 - cosTheta)*(1 + cosTheta));
             
@@ -515,7 +511,7 @@ namespace geantphysics {
     
     
     //____________________
-    double SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Alias(double primekin, double r1, double r2, double r3) const{
+    double SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Alias(double primekin, double r1, double r2, double r3){
         
         // determine primary energy lower grid point
         if (primekin > 100*geant::MeV) {
@@ -911,21 +907,21 @@ namespace geantphysics {
         double phi      = 0.0;
         
         //************* START REJECTION SAMPLING ****
-        //
-        SamplePhotoElectronDirection_Rejection(gammaekin0, sinTheta, cosTheta, phi, td);
-        //
+        if(!fAliasActive)
+            SamplePhotoElectronDirection_Rejection(gammaekin0, sinTheta, cosTheta, phi, td);
+        
         //************* END REJECTION SAMPLING ****
         
         
         //************* START ALIAS SAMPLING ****
-        //
-        //td->fRndm->uniform_array(4, rndArray);
-        //double *rndArray2 = td->fDblArray;
-        //td->fRndm->uniform_array(4, rndArray2);
-        //cosTheta=SamplePhotoElectronDirection_Alias(gammaekin0, rndArray2[0], rndArray2[1], rndArray2[2]);
-        //phi = geant::kTwoPi * rndArray2[3];
-        //sinTheta=std::sqrt((1 - cosTheta)*(1 + cosTheta));
-        //
+        else{
+            
+            double *rndArray = td->fDblArray;
+            td->fRndm->uniform_array(4, rndArray);
+            cosTheta=SamplePhotoElectronDirection_Alias(gammaekin0, rndArray[0], rndArray[1], rndArray[2]);
+            phi = geant::kTwoPi * rndArray[3];
+            sinTheta=std::sqrt((1 - cosTheta)*(1 + cosTheta));
+        }
         //************* END ALIAS SAMPLING ****
         
         
@@ -1087,8 +1083,8 @@ namespace geantphysics {
         double y = 1 - cosTheta * cosTheta; //sen^2(theta)
         
         double dsigmadcostheta = (y / z4) * (1 + 0.5 * gamma * (tau) * (gamma - 2) * z);
-        double dsigmadxsi=dsigmadcostheta*(-std::exp(xsi));
-        
+        double dsigmadxsi=dsigmadcostheta*(std::exp(xsi));
+        //std::cout<<"dsigmadcostheta: "<<dsigmadcostheta<<" and dsigmadxsi: "<<dsigmadxsi<<std::endl;
         return dsigmadxsi;
         
     }
@@ -1119,36 +1115,42 @@ namespace geantphysics {
         
     }
     
-    
-    int SauterGavrilaPhotoElectricModel::PrepareLinAlias(double tau, std::vector<double> & x, std::vector<double> & y){
+    void SauterGavrilaPhotoElectricModel::BuildOneLinAlias(int indx, double tau){
         
-        int numpoints=40;
-        int curNumData = 5;
-        double maxErrorThreshold = gsingleTableErrorThreshold;
+        fAliasData[indx]              = new LinAlias();
+        fAliasData[indx]->fNumdata    = fNumSamplingAngles;
+        fAliasData[indx]->fXdata      = new double[fNumSamplingAngles];
+        fAliasData[indx]->fYdata      = new double[fNumSamplingAngles];
+        fAliasData[indx]->fAliasW     = new double[fNumSamplingAngles];
+        fAliasData[indx]->fAliasIndx  = new    int[fNumSamplingAngles];
         
-        x.resize(numpoints);
-        y.resize(numpoints);
+        /*fAliasData[indx]->fXdata[0] = 0; //min
+        fAliasData[indx]->fXdata[1] = (std::log(3) )/2;
+        fAliasData[indx]->fXdata[2] = std::log(3);
         
-        //cosTheta variable between [-1, 1]
-        //start with 5 points: thetaMin, thetaMin+0.1, 0, thetaMax-0.1, thetaMax
-        double thetaMin=-1.;
-        double thetaMax=1.;
-        x[0] = thetaMin;
-        x[1] = thetaMin+0.1;
-        x[2] = 0.;
-        x[3] = thetaMax-0.1;
-        x[4] = thetaMax;
-        y[0] = CalculateDiffCrossSection(tau, x[0]);
-        y[1] = CalculateDiffCrossSection(tau, x[1]);
-        y[2] = CalculateDiffCrossSection(tau, x[2]);
-        y[3] = CalculateDiffCrossSection(tau, x[3]);
-        y[4] = CalculateDiffCrossSection(tau, x[4]);
-        double maxerr     = 1.0;
+        fAliasData[indx]->fYdata[0] = CalculateDiffCrossSectionLog(tau, fAliasData[indx]->fXdata[0]);
+        fAliasData[indx]->fYdata[1] = CalculateDiffCrossSectionLog(tau, fAliasData[indx]->fXdata[1]);
+        fAliasData[indx]->fYdata[2] = CalculateDiffCrossSectionLog(tau, fAliasData[indx]->fXdata[2]);
+        */
         
-        // expand the data up to the required precision level
-        while (curNumData<numpoints &&  maxerr>=maxErrorThreshold ) {
-            // find the lower index of the bin, where we have the biggest linear interp. error
-            maxerr     = 0.0; // value of the current maximum error
+        // note: the variable is a cos in [-1,1]
+        // so fill 3 initial values of cos:
+        //  -  xi_0 = x_min = -1.
+        //  -  xi_1 = (x_max-x_min)/2 = 0.
+        //  -  xi_2 = x_max = 1.
+        // and the corresponding y(i.e.~PDF) values
+        fAliasData[indx]->fXdata[0] = -1.;
+        fAliasData[indx]->fXdata[1] = 0.;
+        fAliasData[indx]->fXdata[2] = 1.0;
+        fAliasData[indx]->fYdata[0] = CalculateDiffCrossSection(tau, fAliasData[indx]->fXdata[0]);
+        fAliasData[indx]->fYdata[1] = CalculateDiffCrossSection(tau, fAliasData[indx]->fXdata[1]);
+        fAliasData[indx]->fYdata[2] = CalculateDiffCrossSection(tau, fAliasData[indx]->fXdata[2]);
+        
+        int curNumData = 3;
+        // expand the data up to numdata points
+        while (curNumData<fAliasData[indx]->fNumdata) {
+            // find the lower index of the bin, where we have the biggest linear interp. error compared to spline
+            double maxerr     = 0.0; // value of the current maximum error
             double thexval    = 0.0;
             double theyval    = 0.0;
             int    maxerrindx = 0;   // the lower index of the corresponding bin
