@@ -97,7 +97,7 @@ static bool          isProdCutInLength = true;            // is the production c
 static bool          isAlias           = false;            // is the Alias sampling active ?
 
 static struct option options[] = {
-
+    
     {"particle-name     (possible particle names: gamma)                         - default: gamma"               , required_argument, 0, 'p'},
     {"material-name     (with a NIST_MAT_ prefix; see more in material doc.)     - default: NIST_MAT_Pb"         , required_argument, 0, 'm'},
     {"primary-energy    (in internal energy units i.e. [GeV])                    - default: 0.01"                , required_argument, 0, 'E'},
@@ -251,8 +251,7 @@ int main(int argc, char *argv[]) {
     // Create a SauterGavrilaPhotoElectricModel model for gammas:
     // - Create a SauterGavrilaPhotoElectricModel model
     std::cout<<"Creating the model SauterGavrilaPhotoElectricModel\n";
-    EMModel *emModel = new SauterGavrilaPhotoElectricModel(photoElectricModelName, true); //true to use Alias Sampling method
-    EMModel *emModel_rej = new SauterGavrilaPhotoElectricModel(photoElectricModelName, false); //true to use Alias Sampling method
+    EMModel *emModel = new SauterGavrilaPhotoElectricModel(photoElectricModelName, isAlias); //true to use Alias Sampling method
     // - Set low/high energy usage limits to their min/max possible values
     emModel->SetLowEnergyUsageLimit ( 0.01*geant::keV);
     
