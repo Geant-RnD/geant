@@ -221,7 +221,7 @@ public:
   bool FinishRun();
   bool LoadGeometry(const char *filename);
   void RunSimulation();
-  bool RunSimulationTask(EventSet *workload, GeantTaskData *td);
+  bool RunSimulationTask(EventSet *workload);
   void StopTransport();
 
 };

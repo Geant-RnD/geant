@@ -206,6 +206,7 @@ bool GeantEventServer::AddEvent(GeantEvent *event)
     fBindex = link->index;
     //td->fVolume = vol;
     // Check and fix tracks
+    event->SetEvent(evt);
     for (int itr=0; itr<ntracks; ++itr) {
       GeantTrack &track = *event->GetPrimary(itr);
       track.SetPrimaryParticleIndex(itr); 
@@ -307,7 +308,7 @@ GeantEvent *GeantEventServer::ActivateEvent(GeantEvent *event, unsigned int &err
   // Pre-activate slot and event number
   fEvents[slot]->SetSlot(slot);
   int nactive = fNactive.fetch_add(1) + 1;
-  fEvents[slot]->SetEvent(nactive - 1);
+  //fEvents[slot]->SetEvent(nactive - 1);
   
   
   // Try to replace the active event with the new one
