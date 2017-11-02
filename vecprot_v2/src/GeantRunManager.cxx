@@ -477,10 +477,12 @@ EventSet *GeantRunManager::NotifyEventSets(GeantEvent *finished_event)
 }
 
 //______________________________________________________________________________
-bool GeantRunManager::RunSimulationTask(EventSet *workload) {
+bool GeantRunManager::RunSimulationTask(EventSet *workload, GeantTaskData *td) {
 // Entry point for running simulation as asynchonous task. The user has to provide
-// an event set to be transported. The method will return only when the given
-// workload is completed. The actual thread executing this task will co-operate
+// an event set to be transported, and to pre-book the transport task. The method 
+// will return only when the given workload is completed.
+// 
+// The actual thread executing this task will co-operate
 // to the completion of other workloads pipelined by other similar tasks. In case
 // the worker doesn't manage to complete the workload and there is no more work
 // to be done, the thread will go to sleep and be waken at the completion of the
@@ -491,7 +493,7 @@ bool GeantRunManager::RunSimulationTask(EventSet *workload) {
   // Register the workload in the manager and insert events in the server
   AddEventSet(workload);
   Printf("= GeantV transport task started");
-  bool completed = WorkloadManager::TransportTracksTask(workload, this);
+  bool completed = WorkloadManager::TransportTracksTask(workload, td);
   return completed;
 }
 

@@ -190,6 +190,8 @@ public:
 
   GEANT_FORCE_INLINE
   TDManager *GetTDManager() const { return fTDManager; }
+  
+  GeantTaskData *BookTransportTask();
 
   GEANT_FORCE_INLINE
   bool IsInitialized() { return fInitialized; }
@@ -221,7 +223,7 @@ public:
   bool FinishRun();
   bool LoadGeometry(const char *filename);
   void RunSimulation();
-  bool RunSimulationTask(EventSet *workload);
+  bool RunSimulationTask(EventSet *workload, GeantTaskData *td);
   void StopTransport();
 
 };
