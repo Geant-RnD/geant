@@ -73,12 +73,10 @@ void CaloApp::AttachUserData(Geant::GeantTaskData *td) {
   // structure. Provide number of event-slots and number of primaries per event
   CaloAppThreadDataEvents *eventData = new CaloAppThreadDataEvents(fNumBufferedEvents, fNumPrimaryPerEvent);
   fDataHandlerEvents->AttachUserData(eventData, td);
-  printf("Attached user data %s %p for tid=%d\n", fDataHandlerEvents->GetName(), eventData, td->fTid);
   // Create application specific thread local data structure to collecet/handle thread local run-global data structure.
   CaloAppThreadDataRun *runData = new CaloAppThreadDataRun();
   runData->CreateHisto1(fHist1NumBins, fHist1Min, fHist1Max);
   fDataHandlerRun->AttachUserData(runData, td);
-  printf("Attached user data %s %p for tid=%d\n", fDataHandlerRun->GetName(), runData, td->fTid);
 }
 
 bool CaloApp::Initialize() {
@@ -93,7 +91,7 @@ bool CaloApp::Initialize() {
 
   //get detector parameters/logical volume IDs
   fNumAbsorbers = fDetector->GetNumAbsorbers();
-  for (int k=1; k<=fNumAbsorbers; k++){
+  for (int k=0; k<fNumAbsorbers; k++){
   	fAbsorberLogicalVolumeID[k] = fDetector->GetAbsorberLogicalVolumeID(k);
   }
 
@@ -131,11 +129,11 @@ void CaloApp::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td
   Node_t const *current;
   int idvol = -1;
   int ilev = -1;
-  ilev = track.fPath->GetCurrentLevel() - 1;
+  ilev = track.Path()->GetCurrentLevel() - 1;
   if (ilev<1) {
     return;
   }
-  current = track.fPath->Top();
+  current = track.Path()->Top();
   if (!current) {
     return;
   }
@@ -160,7 +158,7 @@ void CaloApp::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td
   int currentAbsorber=0;
   bool validVolume=false;
 
-  for (int k=1; k<=fNumAbsorbers; k++){
+  for (int k=0; k<fNumAbsorbers; k++){
 	if (idvol==fAbsorberLogicalVolumeID[k]){
 		currentAbsorber=k;
 		validVolume=true;
@@ -213,13 +211,13 @@ void CaloApp::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td
     if (isTransmit && isPrimary) {
           // get the user defined thread local data structure for the run
           CaloAppThreadDataRun  &dataRun =  (*fDataHandlerRun)(td);
-          dataRun.GetHisto1()->Fill(dataPerPrimary.GetEdepInAbsorber(1));
+          dataRun.GetHisto1()->Fill(dataPerPrimary.GetEdepInAbsorber(0));
     }
   }
 }
 
 
-void CaloApp::Digitize(Geant::GeantEvent *event) {
+void CaloApp::FinishEvent(Geant::GeantEvent *event) {
   // merge the thread local data (filled in the SteppingActions() and distributed now in the different threads) that
   // belongs to the event (that occupied a given event-slot) that has been just transported
   CaloAppThreadDataEvents *data = fRunMgr->GetTDManager()->MergeUserData(event->GetSlot(), *fDataHandlerEvents);
@@ -281,7 +279,7 @@ void CaloApp::FinishRun() {
   double rmsNeTrackL[fNumAbsorbers+1];
   double rmsEdep[fNumAbsorbers+1];
 
-  for (int k=1; k<=fNumAbsorbers; k++){
+  for (int k=0; k<fNumAbsorbers; k++){
 	rmsChTrackL[k]   = meanChTrackL2[k] - meanChTrackL[k]*meanChTrackL[k];
 	rmsNeTrackL[k]   = meanNeTrackL2[k] - meanNeTrackL[k]*meanNeTrackL[k];
 	rmsEdep[k]       = meanEdep2[k]     - meanEdep[k]*meanEdep[k];
@@ -289,7 +287,7 @@ void CaloApp::FinishRun() {
   double rmsELeakPr    = meanELeakPr2  - meanELeakPr*meanELeakPr;
   double rmsELeakSec   = meanELeakSec2 - meanELeakSec*meanELeakSec;
   // compute sigmas and write it into rms..
-  for (int k=1; k<=fNumAbsorbers; k++){
+  for (int k=0; k<fNumAbsorbers; k++){
 	  if (rmsChTrackL[k]>0.) {
 	    rmsChTrackL[k]  = std::sqrt(rmsChTrackL[k]*norm);
 	  } else {
@@ -330,7 +328,7 @@ void CaloApp::FinishRun() {
   //
   // some additional quantities:
   // 
-for(int k=1; k<=fNumAbsorbers; k++){
+for(int k=0; k<fNumAbsorbers; k++){
 ///////////////////////for loop start, looping over absorbers///////////////////////////////////////////
   std::cout << "---------------Started data analysis for " << fDetector->GetAbsorberMaterialName(k) << " absorber---------------------" << std::endl;
   const  geantphysics::Material* absorberMaterial = fDetector->GetAbsorberMaterial(k);

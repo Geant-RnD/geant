@@ -168,23 +168,24 @@ public:
   bool fPending = false;     /** Track pending to be processed */
   bool fOwnPath = false;     /** Marker for path ownership */
   bool fIsOnBoundaryPreStp = false;   // to indicate that the particle was on boundary at the pre-step pint
-#ifndef GEANT_NEW_DATA_FORMAT
+  Volume_t const *fVolume = nullptr; /** Current volume the particle is in */
+
+  // max number of physics processesper particle is assumed to be 10!
+  static constexpr size_t fNumPhysicsProcess = 10;
+  size_t  fPhysicsProcessIndex = -1;  // selected physics process
+  double  fPhysicsNumOfInteractLengthLeft[fNumPhysicsProcess];
+  double  fPhysicsInteractLength[fNumPhysicsProcess]; // mfp
+
+private:
+#ifdef GEANT_NEW_DATA_FORMAT
+  StepPointInfo fPreStep;    /** Pre-step state */
+  StepPointInfo fPostStep;   /** Post-step state */
+#else
   VolumePath_t *fPath = nullptr;     /** Paths for the particle in the geometry */
   VolumePath_t *fNextpath = nullptr; /** Path for next volume */
 #endif
 
-#ifdef GEANT_NEW_DATA_FORMAT
-  StepPointInfo fPreStep;    /** Pre-step state */
-  StepPointInfo fPostStep;   /** Post-step state */
-#endif
-
-
-  // max number of physics processesper particle is assumed to be 10!
-  static constexpr size_t fNumPhysicsProcess = 10;
-  size_t  fPhysicsProcessIndex;  // selected physics process
-  double  fPhysicsNumOfInteractLengthLeft[fNumPhysicsProcess];
-  double  fPhysicsInteractLength[fNumPhysicsProcess]; // mfp
-
+public:
 char *fExtraData;                   /** Start of user data at first aligned address. This needs to point to an aligned address. */
   // See: implementation of SizeOfInstance. Offsets of user data blocks are with respect to the fExtraData address. We have to pinpoint this
   // because the start address of the block of user data needs to be aligned, which make the offsets track-by-track dependent if they are
@@ -328,22 +329,57 @@ public:
 
   /** @brief Function that return volume */
   VECCORE_ATT_HOST_DEVICE
-  Volume_t const*GetVolume() const;
+  GEANT_FORCE_INLINE
+  Volume_t const *GetVolume() const { return fVolume; }
+
+  /** @brief Function that returns current path */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  VolumePath_t *Path() const { return fPath; }
+
+  /** @brief Function that returns next path */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  VolumePath_t *NextPath() const { return fNextpath; }
+
+  /** @brief Function that swaps path and next path */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  void UpdateSwapPath() { 
+    VolumePath_t *tmp = fNextpath;
+    fNextpath = fPath;
+    fPath = tmp;
+    UpdateVolume();
+  }
+
+  /** @brief Function that makes next path have the same content as the current. */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  void UpdateSameNextPath() { *fNextpath = *fPath; }
+  
+  /** @brief Function that updates the current volume the particle is in */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  void UpdateVolume() {   
+#ifdef USE_VECGEOM_NAVIGATOR
+    fVolume = fPath->Top()->GetLogicalVolume();
+#else
+    fVolume = fPath->GetCurrentNode()->GetVolume();
+#endif
+  }
 
   /** @brief Function that return next volume */
   VECCORE_ATT_HOST_DEVICE
-  Volume_t const*GetNextVolume() const;
+  Volume_t const *GetNextVolume() const {
+#ifdef USE_VECGEOM_NAVIGATOR
+    return ( fNextpath->Top()->GetLogicalVolume() );
+#else
+    return ( fNextpath->GetCurrentNode()->GetVolume() );
+#endif
+  }
 
   /** @brief Function that return material */
   Material_t *GetMaterial() const;
-
-  /** @brief Function that returns the current path (NavigationState) of the track */
-  VECCORE_ATT_HOST_DEVICE
-  GEANT_FORCE_INLINE
-  VolumePath_t *GetPath() const { return fPath; }
-
-  /** @brief Function that return next path (NavigationState) of the track */
-  VolumePath_t *GetNextPath() const { return fNextpath; }
 
   /** @brief Function that return number of physical step made */
   VECCORE_ATT_HOST_DEVICE
@@ -529,6 +565,10 @@ public:
   /** Clear function */
   VECCORE_ATT_HOST_DEVICE
   void Clear(const char *option = "");
+
+  /** Fast reset function */
+  VECCORE_ATT_HOST_DEVICE
+  void Reset(GeantTrack const &blueprint);
 
   /** @brief Function that return X coordinate */
   VECCORE_ATT_HOST_DEVICE
@@ -876,7 +916,7 @@ private:
   std::string fName;      /** token name */
   size_t fOffset;         /** offset with respect to track user data base address */
 public:
-  TrackToken(const char *name, size_t offset) : fName(name), fOffset(offset) {}
+  TrackToken(const char *name = "", size_t offset = 0) : fName(name), fOffset(offset) {}
 
   std::string const GetName() const { return fName; }
 
@@ -914,7 +954,7 @@ private:
   size_t fMaxDepth = 0;   /** Maximum geometry depth, to be provided at construction time */
 
   vector_t<DataInplaceConstructor_t> fConstructors; /** Inplace user-defined constructors to be called at track initialization. */
-  vector_t<TrackToken *> fTokens;
+  vector_t<TrackToken> fTokens;
   std::mutex fRegisterLock; /** Multithreading lock for the registration phase */
 
   VECCORE_ATT_HOST_DEVICE
@@ -936,9 +976,9 @@ public:
   size_t GetDataSize() const { return fDataOffset; }
 
   GEANT_FORCE_INLINE
-  TrackToken *GetToken(const char *name) const
+  const TrackToken *GetToken(const char *name) const
   {
-    for (auto token : fTokens) { if (token->GetName() == name) return (token); }
+    for (size_t i=0; i<fTokens.size(); ++i) { if (fTokens[i].GetName() == name) return &fTokens[i]; }
     return nullptr;
   }
 
@@ -967,19 +1007,19 @@ public:
   {
     std::cout << "*** TrackDataMgr report: track size = " << fTrackSize << " bytes,  max. depth = " << fMaxDepth << std::endl;
     std::cout << "                         extra data size = " <<  fDataOffset << " bytes in the following blocks: ";
-    for (auto token : fTokens) std::cout << token->GetName() << "  ";
+    for (const auto &token : fTokens) std::cout << token.GetName() << " ";
     std::cout << "\n";
   }
 
   template <typename T /*, typename... Params*/>
-  TrackToken *RegisterDataType(const char *name /*, Params... params*/)
+  TrackToken RegisterDataType(const char *name /*, Params... params*/)
   {
     if (fLocked) throw std::runtime_error("Registering types in the track is locked");
     std::lock_guard<std::mutex> lock(fRegisterLock);
 
     // If a token with same name is found, return its reference
-    TrackToken *token = GetToken(name);
-    if (token) return (token);
+    const TrackToken *token = GetToken(name);
+    if (token) return (*token);
 
     // Register lambda for constructing in-place the user data
     auto userinplaceconstructor = [&](void * address) {
@@ -999,10 +1039,10 @@ public:
     fConstructors.push_back(ctor);
 
     // Create a new token
-    token = new TrackToken(name, fDataOffset);
-    fTokens.push_back(token);
+    TrackToken newtoken(name, fDataOffset);
+    fTokens.push_back(newtoken);
     fDataOffset += block_size;
-    return (token);
+    return (newtoken);
   }
 };
 

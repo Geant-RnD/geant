@@ -21,11 +21,10 @@
 #ifndef VECCORE_CUDA
 #ifdef USE_ROOT
 #include "Rtypes.h"
+#include "TDatabasePDG.h"
 #endif
 #endif
-#ifdef USE_VECGEOM_NAVIGATOR
-#include "Particle.h"
-#endif
+#include "ParticleOld.h"
 #include "Geant/Typedefs.h"
 #include "Geant/Error.h"
 #ifdef VECCORE_CUDA
@@ -65,8 +64,13 @@ extern VECCORE_ATT_DEVICE TPartIndex *fgPartIndexDev;
 extern TPartIndex *fgPartIndexHost;
 #endif
 
-class TPartIndex {
+#if defined(USE_VECGEOM_NAVIGATOR)
+typedef geant::ParticleOld Particle_t;
+#else
+typedef TParticlePDG Particle_t;
+#endif
 
+class TPartIndex {
 public:
 #if defined(USE_VECGEOM_NAVIGATOR) && defined(VECCORE_CUDA)
   using Map_t = vecgeom::map<int,int>;

@@ -24,7 +24,7 @@
 using namespace Geant;
 
 static int n_events = 10;
-static int n_buffered = 5;
+static int n_buffered = 16;
 static int n_threads = 4;
 static int n_track_max = 64;
 static int n_learn_steps = 100000;
@@ -173,6 +173,7 @@ int main(int argc, char *argv[]) {
 
     case 'v':
       usev3 = bool(strtol(optarg, NULL, 10));
+      if (!usev3) n_buffered = 4;
       break;
 
     case 'n':

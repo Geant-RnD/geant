@@ -301,7 +301,7 @@ void CMSApplication::StepManager(int npart, const GeantTrack_v &tracks, GeantTas
 }
 
 //______________________________________________________________________________
-void CMSApplication::Digitize(GeantEvent *event) {
+void CMSApplication::FinishEvent(GeantEvent *event) {
   // User method to digitize a full event, which is at this stage fully transported
   //   Geant::Printf("======= Statistics for event %d:\n", event);
   

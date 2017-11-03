@@ -62,12 +62,10 @@ void TestEm5::AttachUserData(Geant::GeantTaskData *td) {
   // structure. Provide number of event-slots and number of primaries per event
   TestEm5ThreadDataEvents *eventData = new TestEm5ThreadDataEvents(fNumBufferedEvents, fNumPrimaryPerEvent);
   fDataHandlerEvents->AttachUserData(eventData, td);
-  printf("Attached user data %s %p for tid=%d\n", fDataHandlerEvents->GetName(), eventData, td->fTid);
   // Create application specific thread local data structure to collecet/handle thread local run-global data structure.
   TestEm5ThreadDataRun *runData = new TestEm5ThreadDataRun();
   runData->CreateHisto1(fHist1NumBins, fHist1Min, fHist1Max);
   fDataHandlerRun->AttachUserData(runData, td);
-  printf("Attached user data %s %p for tid=%d\n", fDataHandlerRun->GetName(), runData, td->fTid);
 }
 
 bool TestEm5::Initialize() {
@@ -98,12 +96,6 @@ bool TestEm5::Initialize() {
   // create the unique, global data struture that will be used to store cumulated per-primary data during the simulation
   fData        = new TestEm5Data();
   //
-  // CREATE PhysicsData here: should be done at the init of PhysicsProcessHandler but
-  // GeantTaskData are constructed later than that call
-  for (int i=0; i<fRunMgr->GetNthreadsTotal(); ++i) {
-    fRunMgr->GetTDManager()->GetTaskData(i)->fPhysicsData = new geantphysics::PhysicsData();
-  }
-  //
   fInitialized = true;
   return true;
 }
@@ -114,11 +106,11 @@ void TestEm5::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td
   Node_t const *current;
   int idvol = -1;
   int ilev = -1;
-  ilev = track.fPath->GetCurrentLevel() - 1;
+  ilev = track.Path()->GetCurrentLevel() - 1;
   if (ilev<1) {
     return;
   }
-  current = track.fPath->Top();
+  current = track.Path()->Top();
   if (!current) {
     return;
   }
@@ -216,7 +208,7 @@ void TestEm5::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td
 }
 
 
-void TestEm5::Digitize(Geant::GeantEvent *event) {
+void TestEm5::FinishEvent(Geant::GeantEvent *event) {
   // merge the thread local data (filled in the SteppingActions() and distributed now in the different threads) that
   // belongs to the event (that occupied a given event-slot) that has been just transported
   TestEm5ThreadDataEvents *data = fRunMgr->GetTDManager()->MergeUserData(event->GetSlot(), *fDataHandlerEvents);

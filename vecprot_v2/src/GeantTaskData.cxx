@@ -76,7 +76,6 @@ GeantTaskData::GeantTaskData(void *addr, size_t nthreads, int maxPerBasket, Gean
   fIntArray = new (buffer) int[fSizeInt];
   buffer += fSizeInt*sizeof(int);
 
-  fBlock = fPropagator->fTrackMgr->GetNewBlock(); 
   fTrack = GeantTrack::MakeInstance();
 
 #ifndef VECCORE_CUDA
@@ -115,6 +114,28 @@ GeantTaskData::~GeantTaskData()
     delete basket;
   fStageBuffers.clear();
 }
+
+//______________________________________________________________________________
+VECCORE_ATT_HOST_DEVICE
+void GeantTaskData::AttachPropagator(GeantPropagator *prop, int node)
+{
+  // Attach to a given propagator and a given NUMA node.
+  if (fPropagator) {
+    assert(fPropagator == prop);
+    fNode = node;
+    return;
+  }
+  fPropagator = prop;
+  fNode = node;
+  bool usenuma = prop->fConfig->fUseNuma;
+  fShuttleBasket = usenuma ? new Basket(1000, 0, node) : new Basket(1000, 0);
+  fBvector = usenuma ? new Basket(256, 0, node) : new Basket(256, 0);
+  for (int i=0; i<=int(kSteppingActionsStage); ++i)
+    fStageBuffers.push_back(usenuma ? new Basket(1000, 0, node) : new Basket(1000, 0));
+  fStackBuffer = new StackLikeBuffer(prop->fConfig->fNstackLanes, this);
+  fStackBuffer->SetStageBuffer(fStageBuffers[0]);
+  fBlock = fPropagator->fTrackMgr->GetNewBlock();
+}  
 
 //______________________________________________________________________________
 VECCORE_ATT_DEVICE
@@ -202,11 +223,14 @@ GeantTrack &GeantTaskData::GetNewTrack()
     assert(fBlock->GetCurrent() == 0 && fBlock->GetUsed() == 0);
   }
   GeantTrack *track = fBlock->GetObject(index);
-  track->Clear();
+  track->Reset(*fTrack);
   track->fBindex = index;
   return *track;
-  
-//  return ( fPropagator->fTrackMgr->GetTrack() );
+//  GeantTrack &track = fPropagator->fTrackMgr->GetTrack();
+//  index = track.fBindex;
+//  track.Reset(*fTrack);
+//  track.fBindex = index;
+//  return track;
 }
 
 //______________________________________________________________________________

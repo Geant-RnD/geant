@@ -16,17 +16,20 @@
 #include <atomic>
 #include <vector>
 #include "Geant/Config.h"
+#include "base/Vector3D.h"
 
 namespace Geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
 class GeantTrack;
 class GeantRunManager;
+class GeantTaskData;
 
 /** @brief Class GeantEvent that decribes events */
 class GeantEvent {
 
 private:
+  vecgeom::Vector3D<double> fVertex;     /** Vertex position */
   bool             fPrioritize = false;  /** Prioritize this event */
   bool             fTransported = false; /** Event transported */
   float            fPriorityThr = 0.01; /** Priority threshold in percent of max in flight */
@@ -55,6 +58,21 @@ public:
   /* @brief Function for accounting adding a new track */
   int AddPrimary(GeantTrack *track) { fPrimaries.push_back(track); return AddTrack(); }
 
+  /* @brief Crear the event and release all primaries */
+  void Clear();
+
+  /** @brief Dispatch track. */
+  GEANT_FORCE_INLINE
+  int DispatchTrack(bool &valid) {
+    int itr = fNdispatched.fetch_add(1);
+    valid = itr < fNprimaries;
+    return itr;
+  }
+
+  /** @brief Check if event is dispatched. */
+  GEANT_FORCE_INLINE
+  bool IsDispatched() const { return (fNdispatched.load() >= fNprimaries); }
+
   /* @brief Function for retrieving a primary. No range check. */
   GEANT_FORCE_INLINE
   GeantTrack *GetPrimary(int i) { return fPrimaries[i]; }
@@ -67,17 +85,15 @@ public:
   GEANT_FORCE_INLINE
   void SetNprimaries(int nprim) { fNprimaries = nprim; fPrimaries.reserve(nprim);}
 
-  /**
-   * @brief Function that returns the event number
-   * @return Event number
-   */
+  /** @brief Function that returns the event vertex */
+  GEANT_FORCE_INLINE
+  vecgeom::Vector3D<double> GetVertex() const { return fVertex; }
+
+  /** @brief Function that returns the event number */
   GEANT_FORCE_INLINE
   int GetEvent() const { return fEvent; }
 
-  /**
-   * @brief Function that returns the number of slot
-   * @return Slot number
-   */
+  /** @brief Function that returns the slot number */
   GEANT_FORCE_INLINE
   int GetSlot() const { return fSlot; }
 
@@ -135,6 +151,10 @@ public:
   GEANT_FORCE_INLINE
   void SetEvent(int event) { fEvent = event; }
 
+  /** @brief Function to set the vertex */
+  GEANT_FORCE_INLINE
+  void SetVertex(double x, double y, double z) { fVertex.Set(x, y, z); }
+
   /**
    * @brief Function to set the slot number
    *
@@ -166,7 +186,7 @@ public:
    *
    * @return Flag true if stopping qa track started priority mode for the event
    */
-  bool StopTrack(GeantRunManager *runmgr);
+  bool StopTrack(GeantRunManager *runmgr, GeantTaskData *td);
 
   /** @brief Print function */
   void Print(const char *option = "") const;

@@ -52,12 +52,14 @@ class StackLikeBuffer;
 class TrackStat;
 
 class GeantTaskData {
+private:
+  GeantTrack *fTrack = nullptr; /** Blueprint track */
+
 public:
 
   using NumaTrackBlock_t = NumaBlock<GeantTrack>;
   using UserDataVect_t = vector_t<char*>;
 
-  GeantTrack *fTrack = nullptr; /** Temporary track */
   GeantPropagator *fPropagator = nullptr; /** GeantPropagator */
   int fTid = -1;         /** Thread unique id */
   int fNode = -1;        /** Locality node */
@@ -141,6 +143,10 @@ public:
   /** @brief GeantTaskData destructor */
   ~GeantTaskData();
 
+  /** @brief Attach a propagator on a numa node. */
+  VECCORE_ATT_HOST_DEVICE
+  void AttachPropagator(GeantPropagator *prop, int node);
+  
   /**
    * @brief GeantTrack MakeInstance based on a provided single buffer.
    */
@@ -192,10 +198,6 @@ public:
   VolumePath_t *GetPath() {
     return fPath;
   }
-
-  /** @brief Get new track from track manager */
-  VECCORE_ATT_HOST_DEVICE
-  GeantTrack &GetTrack() { return *fTrack; }
 
   /** @brief Get new track from track manager */
   VECCORE_ATT_HOST_DEVICE

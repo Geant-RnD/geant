@@ -24,7 +24,6 @@
 #include "TGeoNode.h"
 #endif
 #else
-#pragma message("Compiling against TGeo")
 #include "ScalarNavInterfaceTGeo.h"
 #include <iostream>
 #include "TGeoNavigator.h"
@@ -171,7 +170,7 @@ int TransportManager::CheckSameLocationSingle(GeantTrack &track,
   
   track.fBoundary = true;
   track.fStatus = kBoundary;
-  if (track.fNextpath->IsOutside())
+  if (track.NextPath()->IsOutside())
     track.fStatus = kExitingSetup;
   if (track.fStep < 1.E-8) td->fNsmall++;
   return 1;
@@ -240,7 +239,7 @@ void TransportManager::ComputeTransportLength(TrackVec_t &tracks,
 #endif // VECTORIZED_GEOMETRY
   // perform a couple of additional checks/ set status flags and so on
   for (auto track : tracks) {
-    if ((track->fNextpath->IsOutside() && track->fSnext < 1.E-6) || track->fSnext > 1.E19)
+    if ((track->NextPath()->IsOutside() && track->fSnext < 1.E-6) || track->fSnext > 1.E19)
       track->fStatus = kExitingSetup;
   }
 #else
@@ -276,7 +275,7 @@ void TransportManager::ComputeTransportLengthSingle(GeantTrack &track, GeantTask
   // Update number of calls to geometry
   td->fNsnext++;
   // if outside detector or enormous step mark particle as exiting the detector
-  if (track.fNextpath->IsOutside() || track.fSnext > 1.E19)
+  if (track.NextPath()->IsOutside() || track.fSnext > 1.E19)
     track.fStatus = kExitingSetup;
 }
 
@@ -465,7 +464,7 @@ int TransportManager::PropagateTracks(TrackVec_t &tracks, GeantTaskData *td) {
     if (track.fCharge == 0 || bmag < 1.E-10) {
       // Do straight propagation to physics process or boundary
       if (track.fBoundary) {
-        if (track.fNextpath->IsOutside())
+        if (track.NextPath()->IsOutside())
           track.fStatus = kExitingSetup;
         else
           track.fStatus = kBoundary;
@@ -605,7 +604,7 @@ int TransportManager::PropagateSingleTrack(GeantTrack *track, Basket *output, Ge
     if (track->fCharge == 0 || bmag < 1.E-10) {
       // Do straight propagation to physics process or boundary
       if (track->fBoundary) {
-        if (track->fNextpath->IsOutside())
+        if (track->NextPath()->IsOutside())
           track->fStatus = kExitingSetup;
         else
           track->fStatus = kBoundary;
@@ -718,7 +717,7 @@ int TransportManager::PropagateSingleTrack(TrackVec_t &tracks, int &itr, GeantTa
     if (track.fCharge == 0 || bmag < 1.E-10) {
       // Do straight propagation to physics process or boundary
       if (track.fBoundary) {
-        if (track.fNextpath->IsOutside())
+        if (track.NextPath()->IsOutside())
           track.fStatus = kExitingSetup;
         else
           track.fStatus = kBoundary;

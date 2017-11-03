@@ -198,25 +198,36 @@ bool GeantRunManager::Initialize() {
   }
 
   fPrimaryGenerator->InitPrimaryGenerator();
-  fEventServer = new GeantEventServer(fConfig->fNtotal, this);
-  for (int i=0; i<fConfig->fNtotal; ++i)
-    fEventServer->AddEvent();
 
+  // Initialize task data
   int nthreads = GetNthreadsTotal();
   fTDManager = new TDManager(nthreads, fConfig->fMaxPerBasket);
+
+  // Initialize application
   if (fConfig->fUseStdScoring) {
     fStdApplication = new StdApplication(this);
     fStdApplication->Initialize();
-    for (int i = 0; i < nthreads; i++)
-      fStdApplication->AttachUserData(fTDManager->GetTaskData(i));
   }
   fApplication->Initialize();
-  for (int i = 0; i < nthreads; i++)
-    fApplication->AttachUserData(fTDManager->GetTaskData(i));
 
+  // Attach user data and physics data to task data
+  for (int i = 0; i < nthreads; i++) {
+    GeantTaskData *td = fTDManager->GetTaskData(i);
+    if (fPhysicsInterface) fPhysicsInterface->AttachUserData(td);
+    if (fStdApplication) fStdApplication->AttachUserData(td);
+    fApplication->AttachUserData(td);
+  }
+
+  // Initialize all propagators
   for (auto i=0; i<fNpropagators; ++i)
     fPropagators[i]->Initialize();
 
+  GeantTaskData *td = fTDManager->GetTaskData(0);
+  td->AttachPropagator(fPropagators[0], 0);
+
+  // Initialize the event server
+  fEventServer = new GeantEventServer(fConfig->fNbuff, this);
+  
   dataMgr->Print();
   fInitialized = true;
   return fInitialized;
@@ -347,25 +358,24 @@ void GeantRunManager::PrepareRkIntegration() {
 
 
 //______________________________________________________________________________
-void GeantRunManager::EventTransported(int evt)
+void GeantRunManager::EventTransported(GeantEvent *event, GeantTaskData *td)
 {
 // Actions executed after an event is transported.
-  // Signal completion of one event to the event server
-  fEventServer->CompletedEvent(evt);
   // Adjust number of prioritized events
-  GeantEvent *event = fEventServer->GetEvent(evt);
   if (event->IsPrioritized()) fPriorityEvents--;
   // closing event in MCTruthManager
-  if(fTruthMgr) fTruthMgr->CloseEvent(evt);
-  event->Print();
-  // Digitizer (todo)
-  Info("EventTransported", " = digitizing event %d with %d tracks", evt, event->GetNtracks());
-  LocalityManager *lmgr = LocalityManager::Instance();
-  Printf("   NQUEUED = %d  NBLOCKS = %d NRELEASED = %d",
-         lmgr->GetNqueued(), lmgr->GetNallocated(), lmgr->GetNreleased());
-  fApplication->FinishEvent(event->GetEvent(), event->GetSlot());
-  fApplication->Digitize(event);
-  fDoneEvents->SetBitNumber(evt);
+  if(fTruthMgr) fTruthMgr->CloseEvent(event->GetEvent());
+  // event->Print();
+  // Digitizer
+  Info("EventTransported", " = task %d digitizing event %d with %d tracks", td->fTid, event->GetEvent(), event->GetNtracks());
+//  LocalityManager *lmgr = LocalityManager::Instance();
+//  Printf("   NQUEUED = %d  NBLOCKS = %d NRELEASED = %d",
+//         lmgr->GetNqueued(), lmgr->GetNallocated(), lmgr->GetNreleased());
+  fApplication->FinishEvent(event);
+  // Signal completion of one event to the event server
+  fDoneEvents->SetBitNumber(event->GetEvent());
+  assert(event->GetNtracks() > 0);
+  fEventServer->CompletedEvent(event, td);
 }
 
 //______________________________________________________________________________
@@ -424,7 +434,7 @@ void GeantRunManager::RunSimulation() {
   timer.Stop();
   double rtime = timer.Elapsed();
   double ctime = timer.CpuElapsed();
-  long ntransported = fNprimaries;
+  long ntransported = fEventServer->GetNprimaries();
   long nsteps = 0;
   long nsnext = 0;
   long nphys = 0;
@@ -447,10 +457,10 @@ void GeantRunManager::RunSimulation() {
   }
   Printf("=== Summary: %d propagators x %d threads: %ld primaries/%ld tracks,  total steps: %ld, snext calls: %ld, "
          "phys steps: %ld, mag. field steps: %ld, small steps: %ld, pushed: %ld, killed: %ld, bdr. crossings: %ld  RealTime=%gs CpuTime=%gs",
-         fNpropagators, fNthreads, fNprimaries, ntransported, nsteps, nsnext, nphys, nmag, nsmall, npushed, nkilled, ncross, rtime, ctime);
-  LocalityManager *lmgr = LocalityManager::Instance();
-  Printf("NQUEUED = %d  NBLOCKS = %d NRELEASED = %d",
-         lmgr->GetNqueued(), lmgr->GetNallocated(), lmgr->GetNreleased());
+         fNpropagators, fNthreads, fEventServer->GetNprimaries(), ntransported, nsteps, nsnext, nphys, nmag, nsmall, npushed, nkilled, ncross, rtime, ctime);
+  //LocalityManager *lmgr = LocalityManager::Instance();
+  // Printf("NQUEUED = %d  NBLOCKS = %d NRELEASED = %d",
+  //       lmgr->GetNqueued(), lmgr->GetNallocated(), lmgr->GetNreleased());
 #ifdef USE_VECGEOM_NAVIGATOR
   Printf("=== Navigation done using VecGeom ====");
 #else

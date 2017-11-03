@@ -42,7 +42,6 @@ private:
   int fNpropagators = 0;          /** Number of propagators */
   int fNthreads     = 0;          /** Number of threads per propagator */
   int fNvolumes     = 0;          /** Number of active volumes in the geometry */
-  int fNprimaries   = 0;          /** Total number of primaries in the run */
   int fNbuff        = 0;          /** Number of event slots per propagator */
   int fNfeedProp    = 0;          /** Number of propagators with initial feed */
   int fInitialShare = 0;          /** Initial basket share for each propagator */
@@ -55,8 +54,8 @@ private:
   GeantVTaskMgr     *fTaskMgr = nullptr;        /** GeantV task manager */
   PhysicsProcessOld *fProcess = nullptr;           /** For now the only generic process pointing to the tabulated physics */
   PhysicsProcessOld *fVectorPhysicsProcess = nullptr; /** Interface to vector physics final state sampling */
-  PhysicsInterface *fPhysicsInterface; /** The new, real physics interface */
-  PrimaryGenerator *fPrimaryGenerator = nullptr;   /** Primary generator */
+  PhysicsInterface *fPhysicsInterface = nullptr; /** The new, real physics interface */
+  PrimaryGenerator *fPrimaryGenerator = nullptr; /** Primary generator */
   MCTruthMgr *fTruthMgr = nullptr;              /** MCTruth manager */
   GeantEventServer *fEventServer = nullptr;     /** The event server */
   TDManager *fTDManager = nullptr;              /** The task data manager */
@@ -105,10 +104,7 @@ public:
   vector_t<Volume_t const *> &GetVolumes() { return fVolumes; }
 
   GEANT_FORCE_INLINE
-  int  GetNprimaries() const { return fNprimaries; }
-
-  GEANT_FORCE_INLINE
-  void  SetNprimaries(int nprim) { fNprimaries = nprim; }
+  int  GetNprimaries() const { return (fEventServer) ? fEventServer->GetNprimaries() : 0; }
 
   GEANT_FORCE_INLINE
   int  GetInitialShare() const { return fInitialShare; }
@@ -129,7 +125,7 @@ public:
   Volume_t const *GetVolume(int ivol) { return fVolumes[ivol]; }
 
   GEANT_FORCE_INLINE
-  GeantEvent *GetEvent(int i) { return fEventServer->GetEvent(i); }
+  GeantEvent *GetEvent(int slot) { return fEventServer->GetEvent(slot); }
 
   GEANT_FORCE_INLINE
   GeantEventServer *GetEventServer() const { return fEventServer; }
@@ -202,7 +198,7 @@ public:
   /** @brief Implementation of work stealing */
   int ProvideWorkTo(GeantPropagator *prop);
 
-  void EventTransported(int evt);
+  void EventTransported(GeantEvent *event, GeantTaskData *td);
   bool Initialize();
   bool FinishRun();
   bool LoadGeometry(const char *filename);

@@ -8,7 +8,7 @@
 #include "Geant/Typedefs.h"
 #include "GeantTaskData.h"
 #include "GeantConfig.h"
-#include "mpmc_bounded_queue.h"
+#include "priority_queue.h"
 
 namespace Geant {
 inline namespace GEANT_IMPL_NAMESPACE {
@@ -36,12 +36,23 @@ class StackLikeBuffer;
 
 class GeantEventServer
 {
+public:
 
-using queue_t = mpmc_bounded_queue<size_t>;
+enum ErrorType {
+  kNoerr   = 0x00,    // normal operation
+  kCSlots  = 0x01,    // contention on slots
+  kCEvents = 0x02,    // contention on queued events
+  kDone    = 0x04     // all events dispatched
+};
+
+using queue_slots = mpmc_bounded_queue<size_t>;
+using queue_events = mpmc_bounded_queue<GeantEvent*>;
 
 private:
   int fNevents = 0;                    /** Number of events to be filled */
-  int fNactiveMax = 0;                 /** Maximum number of active events */
+  int fNprimaries = 0;                 /** Number of primaries served */
+  int fNactiveMax = 0;                 /** Maximum number of active events (buffer size)*/
+  int fNtracksInit = 0;                /** Initial number of tracks in the buffer. */
   int fNbasketsInit = 0;               /** Initial number of baskets to be served */
   std::atomic_int fNactive;            /** Number of deployed events */
   std::atomic_int fNserved;            /** Number of baskets served */
@@ -50,20 +61,24 @@ private:
   std::atomic_int fNload;              /** Last load event in the server */
   std::atomic_int fNstored;            /** Number of stored events in the server */
   std::atomic_int fNcompleted;         /** Number of completed events */
+  std::atomic_flag fGenLock;           /** Generator lock */
+  std::atomic<GeantEvent*> fEvent;     /** Current event being distributed */
   GeantRunManager *fRunMgr = nullptr;  /** Run manager */
   bool fEventsServed = false;          /** All events served */
   bool fDone = false;                  /** All events transported */
   bool fHasTracks = false;             /** Server has tracks to dispatch */
-  bool fInitialPhase = true;           /** Server in initial dispatch phase */
+  bool fInitialPhase = false;          /** Server in initial dispatch phase */
   GeantEvent** fEvents = nullptr;      /** Events to be dispatched */
   int  fBindex = 0;                    /** Basket manager index */
-  queue_t fFreeSlots;                  /** Queue of free event slots */
+  queue_slots fFreeSlots;              /** Queue of free event slots */
+  queue_events fPendingEvents;         /** Queue of pending events */
+  queue_events fDoneEvents;            /** Queue of transported events */
 
 protected:
-  GeantTrack *GetNextTrack();
+  GeantTrack *GetNextTrack(unsigned int &error);
 
 public:
-  GeantEventServer(int event_capacity, GeantRunManager *runmgr);
+  GeantEventServer(int nactive_max, GeantRunManager *runmgr);
   ~GeantEventServer();
 
   GEANT_FORCE_INLINE
@@ -73,6 +88,9 @@ public:
 // Accessors
   GEANT_FORCE_INLINE
   int  GetNevents() const { return fNevents; }
+
+  GEANT_FORCE_INLINE
+  int  GetNprimaries() const { return fNprimaries; }
 
   GEANT_FORCE_INLINE
   int  GetNbasketsInit() const { return fNbasketsInit; }
@@ -90,10 +108,22 @@ public:
   int  GetNstored() const { return fNstored.load(); }
   
   GEANT_FORCE_INLINE
-  GeantEvent *GetEvent(int i) { return fEvents[i]; }
+  GeantEvent *GetEvent(int slot) { return fEvents[slot]; }
+
+  GEANT_FORCE_INLINE
+  GeantEvent *FindEvent(int event) {
+    // trying to avoid concurrent map, but this could be smarter
+    for (int i=0; i<fNactiveMax; ++i) {
+      if (fEvents[i]->GetEvent() == event) return fEvents[i];
+    }
+    return nullptr;
+  }
 
   GEANT_FORCE_INLINE
   int GetBindex() { return fBindex; }
+
+  GEANT_FORCE_INLINE
+  bool EventsServed() const { return fEventsServed; }
 
   GEANT_FORCE_INLINE
   bool HasTracks() const { return fHasTracks; }
@@ -101,17 +131,22 @@ public:
   GEANT_FORCE_INLINE
   bool IsInitialPhase() const { return fInitialPhase; }
 
-  int FillBasket(GeantTrack_v &tracks, int ntracks);
+  int FillBasket(GeantTrack_v &tracks, int ntracks, unsigned int &error);
 
-  int FillBasket(Basket *basket, int ntracks);
+  int FillBasket(Basket *basket, int ntracks, unsigned int &error);
 
-  int FillStackBuffer(StackLikeBuffer *buffer, int ntracks);
+  int FillStackBuffer(StackLikeBuffer *buffer, int ntracks, unsigned int &error);
   
-  int AddEvent(GeantTaskData *td = nullptr);
+  // int AddEvent(GeantTaskData *td);
   
-  int ActivateEvents();
+  /** @brief Add one event to the server */
+  bool AddEvent(GeantEvent *event);
+
+  GeantEvent *GenerateNewEvent(GeantTaskData *td, unsigned int &error);
   
-  void CompletedEvent(int evt);
+  GeantEvent *ActivateEvent(GeantEvent *expected, unsigned int &error);
+  
+  void CompletedEvent(GeantEvent *event, GeantTaskData *td);
 };
 
 } // GEANT_IMPL_NAMESPACE

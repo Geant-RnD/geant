@@ -41,7 +41,6 @@ void ExN03Application::AttachUserData(GeantTaskData *td)
   // Create task data for handling digits. Provide number of event slots.
   ExN03ScoringData *data = new ExN03ScoringData(fRunMgr->GetConfig()->fNbuff, kNlayers);
   fDigitsHandle->AttachUserData(data, td);
-  printf("Attached user data %p for tid=%d\n", data, td->fTid);
 }
 
 //______________________________________________________________________________
@@ -83,87 +82,6 @@ bool ExN03Application::Initialize() {
 }
 
 //______________________________________________________________________________
-void ExN03Application::StepManager(int npart, const GeantTrack_v &tracks, GeantTaskData *td) {
-  // Application stepping manager. The thread id has to be used to manage storage
-  // of hits independently per thread.
-  if (!fInitialized)
-    return; // FOR NOW
-  // Loop all tracks, check if they are in the right volume and collect the
-  // energy deposit and step length
-  int tid = td->fTid;
-  Node_t const *current;
-  int idvol = -1;
-  int idnode = -1;
-  int ilev = -1;
-  for (int i = 0; i < npart; i++) {
-//      printf("%d=>\n", i);
-//      tracks.PrintTrack(i);
-#ifndef USE_VECGEOM_NAVIGATOR
-    ilev = tracks.fPathV[i]->GetLevel();
-#else
-    ilev = tracks.fPathV[i]->GetCurrentLevel() - 1;
-#endif
-    if (ilev < 1)
-      continue;
-#ifndef USE_VECGEOM_NAVIGATOR
-    current = tracks.fPathV[i]->GetCurrentNode();
-#else
-    current = tracks.fPathV[i]->Top();
-#endif
-    if (!current)
-      continue;
-#ifndef USE_VECGEOM_NAVIGATOR
-    idnode = tracks.fPathV[i]->GetNode(ilev - 1)->GetNumber();
-    idvol = current->GetVolume()->GetNumber();
-#else
-    idnode = tracks.fPathV[i]->At(ilev - 1)->id();
-    idvol = current->GetLogicalVolume()->id();
-#endif
-    if (idvol == fIdGap) {
-      //         tracks.PrintTrack(i);
-      fEdepGap[idnode][tid] += tracks.fEdepV[i];
-      fLengthGap[idnode][tid] += tracks.fStepV[i];
-    } else if (idvol == fIdAbs) {
-      //         tracks.PrintTrack(i);
-      fEdepAbs[idnode][tid] += tracks.fEdepV[i];
-      fLengthAbs[idnode][tid] += tracks.fStepV[i];
-    }
-  }
-  if (fRunMgr->GetConfig()->fFillTree) {
-    MyHit *hit;
-    //    int nhits = 0;
-    for (int i = 0; i < npart; i++) {
-      // Deposit hits in scintillator
-      if (idvol==fIdGap && tracks.fEdepV[i]>0.00002)
-	{
-	  hit = fFactory->NextFree(tracks.fEvslotV[i], tid);
-
-	  hit->fX = tracks.fXposV[i];
-	  hit->fY = tracks.fYposV[i];
-	  hit->fZ = tracks.fZposV[i];
-	  hit->fEdep = tracks.fEdepV[i];
-          hit->fTime = tracks.fTimeV[i];
-          hit->fEvent = tracks.fEventV[i];
-          hit->fTrack = tracks.fParticleV[i];
-	  hit->fVolId = idvol;
-	  hit->fDetId = idnode;
-
-	  //      if (track->path && track->path->GetCurrentNode()) {
-	  //         hit->fVolId = track->path->GetCurrentNode()->GetVolume()->GetNumber();
-	  //         hit->fDetId = track->path->GetCurrentNode()->GetNumber();
-	  //      }
-	  //	  nhits++;
-	}
-    }
-  }
-
-  //  Printf("Thread %d produced %d hits", tid, nhits);
-  //  Printf("StepManager: size of queue %zu", fFactory->fOutputs.size());
-
-  return;
-}
-
-//______________________________________________________________________________
 void ExN03Application::SteppingActions(GeantTrack &track, GeantTaskData *td)
 {
   if (!fInitialized) return;
@@ -174,22 +92,22 @@ void ExN03Application::SteppingActions(GeantTrack &track, GeantTaskData *td)
   int idnode = -1;
   int ilev = -1;
 #ifndef USE_VECGEOM_NAVIGATOR
-  ilev = track.fPath->GetLevel();
+  ilev = track.Path()->GetLevel();
 #else
-  ilev = track.fPath->GetCurrentLevel() - 1;
+  ilev = track.Path()->GetCurrentLevel() - 1;
 #endif
   if (ilev < 1) return;
 #ifndef USE_VECGEOM_NAVIGATOR
-  current = track.fPath->GetCurrentNode();
+  current = track.Path()->GetCurrentNode();
 #else
-  current = track.fPath->Top();
+  current = track.Path()->Top();
 #endif
   if (!current) return;
 #ifndef USE_VECGEOM_NAVIGATOR
-    idnode = track.fPath->GetNode(ilev - 1)->GetNumber();
+    idnode = track.Path()->GetNode(ilev - 1)->GetNumber();
     idvol = current->GetVolume()->GetNumber();
 #else
-    idnode = track.fPath->At(ilev - 1)->id();
+    idnode = track.Path()->At(ilev - 1)->id();
     idvol = current->GetLogicalVolume()->id();
 #endif
   ExN03LayerDigit &digit = (*fDigitsHandle)(td).GetDigits(track.fEvslot).GetDigit(idnode);
@@ -200,7 +118,7 @@ void ExN03Application::SteppingActions(GeantTrack &track, GeantTaskData *td)
 }
 
 //______________________________________________________________________________
-void ExN03Application::Digitize(GeantEvent *event) {
+void ExN03Application::FinishEvent(GeantEvent *event) {
   // User method to digitize a full event, which is at this stage fully transported
   //   printf("======= Statistics for event %d:\n", event);
   // Merge the digits for the event
