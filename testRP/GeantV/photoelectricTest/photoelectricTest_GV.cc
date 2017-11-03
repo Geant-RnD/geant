@@ -251,15 +251,16 @@ int main(int argc, char *argv[]) {
     // Create a SauterGavrilaPhotoElectricModel model for gammas:
     // - Create a SauterGavrilaPhotoElectricModel model
     std::cout<<"Creating the model SauterGavrilaPhotoElectricModel\n";
-    EMModel *emModel = new SauterGavrilaPhotoElectricModel(photoElectricModelName, isAlias); //true to use Alias Sampling method
+    EMModel *emModel = new SauterGavrilaPhotoElectricModel(photoElectricModelName, true); //true to use Alias Sampling method
+    EMModel *emModel_rej = new SauterGavrilaPhotoElectricModel(photoElectricModelName, false); //true to use Alias Sampling method
     // - Set low/high energy usage limits to their min/max possible values
     emModel->SetLowEnergyUsageLimit ( 0.01*geant::keV);
     
     emModel->SetHighEnergyUsageLimit(100.0*geant::GeV);
-
-
+    
+    
     emModel_rej->SetLowEnergyUsageLimit ( 0.01*geant::keV);
-
+    
     emModel_rej->SetHighEnergyUsageLimit(100.0*geant::GeV);
     //
     //*******************************************************************************************//
@@ -289,7 +290,7 @@ int main(int argc, char *argv[]) {
     // - Initialisation of the model
     emModel->Initialize();
     //===========================================================================================//
-
+    
     //=========== Set the active regions of the model and one physics-parameter object ==========//
     // - Set the model to be active in region index 0
     (emModel_rej->GetListActiveRegions()).resize(1); // one region
@@ -302,8 +303,8 @@ int main(int argc, char *argv[]) {
     // - Initialisation of the model
     emModel_rej->Initialize();
     //===========================================================================================//
-
-
+    
+    
     //===========================================================================================//
     //== Use the EMModel interface methods of the model to compute some integrated quantities  ==//
     //
@@ -390,13 +391,13 @@ int main(int argc, char *argv[]) {
     xMax     = 0.5;
     Hist *histo_photoelectron_angular = new Hist(xMin, xMax, numHistBins);
     Hist *histo_photoelectron_angular_rej = new Hist(xMin, xMax, numHistBins);
-
-    xMin     = -1.0001;
-    xMax     = 1.0001;
+    
+    xMin     = -1.0;
+    xMax     = 1.0;
     Hist *histo_angle = new Hist(xMin, xMax, numHistBins);
     Hist *histo_angle_rej = new Hist(xMin, xMax, numHistBins);
-
-
+    
+    
 
     //THE PRIMARY DOES NOT SURVIVE TO THE P.E. PROCESS SO WE DON'T NEED OTHER HISTOGRAMS - THEY MUST BE EMPTY
     ////The primary does not survive to photoelectric effect, so these other histo are not needed
@@ -456,21 +457,10 @@ int main(int argc, char *argv[]) {
     }
     fclose(f);
     delete histo;
-
-
-    sprintf(fileName,"photoElectric_%s_GV_photoelectron_angular_rejection_%s_%sMeV.ascii",photoElectricModelName.c_str(),(matCut->GetMaterial()->GetName()).c_str(), str.c_str());
-    f     = fopen(fileName,"w");
-    histo = histo_photoelectron_angular_rej;
-    norm  = 1./numSamples;
-    for (int i=0; i<histo->GetNumBins(); ++i) {
-        fprintf(f,"%d\t%.8g\t%.8g\n",i,histo->GetX()[i]+0.5*histo->GetDelta(),histo->GetY()[i]*norm);
-    }
-    fclose(f);
-    delete histo;
-
+    
     double xsec[numHistBins];
     double cosTheta;
-
+    
     //sprintf(fileName,"GV_%s_cosTheta_%s_%sMeV.ascii",photoElectricModelName.c_str(),(matCut->GetMaterial()->GetName()).c_str(), str.c_str());
     sprintf(fileName,"cosTheta_%sMeV.ascii", str.c_str());
     f     = fopen(fileName,"w");
@@ -482,15 +472,15 @@ int main(int argc, char *argv[]) {
         xsec[i]= CalculateDiffCrossSection(kineticEnergy/geant::kElectronMassC2, cosTheta);
         sum+=xsec[i];
     }
-
+    
     for (int i=0; i<histo->GetNumBins(); ++i) {
         //fprintf(f,"%d\t%.8g\t%.8g\t%.8g\t%.8g\n",i,histo->GetX()[i]+0.5*histo->GetDelta(),histo->GetY()[i]*norm, xsec[i]/sum,(histo->GetY()[i]*norm)/(xsec[i]/sum) );
         fprintf(f,"%d\t%.8g\t%.8g\t%.8g\t%.8g\n",i,histo->GetX()[i]+0.5*histo->GetDelta(),histo->GetY()[i], histo_angle_rej->GetY()[i], ( (histo->GetY()[i])/(histo_angle_rej->GetY()[i]) ) );
-
+        
     }
     fclose(f);
     delete histo;
-
+    
 
     //*******************************************************************************************//
 
@@ -523,27 +513,27 @@ void help() {
 
 double CalculateDiffCrossSection(double tau, double cosTheta)
 {
-
+    
     // Based on Geant4 : G4SauterGavrilaAngularDistribution
     // SauterGavrila approximation for K-shell, correct to the first \alphaZ order
     // input  : energy0  (incoming photon energy)
     // input  : cosTheta (cons(theta) of photo-electron)
     // output : dsigma   (differential cross section, K-shell only)
-
+    
     //double tau = energy0 / geant::kElectronMassC2;
-
+    
     //gamma and beta: Lorentz factors of the photoelectron
     double gamma = tau + 1.0;
     double beta = std::sqrt(tau * (tau + 2.0)) / gamma;
-
+    
     double z = 1 - beta * cosTheta;
     double z2 = z * z;
     double z4 = z2 * z2;
     double y = 1 - cosTheta * cosTheta; //sen^2(theta)
-
+    
     double dsigma = (y / z4) * (1 + 0.5 * gamma * (tau) * (gamma - 2) * z);
     return dsigma;
-
+    
 }
 
 
@@ -553,9 +543,9 @@ double CalculateDiffCrossSection(double tau, double cosTheta)
 // implementation of the final state distribution sampling
 
 double sampleDistribution(double numSamples, double primaryEnergy, const MaterialCuts *matCut, Particle *primParticle,
-                          EMModel *emModel, Hist *histo1, Hist *histo2, Hist* /*histo3*/) {
-
-
+                          EMModel *emModel, Hist *histo1, Hist *histo2, Hist *histo3) {
+    
+    
     double ekin       = primaryEnergy;
     double dirx       = 0.0;   // direction
     double diry       = 0.0;
@@ -608,7 +598,7 @@ double sampleDistribution(double numSamples, double primaryEnergy, const Materia
             double costPhotoElectron = secondaryLT[0].GetDirZ();
             //if(costPhotoElectron>1) costPhotoElectron=1;
             //else if (costPhotoElectron<-1) costPhotoElectron=-11;
-            //histo3->Fill(costPhotoElectron, 1.0);
+            histo3->Fill(costPhotoElectron, 1.0);
             costPhotoElectron = 0.5*(1.0-costPhotoElectron);
             if (costPhotoElectron>0.0) {
                 costPhotoElectron = std::log10(costPhotoElectron);
