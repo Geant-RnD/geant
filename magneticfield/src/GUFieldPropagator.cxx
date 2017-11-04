@@ -63,12 +63,12 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   // Do the work HERE
   GUFieldTrack yTrackIn( startPosition, 
                         startDirection * startMomentumMag,
-                        // fCharge, 
+                        charge, 
                         0.0); // s_0  xo
   GUFieldTrack yTrackOut( yTrackIn );
   
   // Call the driver HERE
-  fDriver->InitializeCharge( charge );
+  //fDriver->InitializeCharge( charge );
   bool goodAdvance=
      fDriver->AccurateAdvance( yTrackIn, step, fEpsilon, yTrackOut ); // , hInitial );
 

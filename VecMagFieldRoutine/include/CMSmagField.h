@@ -79,14 +79,14 @@ public:
 
   /** @brief Scalar interface for field retrieval */
   virtual void  GetFieldValue( const Vector3D<double> &position, 
-                                     Vector3D<double>  &fieldValue )
+                                     Vector3D<double>  &fieldValue ) override
   {
     GetFieldValue<double>(position, fieldValue);
   }
 
   /** @brief Vector interface for field retrieval */
   virtual void GetFieldValueSIMD( const Vector3D<Double_v> &position, 
-                                        Vector3D<Double_v> &fieldValue )
+                                        Vector3D<Double_v> &fieldValue ) override
   {
     GetFieldValue<Double_v>(position, fieldValue);
   }

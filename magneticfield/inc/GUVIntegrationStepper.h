@@ -58,7 +58,7 @@ class GUVIntegrationStepper
         //       yout[] = output values of integration
         //       yerr[] = estimate of integration error
 
-        virtual  double  DistChord() const = 0; 
+        virtual  double  DistChord(double charge) const = 0; 
         // Estimate the maximum sagital distance (distance of a chord from the true path)
         //  over the last segment integrated.
 
@@ -94,8 +94,8 @@ class GUVIntegrationStepper
         // As some steppers require access to other methods of Eq_of_Mot
         void SetEquationOfMotion(GUVEquationOfMotion* newEquation); 
 
-        virtual void InitializeCharge(double particleCharge) {
-               GetEquationOfMotion()->InitializeCharge(particleCharge); }
+//        virtual void InitializeCharge(double particleCharge) {
+//               GetEquationOfMotion()->InitializeCharge(particleCharge); }
            // Some steppers may need the value(s) / or status - they can intercept        
 
         void InformDone() { GetEquationOfMotion()->InformDone();}

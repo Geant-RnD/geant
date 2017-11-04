@@ -55,7 +55,7 @@ class GUIntegrationDriver
        //    but does return the errors in  position and
        //        momentum (normalised: Delta_Integration(p^2)/(p^2) )
 
-     void  InitializeCharge(double charge) { fpStepper->InitializeCharge(charge);}
+     //void  InitializeCharge(double charge) { fpStepper->InitializeCharge(charge);}
        // Pass needed information and initialize 
      void  DoneIntegration() { fpStepper->GetEquationOfMotion()->InformDone(); } 
        // Pass along information about end of integration - can clears parameters, flag finished

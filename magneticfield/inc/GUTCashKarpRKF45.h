@@ -57,7 +57,7 @@ public:
                                    double*  yOut,
                                    double*  yErr) override;
 
-  double  DistChord()   const override;  
+  double  DistChord(double charge)   const override;  
 
   REALLY_INLINE
   void RightHandSideInl(const double y[], double dydx[]) 
@@ -364,7 +364,7 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
 template <class T_Equation, unsigned int Nvar>
 inline double
 GUTCashKarpRKF45<T_Equation,Nvar>::
-  DistChord()   const
+  DistChord(double charge)   const
 {
   double distLine, distChord; 
   ThreeVector initialPoint, finalPoint, midPoint;

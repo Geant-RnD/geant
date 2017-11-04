@@ -110,7 +110,7 @@ bool TestEquation(GUVEquationOfMotion *equation)
   // double FieldArr[3]= { FieldVec.x(), FieldVec.y(), FieldVec.z() };
   
   equation->InitializeCharge( charge );
-  equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, /* charge, */ dydx );
+  equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, charge, dydx );
 
   ThreeVector_d  ForceVec( dydx[3], dydx[4], dydx[5]);
 
