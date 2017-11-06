@@ -169,40 +169,40 @@ GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
 void
 GUVVectorHelicalStepper::StepWithErrorEstimate( const Double_v yInput[],
                                                 const Double_v*,
-                                                      double hstep,
+                                                const Double_v& hstep,
                                                       Double_v yOut[],
                                                       Double_v yErr[]  )
-{  
-   const int nvar = 6;
+{
+   const int Nvar = 6;
 
-   Double_v  yTemp[7], yIn[7] ;
+   Double_v  yTemp[Nvar], yIn[Nvar] ;
+   Double_v  ySingleStep[Nvar];
 
    ThreeVectorSimd Bfld_initial, Bfld_midpoint;
    
    //  Saving yInput because yInput and yOut can be aliases for same array
 
-   for(unsigned int i=0;i<nvar;i++) { yIn[i]=yInput[i]; }
+   for(unsigned int i=0;i<Nvar;i++) { yIn[i]=yInput[i]; }
 
-   double h = hstep * 0.5; 
+   Double_v halfStep = hstep * 0.5;
 
    MagFieldEvaluate(yIn, Bfld_initial) ;      
 
    // Do two half steps
 
-   StepWithoutErrorEstimate(yIn,   Bfld_initial,  h, yTemp);
+   StepWithoutErrorEstimate(yIn,   Bfld_initial,  halfStep, yTemp);
    MagFieldEvaluate(yTemp, Bfld_midpoint) ;     
-   StepWithoutErrorEstimate(yTemp, Bfld_midpoint, h, yOut); 
+   StepWithoutErrorEstimate(yTemp, Bfld_midpoint, halfStep, yOut); 
 
    // Do a full Step
 
-   h = hstep ;
-   StepWithoutErrorEstimate(yIn, Bfld_initial, h, yTemp);
+   StepWithoutErrorEstimate(yIn, Bfld_initial, hstep, ySingleStep);
 
    // Error estimation
 
-   for(unsigned int i=0; i<nvar; ++i)
+   for(unsigned int i=0; i<Nvar; ++i)
    {
-     yErr[i] = yOut[i] - yTemp[i] ;
+     yErr[i] = yOut[i] - ySingleStep[i] ;
    }
    
    return;
