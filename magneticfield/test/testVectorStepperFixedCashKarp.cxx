@@ -8,11 +8,17 @@
 
 // #include <Vc/Vc>
 #include "base/Vector3D.h"
+#include <Geant/VectorTypes.h>
 
-#include "UniformMagField.h"
+#include "TVectorUniformMagField.h"   // Old vector-only      class
+// #include "UniformMagField.h"          // New type (universal) class
 
 #include "GUVVectorEquationOfMotion.h"
-#include "TVectorMagFieldEquation.h"
+
+// #include "TVectorMagFieldEquation.h"
+#include "TMagFieldEquation.h"
+#include "MagFieldEquation.h"
+
 // #include "TemplateFieldEquationFactory.h"
 
 // #include "TemplateGUVIntegrationStepper.h"
@@ -52,16 +58,19 @@ int main(int argc, char *args[])
     // typedef typename Backend::precision_v Double_v;
 
     using Double_v  = Geant::Double_v;
-    template <typename pod>
-    using Vector3D  = vecgeom::Vector3D<pod>;
-    using ThreeVector_f   = Vector3D<float>;
-    using ThreeVector_d   = Vector3D<double>;
-    using ThreeVectorSimd = Vector3D<Double_v>;
+    // template <typename Tpod>
+    // using Vector3D  = vecgeom::Vector3D<Tpod>;
+    using ThreeVector_f   = vecgeom::Vector3D<float>;
+    using ThreeVector_d   = vecgeom::Vector3D<double>;
+    using ThreeVectorSimd = vecgeom::Vector3D<Double_v>;
 
     // using  GvEquationType=  TemplateTMagFieldEquation<Backend, TemplateTUniformMagField<Backend>, Nposmom>;
 
-    using  FieldType = UniformMagField;
-    using  GvEquationType= TVectorMagFieldEquation<FieldType, Nposmom>;
+    using  FieldType = TUniformMagField;
+    // using  FieldType =  UniformMagField;
+    
+    using  GvEquationType= TMagFieldEquation<FieldType, Nposmom>;
+    // using  GvEquationType=  MagFieldEquation<FieldType>;
        
        // TemplateTMagFieldEquation<Backend, TemplateTUniformMagField<Backend>, Nposmom>;    
    
@@ -82,12 +91,12 @@ int main(int argc, char *args[])
     if(argc>1)
         stepper_no = atoi(args[1]);
     if(argc > 2)
-       step_len_mm = (float)(stof(args[2]));   // *mm);
+       step_len_mm = (float)(atof(args[2]));   // *mm);   //  stof( std::string, size_t ... )
     if(argc > 3)
         no_of_steps = atoi(args[3]);
     if(argc > 4)
-       z_field_in = (float) (stof(args[4]));     // tesla
-    double step_len = step_len_mm * fieldUnits::millimeter;
+       z_field_in = (float) (atof(args[4]));     // tesla
+    double stepLengthValue = step_len_mm * fieldUnits::millimeter;
     
     //Choice of output coordinates
     int
@@ -128,45 +137,40 @@ int main(int argc, char *args[])
     else
        z_field = -1.0;  //  Tesla // *tesla ;
 
-    bool debug= true;
     if( debug ) cout<<"----Just before making UniformMagField object"<<endl;
 
     // Field
     auto gvUniformField= new
-        UniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
+        TVectorUniformMagField( fieldUnits::tesla * ThreeVector_f(x_field, y_field, z_field) );       
+     // UniformMagField( fieldUnits::tesla * ThreeVector_f(x_field, y_field, z_field) ); // New classes
+     //    VectorUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
      // TemplateTUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
-
+    
     if( debug ) cout<<"----TemplateTUniformMagField Object constructed"<<endl;
     cout << "#  Initial  Field strength (GeantV) = "
          << x_field << " , " << y_field << " , " << z_field
          << " Tesla " << endl;
+
+    ThreeVector_d origin(0.0, 0.0, 0.0), fieldValue;
+    gvUniformField->GetFieldValue( origin, fieldValue );
     cout << "#    Values in object created       = "
-         << (1.0/fieldUnits::tesla) * gvUniformField->GetValue()->X() << ",  "
-         << (1.0/fieldUnits::tesla) * gvUniformField->GetValue()->Y() << ",  "
-         << (1.0/fieldUnits::tesla) * gvUniformField->GetValue()->Z() << endl;
+         << (1.0/fieldUnits::tesla) * fieldValue.x() << ",  "
+         << (1.0/fieldUnits::tesla) * fieldValue.y() << ",  "
+         << (1.0/fieldUnits::tesla) * fieldValue.z() << endl;
     cout << endl;    
     cout << "#  Initial  momentum * c = " << x_mom << " , " << y_mom << " , " << z_mom << " GeV " << endl;
-
-#if 0
-    //Create an Equation :
-    if( debug ) cout<<"----Just before making EquationFactory"<<endl;
-    auto gvEquation =
-       TemplateFieldEquationFactory<Backend>::CreateMagEquation<TemplateTUniformMagField<Backend> >(gvField);
-    if( debug ) cout<<"----EquationFactory made "<<endl;
-       // new GvEquationType(gvField);
-       // new TMagFieldEquation<TUniformMagField, Nposmom>(gvField);
-#endif
 
     //Create Equation :
     if( debug ) cout << "Create Equation" << endl;
 
-       // new GvEquationType(gvUniformField);
-       // new TMagFieldEquation<TUniformMagField, Nposmom>(gvUniformField);
-
     // 1. Original way of creating an equation
     // using EquationType = TVectorMagFieldEquation<TVectorUniformMagField, gNposmom>;
-    auto   magEquation = new TVectorMagFieldEquation<TVectorUniformMagField, gNposmom>(gvUniformField);
+    // auto   magEquation = new TVectorMagFieldEquation<TVectorUniformMagField, gNposmom>(gvUniformField);
+
+    // using EquationType = MagFieldEquation<UniformMagField, gNposmom>;
     // auto   magEquation = new EquationType(gvUniformField);   // Simpler line ... as above
+
+    auto   magEquation = new GvEquationType(gvUniformField);
     if( debug ) cout<<"----Equation instantiated. "<<endl;    
 
     //  2. Different method of creating equation:  Factory
@@ -180,14 +184,14 @@ int main(int argc, char *args[])
     //Create a stepper :
     if( debug ) cout << "----Creating a stepper :" << endl;
 
-    TemplateGUVIntegrationStepper<Backend> *myStepper; // , *exactStepper;
+    // TemplateGUVIntegrationStepper<Backend> *myStepper; // , *exactStepper;
     if( debug ) cout<<"---- Preparing to create (Vector) CashKarpRKF45 Stepper "<<endl;
 
-    VectorCashKarpRKF45<Backend,GvEquationType,Nposmom> myStepper2(gvEquation);
-    // GUTVectorCashKarpRKF45<GvEquationType,Nposmom> myStepper2(gvEquation);    
+    VectorCashKarpRKF45< /*Backend,*/ GvEquationType,Nposmom> myStepper2(magEquation);
+    // GUTVectorCashKarpRKF45<GvEquationType,Nposmom> myStepper(gvEquation);    
     if( debug ) cout<<"---- constructed VectorCashKarpRKF45"<<endl;
-   
-    myStepper = &myStepper2;
+                                                              
+    auto myStepper = &myStepper2;
     // myStepper = new VectorCashKarpRKF45<Backend,GvEquationType,Nposmom>(gvEquation);
   
     // myStepper= TemplateStepperFactory<Backend>::CreateStepper<GvEquationType>(gvEquation, stepper_no);
@@ -335,7 +339,8 @@ int main(int argc, char *args[])
     {
         cout<<setw(6)<<j ;           //Printing Step number
         Double_v charge(-1.);
-        myStepper->RightHandSideVIS(yIn, charge, dydx);               //compute dydx - to supply the stepper
+        Double_v step_len( stepLengthValue ); 
+        myStepper->RightHandSideVIS(yIn, charge, dydx);  //compute dydx - to supply the stepper
         #ifdef baseline
         exactStepper->RightHandSideVIS(yInX, dydxRef);   //compute the value of dydx for the exact stepper
         #endif
@@ -348,7 +353,7 @@ int main(int argc, char *args[])
           #endif
         }
         //-> Then print the data
-        cout.setf (ios_base::fixed);
+        cout.setf (std::ios_base::fixed);
         cout.precision(4);
         for(int i=0; i<3;i++)
             if(columns[i]){
@@ -367,8 +372,8 @@ int main(int argc, char *args[])
                
             }
 
-        cout.unsetf (ios_base::fixed);        
-        cout.setf (ios_base::scientific);
+        cout.unsetf (std::ios_base::fixed);        
+        cout.setf (std::ios_base::scientific);
         for(int i=3; i<6;i++)
             if(columns[i]){
                if( printSep ) cout << " | " ;  // Separator
@@ -384,7 +389,7 @@ int main(int argc, char *args[])
                if( printErr ) cout<<setw(nwdf)<< yerr[i] / ppGVf ;
 
             }
-        cout.unsetf (ios_base::scientific);
+        cout.unsetf (std::ios_base::scientific);
         
         for(int i=0; i<6;i++)   // Print auxiliary components
         {
@@ -401,10 +406,10 @@ int main(int argc, char *args[])
            
            if( i == 0 ){            // length / length                      
               // cout.unsetf (ios_base::scientific);
-              cout.setf (ios_base::fixed);
+              cout.setf (std::ios_base::fixed);
            }else if( i == 3 ){
-              cout.unsetf (ios_base::fixed);              
-              cout.setf (ios_base::scientific);
+              cout.unsetf (std::ios_base::fixed);              
+              cout.setf (std::ios_base::scientific);
            }
            
            if(columns[i+6])
@@ -422,14 +427,14 @@ int main(int argc, char *args[])
                // bool printDiffDeriv = true;
 
            }
-           // if( i == 2 )     { cout.unsetf(ios_base::fixed);      }
-           // else if ( i==5 ) { cout.unsetf(ios_base::scientific); }
+           // if( i == 2 )     { cout.unsetf(std::ios_base::fixed);      }
+           // else if ( i==5 ) { cout.unsetf(std::ios_base::scientific); }
         }
-        cout.unsetf(ios_base::scientific);
+        cout.unsetf(std::ios_base::scientific);
         if( j > 0 )  // Step 0 did not move -- printed the starting values
         {
-           // cout.unsetf(ios_base::scientific);
-           cout.setf (ios_base::fixed);                         
+           // cout.unsetf(std::ios_base::scientific);
+           cout.setf (std::ios_base::fixed);                         
            cout.precision(2);
            cout<<setw(nwdf) << atan2(yout[1],yout[0])/degree;
            

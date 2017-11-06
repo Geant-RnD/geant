@@ -78,7 +78,7 @@ GUExactHelixStepper::StepWithoutErrorEstimate( const double  yIn[],
 // ---------------------------------------------------------------------------
 
 double
-GUExactHelixStepper::DistChord() const 
+GUExactHelixStepper::DistChord( double charge) const 
 {
   // Implementation : must check whether h/R >  pi  !!
   //   If( h/R <  pi)   DistChord=h/2*std::tan(Ang_curve/4)                <

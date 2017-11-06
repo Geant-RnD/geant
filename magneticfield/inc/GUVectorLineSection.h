@@ -89,20 +89,23 @@ Geant::Double_v GUVectorLineSection::Dist
   vecCore::MaskedAssign( unit_projection, fABdistanceSq != 0.0, inner_prod/fABdistanceSq );
   
   // vecCore::MaskedAssign( (0. <= unit_projection ) && (unit_projection <= 1.0 ), sq_VecAZ - unit_projection*inner_prod, &dist_sq );
-  Mask<Geant::Double_v> goodProjection = (0. <= unit_projection ) && (unit_projection <= 1.0 );
+  // Mask<Geant::Double_v> goodProjection = (0. <= unit_projection ) && (unit_projection <= 1.0 );
   vecCore::MaskedAssign( dist_sq,
-                         goodProjection,
-                         // (0. <= unit_projection ) && (unit_projection <= 1.0 ),                       
+                         // goodProjection,
+                         (0. <= unit_projection ) && (unit_projection <= 1.0 ),                       
                          sq_VecAZ - unit_projection*inner_prod );
   
-  // vecCore::MaskedAssign( unit_projection < 0.0, sq_VecAZ, &dist_sq);
-  Mask<Geant::Double_v> negativeProj = unit_projection < 0.0 ;  
-  vecCore::MaskedAssign( dist_sq, negativeProj, sq_VecAZ );
+  // -- vecCore::MaskedAssign( unit_projection < 0.0, sq_VecAZ, &dist_sq);
+  // Mask<Geant::Double_v> negativeProj = unit_projection < 0.0 ;  
+  // vecCore::MaskedAssign( dist_sq, negativeProj, sq_VecAZ );
+  vecCore::MaskedAssign( dist_sq, unit_projection < 0.0, sq_VecAZ );
+  
   
   // vecCore::MaskedAssign( (fABdistanceSq != 0.0) && (unit_projection > 1.0), (OtherPnt -(EndpointA + VecAtoB)).Mag2(), &dist_sq);
-  Mask<Geant::Double_v> condDistProj=  (fABdistanceSq != 0.0) && (unit_projection > 1.0),;
-  vecCore::MaskedAssign( &dist_sq, 
-                         condDistProj,
+  // Mask<Geant::Double_v> condDistProj=  (fABdistanceSq != 0.0) && (unit_projection > 1.0),;
+  vecCore::MaskedAssign( dist_sq, 
+                         // condDistProj,
+                         (fABdistanceSq != 0.0) && (unit_projection > 1.0),                         
                          (OtherPnt -(EndpointA + VecAtoB)).Mag2());
   
   // if( fABdistanceSq != 0.0 )
@@ -129,15 +132,16 @@ Geant::Double_v GUVectorLineSection::Dist
   //   }
   // }
 
-  vecCore::MaskedAssign( &dist_sq,  !(fABdistanceSq != 0.0), (OtherPnt - EndpointA).Mag2() );
+  vecCore::MaskedAssign( dist_sq,  !(fABdistanceSq != 0.0), (OtherPnt - EndpointA).Mag2() );
   // else
   // {
   //    dist_sq = (OtherPnt - EndpointA).Mag2() ;   
   // }  
 
   // vecgeom::MaskedAssign( dist_sq < 0.0, 0.0, &dist_sq );  
-  vecgeom::MaskedAssign( &dist_sq, dist_sq < 0.0, 0.0 );
-
+  vecCore::MaskedAssign( dist_sq, dist_sq < Double_v(0.0), Double_v(0.0) );
+  // dist_sq = vecgeom::Max ( dist_sq, 0.0 );
+  
   return vecCore::math::Sqrt(dist_sq) ;
 }
 #endif

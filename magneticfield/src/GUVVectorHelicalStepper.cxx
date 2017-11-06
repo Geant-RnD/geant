@@ -44,7 +44,8 @@ GUVVectorHelicalStepper::~GUVVectorHelicalStepper()
 void
 GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
                                              ThreeVectorSimd Bfld,
-                                       double h,   // Double_v g
+                                       const Double_v& charge,
+                                       const Double_v& h,
                                              Double_v  yHelix[],
                                              Double_v  yHelix2[] )
 {
@@ -91,9 +92,9 @@ GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
 
   //if inside else
   Bool_v trigCond = vecCore::math::Abs(Theta) > approc_limit;
-  // vecCore::MaskedAssign(&SinT, trigCond, vecCore::math::Sin(Theta));
+  // vecCore::MaskedAssign( SinT, trigCond, vecCore::math::Sin(Theta));
   vecCore__MaskedAssignFunc(SinT, trigCond, vecCore::math::Sin(Theta));
-  // vecCore::MaskedAssign(&CosT, trigCond, vecCore::math::Cos(Theta));
+  // vecCore::MaskedAssign( CosT, trigCond, vecCore::math::Cos(Theta));
   vecCore__MaskedAssignFunc(CosT, trigCond, vecCore::math::Cos(Theta));
   
   Double_v R = 1.0 / R_1;
@@ -135,9 +136,9 @@ GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
 
   using vecCore::math::Abs;
 
-  R_Helix =Abs( ptan/(fUnitConstant  * fParticleCharge*Bmag));
+  R_Helix =Abs( ptan/(fUnitConstant  * charge*Bmag));
   // Was: 
-  //    R_Helix =vecCore::math::Abs( ptan/(fUnitConstant  * fParticleCharge*Bmag));
+  //    R_Helix =vecCore::math::Abs( ptan/(fUnitConstant  * charge*Bmag));
   
   // for too small magnetic fields there is no curvature
   // (include momentum here) FIXME
@@ -153,7 +154,7 @@ GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
   vecCore::MaskedAssign( R_Helix, noCurvatureCond, Double_v(0.) );
 
   // R       = vecCore::Blend( noCurvatureCond, h  );  
-  // R_Helix = vecCore::Blend( noCurvatureCond, 0, Abs( ptan/(fUnitConstant  * fParticleCharge*Bmag)) );
+  // R_Helix = vecCore::Blend( noCurvatureCond, 0, Abs( ptan/(fUnitConstant  * charge*Bmag)) );
   
   SetAngCurve( vecCore::math::Abs(Theta) );
   SetCurve(    vecCore::math::Abs(R) );
@@ -168,14 +169,15 @@ GUVVectorHelicalStepper::AdvanceHelix( const Double_v  yIn[],
 
 void
 GUVVectorHelicalStepper::StepWithErrorEstimate( const Double_v yInput[],
-                                                const Double_v*,
+                                                const Double_v*,         // dydx
+                                                const Double_v& charge,
                                                 const Double_v& hstep,
                                                       Double_v yOut[],
                                                       Double_v yErr[]  )
 {
    const int Nvar = 6;
 
-   Double_v  yTemp[Nvar], yIn[Nvar] ;
+   Double_v  yMid[Nvar], yIn[Nvar] ;
    Double_v  ySingleStep[Nvar];
 
    ThreeVectorSimd Bfld_initial, Bfld_midpoint;
@@ -186,20 +188,20 @@ GUVVectorHelicalStepper::StepWithErrorEstimate( const Double_v yInput[],
 
    Double_v halfStep = hstep * 0.5;
 
-   MagFieldEvaluate(yIn, Bfld_initial) ;      
+   MagFieldEvaluate(yIn, Bfld_initial) ;
 
-   // Do two half steps
+   // Do first half step
 
-   StepWithoutErrorEstimate(yIn,   Bfld_initial,  halfStep, yTemp);
-   MagFieldEvaluate(yTemp, Bfld_midpoint) ;     
-   StepWithoutErrorEstimate(yTemp, Bfld_midpoint, halfStep, yOut); 
+   StepWithoutErrorEstimate(yIn, Bfld_initial,  charge, halfStep, yMid);
+   MagFieldEvaluate(yMid, Bfld_midpoint) ;
 
    // Do a full Step
-
-   StepWithoutErrorEstimate(yIn, Bfld_initial, hstep, ySingleStep);
+   StepWithoutErrorEstimate(yIn, Bfld_initial,  charge, hstep,    ySingleStep);
+   
+   // Do second half step   
+   StepWithoutErrorEstimate(yMid, Bfld_midpoint, charge, halfStep, yOut); 
 
    // Error estimation
-
    for(unsigned int i=0; i<Nvar; ++i)
    {
      yErr[i] = yOut[i] - ySingleStep[i] ;

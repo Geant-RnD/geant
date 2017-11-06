@@ -18,12 +18,12 @@
 #include "GUVVectorIntegrationStepper.h"
 
 // #include "TMagErrorStepper.h" //for sake of GUIntegrationNms::NumVars
-#include "TemplateTMagErrorStepper.h"
-#include "AlignedBase.h"
+// #include "TemplateTMagErrorStepper.h"
+
+// #include "AlignedBase.h"  // ==> Ensures alignment of storage for Vc objects
 
 #define INLINERHS 1
 // #define DEBUGAnanya
-#define RemoveAuxStepper
 // #define NoPointers
 
 #ifdef INLINERHS
@@ -31,6 +31,7 @@
 #else
 #define REALLY_INLINE   inline
 #endif
+
 
 template
 <class T_Equation, unsigned int Nvar>
@@ -46,10 +47,11 @@ template
   
   public:
     static constexpr unsigned int sOrderMethod= 4;
-    static constexpr unsigned int sNstore = (GUIntegrationNms::NumVarBase > Nvar) ? GUIntegrationNms::NumVarBase : Nvar;
+    static constexpr unsigned int sNstore = 6;   // How many variables the full state entails
+               // (GUIntegrationNms::NumVarBase > Nvar) ? GUIntegrationNms::NumVarBase : Nvar;
     // std::max( GUIntegrationNms::NumVarBase,  Nvar);
     // static const IntegratorCorrection = 1./((1<<4)-1);
-    inline double IntegratorCorrection() { return 1./((1<<4)-1); }
+    inline double IntegratorCorrection() { return 1./((1<<sOrderMethod)-1); }
 
   public:
     inline
@@ -64,78 +66,60 @@ template
     GUVVectorIntegrationStepper* Clone() const override;
 
     REALLY_INLINE
-    #ifdef NoPointers
     void StepWithErrorEstimate(const Double_v  yInput[],  // Consider __restrict__
                                const Double_v  dydx[],
+                               const Double_v& charge,
                                const Double_v& hStep,
                                      Double_v  yOut[],
                                      Double_v  yErr[]) override;
-   #else 
-    void StepWithErrorEstimate(const Double_v* yInput,    // Consider __restrict__
-                               const Double_v*  dydx,
-                               const Double_v&  Step,
-                                     Double_v*  yOut,
-                                     Double_v*  yErr) override;
-    #endif 
 
-    // Double_v DistChord() ;// override;  
     Double_v DistChord() const override ;
 
     REALLY_INLINE
-    void RightHandSideInl(Double_v y[], Double_v dydx[]) 
-    {fEquation_Rhs->T_Equation::RightHandSide(y, dydx);}
+    void RightHandSideInl(Double_v y[], const Double_v& charge, Double_v dydx[]) 
+    {fEquation_Rhs->T_Equation::RightHandSide(y, charge, dydx);}
 
     void SetEquationOfMotion(T_Equation* equation);
     
     private:
-
-    
       VectorCashKarpRKF45& operator=(const VectorCashKarpRKF45&) = delete;
         //private assignment operator.
 
+    private: 
+         // State -- intermediate values used during RK step
+         // -----        
+         Double_v ak2[sNstore];
+         Double_v ak3[sNstore];
+         Double_v ak4[sNstore];
+         Double_v ak5[sNstore];
+         Double_v ak6[sNstore];
+         Double_v ak7[sNstore];
+         Double_v yTemp2[sNstore];  // Separate temporaries per step - to aid compiler
+         Double_v yTemp3[sNstore];
+         Double_v yTemp4[sNstore];
+         Double_v yTemp5[sNstore];
+         
+         Double_v yIn[sNstore];
+         // scratch space
+         
+         // State -- values used for subsequent call to DistChord
+         // -----
+         
+         Double_v  fLastStepLength;
+         
+         Double_v  fLastInitialVector[sNstore];
+         Double_v  fLastFinalVector[sNstore];
+         Double_v  fLastDyDx[sNstore];
+         Double_v  fMidVector[sNstore];
+         Double_v  fMidError[sNstore];
+         // for DistChord calculations
+      
     private:
         // 'Invariant' during integration - the pointers must not change
         // -----------
         T_Equation* fEquation_Rhs;
         bool        fOwnTheEquation; //enquire it's nature. If Bool_v , need to change if -> MaskedAssign
-        #ifndef RemoveAuxStepper
-        VectorCashKarpRKF45* fAuxStepper;
-        #endif
-        // State -- intermediate values used during RK step
-        // -----        
-        Double_v ak2[sNstore];
-        Double_v ak3[sNstore];
-        Double_v ak4[sNstore];
-        Double_v ak5[sNstore];
-        Double_v ak6[sNstore];
-        Double_v ak7[sNstore];
-        Double_v yTemp2[sNstore];  // Separate temporaries per step - to aid compiler
-        Double_v yTemp3[sNstore];
-        Double_v yTemp4[sNstore];
-        Double_v yTemp5[sNstore];
-        
-        Double_v yIn[sNstore];
-        // scratch space
 
-        // State -- values used for subsequent call to DistChord
-        // -----
-        
-        Double_v  fLastStepLength;
-      #ifdef NoPointers
-        Double_v  fLastInitialVector[sNstore];
-        Double_v  fLastFinalVector[sNstore];
-        Double_v  fLastDyDx[sNstore];
-        Double_v  fMidVector[sNstore];
-        Double_v  fMidError[sNstore];
-      #endif 
-        // for DistChord calculations
-       #ifndef NoPointers
-        Double_v* fLastInitialVector;
-        Double_v* fLastFinalVector;
-        Double_v* fLastDyDx;
-        Double_v* fMidVector;
-        Double_v* fMidError;
-       #endif
         bool  fDebug= false;
 };
 
@@ -151,49 +135,18 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
                                   ((numStateVariables>0) ? numStateVariables : sNstore) ),
      fEquation_Rhs(EqRhs),
      fOwnTheEquation(primary),
-    #ifndef RemoveAuxStepper
-     fAuxStepper(0),
-    #endif
      fLastStepLength(0.)
 {
    if( fDebug ) {
       std::cout<<"\n----Entered constructor of VectorCashKarpRKF45 "<<std::endl;
       std::cout<<"----In VectorCashKarpRKF45 constructor, Nvar is: "<<Nvar<<std::endl;
    }
-   assert( dynamic_cast<TemplateGUVEquationOfMotion<Backend>*>(EqRhs) != 0 );
+   // assert( dynamic_cast<TemplateGUVEquationOfMotion<Backend>*>(EqRhs) != 0 );
 
 
-   assert( (numStateVariables == 0) || (numStateVariables >= Nvar) );
+   assert( (numStateVariables != 0) && (numStateVariables >= Nvar) );
   
-  #ifndef NoPointers
-   fLastInitialVector = new Double_v[sNstore] ;
-   fLastFinalVector   = new Double_v[sNstore] ;
-   fLastDyDx          = new Double_v[sNstore];
-   
-   fMidVector = new Double_v[sNstore];
-   fMidError  = new Double_v[sNstore];
-  #endif
-
-  #if 0
-    std::cout<<"----Before Auxiliary stepper if condition"<<std::endl;
-  #endif
-
-  #ifndef RemoveAuxStepper
-   if( primary )
-   {
-      // Reuse the Equation of motion in the Auxiliary Stepper      
-      VectorCashKarpRKF45<T_Equation,Nvar> fAuxStepper2(EqRhs, numStateVariables, false);
-      fAuxStepper = &fAuxStepper2;
-      // fAuxStepper = new VectorCashKarpRKF45<T_Equation,Nvar>(EqRhs, numStateVariables, false);
-      #ifdef DEBUGAnanya
-      std::cout<<"----VectorCashKarpRKF45 Auxiliary Stepper being made"<<std::endl;
-      #endif 
-   }
-  #endif 
-
-   #if 0
-    std::cout<<"----end of constructor of VectorCashKarpRKF45"<<std::endl;
-   #endif
+   std::cout<<"----end of constructor of VectorCashKarpRKF45"<<std::endl;
 }
 
 template <class T_Equation, unsigned int Nvar>
@@ -201,7 +154,7 @@ void VectorCashKarpRKF45<T_Equation,Nvar>::
   SetEquationOfMotion(T_Equation* equation)
 {
    fEquation_Rhs= equation;
-   this->GUVIntegrationStepper::SetABCEquationOfMotion(fEquation_Rhs);
+   this->GUVVectorIntegrationStepper::SetABCEquationOfMotion(fEquation_Rhs);
 }
 
 //  Copy - Constructor
@@ -216,10 +169,6 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
                                               right.GetNumberOfStateVariables() ),
      fEquation_Rhs( (T_Equation*) nullptr ),
      fOwnTheEquation(true),
-
-     #ifndef RemoveAuxStepper
-     fAuxStepper(0),   //  May overwrite below
-     #endif 
 
      fLastStepLength(0.)
      // fPrimary( right.fPrimary )
@@ -248,15 +197,6 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
       std::cout << " VectorCashKarpRKF45 - copy constructor: " << std::endl
                 << " Nvar = " << Nvar << " Nstore= " << sNstore 
                 << " Own-the-Equation = " << fOwnTheEquation << std::endl;
-
-  #ifndef RemoveAuxStepper
-   if( right.fAuxStepper )
-   {
-      // Reuse the Equation of motion in the Auxiliary Stepper
-      fAuxStepper = new VectorCashKarpRKF45(fEquation_Rhs, this->GetNumberOfStateVariables(), false);
-      std::cout<<"Auxiliary stepper made"<<std::endl;
-   }
-  #endif
 }
 
 
@@ -265,9 +205,7 @@ template <class T_Equation,unsigned int Nvar>
 REALLY_INLINE
 VectorCashKarpRKF45<T_Equation,Nvar>::~VectorCashKarpRKF45()
 {
-#if 0
-  std::cout<<"----- CashKarp destructor0"<<std::endl;
-#endif
+   std::cout<<"----- Vector CashKarp destructor0"<<std::endl;
 
 
 #ifndef NoPointers
@@ -276,27 +214,13 @@ VectorCashKarpRKF45<T_Equation,Nvar>::~VectorCashKarpRKF45()
    delete[] fLastDyDx;
    delete[] fMidVector;
    delete[] fMidError;
-#if 0
-  std::cout<<"----- CashKarp destructor0.5"<<std::endl;
-#endif
-
-  #ifndef RemoveAuxStepper
-  std::cout<<fAuxStepper<<std::endl;
-   delete fAuxStepper;
-  #endif 
-
-#if 0
-  std::cout<<"----- CashKarp destructor1"<<std::endl;
-#endif
+   std::cout<<"----- VectorCashKarp destructor1"<<std::endl;
 
    if( fOwnTheEquation )
       delete fEquation_Rhs; // Expect to own the equation, except if auxiliary (then sharing the equation)
 #endif
 
-#if 0
-  std::cout<<"----- CashKarp destructor1"<<std::endl;
-#endif
-
+  std::cout<<"----- VectorCashKarp destructor1 (ended)"<<std::endl;
 }
 
 template <class T_Equation, unsigned int Nvar>
@@ -311,19 +235,13 @@ VectorCashKarpRKF45<T_Equation,Nvar>::Clone() const
 template <class T_Equation, unsigned int Nvar>
 inline void
 VectorCashKarpRKF45<T_Equation,Nvar>::
-#ifdef NoPointers
+
   StepWithErrorEstimate(const Double_v  yInput[],    
                         const Double_v  dydx[],
-                        const Double_v&  Step,
+                        const Double_v& charge,                        
+                        const Double_v& Step,
                               Double_v  yOut[],
                               Double_v  yErr[])
-#else 
-  StepWithErrorEstimate(const Double_v*  yInput,
-                        const Double_v*  dydx, 
-                        cosnt Double_v&  Step,
-                              Double_v*  yOut, 
-                              Double_v*  yErr  ) 
-#endif 
 {
     // const double a2 = 0.2 , a3 = 0.3 , a4 = 0.6 , a5 = 1.0 , a6 = 0.875;
     unsigned int i;
@@ -358,32 +276,32 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
     {
         yIn[i]=yInput[i];
     }
-    // RightHandSideInl(yIn, dydx) ;              // 1st Step
+    // RightHandSideInl(yIn, charge,  dydx) ;              // 1st Step
 
     for(i=0;i<Nvar;i++) 
     {
         yTemp2[i] = yIn[i] + b21*Step*dydx[i] ;
     }
-    this->RightHandSideInl(yTemp2, ak2) ;              // 2nd Step
+    this->RightHandSideInl(yTemp2, charge,  ak2) ;              // 2nd Step
 
     for(i=0;i<Nvar;i++)
     {
         yTemp3[i] = yIn[i] + Step*(b31*dydx[i] + b32*ak2[i]) ;
     }
-    this->RightHandSideInl(yTemp3, ak3) ;              // 3rd Step
+    this->RightHandSideInl(yTemp3, charge,  ak3) ;              // 3rd Step
 
     for(i=0;i<Nvar;i++)
     {
         yTemp4[i] = yIn[i] + Step*(b41*dydx[i] + b42*ak2[i] + b43*ak3[i]) ;
     }
-    this->RightHandSideInl(yTemp4, ak4) ;              // 4th Step
+    this->RightHandSideInl(yTemp4, charge,  ak4) ;              // 4th Step
 
     for(i=0;i<Nvar;i++)
     {
         yTemp5[i] = yIn[i] + Step*(b51*dydx[i] + b52*ak2[i] + b53*ak3[i] +
                 b54*ak4[i]) ;
     }
-    this->RightHandSideInl(yTemp5, ak5) ;              // 5th Step
+    this->RightHandSideInl(yTemp5, charge,  ak5) ;              // 5th Step
 
     {
       Double_v yTemp6[sNstore];                
@@ -392,7 +310,7 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
         yTemp6[i] = yIn[i] + Step*(b61*dydx[i] + b62*ak2[i] + b63*ak3[i] +
                 b64*ak4[i] + b65*ak5[i]) ;
       }
-      this->RightHandSideInl(yTemp6, ak6) ;              // 6th Step
+      this->RightHandSideInl(yTemp6, charge,  ak6) ;              // 6th Step
     }
     
     for(i=0;i<Nvar;i++)
@@ -426,11 +344,14 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
 
 template <class T_Equation, unsigned int Nvar>
 inline 
-Double_v
+Geant::Double_v
 VectorCashKarpRKF45<T_Equation,Nvar>::
   DistChord()  const
 {
-    Double_v        distLine, distChord; 
+#if 1
+    Double_v        distChord= 0.0;
+#else   
+    Double_v        distLine, distChord;
     ThreeVectorSimd initialPoint, finalPoint, midPoint;
 
     // Store last initial and final points (they will be overwritten in self-Stepper call!)
@@ -439,28 +360,20 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
     finalPoint   = ThreeVectorSimd( fLastFinalVector[0],  
                                     fLastFinalVector[1],  fLastFinalVector[2]); 
 
-#ifndef RemoveAuxStepper
     // Do half a step using StepNoErr
-  #ifdef NoPointers
     fAuxStepper->StepWithErrorEstimate( fLastInitialVector, 
                                         fLastDyDx, 
                                         0.5 * fLastStepLength, 
                                         fMidVector,   
                                         fMidError );
-  #else 
-    fAuxStepper->VectorCashKarpRKF45::StepWithErrorEstimate( fLastInitialVector, 
-                                                                  fLastDyDx, 
-                                                                  0.5 * fLastStepLength, 
-                                                                  fMidVector,   
-                                                                  fMidError );
-  #endif 
+
     midPoint = ThreeVectorSimd( fMidVector[0], fMidVector[1], fMidVector[2]);       
 
     // Use stored values of Initial and Endpoint + new Midpoint to evaluate
     //  distance of Chord
 
     distChord  = GUVectorLineSection::Distline( midPoint, initialPoint, finalPoint );
-  #endif
+#endif    
     return distChord;
 }
 

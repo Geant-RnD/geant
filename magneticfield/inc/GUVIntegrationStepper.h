@@ -44,8 +44,8 @@ class GUVIntegrationStepper
         // Core methods
         // ---------------------
         virtual void StepWithErrorEstimate( const double y[],
-                                                  double charge,
                                             const double dydx[],
+                                                  double charge,
                                                   double h,
                                                   double yout[],
                                                   double yerr[]  ) = 0;

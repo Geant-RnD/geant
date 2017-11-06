@@ -48,14 +48,16 @@ class GUVVectorIntegrationStepper
         // ---------------------
         virtual void StepWithErrorEstimate( const Double_v  yInput[],
                                             const Double_v  dydx[],
+                                            const Double_v& charge, 
                                             const Double_v& hStep,
                                                   Double_v  yOutput[],
                                                   Double_v  yError[]  ) = 0;
         // Integrate typically using Runge Kutta 
         // Input:
         //          y[] = initial derivative
-        //       dydx[] = initial derivative        
-        //          h   = requested step
+        //       dydx[] = initial derivative
+        //       charge = particle Charge
+        //        hStep = requested step
         // Output:
         //       yout[] = output values of integration
         //       yerr[] = estimate of integration error

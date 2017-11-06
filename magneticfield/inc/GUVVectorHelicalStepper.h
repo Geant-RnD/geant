@@ -42,6 +42,7 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
   
     virtual void StepWithErrorEstimate( const Double_v y[],  // virtual for ExactHelix 
                                         const Double_v dydx[],
+                                        const Double_v&  charge,
                                         const Double_v&  h,                                        
                                               Double_v yout[],
                                               Double_v yerr[] );
@@ -51,7 +52,8 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
       // Outputs yout[] and its estimated error yerr[].
   
     virtual  void StepWithoutErrorEstimate( const Double_v y[],
-                                                  ThreeVectorSimd Bfld,
+                                            ThreeVectorSimd Bfld,
+                                            const Double_v& charge,
                                             const Double_v& hStep,
                                                   Double_v yout[]     ) = 0;
       // Performs a 'dump' Step without error calculation.
@@ -62,13 +64,14 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
   protected:  // with description
 
     inline void LinearStep( const Double_v  yIn[],
-                                  double  h,
+                            const Double_v& h,
                                   Double_v  yHelix[]) const;
       // A linear Step in regions without magnetic field.
 
      void AdvanceHelix( const Double_v  yIn[],
                               ThreeVectorSimd Bfld,
-                              double  h,
+                        const Double_v& charge,
+                        const Double_v& h,
                               Double_v  yHelix[],
                               Double_v yHelix2[]=0);    // output 
       // A first order Step along a helix inside the field.
@@ -123,7 +126,7 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
 
 inline 
 void GUVVectorHelicalStepper::LinearStep( const Double_v yIn[],
-                                          double  h,
+                                          const Double_v& h,
                                           Double_v yLinear[]) const
 {
 
