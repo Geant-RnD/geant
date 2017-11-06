@@ -12,10 +12,7 @@ unsigned int GUVEquationOfMotion::fNumObjectsDeleted= 0;
 
 GUVEquationOfMotion::~GUVEquationOfMotion()
 {
-   CheckDone();
-   // std::cout << " Destructing Equation " << this << " info= " << *this << std::endl;   
    fNumObjectsDeleted++;
-   // To help ensure that clients call InformDone() - ie. clear
 }
 
 

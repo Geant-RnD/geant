@@ -107,12 +107,6 @@ public:
                  double        cof,                     
                  double const  dydx[]  ) const;
 
-  GEANT_FORCE_INLINE
-  void InitializeCharge(double /*particleCharge*/) final
-  { /*fParticleCharge= particleCharge*/;  GUVEquationOfMotion::InformReady();  }
-
-  void InvalidateParameters() final { GUVEquationOfMotion::InformDone();}
-
 private:
   enum { G4maximum_number_of_field_components = 24 };
   Field    *fPtrField;

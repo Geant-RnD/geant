@@ -127,6 +127,9 @@ int main(int argc, char *args[])
     auto gvEquation =
        FieldEquationFactory::CreateMagEquation<TUniformMagField>(gvField);
 
+    cout << " Equation information: ptr= " << gvEquation  << endl
+         << "   full:  "  << *gvEquation   << endl;
+    
        // new GvEquationType(gvField);
        // new TMagFieldEquation<TUniformMagField, Nposmom>(gvField);
 
@@ -152,6 +155,9 @@ int main(int argc, char *args[])
        delete baseStepper;
        myStepper = cloneStepper;
     }
+
+    cout << " Stepper  information: ptr= " << myStepper << endl;
+    // cout << "       full " << *myStepper << endl;
 
     //myStepper->InitializeCharge( particleCharge );
     
@@ -282,6 +288,7 @@ int main(int argc, char *args[])
         exactStepper->RightHandSideVIS(yInX, particleCharge, dydxRef);   //compute the value of dydx for the exact stepper
         #endif
 
+           
         if( j > 0 )  // Let's print the initial points!
         {
            myStepper->StepWithErrorEstimate(yIn,dydx,particleCharge,step_len,yout,yerr);   //Call the 'trial' stepper
@@ -407,7 +414,6 @@ int main(int argc, char *args[])
     /*-----------------END-STEPPING------------------*/
 
     /*------ Clean up ------*/
-    myStepper->InformDone(); 
     delete myStepper;
 
 #ifdef BASELINESTEPPER

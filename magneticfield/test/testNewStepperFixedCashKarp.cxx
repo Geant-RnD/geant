@@ -150,11 +150,17 @@ int main(int argc, char *args[])
     if( debug ) cout<<"---- Preparing to create (Vector) CashKarpRKF45 Stepper "<<endl;
 
     VectorCashKarpRKF45< /*Backend,*/ GvEquationType,Nposmom> myStepper2(magEquation);
-    if( debug ) cout<<"---- constructed VectorCashKarpRKF45"<<endl;
-                                                              
+
     auto myStepper = &myStepper2;
     // myStepper = new VectorCashKarpRKF45<Backend,GvEquationType,Nposmom>(gvEquation);
-  
+                                                                                  
+    if( debug )
+    {
+       cout << "---- constructed VectorCashKarpRKF45" << endl;
+       cout << " Stepper  information: ptr= " << myStepper << endl;
+       // cout << "       full " << *myStepper << endl;
+    }
+                                                              
     // Phase 1 - get it to work without cloning
 
     //Initialising coordinates
@@ -284,7 +290,7 @@ int main(int argc, char *args[])
         cout<<setw(6)<<j ;           //Printing Step number
         Double_v charge(-1.);
         Double_v step_len( stepLengthValue ); 
-        myStepper->RightHandSideVIS(yIn, charge, dydx);  //compute dydx - to supply the stepper
+        myStepper->RightHandSideInl(yIn, charge, dydx);  //compute dydx - to supply the stepper
         #ifdef baseline
         exactStepper->RightHandSideVIS(yInX, dydxRef);   //compute the value of dydx for the exact stepper
         #endif
@@ -407,7 +413,7 @@ int main(int argc, char *args[])
     exactStepper->InformDone();
     #endif 
 
-    delete myStepper;
+    // delete myStepper;  // Only if object was new'ed !!
 
     if( debug )  cout<<"----deletion of stepper done "<<endl;
 

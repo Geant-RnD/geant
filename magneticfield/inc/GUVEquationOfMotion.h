@@ -41,15 +41,6 @@ class GUVEquationOfMotion
        // This is the _only_ function a subclass must define.
        // The other two functions use Rhs_givenB.
 
-      virtual void InitializeCharge(double particleCharge)=0;
-       // Must be called to correctly initialise and provide charge
-      virtual void InvalidateParameters()=0;
-      
-      inline void InformReady(); // All parameters have been set (charge+)
-      inline void InformDone();  // Invalidate charge, other parameters
-      inline void CheckInitialization() const; // Ensure initialization
-      inline void CheckDone() const;
-
      // virtual void SetChargeMomentumMass(double particleCharge,
      //                                    double MomentumXc,
      //                                    double MassXc2) = 0;
@@ -119,28 +110,6 @@ GUVEquationOfMotion::GUVEquationOfMotion(GUVField* pField, unsigned short verbos
 }
 
 inline
-void GUVEquationOfMotion::InformReady() // was Initialize()
-{
-   // std::cout << " Called GUVEquationOfMotion::InformReady() " << std::endl;
-
-   // assert( ! fInitialised ); // Sanity checking - assumes Clear() is always called!
-                      // BUT: Will signal problem if two steppers share an equation
-   fInitialised= true;
-}
-
-inline
-void GUVEquationOfMotion::InformDone()  // was Clear() and before Finished();
-{
-   if(fVerbose)
-   {
-     std::cout << " Called GUVEquationOfMotion::InformDone() " << std::endl;
-     std::cout << *this << std::endl;
-   }
-   assert( fInitialised );
-   fInitialised= false;
-}
-
-inline
 void GUVEquationOfMotion::GetFieldValue( const vecgeom::Vector3D<double> &Position,
                                                vecgeom::Vector3D<double>  &FieldValue ) const
 {
@@ -154,7 +123,6 @@ GUVEquationOfMotion::RightHandSide( const  double y[],
                                            double dydx[]  ) const
 {
    using ThreeVectorD = vecgeom::Vector3D<double>;
-   CheckInitialization();
 
    // double Field[GUVmaximum_number_of_field_components];
    ThreeVectorD  field;
@@ -186,28 +154,6 @@ EvaluateRhsReturnB( const double           y[],
    
    GetFieldValue( ThreeVector(y[0], y[1], y[2]), field) ;
    EvaluateRhsGivenB( y, field, charge, dydx );
-}
-
-#include <iostream>
-
-void GUVEquationOfMotion::CheckInitialization() const
-{
-#ifdef GUVERBOSE
-   if( fVerbose && !fInitialised ){
-      std::cerr << "GUVEquationOfMotion is not Initialised" << std::endl;
-   }
-#endif
-   assert( fInitialised );
-}
-
-void GUVEquationOfMotion::CheckDone() const
-{
-#ifdef GUVERBOSE
-   if( fVerbose && fInitialised ){
-      std::cerr << "GUVEquationOfMotion was NOT told it is Done!" << std::endl;
-   }
-#endif
-   assert( !fInitialised );
 }
 
 #endif /* GUV_EquationOfMotion_DEF */

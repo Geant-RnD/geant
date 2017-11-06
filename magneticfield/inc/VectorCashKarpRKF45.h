@@ -124,7 +124,7 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
                                   ((numStateVariables>0) ? numStateVariables : sNstore) ),
      fEquation_Rhs(EqRhs),
      // fLastStepLength(0.),
-     fOwnTheEquation(true)
+     fOwnTheEquation(false)
 {
    if( fDebug ) {
       std::cout<<"\n----Entered constructor of VectorCashKarpRKF45 "<<std::endl;
@@ -134,7 +134,7 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
 
    fLastStepLength= Double_v(0.);
    
-   assert( (numStateVariables != 0) && (numStateVariables >= Nvar) );
+   assert( (numStateVariables == 0) || (numStateVariables >= Nvar) );
   
    std::cout<<"----end of constructor of VectorCashKarpRKF45"<<std::endl;
 }
@@ -158,7 +158,7 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
                                               Nvar,
                                               right.GetNumberOfStateVariables() ),
      fEquation_Rhs( (T_Equation*) nullptr ),
-     fOwnTheEquation(true)
+     fOwnTheEquation(false)
 {
    if( fDebug ) {
     std::cout<<"----Entered constructor of VectorCashKarpRKF45 "<<std::endl;

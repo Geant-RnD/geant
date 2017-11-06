@@ -98,9 +98,6 @@ class GUVIntegrationStepper
 //               GetEquationOfMotion()->InitializeCharge(particleCharge); }
            // Some steppers may need the value(s) / or status - they can intercept        
 
-        void InformDone() { GetEquationOfMotion()->InformDone();}
-          // InvalidateParameters()
-
     private:
 
         GUVIntegrationStepper& operator=(const GUVIntegrationStepper&);
@@ -123,6 +120,7 @@ inline
 void GUVIntegrationStepper::
 RightHandSideVIS( const  double y[], double charge, double dydx[] )
 {
+   assert ( fAbstrEquation != nullptr ); 
    fAbstrEquation-> RightHandSide(y, charge, dydx);
 }
 
