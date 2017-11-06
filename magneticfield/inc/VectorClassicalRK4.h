@@ -10,9 +10,9 @@
 // template <class T> inline constexpr const T& MaxConst (const T& a, const T& b) { return (a<b)?b:a;  } 
 
 template
-<class Double_v, class T_Equation, unsigned int Nvar>
+<class BackendDouble_v, class T_Equation, unsigned int Nvar>
 class TemplateTClassicalRK4 : public  TemplateTMagErrorStepper
-                      <Double_v, TemplateTClassicalRK4<Double_v, T_Equation, Nvar>, T_Equation, Nvar>
+                      <BackendDouble_v, TemplateTClassicalRK4<BackendDouble_v, T_Equation, Nvar>, T_Equation, Nvar>
 {
   public:  // with description
     static constexpr unsigned int OrderRK4= 4;
@@ -21,14 +21,14 @@ class TemplateTClassicalRK4 : public  TemplateTMagErrorStepper
                         // std::max( GUIntegrationNms::NumVarBase,  Nvar);
 
     TemplateTClassicalRK4(T_Equation *EqRhs) // , int numberOfVariables = 8)
-       : TemplateTMagErrorStepper<Double_v, TemplateTClassicalRK4<Double_v, T_Equation, Nvar>, T_Equation, Nvar>(EqRhs, OrderRK4, Nvar)
+       : TemplateTMagErrorStepper<BackendDouble_v, TemplateTClassicalRK4<BackendDouble_v, T_Equation, Nvar>, T_Equation, Nvar>(EqRhs, OrderRK4, Nvar)
        // fEquation_Rhs(EqRhs)
     {
     }
 
     TemplateTClassicalRK4(const TemplateTClassicalRK4& right);
 
-    virtual  TemplateGUVIntegrationStepper<Double_v>* Clone() const override final;
+    virtual  TemplateGUVIntegrationStepper<BackendDouble_v>* Clone() const override final;
     
     // void SetOurEquationOfMotion(T_Equation* equation);
        
@@ -47,11 +47,11 @@ class TemplateTClassicalRK4 : public  TemplateTMagErrorStepper
     
     // A stepper that does not know about errors.
     // It is used by the MagErrorStepper stepper.
-    void  StepWithoutErrorEst( const Double_v  yIn[],
-                               const Double_v  dydx[],
-                                     Double_v  h,
-                                     // Double_v  charge,
-                                     Double_v  yOut[]);  // override final;  => Not virtual method, must exist though!
+    void  StepWithoutErrorEst( const BackendDouble_v  yIn[],
+                               const BackendDouble_v  dydx[],
+                                     BackendDouble_v  h,
+                                     // BackendDouble_v  charge,
+                                     BackendDouble_v  yOut[]);  // override final;  => Not virtual method, must exist though!
  
   public:
     // __attribute__((always_inline)) 
@@ -71,27 +71,27 @@ class TemplateTClassicalRK4 : public  TemplateTMagErrorStepper
     // STATE
     
     // scratch space
-    Double_v dydxm[Nvarstor]; 
-    Double_v dydxt[Nvarstor]; 
-    Double_v yt[Nvarstor];
+    BackendDouble_v dydxm[Nvarstor]; 
+    BackendDouble_v dydxt[Nvarstor]; 
+    BackendDouble_v yt[Nvarstor];
 };
 
-template <class Double_v, class T_Equation, unsigned int Nvar>
-  TemplateTClassicalRK4<Double_v,T_Equation,Nvar>::
+template <class BackendDouble_v, class T_Equation, unsigned int Nvar>
+  TemplateTClassicalRK4<BackendDouble_v,T_Equation,Nvar>::
   TemplateTClassicalRK4(const TemplateTClassicalRK4& right)
-   :  TemplateTMagErrorStepper<Double_v, TemplateTClassicalRK4<Double_v, T_Equation, Nvar>, T_Equation, Nvar>( // (T_Equation*) 0,
+   :  TemplateTMagErrorStepper<BackendDouble_v, TemplateTClassicalRK4<BackendDouble_v, T_Equation, Nvar>, T_Equation, Nvar>( // (T_Equation*) 0,
            new T_Equation(*(right.fEquation_Rhs)),
            OrderRK4,
            right.GetNumberOfStateVariables() )  
 {
 }  
 
-template <class Double_v, class T_Equation, unsigned int Nvar>
-TemplateGUVIntegrationStepper<Double_v>* 
-TemplateTClassicalRK4<Double_v,T_Equation,Nvar>::Clone() const
+template <class BackendDouble_v, class T_Equation, unsigned int Nvar>
+TemplateGUVIntegrationStepper<BackendDouble_v>* 
+TemplateTClassicalRK4<BackendDouble_v,T_Equation,Nvar>::Clone() const
 {
-   // return new TemplateTClassicalRK4<Double_v,T_Equation,Nvar>( *this );
-   auto clone= new TemplateTClassicalRK4<Double_v,T_Equation,Nvar>( *this );
+   // return new TemplateTClassicalRK4<BackendDouble_v,T_Equation,Nvar>( *this );
+   auto clone= new TemplateTClassicalRK4<BackendDouble_v,T_Equation,Nvar>( *this );
    // clone->Check();
    assert ( clone->fEquation_Rhs != 0 );
    return clone;
@@ -101,19 +101,19 @@ static constexpr double inv6=1./6;
 
 #define INLINEDUMBSTEPPER 1
 
-template <class Double_v, class T_Equation, unsigned int Nvar>
+template <class BackendDouble_v, class T_Equation, unsigned int Nvar>
 #ifdef INLINEDUMBSTEPPER
    __attribute__((always_inline)) 
 #else
 #pragma message "NOT in-lining Dumb Stepper"   
 // __attribute__((noinline))
 #endif 
-void TemplateTClassicalRK4<Double_v,T_Equation,Nvar>
-  ::StepWithoutErrorEst( const Double_v  yIn[],
-                         const Double_v  dydx[],
-                               Double_v  h,
-                               // Double_v  charge,
-                               Double_v  yOut[])
+void TemplateTClassicalRK4<BackendDouble_v,T_Equation,Nvar>
+  ::StepWithoutErrorEst( const BackendDouble_v  yIn[],
+                         const BackendDouble_v  dydx[],
+                               BackendDouble_v  h,
+                               // BackendDouble_v  charge,
+                               BackendDouble_v  yOut[])
    // Given values for the variables y[0,..,n-1] and their derivatives
    // dydx[0,...,n-1] known at x, use the classical 4th Runge-Kutta
    // method to advance the solution over an interval h and return the

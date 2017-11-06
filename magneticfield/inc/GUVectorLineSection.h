@@ -86,17 +86,24 @@ Geant::Double_v GUVectorLineSection::Dist
   //  Determine  Projection(AZ on AB) / Length(AB) 
 
   // veccore::MaskedAssign( fABdistanceSq != 0.0, inner_prod/fABdistanceSq, &unit_projection );
-  vecCore::MaskedAssign( &unit_projection, fABdistanceSq != 0.0, inner_prod/fABdistanceSq );
+  vecCore::MaskedAssign( unit_projection, fABdistanceSq != 0.0, inner_prod/fABdistanceSq );
   
   // vecCore::MaskedAssign( (0. <= unit_projection ) && (unit_projection <= 1.0 ), sq_VecAZ - unit_projection*inner_prod, &dist_sq );
-  vecCore::MaskedAssign( &dist_sq, (0. <= unit_projection ) && (unit_projection <= 1.0 ), sq_VecAZ - unit_projection*inner_prod );
+  Mask<Geant::Double_v> goodProjection = (0. <= unit_projection ) && (unit_projection <= 1.0 );
+  vecCore::MaskedAssign( dist_sq,
+                         goodProjection,
+                         // (0. <= unit_projection ) && (unit_projection <= 1.0 ),                       
+                         sq_VecAZ - unit_projection*inner_prod );
   
   // vecCore::MaskedAssign( unit_projection < 0.0, sq_VecAZ, &dist_sq);
-  vecCore::MaskedAssign( &dist_sq, unit_projection < 0.0, sq_VecAZ );
+  Mask<Geant::Double_v> negativeProj = unit_projection < 0.0 ;  
+  vecCore::MaskedAssign( dist_sq, negativeProj, sq_VecAZ );
   
   // vecCore::MaskedAssign( (fABdistanceSq != 0.0) && (unit_projection > 1.0), (OtherPnt -(EndpointA + VecAtoB)).Mag2(), &dist_sq);
-  vecCore::MaskedAssign( &dist_sq, (fABdistanceSq != 0.0) && (unit_projection > 1.0), (OtherPnt -(EndpointA + VecAtoB)).Mag2());
-  
+  Mask<Geant::Double_v> condDistProj=  (fABdistanceSq != 0.0) && (unit_projection > 1.0),;
+  vecCore::MaskedAssign( &dist_sq, 
+                         condDistProj,
+                         (OtherPnt -(EndpointA + VecAtoB)).Mag2());
   
   // if( fABdistanceSq != 0.0 )
   // {

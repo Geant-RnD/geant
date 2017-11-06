@@ -145,7 +145,9 @@ void GUVVectorHelicalStepper::MagFieldEvaluate(const Double_v y[],
                                                ThreeVectorSimd &Bfield )
 {
   Double_v B[3];
-  fPtrMagEqOfMot->GetFieldValue(y, B);
+  GetABCEquationOfMotion()->  GetFieldValue(y, B);
+  // GetEquationOfMotion()->  GetFieldValue(y, B);  
+  // fPtrMagEqOfMot->GetFieldValue(y, B);
 
   Bfield.Set(B[0], B[1], B[2]);
 }

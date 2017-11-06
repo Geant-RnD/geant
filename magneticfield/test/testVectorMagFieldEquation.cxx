@@ -51,21 +51,21 @@ main( int, char** )
 {
   ThreeVector_f  fieldValue(0.0, 0.0, 1.0);
    
-  GUVVectorEquationOfMotion* eq = CreateUniformFieldAndEquation( fieldValue );
-  bool okUniform = TestEquation(eq);
-  bool good = okUniform;
+  GUVVectorEquationOfMotion* eq = CreateUniformFieldAndEquation( FieldValue );
+  bool errUniform = TestEquation(eq);
+  bool bad = errUniform;
   
 #ifdef CMS_FIELD
   GUVVectorEquationOfMotion* eq2 = CreateFieldAndEquation( defaultFieldFileName ); // ("cmsMagneticField2015.txt");
-  bool okCMSfield = TestEquation(eq2);
+  bool errCMSfield = TestEquation(eq2);
 
-  good = good && okCMSfield;
+  bad = bad && errCMSfield;
 #endif
   
-  if (good) cout << "*** TEST PASSED ***\n";
-  else      cout << "*** TEST PASSED ***\n";
+  if (!bad) cout << "*** TEST PASSED ***\n";
+  else      cout << "*** TEST FAILED ***\n";
   
-  return good;
+  return bad;
 }
 
 GUVVectorEquationOfMotion* CreateUniformFieldAndEquation(ThreeVector_f fieldValue)
@@ -135,13 +135,15 @@ bool TestEquation(GUVVectorEquationOfMotion *equation)
   vecgeom::Vector3D<Double_v> FieldVec = { Double_v( BFieldValue[0] ),
                                            Double_v( BFieldValue[1] ),
                                            Double_v( BFieldValue[2] ) };
-  // Input check
-  //
-  const bool printInput= false;
   for ( int i = 0; i < 3; i ++ ) {
     PositionMomentum[i]   = Double_v( Position[i] );
     PositionMomentum[3+i] = Double_v( Momentum[i] );
   }
+
+  // Input check
+  //
+  const bool printInput= false;
+  
   if( printInput ) {
     for ( int i= 0; i<3; i++ )  
        cout << " pos["<<i<<"] = " << setw(6) << Position[i] << " PositionMomentum[] = " << PositionMomentum[i] << endl;

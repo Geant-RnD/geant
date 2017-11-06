@@ -1,5 +1,5 @@
-#ifndef TEMPLATETMAGERRORSTEPPER_HH
-#define TEMPLATETMAGERRORSTEPPER_HH
+#ifndef VECTORSIMPLESTEPPER_HH
+#define VECTORSIMPLESTEPPER_HH
 
 #include <algorithm> // for std::max
 
@@ -22,7 +22,7 @@
 
 template
 <class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
-class TemplateTMagErrorStepper : public TemplateGUVIntegrationStepper<BackendType>
+class VectorSimpleStepper : public TemplateGUVIntegrationStepper<BackendType>
 {
     public:  // with description
 
@@ -35,15 +35,15 @@ class TemplateTMagErrorStepper : public TemplateGUVIntegrationStepper<BackendTyp
                                                    Nvar : GUIntegrationNms::NumVarBase ;
          // std::max( GUIntegrationNms::NumVarBase,  Nvar);
 
-      TemplateTMagErrorStepper( T_Equation *EqRhs,
+      VectorSimpleStepper( T_Equation *EqRhs,
                                 unsigned int integrationOrder,   // Make it a template Parameter ??
                                 unsigned int numStateVariables); // = -1)  // No default -- must ensure order is set
 
-      TemplateTMagErrorStepper( const TemplateTMagErrorStepper& right );
+      VectorSimpleStepper( const VectorSimpleStepper& right );
 
       // void SetYourEquationOfMotion(T_Equation* fEquation_Rhs);
 
-      virtual ~TemplateTMagErrorStepper() {delete fEquation_Rhs;}
+      virtual ~VectorSimpleStepper() {delete fEquation_Rhs;}
 
       inline void RightHandSide(Double_v y[], /*Double_v charge, */Double_v dydx[]) 
         { assert(fEquation_Rhs); fEquation_Rhs->T_Equation::RightHandSide(y,/* charge,*/ dydx); }
@@ -62,12 +62,12 @@ class TemplateTMagErrorStepper : public TemplateGUVIntegrationStepper<BackendTyp
 
       template<class BackendType_, class T_Stepper_, class T_Equation_, int Nvar_>
       friend  std::ostream&
-         operator<<( std::ostream& os, const TemplateTMagErrorStepper<BackendType_, T_Stepper_, T_Equation_, Nvar_> &  );
+         operator<<( std::ostream& os, const VectorSimpleStepper<BackendType_, T_Stepper_, T_Equation_, Nvar_> &  );
 
       bool CheckInitialisation() const; //discuss bool or Bool_v
 
     private:
-      TemplateTMagErrorStepper& operator=(const TemplateTMagErrorStepper&) = delete;
+      VectorSimpleStepper& operator=(const VectorSimpleStepper&) = delete;
       // Private assignment operator.
 
     protected:
@@ -94,8 +94,8 @@ class TemplateTMagErrorStepper : public TemplateGUVIntegrationStepper<BackendTyp
 // ------------------------------------------------------------------
 
 template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
-   TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::
-   TemplateTMagErrorStepper( T_Equation *EqRhs,
+   VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>::
+   VectorSimpleStepper( T_Equation *EqRhs,
                              unsigned int integrationOrder,
                              unsigned int numStateVariables)
    : TemplateGUVIntegrationStepper<BackendType>( EqRhs,
@@ -105,7 +105,7 @@ template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar
     fEquation_Rhs(EqRhs)
 {
    // assert(EqRhs != 0);
-   std::cerr << "- TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar> Constructor 1 called: " << std::endl;
+   std::cerr << "- VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar> Constructor 1 called: " << std::endl;
    // std::cerr << "  Full info: " << *this << std::endl;
 
    std::cerr << "    Nvar = " << Nvar <<   "  numState = " << numStateVariables; // << std::endl;
@@ -126,8 +126,8 @@ template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar
 }
 
 template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
-   TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::
-   TemplateTMagErrorStepper( const TemplateTMagErrorStepper& right )
+   VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>::
+   VectorSimpleStepper( const VectorSimpleStepper& right )
     :
        TemplateGUVIntegrationStepper<BackendType>( (T_Equation *) 0,
                               right.IntegratorOrder(),
@@ -137,9 +137,9 @@ template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar
        // fEquation_Rhs(right.GetEquationOfMotion()->Clone())
 {
    assert(fEquation_Rhs!=0);
-   // TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::
+   // VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>::
    TemplateGUVIntegrationStepper<BackendType>::SetEquationOfMotion(fEquation_Rhs);
-   std::cerr << " TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar> " << std::endl;
+   std::cerr << " VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar> " << std::endl;
    std::cerr << "   Copy Constructor created: " << *this << std::endl;
 
    // unsigned nvar = std::max(this->GetNumberOfVariables(), 8);
@@ -148,9 +148,9 @@ template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar
 
 template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
 std::ostream&
-          operator<<( std::ostream& ostr, const TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar> &stepper )
+          operator<<( std::ostream& ostr, const VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar> &stepper )
 {
-   ostr << "- TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>: " << std::endl;
+   ostr << "- VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>: " << std::endl;
    ostr << "    order= " << stepper.IntegrationOrder() << std::endl;
    ostr << "    Nvar = " << Nvar <<   "  numState = " << stepper.GetNumberOfStateVariables() << std::endl;
    ostr << "    Eq-of-motion (here) = " << stepper.GetEquationOfMotion()
@@ -165,7 +165,7 @@ std::ostream&
 
 template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
  bool
-   TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::
+   VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>::
    CheckInitialisation() const
 {
    bool goodNvar = ( this->GetNumberOfVariables() == Nvar );
@@ -186,7 +186,7 @@ template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar
 // inline
 template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
 void
-   TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::
+   VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>::
    StepWithErrorEstimate( const Double_v yInput[],
                           const Double_v dydx[],
                                 Double_v hstep,
@@ -254,7 +254,7 @@ void
 // #ifdef OPT_CHORD_FUNCTIONALITY
 template<class BackendType, class T_Stepper, class T_Equation, unsigned int Nvar>
 Double_v
-TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::DistChord() const 
+VectorSimpleStepper<BackendType, T_Stepper, T_Equation, Nvar>::DistChord() const 
 {
   // Estimate the maximum distance from the curve to the chord
   //
@@ -285,4 +285,4 @@ TemplateTMagErrorStepper<BackendType, T_Stepper, T_Equation, Nvar>::DistChord() 
 //#endif
 
 
-#endif  /* TemplateTMagErrorStepper_HH */
+#endif  /* VectorSimpleStepper_HH */
