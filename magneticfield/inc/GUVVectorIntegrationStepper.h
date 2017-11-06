@@ -29,9 +29,9 @@
  
 class GUVVectorIntegrationStepper
 {
-  using Double_v = Geant::Double_v;
-
   public:
+        using Double_v = Geant::Double_v;
+   
         // GUVVectorIntegrationStepper();   // DELET
         GUVVectorIntegrationStepper( GUVVectorEquationOfMotion* equation,
                                      unsigned int IntegrationOrder,
@@ -46,12 +46,11 @@ class GUVVectorIntegrationStepper
 
         // Core methods
         // ---------------------
-        virtual void StepWithErrorEstimate( const Double_v y[],
-                                            const Double_v dydx[],
-//                                            const Double_v h,
-                                                  double   h, 
-                                                  Double_v yout[],
-                                                  Double_v yerr[]  ) = 0;
+        virtual void StepWithErrorEstimate( const Double_v  yInput[],
+                                            const Double_v  dydx[],
+                                            const Double_v& hStep,
+                                                  Double_v  yOutput[],
+                                                  Double_v  yError[]  ) = 0;
         // Integrate typically using Runge Kutta 
         // Input:
         //          y[] = initial derivative
