@@ -7,22 +7,23 @@ using namespace Nudy;
 using namespace NudyPhysics;
 
 NudyProcess::NudyProcess() : geantphysics::PhysicsProcess(""),
-fType( HadronicProcessType::kNotDefined ), fXsecStore( nullptr ),
-fModelStore( nullptr )
+//fType( HadronicProcessType::kNotDefined ), fXsecStore( nullptr ),
+fProcNType( NudyProcessType::kNotDefined ), fXsecStore( nullptr ),
+fModelNStore( nullptr )
 {}
 
 NudyProcess::NudyProcess( const std::string &name ) : geantphysics::PhysicsProcess( name )
 {
-  fModelStore = new HadronicFinalStateModelStore();
+  fModelNStore = new NudyFinalStateModelStore();
   fXsecStore = new NudyCrossSectionStore();
 }
 
 NudyProcess::NudyProcess( const std::string &name,
-  const std::vector< int > &particlecodevec, const HadronicProcessType pType,
+  const std::vector< int > &particlecodevec, const NudyProcessType pType,
   const bool isatrest, NudyCrossSectionStore* xsecstore,
-  HadronicFinalStateModelStore* modelstore ) : PhysicsProcess( true, false,
+  NudyFinalStateModelStore* modelstore ) : PhysicsProcess( true, false,
     isatrest, ForcedCondition::kNotForced, ProcessType::kHadronic, name ),
-  fType( pType ), fXsecStore( xsecstore ), fModelStore( modelstore )
+  fProcNType( pType ), fXsecStore( xsecstore ), fModelNStore( modelstore )
 {
   SetParticleCodeVec( particlecodevec );
 }
@@ -31,7 +32,7 @@ NudyProcess::~NudyProcess() {}
 
 double NudyProcess::ComputeMacroscopicXSection(
     const MaterialCuts *matCuts, double kEnergy,  const Particle *particle,
-    HadronicProcessType pType
+    NudyProcessType pType
   ) const {
     double xsec = 0.0;
     const Material* mat = matCuts->GetMaterial();
@@ -49,7 +50,7 @@ double NudyProcess::ComputeMacroscopicXSection(
 
   double NudyProcess::GetAtomicCrossSection( const int particlecode,
     const double particlekineticenergy, const Element* targetelement,
-    HadronicProcessType pType ) const {
+    NudyProcessType pType ) const {
     double xsec = -1.0;
     if ( fXsecStore ) {
       xsec = fXsecStore->GetElementCrossSection( particlecode,
@@ -59,7 +60,7 @@ double NudyProcess::ComputeMacroscopicXSection(
     return xsec;
   }
 
-  Isotope* NudyProcess::SampleTarget( LightTrack &track, HadronicProcessType pType ) const {
+  Isotope* NudyProcess::SampleTarget( LightTrack &track, NudyProcessType pType ) const {
     Isotope* targetIsotope = nullptr;
     int particleCode = track.GetGVcode();
     double eKin = track.GetKinE();
@@ -77,7 +78,7 @@ double NudyProcess::ComputeMacroscopicXSection(
     return targetIsotope;
   }
 
-  void NudyProcess::AddModel(HadronicFinalStateModel *model) {
+  void NudyProcess::AddModel(NudyFinalStateModel *model) {
     if (!model) {
       std::string partNames = "\n";
       for (unsigned long p=0; p<GetListParticlesAssignedTo().size(); ++p)
@@ -88,7 +89,8 @@ double NudyProcess::ComputeMacroscopicXSection(
                << partNames << " is ignored."
                << std::endl;
     } else {
-      fModelStore->RegisterHadronicFinalStateModel(model);
+      //fModelStore->RegisterHadronicFinalStateModel(model);
+      fModelNStore->RegisterNudyFinalStateModel(model);
     }
     return;
   }

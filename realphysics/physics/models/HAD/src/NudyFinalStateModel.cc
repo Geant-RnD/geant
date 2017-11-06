@@ -4,7 +4,7 @@
 using namespace geantphysics;
 
 NudyFinalStateModel::NudyFinalStateModel() :
-     fName(""), fModelType(NudyModelType::kNotDefined), fLowEnergyLimit(0.0),
+     fName(""), fModelNType(NudyModelType::kNotDefined), fLowEnergyLimit(0.0),
      fHighEnergyLimit(1.0e+10), fMinTargetZ(1), fMaxTargetZ(120),
      fMinTargetA(1), fMaxTargetA(300) {}
 
@@ -13,14 +13,14 @@ NudyFinalStateModel::NudyFinalStateModel(
   const std::string name, const std::vector< int > &projectilecodevec,
   const NudyModelType modelType, const double minE, const double maxE,
   const double minZ, const double maxZ, const double minA, const double maxA
-) : fName(name), fModelType(modelType), fLowEnergyLimit(minE), fHighEnergyLimit(maxE),
+) : fName(name), fModelNType(modelType), fLowEnergyLimit(minE), fHighEnergyLimit(maxE),
 fMinTargetZ(minZ), fMaxTargetZ(maxZ), fMinTargetA(minA), fMaxTargetA(maxA)
 {
     SetProjectileCodeVec( projectilecodevec );
 }
 
 NudyFinalStateModel::NudyFinalStateModel( const NudyFinalStateModel &other ):
-fName( other.fName ), fModelType( other.fModelType ),
+fName( other.fName ), fModelNType( other.fModelNType ),
 fLowEnergyLimit( other.fLowEnergyLimit ), fHighEnergyLimit( other.fHighEnergyLimit ),
 fMinTargetZ( other.fMinTargetZ ), fMaxTargetZ( other.fMaxTargetZ ),
 fMinTargetA( other. fMinTargetA ), fMaxTargetA( other.fMaxTargetA )
@@ -32,7 +32,7 @@ NudyFinalStateModel& NudyFinalStateModel::operator=( const NudyFinalStateModel &
   if ( this != &other ) {
     SetProjectileCodeVec( other.fProjectileCodeVec );
     fName = other.fName;
-    fModelType = other.fModelType;
+    fModelNType = other.fModelNType;
     fLowEnergyLimit = other.fLowEnergyLimit;
     fHighEnergyLimit = other.fHighEnergyLimit;
     fMinTargetZ = other.fMinTargetZ;

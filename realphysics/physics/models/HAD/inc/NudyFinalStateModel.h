@@ -10,7 +10,8 @@
 #include <string>
 #include <vector>
 
-#include "HadronicProcess.h"
+//#include "HadronicProcess.h"
+#include "NudyProcess.h"
 #include "NudyCrossSectionStore.h"
 #include "GeantTaskData.h"
 
@@ -27,7 +28,7 @@ namespace geantphysics {
     class Material;
     class Element;
   }
-  enum class HadronicProcessType;
+  //enum class HadronicProcessType;
   enum class NudyModelType {
     kNotDefined,
     kElastic,
@@ -53,7 +54,7 @@ namespace geantphysics {
 
     const std::vector< int >& GetProjectileCodeVec() const { return fProjectileCodeVec; }
     std::string GetName() const { return fName; }
-    NudyModelType GetType() const { return fModelType; }
+    NudyModelType GetModelNType() const { return fModelNType; }
     double GetLowEnergyUsageLimit() const { return fLowEnergyLimit; }
     double GetHighEnergyUsageLimit() const { return fHighEnergyLimit; }
     double GetMinTargetZ() const { return fMinTargetZ; }
@@ -62,15 +63,13 @@ namespace geantphysics {
     double GetMaxTargetA() const { return fMaxTargetA; }
 
     void SetName( const std::string &name ) { fName = name; }
-    void SetType( const NudyModelType type ) { fModelType = type; }
+    void SetModelNType( const NudyModelType type ) { fModelNType = type; }
     void SetLowEnergyUsageLimit( const double minE ) { fLowEnergyLimit = minE; }
     void SetHighEnergyUsageLimit( const double maxE ) { fHighEnergyLimit = maxE; }
     void SetMinTargetZ( const double minZ ) { fMinTargetZ = minZ; }
     void SetMinTargetA( const double minA ) { fMinTargetA = minA; }
     void SetMaxTargetZ( const double maxZ ) { fMaxTargetZ = maxZ; }
     void SetMaxTargetA( const double maxA ) { fMaxTargetA = maxA; }
-
-
 
     virtual bool IsApplicable(
       const int projectilecode, const double projectileKE,
@@ -87,8 +86,9 @@ namespace geantphysics {
   private:
     std::string fName;
     std::vector< int > fProjectileCodeVec;
-    HadronicProcessType fProcType;
-    NudyModelType fModelType;
+    //HadronicProcessType fProcHType;
+    NudyProcessType fProcNType;
+    NudyModelType fModelNType;
     double fLowEnergyLimit;
     double fHighEnergyLimit;
     double fMinTargetZ;

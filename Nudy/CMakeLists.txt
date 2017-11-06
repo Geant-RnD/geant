@@ -10,6 +10,7 @@ file(GLOB headers
  ${CMAKE_SOURCE_DIR}/base/inc/PhysicalConstants.h
  ${CMAKE_SOURCE_DIR}/base/inc/SystemOfUnits.h
  ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc/*.h
+ ${CMAKE_SOURCE_DIR}/realphysics/physics/models/HAD/inc/*.h
  ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/HAD/inc/*.h
  ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc/*.h
  ${CMAKE_SOURCE_DIR}/realphysics/dummies/inc/*.h
@@ -19,7 +20,7 @@ include_directories(
  ${CMAKE_SOURCE_DIR}/Nudy/inc
  ${CMAKE_SOURCE_DIR}/inc
  ${CMAKE_SOURCE_DIR}/material/inc
- ${CMAKE_SOURCE_DIR}/base/inc 
+ ${CMAKE_SOURCE_DIR}/base/inc
  ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/HAD/inc
  ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc
  ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc

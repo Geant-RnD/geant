@@ -19,7 +19,9 @@
 
 #include "SystemOfUnits.h"
 #include "PhysicalConstants.h"
-#include "HadronicProcess.h"
+//#include "HadronicProcess.h"
+#include "NudyProcess.h"
+#include "NudyCrossSection.h"
 
 
 #ifdef USE_ROOT
@@ -88,9 +90,12 @@ using NudyPhysics::TNudyEndfSigma;
 
 namespace geantphysics {
   class LightTrack;
-  class HadronicCrossSection;
-  class HadronicProcess;
+  //class HadronicCrossSection;
+  //class HadronicProcess;
 //  class HadronicProcessType;
+  class NudyCrossSection;
+  class NudyProcess;
+  enum class NudyProcessType;
 
   // class HadronicProcess;
   inline namespace GEANT_IMPL_NAMESPACE {
@@ -104,14 +109,14 @@ namespace NudyPhysics{
 
   class NudyInterface {
   public:
-    NudyInterface () ;
+    NudyInterface ();
     NudyInterface( const int projCode, const double projKE, const double temp, const std::string isoName,
-      const int tZ, const int tA, geantphysics::HadronicProcessType  processType );
+      const int tZ, const int tA, geantphysics::NudyProcessType  processType );
     virtual ~NudyInterface ();
 
   public:
     double GetXS( int projCode, double projKE, double temp, std::string isoName,
-      int tZ, int tA, geantphysics::HadronicProcessType pType
+      int tZ, int tA, geantphysics::NudyProcessType pType
     ) ;
     std::string  SetDataFileNameENDF( int projCode, std::string isoName); //, int tZ, int tA );
     std::string findENDFFileName( std::string ele);//, int tZ, int tA ) ;
@@ -123,7 +128,7 @@ namespace NudyPhysics{
     bool GetFisCha(int inKey);
     void SetProjIDFn( int projCode, std::string style);
     double ComputeCrossSection( );
-    void SetMTValues(geantphysics::HadronicProcessType pType);
+    void SetMTValues(geantphysics::NudyProcessType pType);
   public:
     inline std::string GetIsotopeName ();
     inline int GetProjectileCode ();
@@ -134,7 +139,7 @@ namespace NudyPhysics{
     inline double GetCrossSection ();
     inline bool GetIsFissKey();
     inline std::string GetProjID();
-    inline std::vector<double> GetXSTable();
+    //inline std::vector<double> GetXSTable();
 
     inline void SetIsotopeName (const std::string &isoName );
     inline void SetProjectileCode ( const int projCode );
@@ -149,12 +154,12 @@ namespace NudyPhysics{
     inline void SetIsFissKey( const bool theKey);
     inline void SetProjID (const std::string &theID);
     inline void AppendXS ( const double xsvalue );
-    inline void SetProcessType ( const geantphysics::HadronicProcessType ptype );
+    inline void SetProcessType ( const geantphysics::NudyProcessType ptype );
 
 
   private :
     unsigned int fNumberOfReactionChannels = 895;
-    geantphysics::HadronicProcessType fProcType;
+    geantphysics::NudyProcessType fProcType;
     std::string fIsoName;
     int fMTValue;
     int fProjCode;
@@ -183,7 +188,7 @@ namespace NudyPhysics{
   inline double NudyInterface::GetTemp () { return fTemperature; }
   inline bool NudyInterface::GetIsFissKey() { return fIsFiss; }
   inline std::string NudyInterface::GetProjID() { return fProjID; }
-  inline std::vector<double> NudyInterface::GetXSTable() { return fChannelXSArray; }
+  //inline std::vector<double> NudyInterface::GetXSTable() { return fChannelXSArray; }
 
   //--------- SETTERS ---------
   inline void NudyInterface::SetIsotopeName ( const std::string &isoName ) { fIsoName = isoName; }
@@ -198,8 +203,8 @@ namespace NudyPhysics{
   inline void NudyInterface::SetRootFileName ( const char * fileName ) { fRootFileName = fileName; }
   inline void NudyInterface::SetIsFissKey( const bool theKey ) { fIsFiss = theKey; }
   inline void NudyInterface::SetProjID (const std::string &theID ) { fProjID = theID; }
-  inline void NudyInterface::AppendXS ( const double xsvalue ) { fChannelFiss.push_back(xsvalue); }
-  inline void NudyInterface::SetProcessType ( const geantphysics::HadronicProcessType ptype ) { fProcType = ptype; }
+  //inline void NudyInterface::AppendXS ( const double xsvalue ) { fChannelFiss.push_back(xsvalue); }
+  inline void NudyInterface::SetProcessType ( const geantphysics::NudyProcessType ptype ) { fProcType = ptype; }
  } // namespace NudyPhysics
 
 #endif

@@ -1,7 +1,7 @@
 /*****************************************************************
  * @file NudyCrossSectionStore.h
  * @author Abhijit Bhattacharyya
- * @brief class for all GV process cross section like Hadronic processes.
+ * @brief class for all GV process cross section like Hadronic cross section.
  ********************************************************************/
 #ifndef NUDY_CROSS_SECTION_STORE
 #define NUDY_CROSS_SECTION_STORE
@@ -11,9 +11,9 @@
 #include "Geant/Config.h"
 
 namespace geantphysics {
-  class HadronicCrossSection;
-  class HadronicProcess;
-  enum class HadronicProcessType;
+  //class HadronicCrossSection;
+  //class HadronicProcess;
+  //enum class HadronicProcessType;
   inline namespace GEANT_IMPL_NAMESPACE {
     class Isotope;
     class Material;
@@ -21,6 +21,8 @@ namespace geantphysics {
   }
   class NudyInterface;
   class NudyCrossSection;
+  class NudyProcess;
+  enum class NudyProcessType;
 
   class NudyCrossSectionStore {
   public:
@@ -48,23 +50,27 @@ namespace geantphysics {
     // @brief get microscopic cross section for target isotope
     double GetIsotopeCrossSection( const int projectileCode,
       const double projectileEnergy, const Isotope* targetIsotope,
-       HadronicProcessType pType
+      NudyProcessType pType
+       //HadronicProcessType pType
     );
 
     // @brief get cross section for element
     double GetElementCrossSection( const int projectileCode,
       const double projectileEnergy, const Element* targetElement,
-      HadronicProcessType pType
+      NudyProcessType pType
+      //HadronicProcessType pType
     );
 
     // @brief get macroscopic cross section for target
     double GetMacroscopicCrossSection( const int projectileCode,
-      const double projectileEnergy, const Material* targetMaterial, HadronicProcessType pType
+      const double projectileEnergy, const Material* targetMaterial,// HadronicProcessType pType
+      NudyProcessType pType
     );
 
     // @brief Method that returns a target neucleus as a pair of Z and A
     std::pair< int, int > SampleTarget( const int projectileCode,
-      const double projectileEnergy,const Material* targetMaterial, HadronicProcessType pType
+      const double projectileEnergy,const Material* targetMaterial,// HadronicProcessType pType
+      NudyProcessType pType
     );
 
     // @brief Method returns vector of NudyCrossSection

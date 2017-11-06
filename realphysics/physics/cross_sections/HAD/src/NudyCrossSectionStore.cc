@@ -61,7 +61,8 @@ int NudyCrossSectionStore::GetIndexFirstApplicableXsec (
 }
 
 double NudyCrossSectionStore::GetIsotopeCrossSection( const int projectileCode,
-  const double projEnergy, const Isotope* targetIsotope,  HadronicProcessType pType
+  const double projEnergy, const Isotope* targetIsotope,  NudyProcessType pType
+  // const double projEnergy, const Isotope* targetIsotope,  HadronicProcessType pType
 ) {
   double xsec = -1.0;
   int index = GetIndexFirstApplicableXsec ( projectileCode, projEnergy );
@@ -74,7 +75,9 @@ double NudyCrossSectionStore::GetIsotopeCrossSection( const int projectileCode,
 
 
 double NudyCrossSectionStore::GetElementCrossSection(
-  const int projectileCode, const double projEnergy, const Element* targetElement, HadronicProcessType pType
+  // const int projectileCode, const double projEnergy, const Element* targetElement, HadronicProcessType pType
+  const int projectileCode, const double projEnergy, const Element* targetElement, NudyProcessType pType
+
 ) {
   double xsec = -1.0;
   int index = GetIndexFirstApplicableXsec(
@@ -102,7 +105,8 @@ double NudyCrossSectionStore::GetElementCrossSection(
 
 double NudyCrossSectionStore::GetMacroscopicCrossSection(
   const int projectileCode, const double projectileEnergy,
-  const Material* targetMaterial, HadronicProcessType pType
+  const Material* targetMaterial, NudyProcessType pType
+  // const Material* targetMaterial, HadronicProcessType pType
 ) {
   double xsec = -1.0;
   if ( targetMaterial ) {
@@ -124,7 +128,8 @@ double NudyCrossSectionStore::GetMacroscopicCrossSection(
 
 std::pair< int, int > NudyCrossSectionStore::SampleTarget(
   const int projectileCode, const double projectileEnergy,
-  const Material* targetMaterial, HadronicProcessType pType
+  const Material* targetMaterial, NudyProcessType pType
+  // const Material* targetMaterial, HadronicProcessType pType
 ) {
   int tZ = 0;
   int tA = 0;

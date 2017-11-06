@@ -23,8 +23,10 @@ using geantphysics::KaonMinus;
 
 using namespace Nudy;
 using NudyPhysics::NudyInterface;
-using geantphysics::HadronicProcess;
-using geantphysics::HadronicProcessType;
+using geantphysics::NudyProcess;
+using geantphysics::NudyProcessType;
+//using geantphysics::HadronicProcess;
+//using geantphysics::HadronicProcessType;
 
 
 
@@ -48,7 +50,7 @@ int main(int /*argc*/, char** /*argv*/) {
   */
   double EnergyValue = 14.0 * geant::MeV; // 1.0e+5; // 2.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
 
-  geantphysics::HadronicProcessType pType ;
+  geantphysics::NudyProcessType pType ;
   NudyPhysics::NudyInterface  nudyxs;
   //pType = geantphysics::HadronicProcessType::kElastic;  // kFission;
   //pType = geantphysics::HadronicProcessType::kFission;  // kElastic;
@@ -70,11 +72,11 @@ int main(int /*argc*/, char** /*argv*/) {
 
 double Eval = EnergyValue/geant::eV;
 
-pType = geantphysics::HadronicProcessType::kElastic;
+pType = geantphysics::NudyProcessType::kElastic;
 double xse = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
-pType = geantphysics::HadronicProcessType::kFission;
+pType = geantphysics::NudyProcessType::kFission;
 double xsf = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
-pType = geantphysics::HadronicProcessType::kCapture;
+pType = geantphysics::NudyProcessType::kCapture;
 double xsc = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
 std::cout << "Neutron Energy = " << EnergyValue/geant::MeV << " MeV " << " Isotope "
           << AtomicNumber << "-" << eleName << "-" << MassNumber

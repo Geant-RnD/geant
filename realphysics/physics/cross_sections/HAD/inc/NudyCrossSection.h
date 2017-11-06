@@ -13,18 +13,20 @@
 #include <vector>
 #include <string>
 
-#ifdef USE_ROOT
+// #ifdef USE_ROOT
 #include "NudyInterface.h"
-#endif
+// #endif
 
 
 // Forward declaration
 namespace geantphysics {
   class LightTrack;
   class LightTrack_v;
-  class HadronicCrossSection;
-  class HadronicProcess;
-  enum class HadronicProcessType;
+  //class HadronicCrossSection;
+  //class HadronicProcess;
+  //enum class HadronicProcessType;
+  class NudyProcess;
+  enum class NudyProcessType;
 
   inline namespace GEANT_IMPL_NAMESPACE {
     class Isotope;
@@ -47,13 +49,14 @@ namespace geantphysics {
 
     NudyCrossSection();
     NudyCrossSection( const std::string isoName, const int Aval, const int Zval,
-      const double projectileKE);
+      const double projectileKE );
     NudyCrossSection( const NudyCrossSection &other );
     NudyCrossSection& operator=( const NudyCrossSection &other );
     virtual ~NudyCrossSection();    // destructor
 
     double GetIsotopeCrossSection(int projCode, double projKE, double temp, std::string isoName,
-      int tZ, int tA, HadronicProcessType pType);
+      int tZ, int tA, NudyProcessType pType);
+      //int tZ, int tA, HadronicProcessType pType);
 
     //--------- Getters --------------
     std::string GetisoName() const { return fIsoName; }           // returns name of the isotope

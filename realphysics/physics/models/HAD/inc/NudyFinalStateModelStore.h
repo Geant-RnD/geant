@@ -32,7 +32,7 @@ namespace geantphysics {
     // ordering is not important for registering
     void RegisterNudyFinalStateModel ( NudyFinalStateModel* ptrnudyfs );
 
-    int GetIndexChosenFinalStateModel( const int projectilecode, const double projKE,
+    int GetIndexChosenFinalStateModel( const int projcode, const double projKE,
       const Isotope* targetisotope
     ) const;
 

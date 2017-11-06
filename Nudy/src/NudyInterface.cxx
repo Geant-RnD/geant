@@ -11,15 +11,15 @@ using namespace Nudy;
 using namespace NudyPhysics;
 
 
-NudyInterface::NudyInterface() //:
+NudyPhysics::NudyInterface::NudyInterface() //:
 // fProjCode(2112), fProjKE(4.0e+6), fTemperature(293.60608), fIsoName("Fe"), ftZ(26), ftN(56),
 // fEndfDataFileName(""), fEndfSubDataFileName(""), fRootFileName("")
 {};
 
 
-NudyInterface::NudyInterface(
+NudyPhysics::NudyInterface::NudyInterface(
   const int projCode, const double projKE, double temp, const std::string isoName,
-  const int tZ, const int tA, geantphysics::HadronicProcessType ProcessType
+  const int tZ, const int tA, geantphysics::NudyProcessType ProcessType
 )
   // : fProjCode(projCode), fProjKE(projKE), fIsoName(isoName), ftZ(tZ), ftN(tN) {
   {
@@ -33,11 +33,11 @@ NudyInterface::NudyInterface(
     SetMTValues (ProcessType);
   };
 
-NudyInterface::~NudyInterface() {}
+NudyPhysics::NudyInterface::~NudyInterface() {}
 
 ////////////////////////////////////
-double NudyInterface::GetXS( int projCode, double projKE, double temp,
-  std::string isoName, int tZ, int tA, geantphysics::HadronicProcessType pType
+double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double temp,
+  std::string isoName, int tZ, int tA, geantphysics::NudyProcessType pType
 ) {
   SetProcessType (pType);
   SetMTValues ( pType );
@@ -79,7 +79,7 @@ double NudyInterface::GetXS( int projCode, double projKE, double temp,
   return XSvalue;
 }
 
-std::string NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName){
+std::string NudyPhysics::NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName){
   std::string fstyle = "ENDF";
   SetProjIDFn( projCode, fstyle);
   std::string DataFileNameString = findENDFFileName( isoName);
@@ -87,21 +87,21 @@ std::string NudyInterface::SetDataFileNameENDF( int projCode, std::string isoNam
   return fileENDFName1;
 }
 
-std::string NudyInterface::SetDataFileNameROOT( std::string isoName){
+std::string NudyPhysics::NudyInterface::SetDataFileNameROOT( std::string isoName){
   std::string DataFileNameString = findENDFFileName(isoName);
   std::string fileENDFName2 = FixRootDataFile(DataFileNameString);
   return fileENDFName2;
 }
 
 // This method is to be modified
-void NudyInterface::SetProjIDFn(int projCode, std::string fstyle) {
+void NudyPhysics::NudyInterface::SetProjIDFn(int projCode, std::string fstyle) {
   bool isChFiss = GetFisCha(fMTValue);
 //  if ( projKE < 0.03*geant::eV && projCode == 2112 ) SetProjID("thermal_scatt");
   if ( projCode == 2112 ) SetProjID("neutrons");
   if (isChFiss && fstyle.compare("ENDFSUB")==0) SetProjID("nfy");
 }
 
-std::string NudyInterface::SetDataFileNameENDFSUB( std::string isoName){
+std::string NudyPhysics::NudyInterface::SetDataFileNameENDFSUB( std::string isoName){
   std::string fileENDFName3;
   std::string DataFileNameString;
   SetProjID("nfy");
@@ -112,7 +112,7 @@ std::string NudyInterface::SetDataFileNameENDFSUB( std::string isoName){
 }
 
 // Actual Nudy CrossSection computation method
-double NudyInterface::ComputeCrossSection() {
+double NudyPhysics::NudyInterface::ComputeCrossSection() {
   int iElementID = 0;  //<------------- confusing testing by Abhijit 419 ?
   double xsvalue = 0.0;
   double iSigDiff = 0.001;   // trial value for test documentation reqd.
@@ -149,7 +149,7 @@ double NudyInterface::ComputeCrossSection() {
 }
 
 // selects the data file name for ENDF data
-std::string NudyInterface::GetDataFileName(std::string str1, std::string str2) {
+std::string NudyPhysics::NudyInterface::GetDataFileName(std::string str1, std::string str2) {
   std::string EndfDataPath="";
   if (std::getenv("ENDFDATADIR")!=NULL){
     EndfDataPath = std::getenv("ENDFDATADIR");
@@ -163,7 +163,7 @@ std::string NudyInterface::GetDataFileName(std::string str1, std::string str2) {
 }
 
 // selects name of root data file in the current working directory
-std::string NudyInterface::FixRootDataFile(std::string str1){
+std::string NudyPhysics::NudyInterface::FixRootDataFile(std::string str1){
   std::string cwdPath = GetCWD();
   std::string rootENDFFile = cwdPath + "/" + str1 + ".root";
   return rootENDFFile;
@@ -171,14 +171,14 @@ std::string NudyInterface::FixRootDataFile(std::string str1){
 
 // store root data file in current working directory
 // This is a bad technique. Using for the testing as quick solution.
-std::string NudyInterface::GetCWD() {
+std::string NudyPhysics::NudyInterface::GetCWD() {
   char * tempDIRarray = new char[1024];
   std::string cwdPath= (getcwd(tempDIRarray, 1024)) ? std::string(tempDIRarray) : std::string("");
   delete [] tempDIRarray;
   return cwdPath;
 }
 
-std::string NudyInterface::findENDFFileName(std::string elementName){
+std::string NudyPhysics::NudyInterface::findENDFFileName(std::string elementName){
   std::stringstream ss;
   std::string fName = "";
   if (fProjID == "thermal_scatt") {
@@ -218,22 +218,22 @@ std::string NudyInterface::findENDFFileName(std::string elementName){
 }
 
 // Depending on the process type set the MT value for cross section
-void NudyInterface::SetMTValues (geantphysics::HadronicProcessType pType) {
+void NudyPhysics::NudyInterface::SetMTValues (geantphysics::NudyProcessType pType) {
   SetProcessType ( pType );
   switch (pType) {
-    case geantphysics::HadronicProcessType::kElastic          : fMTValue = 2;   break;
-    case geantphysics::HadronicProcessType::kInelastic        : fMTValue = 3;   break;
-    case geantphysics::HadronicProcessType::kFission          : fMTValue = 18;  break;
-    case geantphysics::HadronicProcessType::kCapture          : fMTValue = 102; break;
-    case geantphysics::HadronicProcessType::kRadioactiveDecay : fMTValue = 457; break;
-    case geantphysics::HadronicProcessType::kNotDefined       :
-    case geantphysics::HadronicProcessType::kQuasiElastic     :
-    case geantphysics::HadronicProcessType::kUserDefined      :
-    case geantphysics::HadronicProcessType::kLeptoNuclear     : fMTValue = 2;   // to be changed later
+    case geantphysics::NudyProcessType::kElastic          : fMTValue = 2;   break;
+    case geantphysics::NudyProcessType::kInelastic        : fMTValue = 3;   break;
+    case geantphysics::NudyProcessType::kFission          : fMTValue = 18;  break;
+    case geantphysics::NudyProcessType::kCapture          : fMTValue = 102; break;
+    case geantphysics::NudyProcessType::kRadioActiveDecay : fMTValue = 457; break;
+    case geantphysics::NudyProcessType::kNotDefined       :
+    case geantphysics::NudyProcessType::kQuasiElastic     :
+    case geantphysics::NudyProcessType::kUserDefined      :
+    case geantphysics::NudyProcessType::kLeptoNuclear     : fMTValue = 2;   // to be changed later
   }
 }
 
-bool NudyInterface::GetFisCha(int inKey) {
+bool NudyPhysics::NudyInterface::GetFisCha(int inKey) {
   bool isIn = false;
   isIn = std::find(
   fChannelFiss.begin(), NudyInterface::fChannelFiss.end(), inKey ) != fChannelFiss.end();
