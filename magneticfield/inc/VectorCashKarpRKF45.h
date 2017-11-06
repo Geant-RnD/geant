@@ -22,30 +22,21 @@
 
 // #include "AlignedBase.h"  // ==> Ensures alignment of storage for Vc objects
 
-#define INLINERHS 1
 // #define DEBUGAnanya
 // #define NoPointers
-
-#ifdef INLINERHS
-#define REALLY_INLINE   inline __attribute__((always_inline))
-#else
-#define REALLY_INLINE   inline
-#endif
-
 
 template
 <class T_Equation, unsigned int Nvar>
    class VectorCashKarpRKF45 : public GUVVectorIntegrationStepper // <Backend>, public AlignedBase
 {
-  // typedef                   typename Backend::precision_v  Double_v;
-  // typedef vecgeom::Vector3D<typename Backend::precision_v> ThreeVectorSimd; 
-  template <typename T>
-  using Vector3D = vecgeom::Vector3D<T>;
-  
-  using Double_v        = Geant::Double_v;
-  using ThreeVectorSimd = Vector3D<Double_v>;
-  
   public:
+   
+    template <typename T>
+       using Vector3D = vecgeom::Vector3D<T>;
+  
+    using Double_v        = Geant::Double_v;
+    using ThreeVectorSimd = Vector3D<Double_v>;
+  
     static constexpr unsigned int sOrderMethod= 4;
     static constexpr unsigned int sNstore = 6;   // How many variables the full state entails
                // (GUIntegrationNms::NumVarBase > Nvar) ? GUIntegrationNms::NumVarBase : Nvar;
@@ -56,8 +47,7 @@ template
   public:
     inline
     VectorCashKarpRKF45( T_Equation *EqRhs,
-                              unsigned int numStateVariables=0,
-                              bool primary=true);
+                         unsigned int numStateVariables=0);
 
     VectorCashKarpRKF45( const VectorCashKarpRKF45& );
     
@@ -65,7 +55,7 @@ template
 
     GUVVectorIntegrationStepper* Clone() const override;
 
-    REALLY_INLINE
+    GEANT_FORCE_INLINE
     void StepWithErrorEstimate(const Double_v  yInput[],  // Consider __restrict__
                                const Double_v  dydx[],
                                const Double_v& charge,
@@ -75,7 +65,7 @@ template
 
     Double_v DistChord() const override ;
 
-    REALLY_INLINE
+    GEANT_FORCE_INLINE
     void RightHandSideInl(Double_v y[], const Double_v& charge, Double_v dydx[]) 
     {fEquation_Rhs->T_Equation::RightHandSide(y, charge, dydx);}
 
@@ -118,7 +108,7 @@ template
         // 'Invariant' during integration - the pointers must not change
         // -----------
         T_Equation* fEquation_Rhs;
-        bool        fOwnTheEquation; //enquire it's nature. If Bool_v , need to change if -> MaskedAssign
+        bool        fOwnTheEquation;  //  --> indicates ownership of Equation object
 
         bool  fDebug= false;
 };
@@ -127,15 +117,14 @@ template <class T_Equation, unsigned int Nvar>
 inline
 VectorCashKarpRKF45<T_Equation,Nvar>::
    VectorCashKarpRKF45( T_Equation *EqRhs,
-                             unsigned int numStateVariables,
-                             bool primary                  )
-   : GUVVectorIntegrationStepper( EqRhs,    
+                        unsigned int numStateVariables )
+   : GUVVectorIntegrationStepper( nullptr, // EqRhs,   ==>>  Does not inherit !!
                                   sOrderMethod,
                                   Nvar, //8, //Ananya
                                   ((numStateVariables>0) ? numStateVariables : sNstore) ),
      fEquation_Rhs(EqRhs),
-     fOwnTheEquation(primary),
-     fLastStepLength(0.)
+     // fLastStepLength(0.),
+     fOwnTheEquation(true)
 {
    if( fDebug ) {
       std::cout<<"\n----Entered constructor of VectorCashKarpRKF45 "<<std::endl;
@@ -143,7 +132,8 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
    }
    // assert( dynamic_cast<TemplateGUVEquationOfMotion<Backend>*>(EqRhs) != 0 );
 
-
+   fLastStepLength= Double_v(0.);
+   
    assert( (numStateVariables != 0) && (numStateVariables >= Nvar) );
   
    std::cout<<"----end of constructor of VectorCashKarpRKF45"<<std::endl;
@@ -154,7 +144,7 @@ void VectorCashKarpRKF45<T_Equation,Nvar>::
   SetEquationOfMotion(T_Equation* equation)
 {
    fEquation_Rhs= equation;
-   this->GUVVectorIntegrationStepper::SetABCEquationOfMotion(fEquation_Rhs);
+   this->GUVVectorIntegrationStepper::SetABCEquationOfMotion(nullptr); // fEquation_Rhs);
 }
 
 //  Copy - Constructor
@@ -168,31 +158,19 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
                                               Nvar,
                                               right.GetNumberOfStateVariables() ),
      fEquation_Rhs( (T_Equation*) nullptr ),
-     fOwnTheEquation(true),
-
-     fLastStepLength(0.)
-     // fPrimary( right.fPrimary )
+     fOwnTheEquation(true)
 {
    if( fDebug ) {
     std::cout<<"----Entered constructor of VectorCashKarpRKF45 "<<std::endl;
    }
-   // if( primary )
    SetEquationOfMotion( new T_Equation( *(right.fEquation_Rhs)) );
-   fOwnTheEquation=true;
     // fEquation_Rhs= right.GetEquationOfMotion()->Clone());
    
-   assert( dynamic_cast<GUVVectorEquationOfMotion*>(fEquation_Rhs) != 0 );  
+   // assert( dynamic_cast<GUVVectorEquationOfMotion*>(fEquation_Rhs) != 0 );   // No longer Deriving
    assert( this->GetNumberOfStateVariables() >= Nvar);
-  
-  #ifndef NoPointers
-   fLastInitialVector = new Double_v[sNstore] ;
-   fLastFinalVector   = new Double_v[sNstore] ;
-   fLastDyDx          = new Double_v[sNstore];
-   
-   fMidVector = new Double_v[sNstore];
-   fMidError  = new Double_v[sNstore];
-  #endif 
 
+   fLastStepLength= Double_v(0.);   
+   
    if( fDebug )
       std::cout << " VectorCashKarpRKF45 - copy constructor: " << std::endl
                 << " Nvar = " << Nvar << " Nstore= " << sNstore 
@@ -202,25 +180,14 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
 
 
 template <class T_Equation,unsigned int Nvar>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 VectorCashKarpRKF45<T_Equation,Nvar>::~VectorCashKarpRKF45()
 {
-   std::cout<<"----- Vector CashKarp destructor0"<<std::endl;
-
-
-#ifndef NoPointers
-   delete[] fLastInitialVector;
-   delete[] fLastFinalVector;
-   delete[] fLastDyDx;
-   delete[] fMidVector;
-   delete[] fMidError;
-   std::cout<<"----- VectorCashKarp destructor1"<<std::endl;
-
+   std::cout<<"----- Vector CashKarp destructor"<<std::endl;
    if( fOwnTheEquation )
       delete fEquation_Rhs; // Expect to own the equation, except if auxiliary (then sharing the equation)
-#endif
 
-  std::cout<<"----- VectorCashKarp destructor1 (ended)"<<std::endl;
+  std::cout<<"----- VectorCashKarp destructor (ended)"<<std::endl;
 }
 
 template <class T_Equation, unsigned int Nvar>

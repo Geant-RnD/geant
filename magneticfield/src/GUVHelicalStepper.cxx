@@ -75,7 +75,7 @@ GUVHelicalStepper::AdvanceHelix( const double  yIn[],
   double      velocityVal = initVelocity.Mag2();
   ThreeVector initTangent = (1.0/velocityVal) * initVelocity;
   
-  R_1=GetInverseCurve(velocityVal,Bmag);
+  R_1=GetInverseCurve(velocityVal,charge,Bmag);
 
   // for too small magnetic fields there is no curvature
   // (include momentum here) FIXME
@@ -221,7 +221,7 @@ GUVHelicalStepper::StepWithErrorEstimate( const double yInput[],
 }
 
 double
-GUVHelicalStepper::DistChord(double charge) const 
+GUVHelicalStepper::DistChord(double /*charge*/ ) const 
 {
   // Check whether h/R >  pi  !!
   // Method DistLine is good only for <  pi

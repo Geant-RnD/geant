@@ -51,27 +51,36 @@ public:
 
   REALLY_INLINE
   void StepWithErrorEstimate(const double* yInput,    // Consider __restrict__
-                                   double   charge,
                              const double*  dydx,
+                                   double   charge,
                                    double   Step,
                                    double*  yOut,
-                                   double*  yErr) override;
+                                   double*  yErr) override final;
 
   double  DistChord(double charge)   const override;  
 
   REALLY_INLINE
-  void RightHandSideInl(const double y[], double dydx[]) 
-  {fEquation_Rhs->T_Equation::RightHandSide(y, dydx);}
+     void RightHandSideInl(const double y[], double charge, double dydx[]) 
+  {fEquation_Rhs->T_Equation::RightHandSide(y, charge, dydx);}
 
   REALLY_INLINE
-  void RightHandSideInl(const double y[], double dydx[], vecgeom::Vector3D<double> &Bfield) 
+     void RightHandSideInl(const double y[],
+                                 double charge,
+                                 double dydx[],                           
+                           vecgeom::Vector3D<double> &Bfield
+                           
+        ) 
   { 
     // vecgeom::Vector3D<double> Position = { y[0], y[1], y[2] } ;
-    PositionTmp.Set( y[0], y[1], y[2] );
-    fEquation_Rhs->RightHandSide(y, PositionTmp, dydx, Bfield);
-   // fEquation_Rhs->T_Equation::RightHandSide(y, dydx, Bfield);       
-   // fEquation_Rhs->GetField()->T_Field::GetFieldValue(Point, Bfield);
-   // fEquation_Rhs->TEvaluateRhsGivenB( y, Bfield, dydx ); 
+    // PositionTmp.Set( y[0], y[1], y[2] );
+    // fEquation_Rhs->RightHandSide(y, /*PositionTmp,*/ dydx, charge, Bfield);
+
+     //-- fEquation_Rhs->GetField()->T_Field::GetFieldValue(Point, Bfield);
+
+     // fEquation_Rhs->T_Equation::RightHandSide(y, dydx, Bfield);       
+     // fEquation_Rhs->TEvaluateRhsGivenB( y, dydx, charge, Bfield);
+ 
+     fEquation_Rhs->TEvaluateRhsReturnB( y, dydx, charge, Bfield); 
   }
 
   void SetEquationOfMotion(T_Equation* equation);
@@ -117,8 +126,8 @@ private:
   double* fLastInitialVector;
   double* fLastFinalVector;
   double* fLastDyDx;
-  double* fMidVector;
-  double* fMidError;
+  /*volatile*/ double* fMidVector;
+  /*volatile*/ double* fMidError;
   // for DistChord calculations
 
   // Parameters - for debugging etc
@@ -236,8 +245,8 @@ template <class T_Equation, unsigned int Nvar>
 inline void
 GUTCashKarpRKF45<T_Equation,Nvar>::
    StepWithErrorEstimate(const double*  yInput, // [],
-                         double /*charge*/,
                          const double*  dydx, // [],
+                         double charge,
                          double Step,
                          double*  yOut, // [],
                          double*  yErr) // [])
@@ -286,7 +295,7 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
   #if 0
   double ak1[sNstore];
   vecgeom::Vector3D<double>  Bfield1;
-  RightHandSideInl(yIn, ak1, Bfield1 );   // -- Get it again, for debugging
+  RightHandSideInl(yIn, charge, ak1, Bfield1 );   // -- Get it again, for debugging
   // PrintField("yIn   ", yIn, Bfield1);
   // PrintDyDx("ak1-", ak1, yIn);
   #endif
@@ -297,7 +306,9 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
       yTemp2[i] = yIn[i] + b21*Step*dydx[i] ;
   }
   // std::cout<<" just before rhs calculation " << std::endl;
-  RightHandSideInl(yTemp2, ak2, Bfield2 ); // 2nd Step
+  RightHandSideInl(yTemp2, charge, ak2
+                              , Bfield2
+     ); // 2nd Step
   // PrintField("yTemp2", yTemp2, Bfield2);
   // PrintDyDx("ak2", ak2, yTemp2); 
   // std::cout<<" 1 RHS calculating " << std::endl;
@@ -305,7 +316,9 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
   {
       yTemp3[i] = yIn[i] + Step*(b31*dydx[i] + b32*ak2[i]) ;
   }
-  RightHandSideInl(yTemp3, ak3, Bfield3 ); // 3rd Step
+  RightHandSideInl(yTemp3, charge, ak3
+                   //         , Bfield3
+     ); // 3rd Step
   // PrintField("yTemp3", yTemp3, Bfield3);
   // PrintDyDx("ak3", ak3, yTemp3); 
 
@@ -313,7 +326,9 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
   {
       yTemp4[i] = yIn[i] + Step*(b41*dydx[i] + b42*ak2[i] + b43*ak3[i]) ;
   }
-  RightHandSideInl(yTemp4, ak4, Bfield4 ); // 4th Step
+  RightHandSideInl(yTemp4, charge, ak4
+                   //         , Bfield4
+     ); // 4th Step
   // PrintField("yTemp4", yTemp4, Bfield4);
   // PrintDyDx("ak4", ak4, yTemp4); 
 
@@ -322,7 +337,9 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
       yTemp5[i] = yIn[i] + Step*(b51*dydx[i] + b52*ak2[i] + b53*ak3[i] +
               b54*ak4[i]) ;
   }
-  RightHandSideInl(yTemp5, ak5, Bfield5 );              // 5th Step
+  RightHandSideInl(yTemp5, charge, ak5
+                   //         , Bfield5
+     );              // 5th Step
   // PrintField("yTemp5", yTemp5, Bfield5);
   // PrintDyDx("ak5", ak5, yTemp5); 
 
@@ -331,7 +348,9 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
     yTemp6[i] = yIn[i] + Step*(b61*dydx[i] + b62*ak2[i] + b63*ak3[i] +
                 b64*ak4[i] + b65*ak5[i]) ;
   }
-  RightHandSideInl(yTemp6, ak6, Bfield6 );              // 6th Step
+  RightHandSideInl(yTemp6, charge, ak6
+                   // , Bfield6
+     );              // 6th Step
   // PrintField("yTemp6", yTemp6, Bfield6);
   // PrintDyDx("ak6", ak6, yTemp6);
 
@@ -379,8 +398,8 @@ GUTCashKarpRKF45<T_Equation,Nvar>::
 
   fAuxStepper->GUTCashKarpRKF45::StepWithErrorEstimate( 
           fLastInitialVector, 
+          fLastDyDx,
           charge,
-          fLastDyDx, 
           0.5 * fLastStepLength, 
           fMidVector,   
           fMidError );

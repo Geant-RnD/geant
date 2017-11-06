@@ -45,8 +45,8 @@ class TMagErrorStepper : public GUVIntegrationStepper
           { assert(fEquation_Rhs); fEquation_Rhs->T_Equation::RightHandSide(y, charge, dydx); }
 
         inline void StepWithErrorEstimate( const double yInput[],
-                                           double charge,
                                            const double dydx[],
+                                           double charge,
                                            double hstep,
                                            double yOutput[],
                                            double yError []      );
@@ -185,8 +185,8 @@ template<class T_Stepper, class T_Equation, unsigned int Nvar>
 void
    TMagErrorStepper<T_Stepper, T_Equation, Nvar>::
 StepWithErrorEstimate( const double yInput[],
-                double charge,
                 const double dydx[],
+                double charge,
                 double hstep,
                 double yOutput[],
                 double yError []      )

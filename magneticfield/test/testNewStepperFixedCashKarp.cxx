@@ -12,24 +12,12 @@
 
 #include "UniformMagField.h"          // New type (universal) class
 
-#include "GUVVectorEquationOfMotion.h"
+// #include "GUVVectorEquationOfMotion.h"
 
-// #include "TVectorMagFieldEquation.h"
-#include "TMagFieldEquation.h"
 #include "MagFieldEquation.h"
 
-// #include "TemplateFieldEquationFactory.h"
-
-// #include "TemplateGUVIntegrationStepper.h"
 #include "GUVVectorIntegrationStepper.h"
-
-// #include "TemplateStepperFactory.h"
-// #include "GUVectorStepperFactory.h"
-
-// #include "TemplateTClassicalRK4.h"
 #include "VectorCashKarpRKF45.h"
-
-// #include "TemplateCashKarpRKF45.h"
 
 // #include "TemplateTSimpleRunge.h"
 // #include "TemplateGUExactHelixStepper.h"
@@ -61,13 +49,10 @@ int main(int argc, char *args[])
     // using Vector3D  = vecgeom::Vector3D<Tpod>;
     using ThreeVector_f   = vecgeom::Vector3D<float>;
     using ThreeVector_d   = vecgeom::Vector3D<double>;
-    using ThreeVectorSimd = vecgeom::Vector3D<Double_v>;
+    // using ThreeVectorSimd = vecgeom::Vector3D<Double_v>;
 
-    using  FieldType =  UniformMagField;
-    
-    using  GvEquationType=  MagFieldEquation<FieldType>;
-       
-       // TemplateTMagFieldEquation<Backend, TemplateTUniformMagField<Backend>, Nposmom>;    
+    using  FieldType      =  UniformMagField;
+    using  GvEquationType =  MagFieldEquation<FieldType>;
    
     /* -----------------------------SETTINGS-------------------------------- */
     
@@ -136,8 +121,7 @@ int main(int argc, char *args[])
 
     // Field
     auto gvUniformField= new
-        TVectorUniformMagField( fieldUnits::tesla * ThreeVector_f(x_field, y_field, z_field) );       
-     // UniformMagField( fieldUnits::tesla * ThreeVector_f(x_field, y_field, z_field) ); // New classes
+          UniformMagField( fieldUnits::tesla * ThreeVector_f(x_field, y_field, z_field) ); // New classes
      //    VectorUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
      // TemplateTUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
     
@@ -159,54 +143,19 @@ int main(int argc, char *args[])
     if( debug ) cout << "Create Equation" << endl;
 
     // 1. Original way of creating an equation
-    // using EquationType = TVectorMagFieldEquation<TVectorUniformMagField, gNposmom>;
-    // auto   magEquation = new TVectorMagFieldEquation<TVectorUniformMagField, gNposmom>(gvUniformField);
-
-    // using EquationType = MagFieldEquation<UniformMagField, gNposmom>;
-    // auto   magEquation = new EquationType(gvUniformField);   // Simpler line ... as above
-
     auto   magEquation = new GvEquationType(gvUniformField);
     if( debug ) cout<<"----Equation instantiated. "<<endl;    
 
-    //  2. Different method of creating equation:  Factory
-    // cout << "---- Calling Vector Field Equation Factory"<< endl;    
-    // auto vecEquation = FieldEquationFactory::CreateMagEquation<TUniformMagField>(pConstBfield);  
-    // if( debug ) cout<<"----Equation created by Factory."<<endl;
-
-    // auto gvEquation =
-    // VectorFieldEquationFactory<Backend>::CreateMagEquation<TemplateTUniformMagField<Backend> >(gvUniformField);
-
     //Create a stepper :
-    if( debug ) cout << "----Creating a stepper :" << endl;
-
-    // TemplateGUVIntegrationStepper<Backend> *myStepper; // , *exactStepper;
     if( debug ) cout<<"---- Preparing to create (Vector) CashKarpRKF45 Stepper "<<endl;
 
     VectorCashKarpRKF45< /*Backend,*/ GvEquationType,Nposmom> myStepper2(magEquation);
-    // GUTVectorCashKarpRKF45<GvEquationType,Nposmom> myStepper(gvEquation);    
     if( debug ) cout<<"---- constructed VectorCashKarpRKF45"<<endl;
                                                               
     auto myStepper = &myStepper2;
     // myStepper = new VectorCashKarpRKF45<Backend,GvEquationType,Nposmom>(gvEquation);
   
-    // myStepper= TemplateStepperFactory<Backend>::CreateStepper<GvEquationType>(gvEquation, stepper_no);
-    // myStepper= StepperFactory::CreateStepper<decltype(gvEquation)*>(gvEquation, stepper_no);
-
     // Phase 1 - get it to work without cloning
-#if 0
-    // Phase 2 - get it to work with cloning -- or make it (and all used) objects fully thread safe
-    const int cloneBump= 10;
-    bool useClonedStepper= (stepper_no > cloneBump);
-    if(  useClonedStepper )
-       stepper_no -= cloneBump;
-    
-    if( useClonedStepper ){
-       auto baseStepper = myStepper;
-       auto cloneStepper = myStepper->Clone();
-       delete baseStepper;
-       myStepper = cloneStepper;
-    }
-#endif
 
     //Initialising coordinates
     const double mmGVf = fieldUnits::millimeter;

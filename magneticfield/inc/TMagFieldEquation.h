@@ -5,15 +5,6 @@
 
 #include "GUVEquationOfMotion.h"
 
-//  Ensure that equation Right Hand Side is inlined - may be compiler dependend
-#define INLINERHS 1
-
-#ifdef  INLINERHS
-#define REALLY_INLINE   inline __attribute__((always_inline)) 
-#else
-#define REALLY_INLINE   inline
-#endif
-
 #ifndef TMAGFIELDEQUATION_H
 #define TMAGFIELDEQUATION_H  1
 
@@ -51,20 +42,20 @@ public:
 
   Field* GetField() { return fPtrField; } 
 
-  inline // REALLY_INLINE
+  inline // GEANT_FORCE_INLINE
   void RightHandSide(const          double   y[],
                      const Vector3D<double> &position,
                                     double   charge,
                                     double   dydx[],
                            Vector3D<double> &BfieldVec) const;
 
-  inline // REALLY_INLINE
+  inline // GEANT_FORCE_INLINE
   void RightHandSide(const          double   y[],
                                     double   charge,
                                     double   dydx[],
                            Vector3D<double> &BfieldVec) const;
 
-  inline // REALLY_INLINE
+  inline // GEANT_FORCE_INLINE
   void RightHandSide(const          double   y[],
                                     double   charge,
                                     double   dydx[]) const;
@@ -97,22 +88,26 @@ public:
     dydx[5] = cof*(y[3]*B[1] - y[4]*B[0]) ;  // Az = a*(Vx*By - Vy*Bx)
   }
 
-     
-
-  REALLY_INLINE
+  GEANT_FORCE_INLINE
+  void TEvaluateRhsReturnB( const double    y[],
+                            double          dydx[],
+                            double          charge,
+                            vecgeom::Vector3D<double> &field  ) const;
+  
+  GEANT_FORCE_INLINE
   void FieldFromY(const double y[], vecgeom::Vector3D<double> &Bfield ) const;
 
-  REALLY_INLINE
+  GEANT_FORCE_INLINE
   void PrintInputFieldAndDyDx(const double y[], double charge, double dydx[] ) const;
 
-  REALLY_INLINE
+  GEANT_FORCE_INLINE
   void PrintAll(  double const  y[],
                  const vecgeom::Vector3D<double> &B,
                  double        charge,
                  double        cof,                     
                  double const  dydx[]  ) const;
 
-  REALLY_INLINE
+  GEANT_FORCE_INLINE
   void InitializeCharge(double /*particleCharge*/) final
   { /*fParticleCharge= particleCharge*/;  GUVEquationOfMotion::InformReady();  }
 
@@ -181,7 +176,7 @@ TMagFieldEquation<Field,Size> *TMagFieldEquation<Field,Size>::CloneOrSafeSelf(bo
 
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void  TMagFieldEquation<Field, Size>::EvaluateRhsGivenB(
                           const          double   y[],
                           const Vector3D<double> &B,
@@ -206,7 +201,7 @@ void  TMagFieldEquation<Field, Size>::EvaluateRhsGivenB(
 }
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void  TMagFieldEquation<Field, Size>::PrintAll(
                 double const  y[],
                 const vecgeom::Vector3D<double> &B,
@@ -239,7 +234,7 @@ void  TMagFieldEquation<Field, Size>::PrintAll(
 }
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void TMagFieldEquation<Field,Size>
   ::FieldFromY(const double y[],  vecgeom::Vector3D<double> &Bfield ) const
 {
@@ -248,7 +243,7 @@ void TMagFieldEquation<Field,Size>
 
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void TMagFieldEquation<Field,Size>
   ::RightHandSide(const double y[], double charge, double dydx[] ) const
 {
@@ -260,7 +255,7 @@ void TMagFieldEquation<Field,Size>
 }
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void TMagFieldEquation<Field,Size>::RightHandSide(
                     const double  y[],
                     double  charge,
@@ -272,7 +267,7 @@ void TMagFieldEquation<Field,Size>::RightHandSide(
 }
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void TMagFieldEquation<Field,Size>
   ::RightHandSide(const                   double   y[],
                   const          Vector3D<double> &position,
@@ -284,12 +279,25 @@ void TMagFieldEquation<Field,Size>
    EvaluateRhsGivenB( y, BfieldVec, charge, dydx );
 }
 
-
+template <class Field, unsigned int Size>
+GEANT_FORCE_INLINE
+void TMagFieldEquation<Field,Size>
+  ::TEvaluateRhsReturnB( const double           y[],
+                          double          dydx[],
+                          double          charge,
+                    vecgeom::Vector3D<double> &field
+                  ) const
+{
+   using ThreeVector = vecgeom::Vector3D<double>;
+   
+   GetFieldValue( ThreeVector(y[0], y[1], y[2]), field) ;
+   EvaluateRhsGivenB( y, field, charge, dydx );
+}
 
 #include <iostream>   // For debuging only
 
 template <class Field, unsigned int Size>
-REALLY_INLINE
+GEANT_FORCE_INLINE
 void TMagFieldEquation<Field,Size>
   ::PrintInputFieldAndDyDx(const double y[], double charge, double dydx[] ) const
 {

@@ -40,10 +40,10 @@ class GUExactHelixStepper : public GUVHelicalStepper
                                    ThreeVector   Bfld,
                                          double  charge,                                   
                                          double  h,
-                                         double  yout[] ); // override final;
+                                         double  yout[] ) override final;
       // Performs a 'dump' Step without error calculation.
   
-    double DistChord(double charge) const;
+    double DistChord(double charge) const override final;
       // Estimate maximum distance of curved solution and chord ... 
 
   private:

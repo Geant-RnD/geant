@@ -663,7 +663,7 @@ GUIntegrationDriver::OneGoodStep(  double y[],        // InOut
   for (iter=0; iter<max_trials ;iter++)
   {
     tot_no_trials++;
-    fpStepper-> StepWithErrorEstimate(y,charge,dydx,h,ytemp,yerr);
+    fpStepper-> StepWithErrorEstimate(y,dydx,charge,h,ytemp,yerr);
     // fStepperCalls++;
     //          *********************
     double eps_pos = eps_rel_max * std::max(h, fMinimumStep);  // Uses remaining step 'h'
@@ -788,7 +788,7 @@ bool  GUIntegrationDriver::QuickAdvance(
   s_start = y_posvel.GetCurveLength();
 
   // Do an Integration Step
-  fpStepper-> StepWithErrorEstimate(yarrin, charge, dydx, hstep, yarrout, yerr_vec) ; 
+  fpStepper-> StepWithErrorEstimate(yarrin, dydx, charge, hstep, yarrout, yerr_vec) ; 
   //          *********************
 
 #ifdef USE_DCHORD  

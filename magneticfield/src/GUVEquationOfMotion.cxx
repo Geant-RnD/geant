@@ -18,19 +18,6 @@ GUVEquationOfMotion::~GUVEquationOfMotion()
    // To help ensure that clients call InformDone() - ie. clear
 }
 
-void
-GUVEquationOfMotion::
-EvaluateRhsReturnB( const double           y[],
-                          double          dydx[],
-                          double          charge,
-                    vecgeom::Vector3D<double> &field
-                  ) const
-{
-   using ThreeVector = vecgeom::Vector3D<double>;
-   
-   GetFieldValue( ThreeVector(y[0], y[1], y[2]), field) ;
-   EvaluateRhsGivenB( y, field, charge, dydx );
-}
 
 std::ostream&  operator<<( std::ostream& os, const GUVEquationOfMotion& eq)
 {

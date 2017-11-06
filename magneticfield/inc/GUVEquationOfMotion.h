@@ -18,6 +18,7 @@
 
 // #include <vector>
 #include "base/Vector3D.h"
+#include <Geant/Config.h>  // To define GEANT_FORCE_INLINE
 
 // #include "GUVTypes.hh"      // "globals.hh"
 #include "GUVField.h"   // required in inline method implementations
@@ -55,7 +56,7 @@ class GUVEquationOfMotion
      //   // Set the charge, momentum and mass of the current particle
      //   // --> used to set the equation's coefficients ...
 
-      inline void RightHandSide( const  double y[],
+     inline void RightHandSide( const  double y[],
                                         double charge ,
                                         double dydx[] ) const;
        // This calculates the value of the derivative dydx at y.
@@ -63,7 +64,7 @@ class GUVEquationOfMotion
        // ---------------------------
        // It uses the virtual function EvaluateRhsGivenB
 
-     void EvaluateRhsReturnB( const double y[],
+     inline void EvaluateRhsReturnB( const double y[],
                               double       dydx[],
                               double       charge,
                   vecgeom::Vector3D<double> &field ) const;
@@ -146,7 +147,7 @@ void GUVEquationOfMotion::GetFieldValue( const vecgeom::Vector3D<double> &Positi
    fField-> GetFieldValue( Position, FieldValue );
 }
 
-inline
+GEANT_FORCE_INLINE
 void
 GUVEquationOfMotion::RightHandSide( const  double y[],
                                            double charge,
@@ -169,6 +170,21 @@ GUVEquationOfMotion::RightHandSide( const  double y[],
 
    GetFieldValue( position, field );
    // GetFieldValue( y, Field_3vf );   
+   EvaluateRhsGivenB( y, field, charge, dydx );
+}
+
+GEANT_FORCE_INLINE
+void
+GUVEquationOfMotion::
+EvaluateRhsReturnB( const double           y[],
+                          double          dydx[],
+                          double          charge,
+                    vecgeom::Vector3D<double> &field
+                  ) const
+{
+   using ThreeVector = vecgeom::Vector3D<double>;
+   
+   GetFieldValue( ThreeVector(y[0], y[1], y[2]), field) ;
    EvaluateRhsGivenB( y, field, charge, dydx );
 }
 

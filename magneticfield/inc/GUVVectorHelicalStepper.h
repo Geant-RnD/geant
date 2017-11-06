@@ -148,7 +148,14 @@ void GUVVectorHelicalStepper::MagFieldEvaluate(const Double_v y[],
                                                ThreeVectorSimd &Bfield )
 {
   Double_v B[3];
-  GetABCEquationOfMotion()->  GetFieldValue(y, B);
+  const char *methodName= "GUVVectorHelicalStepper::MagFieldEvaluate";
+  
+  auto equation= GetABCEquationOfMotion();
+  if( equation ) {
+     GetABCEquationOfMotion()->  GetFieldValue(y, B);
+  } else {
+     std::cerr << "ERROR in " << methodName << ": called when equation held is null\n";
+  }
   // GetEquationOfMotion()->  GetFieldValue(y, B);  
   // fPtrMagEqOfMot->GetFieldValue(y, B);
 

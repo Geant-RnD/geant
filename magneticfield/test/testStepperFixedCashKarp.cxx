@@ -284,7 +284,7 @@ int main(int argc, char *args[])
 
         if( j > 0 )  // Let's print the initial points!
         {
-           myStepper->StepWithErrorEstimate(yIn,particleCharge,dydx,step_len,yout,yerr);   //Call the 'trial' stepper
+           myStepper->StepWithErrorEstimate(yIn,dydx,particleCharge,step_len,yout,yerr);   //Call the 'trial' stepper
 /*           cout.setf (ios_base::fixed);
            cout.precision(4);
            cout<<"\n   Ananya yout: "<<endl;
