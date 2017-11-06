@@ -42,8 +42,7 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
   
     virtual void StepWithErrorEstimate( const Double_v y[],  // virtual for ExactHelix 
                                         const Double_v dydx[],
-                                        //                                    const Double_v h,
-                                              double h,                                        
+                                        const Double_v&  h,                                        
                                               Double_v yout[],
                                               Double_v yerr[] );
       // The stepper for the Runge Kutta integration.
@@ -53,7 +52,7 @@ class GUVVectorHelicalStepper : public GUVVectorIntegrationStepper
   
     virtual  void StepWithoutErrorEstimate( const Double_v y[],
                                                   ThreeVectorSimd Bfld,
-                                                  double  h,
+                                            const Double_v& hStep,
                                                   Double_v yout[]     ) = 0;
       // Performs a 'dump' Step without error calculation.
   
