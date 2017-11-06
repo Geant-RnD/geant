@@ -46,10 +46,10 @@ GUVHelicalStepper::~GUVHelicalStepper()
 
 void
 GUVHelicalStepper::AdvanceHelix( const double  yIn[],
-                                   ThreeVector   Bfld,    
-                                   double  h,
-                                   double  yHelix[],
-                                   double  yHelix2[] )
+                                 ThreeVector   Bfld,    
+                                       double  h,
+                                       double  yHelix[],
+                                       double  yHelix2[] )
 {
   // const G4int    nvar = 6;
  

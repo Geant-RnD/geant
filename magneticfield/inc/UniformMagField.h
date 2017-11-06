@@ -7,7 +7,8 @@
 
 #include <iostream>
 
-#include "base/Vector3D.h"
+#include <base/Vector3D.h>
+#include <Geant/VectorTypes.h>
 
 #include "Constants.h"  //   For pi & twopi - Temporary solution ..
 
@@ -19,7 +20,7 @@ class UniformMagField
 public:
 
   using Double_v = Geant::Double_v;
-  using Float_v = Geant::Float_v;
+  using Float_v =  Geant::Float_v;
   template <typename T>
   using Vector3D = vecgeom::Vector3D<T>;
 

@@ -40,6 +40,10 @@ add_executable(testStepperFixedCashKarp testStepperFixedCashKarp.cxx)
 target_link_libraries(testStepperFixedCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 message(STATUS "Created target for testStepperFixedCashKarp")
 
+add_executable(testVectorStepperFixedCashKarp testVectorStepperFixedCashKarp.cxx)
+target_link_libraries(testVectorStepperFixedCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+message(STATUS "Created target for testVectorStepperFixedCashKarp")
+
 add_executable(testIntegrationDriverCashKarp testIntegrationDriverCashKarp.cxx)
 target_link_libraries(testIntegrationDriverCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 #message(STATUS "Created target for testIntegrationDriverCashKarp")
