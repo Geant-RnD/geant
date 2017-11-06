@@ -27,6 +27,7 @@ class GUExactHelixStepper : public GUVHelicalStepper
     ~GUExactHelixStepper();
 
     void StepWithErrorEstimate( const double y[],
+                                double charge,                                
                   const double dydx[],
                         double h,
                         double yout[],

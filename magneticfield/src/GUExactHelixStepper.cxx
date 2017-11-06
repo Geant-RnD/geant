@@ -16,9 +16,9 @@
 using Constants::pi;
 using Constants::twopi;
 
+#include <cfloat>
 
 #include "GUExactHelixStepper.h"
-#include <cfloat>
 // #include "GUPhysicalConstants.h"
 // #include "ThreeVector.h"
 // #include "GULineSection.h"
@@ -35,10 +35,11 @@ GUExactHelixStepper::~GUExactHelixStepper() {}
 
 void
 GUExactHelixStepper::StepWithErrorEstimate( const double yInput[],
-                              const double*,
-                                    double hstep,
-                                    double yOut[],
-                                    double yErr[]      )
+                                                  double charge, 
+                                            const double*, // dydx
+                                                  double hstep,
+                                                  double yOut[],
+                                                  double yErr[]  )
 {  
    const unsigned int nvar = 6;
 

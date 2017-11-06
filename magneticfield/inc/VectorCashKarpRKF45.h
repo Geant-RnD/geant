@@ -34,7 +34,7 @@
 
 template
 <class T_Equation, unsigned int Nvar>
-class VectorCashKarpRKF45 : public GUVVectorIntegrationStepper<Backend>, public AlignedBase
+   class VectorCashKarpRKF45 : public GUVVectorIntegrationStepper // <Backend>, public AlignedBase
 {
   // typedef                   typename Backend::precision_v  Double_v;
   // typedef vecgeom::Vector3D<typename Backend::precision_v> ThreeVectorSimd; 
@@ -61,19 +61,19 @@ class VectorCashKarpRKF45 : public GUVVectorIntegrationStepper<Backend>, public 
     
     virtual ~VectorCashKarpRKF45();
 
-    GUVVectorIntegrationStepper<Backend>* Clone() const override;
+    GUVVectorIntegrationStepper* Clone() const override;
 
     REALLY_INLINE
     #ifdef NoPointers
-    void StepWithErrorEstimate(const Double_v yInput[],    // Consider __restrict__
+    void StepWithErrorEstimate(const Double_v  yInput[],  // Consider __restrict__
                                const Double_v  dydx[],
-                                     Double_v  Step,
+                               const Double_v& hStep,
                                      Double_v  yOut[],
                                      Double_v  yErr[]) override;
    #else 
     void StepWithErrorEstimate(const Double_v* yInput,    // Consider __restrict__
                                const Double_v*  dydx,
-                                     Double_v   Step,
+                               const Double_v&  Step,
                                      Double_v*  yOut,
                                      Double_v*  yErr) override;
     #endif 
@@ -314,15 +314,15 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
 #ifdef NoPointers
   StepWithErrorEstimate(const Double_v  yInput[],    
                         const Double_v  dydx[],
-                              Double_v   Step,
+                        const Double_v&  Step,
                               Double_v  yOut[],
                               Double_v  yErr[])
 #else 
-  StepWithErrorEstimate(const Double_v*  yInput, // [],    
-                        const Double_v*  dydx, // [],
-                              Double_v   Step,
-                              Double_v*  yOut, // [],
-                              Double_v*  yErr  ) // [])
+  StepWithErrorEstimate(const Double_v*  yInput,
+                        const Double_v*  dydx, 
+                        cosnt Double_v&  Step,
+                              Double_v*  yOut, 
+                              Double_v*  yErr  ) 
 #endif 
 {
     // const double a2 = 0.2 , a3 = 0.3 , a4 = 0.6 , a5 = 1.0 , a6 = 0.875;
