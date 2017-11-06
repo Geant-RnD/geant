@@ -36,20 +36,21 @@ class GUVHelicalStepper : public GUVIntegrationStepper
                       unsigned int order);
     virtual ~GUVHelicalStepper();
   
-    virtual void StepWithErrorEstimate( const double y[],  // virtual for ExactHelix 
-                  const double dydx[],
-                        double h,
-                        double yout[],
-                        double yerr[]  );
+    virtual void StepWithErrorEstimate( const double y[],  // virtual for ExactHelix
+                                    /*  const charge, */  // ==> Re-examine to include it !!
+                                        const double dydx[],
+                                              double h,
+                                              double yout[],
+                                              double yerr[]  );
       // The stepper for the Runge Kutta integration.
       // The stepsize is fixed, equal to h.
       // Integrates ODE starting values y[0 to 6]
       // Outputs yout[] and its estimated error yerr[].
   
     virtual  void StepWithoutErrorEstimate( const double y[],
-                               ThreeVector   Bfld,
-                               double  h,
-                               double yout[] ) = 0;
+                                             ThreeVector Bfld,
+                                                 double  h,
+                                                  double yout[] ) = 0;
       // Performs a 'dump' Step without error calculation.
   
     double DistChord()const ;
