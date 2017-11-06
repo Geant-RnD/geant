@@ -392,8 +392,8 @@ int main(int argc, char *argv[]) {
     Hist *histo_photoelectron_angular = new Hist(xMin, xMax, numHistBins);
     Hist *histo_photoelectron_angular_rej = new Hist(xMin, xMax, numHistBins);
     
-    xMin     = -1.0;
-    xMax     = 1.0;
+    xMin     = -1.0001;
+    xMax     = 1.0001;
     Hist *histo_angle = new Hist(xMin, xMax, numHistBins);
     Hist *histo_angle_rej = new Hist(xMin, xMax, numHistBins);
     
@@ -421,6 +421,10 @@ int main(int argc, char *argv[]) {
     double timeInSec_rej = sampleDistribution(numSamples, kineticEnergy, matCut, particle, emModel_rej, histo_photoelectron_energy_rej, histo_photoelectron_angular_rej, histo_angle_rej);
     std::cout<< "   -------------------------------------------------------------------------------- "<<std::endl;
     std::cout<< "   Time of sampling Alias =  " << timeInSec << " [s]" << std::endl;
+    std::cout<< "   -------------------------------------------------------------------------------- "<<std::endl;
+    
+    std::cout<< "   -------------------------------------------------------------------------------- "<<std::endl;
+    std::cout<< "   Time of sampling Rejection =  " << timeInSec_rej << " [s]" << std::endl;
     std::cout<< "   -------------------------------------------------------------------------------- "<<std::endl;
 
     std::cout<< "   -------------------------------------------------------------------------------- "<<std::endl;

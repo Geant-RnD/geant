@@ -1119,7 +1119,7 @@ namespace geantphysics {
         
         int numpoints=40;
         int curNumData = 5;
-        double maxErrorThreshold = singleTableErrorThreshold;
+        double maxErrorThreshold = gsingleTableErrorThreshold;
         
         x.resize(numpoints);
         y.resize(numpoints);
