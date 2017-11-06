@@ -9,7 +9,7 @@
 // #include <Vc/Vc>
 #include "base/Vector3D.h"
 
-#include "TVectorUniformMagField.h"
+#include "UniformMagField.h"
 
 #include "GUVVectorEquationOfMotion.h"
 #include "TVectorMagFieldEquation.h"
@@ -19,10 +19,10 @@
 #include "GUVVectorIntegrationStepper.h"
 
 // #include "TemplateStepperFactory.h"
-#include "GUVectorStepperFactory.h"
+// #include "GUVectorStepperFactory.h"
 
 // #include "TemplateTClassicalRK4.h"
-#include "GUTVectorCashKarpRKF45.h"
+#include "VectorCashKarpRKF45.h"
 // #include "TemplateTSimpleRunge.h"
 // #include "TemplateGUExactHelixStepper.h"
 
@@ -41,8 +41,6 @@ using std::cerr;
 using std::endl;
 using std::setw;
 
-#define DEBUGAnanya
-
 int main(int argc, char *args[])
 {
     constexpr unsigned int Nposmom= 6; // Position 3-vec + Momentum 3-vec
@@ -58,7 +56,7 @@ int main(int argc, char *args[])
 
     // using  GvEquationType=  TemplateTMagFieldEquation<Backend, TemplateTUniformMagField<Backend>, Nposmom>;
 
-    using  FieldType = TVectorUniformMagField;
+    using  FieldType = UniformMagField;
     using  GvEquationType= TVectorMagFieldEquation<FieldType, Nposmom>;
        
        // TemplateTMagFieldEquation<Backend, TemplateTUniformMagField<Backend>, Nposmom>;    
@@ -123,32 +121,26 @@ int main(int argc, char *args[])
     else
        z_field = -1.0;  //  Tesla // *tesla ;
 
-     #ifdef DEBUGAnanya
-      cout<<"----Just before making UniformMagField object"<<endl;
-     #endif 
+    bool debug= true;
+    if( debug ) cout<<"----Just before making UniformMagField object"<<endl;
 
     // Field
     auto gvField= new
-        TVectorUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
+        UniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
      // TemplateTUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
 
-    #ifdef DEBUGAnanya
-     cout<<"----TemplateTUniformMagField Object constructed"<<endl;
-    #endif
+    if( debug ) cout<<"----TemplateTUniformMagField Object constructed"<<endl;
+
     cout << "#  Initial  Field strength (GeantV) = "
          << x_field << " , " << y_field << " , " << z_field 
        // << (1.0/fieldUnits::tesla) * gvField->GetValue()->X() << ",  "
          << " Tesla " << endl;
     cout << "#  Initial  momentum * c = " << x_mom << " , " << y_mom << " , " << z_mom << " GeV " << endl;
     //Create an Equation :
-    #ifdef DEBUGAnanya
-      cout<<"----Just before making EquationFactory"<<endl;
-    #endif 
+    if( debug ) cout<<"----Just before making EquationFactory"<<endl;
     auto gvEquation =
        TemplateFieldEquationFactory<Backend>::CreateMagEquation<TemplateTUniformMagField<Backend> >(gvField);
-    #ifdef DEBUGAnanya
-       cout<<"----EquationFactory made "<<endl;
-    #endif 
+    if( debug ) cout<<"----EquationFactory made "<<endl;
        // new GvEquationType(gvField);
        // new TMagFieldEquation<TUniformMagField, Nposmom>(gvField);
 
@@ -157,24 +149,18 @@ int main(int argc, char *args[])
     //Create a stepper :
 
     TemplateGUVIntegrationStepper<Backend> *myStepper; // , *exactStepper;
-  #ifdef DEBUGAnanya
-     cout<<"---- "<<endl;
-  #endif
-  #ifdef DEBUGAnanya
-     cout<<"---- Making TemplateGUTCashKarpRKF45"<<endl;
-  #endif   
-    TemplateGUTCashKarpRKF45<Backend,GvEquationType,Nposmom> myStepper2(gvEquation);
-  #ifdef DEBUGAnanya
-    cout<<"---- constructed TemplateGUTCashKarpRKF45"<<endl;
-  #endif
+    if( debug )             
+     cout<<"---- Making VectorCashKarpRKF45"<<endl;
+
+    VectorCashKarpRKF45<Backend,GvEquationType,Nposmom> myStepper2(gvEquation);
+    if( debug )
+       cout<<"---- constructed VectorCashKarpRKF45"<<endl;
    
     myStepper = &myStepper2;
-    // myStepper = new TemplateGUTCashKarpRKF45<Backend,GvEquationType,Nposmom>(gvEquation);
+    // myStepper = new VectorCashKarpRKF45<Backend,GvEquationType,Nposmom>(gvEquation);
   
-
     // myStepper= TemplateStepperFactory<Backend>::CreateStepper<GvEquationType>(gvEquation, stepper_no);
     // myStepper= StepperFactory::CreateStepper<decltype(gvEquation)*>(gvEquation, stepper_no);
-
 
     const int cloneBump= 10;
     bool useClonedStepper= (stepper_no > cloneBump);
@@ -197,9 +183,8 @@ int main(int argc, char *args[])
     // double yIn[] = {x_pos,y_pos,z_pos,x_mom,y_mom,z_mom};
     Double_v yIn[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
                     x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};
-    #ifdef DEBUGAnanya
+    if( debug )    
       cout<<yIn[0]<<endl;
-    #endif 
     
 
     // double yInX[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
@@ -430,15 +415,9 @@ int main(int argc, char *args[])
     
     /*-----------------END-STEPPING------------------*/
 
-    #ifdef DEBUGAnanya
-      cout<<"----Stepping done "<<endl;
-    #endif 
-
+    if( debug ) cout<<"----Stepping done "<<endl;
 
     /*------ Clean up ------*/
-    #ifdef DEBUGAnanya
-      cout<<"----Informing done "<<endl;
-    #endif 
     
     #ifdef BASELINESTEPPER
     exactStepper->InformDone();
@@ -446,9 +425,7 @@ int main(int argc, char *args[])
 
     delete myStepper;
 
-    #ifdef DEBUGAnanya
-      cout<<"----deletion of stepper done "<<endl;
-    #endif 
+    if( debug )  cout<<"----deletion of stepper done "<<endl;
 
     #ifdef BASELINESTEPPER
     delete exactStepper;
