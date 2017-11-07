@@ -6,9 +6,10 @@
 //
 #include <iomanip>
 
-// #include <Vc/Vc>
 #include "base/Vector3D.h"
 #include <Geant/VectorTypes.h>
+
+using namespace vecCore::math;
 
 #include "UniformMagField.h"          // New type (universal) class
 
@@ -56,11 +57,9 @@ int main(int argc, char *args[])
    
     /* -----------------------------SETTINGS-------------------------------- */
     
-    /* Parameters of test
-     - Modify values  */
-    
-    int no_of_steps = 250;         // No. of Steps for the stepper
-    int stepper_no =  5;         // Choose stepper no., for refernce see above
+    // Parameters of test - values can be modified
+    int no_of_steps = 250;        // No. of Steps for the stepper
+    int stepper_no =  5;          // Choose stepper no., for refernce see above
     double step_len_mm = 200.;    // meant as millimeter;  //Step length 
     double z_field_in = DBL_MAX;
 
@@ -167,15 +166,14 @@ int main(int argc, char *args[])
     const double mmGVf = fieldUnits::millimeter;
     const double ppGVf = fieldUnits::GeV ;  //   it is really  momentum * c_light
                                          //   Else it must be divided by fieldUnits::c_light;
-    // const double ppGVf = fieldUnits::GeV / Constants::c_light;     // OLD
 
     // Double_v yIn[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
     //                  x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};
-    Double_v yIn[]= { Double_v(x_pos * mmGVf), Double_v(y_pos * mmGVf) ,
+    Double_v yInVec[]= { Double_v(x_pos * mmGVf), Double_v(y_pos * mmGVf) ,
                       Double_v(z_pos * mmGVf),
                       Double_v(x_mom * ppGVf), Double_v(y_mom * ppGVf) ,
                       Double_v(z_mom * ppGVf) };
-    if( debug ) cout << "Initialized yIn: values [0]= " << yIn[0] << endl;
+    if( debug ) cout << "Initialized yIn: values [0]= " << yInVec[0] << endl;
 
     // double yInX[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
     //                 x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};    
@@ -189,6 +187,11 @@ int main(int argc, char *args[])
     // Should be able to share the Equation -- eventually
     // For now, it checks that it was Done() -- and fails an assert
 
+    //Empty buckets for results
+    Double_v dydxVec[8] = { Double_v(0.),0.,0.,0.,0.,0.,0.,0.},  // 2 extra safety buffer
+             yOutVec[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
+             yErrVec[8] = {0.,0.,0.,0.,0.,0.,0.,0.};
+    
     //Creating the baseline stepper
   #ifdef BASELINESTEPPER
     auto exactStepperGV =
@@ -203,26 +206,19 @@ int main(int argc, char *args[])
     // gvEquation2->InitializeCharge( particleCharge ); //  Different way - in case this works
     
     auto exactStepper = exactStepperGV;
+
+    Double_v dydxVecRef[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
+             yOutVecX[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
+             yErrVecX[8] = {0.,0.,0.,0.,0.,0.,0.,0.};    
   #endif 
-    std::cout << "# step_len_mm = " << step_len_mm;
-    std::cout << " mmRef= " << mmRef << "   ppRef= " << ppRef << std::endl;
+    cout << "# step_len_mm = " << step_len_mm;
+    cout << " mmRef= " << mmRef << "   ppRef= " << ppRef << endl;
     
     // Double_v yInX[] = {x_pos * mmRef, y_pos * mmRef ,z_pos * mmRef,
                      // x_mom * ppRef ,y_mom * ppRef ,z_mom * ppRef};
 
     // double stepLengthRef = step_len_mm * mmRef;
-    
-    //Empty buckets for results
-    Double_v dydx[8] = {0.,0.,0.,0.,0.,0.,0.,0.},  // 2 extra safety buffer
-        // dydxRef[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
-           yout[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
-          // youtX[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
-           yerr[8] = {0.,0.,0.,0.,0.,0.,0.,0.};
-    // Double_v yerrX[8] = {0.,0.,0.,0.,0.,0.,0.,0.};
-    
     /*-----------------------END PREPARING STEPPER---------------------------*/
-    
-
 
     /*---------------------------------------------------*/
     //        -> First Print the (commented) title header
@@ -290,27 +286,50 @@ int main(int argc, char *args[])
         cout<<setw(6)<<j ;           //Printing Step number
         Double_v charge(-1.);
         Double_v step_len( stepLengthValue ); 
-        myStepper->RightHandSideInl(yIn, charge, dydx);  //compute dydx - to supply the stepper
-        #ifdef baseline
-        exactStepper->RightHandSideVIS(yInX, dydxRef);   //compute the value of dydx for the exact stepper
-        #endif
+        myStepper->RightHandSideInl(yInVec, charge, dydxVec);  //compute dydx - to supply the stepper
+#ifdef  BASELINESTEPPER
+        double yinX[Nposmom], youtX[Nposmom], yerrX[Nposmom];
+        exactStepper->RightHandSideVIS(yInVecX, dydxVecRef);   //compute the value of dydx for the exact stepper
+#endif
 
-        if( j > 0 )  // Let's print the initial points!
+        int lane=0; // Lane for printing
+        double yin[Nposmom] = { -999., -99.9, -9.99, 10.0, 1.0, 0.1 };
+        double yout[Nposmom], dydx[Nposmom], yerr[Nposmom];                  
+        if( j > 0 )  // Do nothing for j=0, so we can print the initial points!
         {
-           myStepper->StepWithErrorEstimate( yIn, dydx, charge, step_len, yout, yerr );   //Call the 'trial' stepper
-          #ifdef  BASELINESTEPPER
-           exactStepperGV->StepWithErrorEstimate(yInX,dydxRef,charge,stepLengthRef,youtX,yerrX); //call the reference stepper
-          #endif
+           myStepper->StepWithErrorEstimate( yInVec, dydxVec, charge, step_len, yOutVec, yErrVec );   //Call the 'trial' stepper
+           //         *********************
+#ifdef  BASELINESTEPPER
+           exactStepperGV->StepWithErrorEstimate(yInVecX,dydxVecRef,charge,stepLengthRef,yOutVecX,yErrVecX); //call the reference stepper
+           //              *********************
+#endif
         }
+
+        // Select one lane for printing.
+        for(unsigned int i=0; i<Nposmom;i++) {
+           yin[i]   = vecCore::Get( yInVec[i], lane );           
+           yout[i]  = ( j > 0 ) ? vecCore::Get( yOutVec[i], lane ) :
+                                  vecCore::Get( yInVec[i], lane ); //  yOut is not yet set for j=0
+           yerr[i]  = vecCore::Get( yErrVec[i], lane );
+           dydx[i]  = vecCore::Get( dydxVec[i], lane );
+#ifdef BASELINESTEPPER
+           yinX[i]  = vecCore::Get( yInVecX[i], lane  );
+           youtX[i] = ( j> 0 ) ? vecCore::Get( yOutVecX[i], lane ) :
+                                 vecCore::Get( yInVecX[i], lane ); //  yOut is not yet set for j=0           
+           yerrX[i] = vecCore::Get( yErrVecX[i], lane );
+           dydxX[i] = vecCore::Get( dydxVecRef[i], lane );           
+#endif           
+        }
+
         //-> Then print the data
         cout.setf (std::ios_base::fixed);
         cout.precision(4);
         for(int i=0; i<3;i++)
             if(columns[i]){
                if( printSep ) cout << " | " ;  // Separator
-               if( printInp ) cout << setw(nwdf-2)<< yIn[i] / mmGVf;
+               if( printInp ) cout << setw(nwdf-2)<< yin[i] / mmGVf;
               #ifdef BASELINESTEPPER
-               if( printInpX ) cout << setw(nwdf-2)<< yInX[i] / mmRef;
+               if( printInpX ) cout << setw(nwdf-2)<< yinX[i] / mmRef;
                if( printRef ) cout<<setw(nwdf)<< youtX[i] / mmRef; // Reference Solution
                if( printDiff )                
                   cout<<setw(nwdf)<< yout[i] /  mmGVf - youtX[i] / mmRef ;
@@ -327,9 +346,9 @@ int main(int argc, char *args[])
         for(int i=3; i<6;i++)
             if(columns[i]){
                if( printSep ) cout << " | " ;  // Separator
-               if( printInp ) cout << setw(nwdf-1)<< yIn[i] / ppGVf << " ";
+               if( printInp ) cout << setw(nwdf-1)<< yin[i] / ppGVf << " ";
               #ifdef BASELINESTEPPER
-               if( printInpX ) cout << setw(nwdf-1)<< yInX[i] / ppRef << " ";
+               if( printInpX ) cout << setw(nwdf-1)<< yinX[i] / ppRef << " ";
                if( printRef ) cout<<setw(nwdf)<< youtX[i] / ppRef; // Reference Solution
                if( printDiff ) 
                   cout<<setw(nwdf+2)<< ( yout[i] /  ppGVf )
@@ -392,11 +411,13 @@ int main(int argc, char *args[])
            if( printRef ) 
              cout<<setw(nwdf) << atan2(youtX[1],youtX[0])/degree;
            #endif
+
+           // Prepare the state of yIn(Vec)
            //Copy yout into yIn
-           for(int i=0; i<6;i++){
-              yIn[i] = yout[i];
+           for(unsigned int i=0; i<Nposmom;i++){
+              yInVec[i]  = yOutVec[i];
               #ifdef BASELINESTEPPER
-              yInX[i] = youtX[i];
+              yInVecX[i] = yOutVecX[i];
               #endif
            }
         }
