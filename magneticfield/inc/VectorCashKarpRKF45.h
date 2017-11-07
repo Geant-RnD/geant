@@ -11,8 +11,8 @@
 //         (derived from G4CashKarpRKF45)
 //
 //     
-#ifndef GUVVECTORCASHKARPRKF45_H
-#define GUVVECTORCASHKARPRKF45_H
+#ifndef VECTORCASHKARPRKF45_H
+#define VECTORCASHKARPRKF45_H
 
 #include "GUVectorLineSection.h"
 #include "GUVVectorIntegrationStepper.h"
@@ -85,6 +85,7 @@ template
          Double_v yTemp3[sNstore];
          Double_v yTemp4[sNstore];
          Double_v yTemp5[sNstore];
+         Double_v yTemp6[sNstore];                
          
          Double_v yIn[sNstore];
          // scratch space
@@ -267,15 +268,12 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
     }
     this->RightHandSideInl(yTemp5, charge,  ak5) ;              // 5th Step
 
+    for(i=0;i<Nvar;i++)
     {
-      Double_v yTemp6[sNstore];                
-      for(i=0;i<Nvar;i++)
-      {
-        yTemp6[i] = yIn[i] + Step*(b61*dydx[i] + b62*ak2[i] + b63*ak3[i] +
-                b64*ak4[i] + b65*ak5[i]) ;
-      }
-      this->RightHandSideInl(yTemp6, charge,  ak6) ;              // 6th Step
+       yTemp6[i] = yIn[i] + Step*(b61*dydx[i] + b62*ak2[i] + b63*ak3[i] +
+                                  b64*ak4[i] + b65*ak5[i]) ;
     }
+    this->RightHandSideInl(yTemp6, charge,  ak6) ;              // 6th Step
 
     for(i=0;i<Nvar;i++)
     {
