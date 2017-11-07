@@ -124,7 +124,7 @@ int main(int argc, char *args[])
      //    VectorUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
      // TemplateTUniformMagField<Backend>( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
     
-    if( debug ) cout<<"----TemplateTUniformMagField Object constructed"<<endl;
+    if( debug ) cout<<"----UniformMagField Object constructed"<<endl;
     cout << "#  Initial  Field strength (GeantV) = "
          << x_field << " , " << y_field << " , " << z_field
          << " Tesla " << endl;
@@ -201,10 +201,6 @@ int main(int argc, char *args[])
        // new TSimpleRunge<GvEquationType,Nposmom>(gvEquation2);    
        // new GUExactHelixStepper(gvEquation2);
 
-    // Configure Stepper for current particle
-    // exactStepperGV->InitializeCharge( particleCharge ); // Passes to Equation, is cached by stepper
-    // gvEquation2->InitializeCharge( particleCharge ); //  Different way - in case this works
-    
     auto exactStepper = exactStepperGV;
 
     Double_v dydxVecRef[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
@@ -278,15 +274,18 @@ int main(int argc, char *args[])
     // cout.setf (ios_base::scientific);
     // cout.setf (ios_base::scientific);    
     cout.precision(3);
+
+    const double particleCharge= -1.0; 
+    cout << " particle charge = " << particleCharge << endl;        
     
     /*----------------NOW STEPPING-----------------*/
     no_of_steps = 25;
     for(int j=0; j<no_of_steps; j++)
     {
         cout<<setw(6)<<j ;           //Printing Step number
-        Double_v charge(-1.);
+        Double_v chargeVec( particleCharge );
         Double_v step_len( stepLengthValue ); 
-        myStepper->RightHandSideInl(yInVec, charge, dydxVec);  //compute dydx - to supply the stepper
+        myStepper->RightHandSideInl(yInVec, chargeVec, dydxVec);  //compute dydx - to supply the stepper
 #ifdef  BASELINESTEPPER
         double yinX[Nposmom], youtX[Nposmom], yerrX[Nposmom];
         exactStepper->RightHandSideVIS(yInVecX, dydxVecRef);   //compute the value of dydx for the exact stepper
@@ -297,10 +296,10 @@ int main(int argc, char *args[])
         double yout[Nposmom], dydx[Nposmom], yerr[Nposmom];                  
         if( j > 0 )  // Do nothing for j=0, so we can print the initial points!
         {
-           myStepper->StepWithErrorEstimate( yInVec, dydxVec, charge, step_len, yOutVec, yErrVec );   //Call the 'trial' stepper
+           myStepper->StepWithErrorEstimate( yInVec, dydxVec, chargeVec, step_len, yOutVec, yErrVec );   //Call the 'trial' stepper
            //         *********************
 #ifdef  BASELINESTEPPER
-           exactStepperGV->StepWithErrorEstimate(yInVecX,dydxVecRef,charge,stepLengthRef,yOutVecX,yErrVecX); //call the reference stepper
+           exactStepperGV->StepWithErrorEstimate(yInVecX,dydxVecRef,chargeVec,stepLengthRef,yOutVecX,yErrVecX); //call the reference stepper
            //              *********************
 #endif
         }

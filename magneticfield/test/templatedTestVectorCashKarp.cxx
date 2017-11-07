@@ -329,13 +329,17 @@ bool TestStepper(Stepper_t *stepper) // , Equation_t *equation)
            //              *********************
 #endif
         }
-#if 0
-        // using CopyToArr = SelectOutput<Real_v, scalar_t, Nposmom>;
-        void CopyToArr(Real_v realArr[], scalar_t scalArr[], int lane ) {
-           SelectOutput<Real_v, scalar_t, N>(realArr, scalArr, lane);
-        }
-        CopyToArr( yInVec,  yin,  lane);
-#endif        
+
+        // Try1 : 
+        // SelectoOutput( yInVec,  yin,  lane);        
+        // Try2 : 
+        // void CopyToArr(Real_v realArr[], scalar_t scalArr[], int lane ) {
+        // SelectOutput<Real_v, scalar_t, N>(realArr, scalArr, lane); }
+        // CopyToArr( yInVec,  yin,  lane);
+
+        // Select one lane for printing.
+#if 1
+        // General code - for vecCore types or built-in types
         SelectOutput<Real_v, scalar_t, Nposmom> ( yInVec,  yin,  lane);
         if( j > 0 )
            SelectOutput<Real_v, scalar_t, Nposmom>  ( yOutVec, yout, lane);
@@ -344,7 +348,17 @@ bool TestStepper(Stepper_t *stepper) // , Equation_t *equation)
         SelectOutput<Real_v, scalar_t, Nposmom>  ( yErrVec, yerr, lane);
         SelectOutput<Real_v, scalar_t, Nposmom>  ( dydxVec, dydx, lane);
 
-        // Select one lane for printing.
+#ifdef BASELINESTEPPER
+        SelectOutput<Real_v, scalar_t, Nposmom> ( yInVecX,  yinX,  lane);
+        if( j > 0 )
+           SelectOutput<Real_v, scalar_t, Nposmom>  ( yOutVecX, youtX, lane);
+        else
+           SelectOutput<Real_v, scalar_t, Nposmom>  ( yInVecX, youtX, lane);
+        SelectOutput<Real_v, scalar_t, Nposmom>  ( yErrVecX,   yerrX, lane);
+        SelectOutput<Real_v, scalar_t, Nposmom>  ( dydxVecRef, dydxX, lane);        
+#endif 
+#else
+        //   Original code -- requires vecCore types ...
         for(unsigned int i=0; i<Nposmom;i++) {
            yin[i]   = vecCore::Get( yInVec[i], lane );           
            yout[i]  = ( j > 0 ) ? vecCore::Get( yOutVec[i], lane ) :
@@ -357,9 +371,11 @@ bool TestStepper(Stepper_t *stepper) // , Equation_t *equation)
                                  vecCore::Get( yInVecX[i], lane ); //  yOut is not yet set for j=0           
            yerrX[i] = vecCore::Get( yErrVecX[i], lane );
            dydxX[i] = vecCore::Get( dydxVecRef[i], lane );           
-#endif           
+#endif
         }
-
+#endif
+        // -->> End of Selecting 'lane' for printing
+        
         //-> Then print the data
         cout.setf (std::ios_base::fixed);
         cout.precision(4);

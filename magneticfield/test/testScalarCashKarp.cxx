@@ -75,7 +75,8 @@ int main(int argc, char *args[])
     double step_len = step_len_mm * fieldUnits::millimeter;
     
     //Set Charge etc.
-    double particleCharge = +1.0;      // in e+ units
+    double particleCharge = -1.0;      // in e+ units
+    cout << " particle charge = " << particleCharge << endl;
     
     //Choice of output coordinates
     int
@@ -132,8 +133,6 @@ int main(int argc, char *args[])
     
        // new GvEquationType(gvField);
        // new TMagFieldEquation<TUniformMagField, Nposmom>(gvField);
-
-    // gvEquation->InitializeCharge( particleCharge );  // Send it via Stepper instead    
 
     /*-------------------------PREPARING STEPPER-----------------------------*/
     
@@ -195,7 +194,6 @@ int main(int argc, char *args[])
     
     // Configure Stepper for current particle
     exactStepperGV->InitializeCharge( particleCharge ); // Passes to Equation, is cached by stepper
-    // gvEquation2->InitializeCharge( particleCharge ); //  Different way - in case this works
     
     auto exactStepper = exactStepperGV;
   #endif 
