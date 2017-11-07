@@ -53,8 +53,11 @@ main( int, char** )
   
   auto eq = CreateUniformFieldAndEquation(fieldValue);
 
+  cout << " Testing scalar.      "; // << endl;
   bool okUniformScalar = TestEquation<double, EquationConstField_t>(eq);
+  cout << " Testing Vec Float.   "; // << endl;  
   bool okUniformVecFloat = TestEquation<Float_v, EquationConstField_t>(eq);
+  cout << " Testing Vec Double . "; // << endl;    
   bool okUniformVecDouble = TestEquation<Double_v, EquationConstField_t>(eq);
 
   bool good = okUniformScalar && okUniformVecFloat && okUniformVecDouble;
@@ -72,25 +75,15 @@ main( int, char** )
 MagFieldEquation<UniformMagField>* 
 CreateUniformFieldAndEquation(Vector3D<float> const &fieldValue)
 {
-  // using Field_t = TUniformMagField;
-
+  //  1. Simple method of creating equation
   UniformMagField*   pConstBfield = new UniformMagField( fieldValue );
-
-  // 1. Original way of creating an equation
-  // using EquationType = TMagFieldEquation<TUniformMagField, gNposmom>;
-  // GUVEquationOfMotion*  magEquation = new EquationType(pConstBfield);
-  // return magEquation;
-
-  //  2. Different method of creating equation:  Factory
   return new MagFieldEquation<UniformMagField>(pConstBfield);
 }
 
 #ifdef CMS_FIELD
 GUVEquationOfMotion* CreateFieldAndEquation(const char* filename)
 {
-  // const char *defaultFieldFileName= "cmsMagneticField2015.txt";
-   
-  //  3. Equation for CMS field
+  //  2. Equation for CMS field
   auto cmsField = new CMSmagField( filename ? filename : defaultFieldFileName ); 
   auto equationCMS = FieldEquationFactory::CreateMagEquation<CMSmagField>(cmsField);
 
@@ -128,9 +121,6 @@ bool TestEquation(Equation_t *equation)
   PositionMomentum[4] = MomentumVec[1];
   PositionMomentum[5] = MomentumVec[2];
 
-  // double FieldArr[3]= { FieldVec.x(), FieldVec.y(), FieldVec.z() };
-  
-  //equation->InitializeCharge( charge );
   equation->EvaluateRhsGivenB( PositionMomentum, FieldVec, charge, dydx );
 
   Vector3D<Real_v>  ForceVec( dydx[3], dydx[4], dydx[5]);

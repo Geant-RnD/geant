@@ -234,7 +234,6 @@ int main(int argc, char *args[])
     
     // auto gvEquation2 = new GvEquationType(gvUniformField);
                    // new TMagFieldEquation<TUniformMagField, Nposmom>(gvUniformField);
-    // gvEquation2->InitializeCharge( particleCharge ); // Let's make sure
     
     // Should be able to share the Equation -- eventually
     // For now, it checks that it was Done() -- and fails an assert
@@ -248,10 +247,6 @@ int main(int argc, char *args[])
        // new TSimpleRunge<GvEquationType,Nposmom>(gvEquation2);    
        // new GUExactHelixStepper(gvEquation2);
 
-    // Configure Stepper for current particle
-    // exactStepperGV->InitializeCharge( particleCharge ); // Passes to Equation, is cached by stepper
-    // gvEquation2->InitializeCharge( particleCharge ); //  Different way - in case this works
-    
     auto exactStepper = exactStepperGV;
   #endif 
     std::cout << "# step_len_mm = " << step_len_mm;

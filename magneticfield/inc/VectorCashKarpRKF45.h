@@ -22,9 +22,6 @@
 
 // #include "AlignedBase.h"  // ==> Ensures alignment of storage for Vc objects
 
-// #define DEBUGAnanya
-// #define NoPointers
-
 template
 <class T_Equation, unsigned int Nvar>
    class VectorCashKarpRKF45 : public GUVVectorIntegrationStepper // <Backend>, public AlignedBase
@@ -41,7 +38,7 @@ template
     static constexpr unsigned int sNstore = 6;   // How many variables the full state entails
                // (GUIntegrationNms::NumVarBase > Nvar) ? GUIntegrationNms::NumVarBase : Nvar;
     // std::max( GUIntegrationNms::NumVarBase,  Nvar);
-    // static const IntegratorCorrection = 1./((1<<4)-1);
+    // static const double IntegratorCorrection = 1./((1<<4)-1);
     inline double IntegratorCorrection() { return 1./((1<<sOrderMethod)-1); }
 
   public:
@@ -279,11 +276,10 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
       }
       this->RightHandSideInl(yTemp6, charge,  ak6) ;              // 6th Step
     }
-    
+
     for(i=0;i<Nvar;i++)
     {
-        // Accumulate increments with proper weights
-
+        // Accumulate increments with correct weights
         yOut[i] = yIn[i] + Step*(c1*dydx[i] + c3*ak3[i] + c4*ak4[i] + c6*ak6[i]) ;
     }
     for(i=0;i<Nvar;i++)
@@ -293,9 +289,7 @@ VectorCashKarpRKF45<T_Equation,Nvar>::
 
         yErr[i] = Step*(dc1*dydx[i] + dc3*ak3[i] + dc4*ak4[i] +
                 dc5*ak5[i] + dc6*ak6[i]) ;
-#ifdef DEBUGAnanya
         // std::cout<< "----In Stepper, yerrr is: "<<yErr[i]<<std::endl;
-#endif 
     }
     for(i=0;i<Nvar;i++)
     {
