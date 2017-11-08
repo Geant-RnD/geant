@@ -52,9 +52,9 @@ target_link_libraries(templatedTestVectorCashKarp Vmagfield Geant_v ${VECGEOM_LI
 message(STATUS "Created target for templatedTestVectorCashKarp")
 
 ## Test newest Cash Karp, that can integrate scalar or Double_v
-# add_executable(testFlexibleCashKarp testFlexibleCashKarp.cxx)
-# target_link_libraries(testFlexibleCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-# message(STATUS "Created target for testFlexibleCashKarp")
+add_executable(testFlexibleCashKarp testFlexibleCashKarp.cxx)
+target_link_libraries(testFlexibleCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+message(STATUS "Created target for testFlexibleCashKarp")
 ## --------  End of Stepper Tests
 
 add_executable(testIntegrationDriverCashKarp testIntegrationDriverCashKarp.cxx)
@@ -119,7 +119,7 @@ install(TARGETS testVectorMagFieldEquation DESTINATION bin)
 install(TARGETS testScalarCashKarp DESTINATION bin)
 install(TARGETS testVectorCashKarp DESTINATION bin)
 install(TARGETS templatedTestVectorCashKarp DESTINATION bin)
-# install(TARGETS testFlexibleCashKarp DESTINATION bin)
+install(TARGETS testFlexibleCashKarp DESTINATION bin)
 install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
 install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
 install(TARGETS testStepperFixed DESTINATION bin)
