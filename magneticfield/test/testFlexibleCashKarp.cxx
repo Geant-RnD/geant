@@ -164,14 +164,14 @@ int main(int argc, char *args[])
                                                               
     // Phase 1 - get it to work without cloning
 
-    // cout << " Testing scalar.      " << endl;
-    // bool okScalar    = TestFlexibleStepper<double, StepperType /*, GvEquationType*/ >(myStepper); // , magEquation);
+    cout << " Testing scalar.      " << endl;
+    bool okScalar    = TestFlexibleStepper<double, StepperType >(myStepper);
     // cout << " Testing Vec Float.   " << endl;  
-    // bool okVecFloat  = TestFlexibleStepper<Float_v, StepperType /* , GvEquationType */ >(myStepper); // , magEquation);
+    // bool okVecFloat  = TestFlexibleStepper<Float_v, StepperType >(myStepper); // , magEquation);
     cout << " Testing Vec Double . " << endl;    
-    bool okVecDouble = TestFlexibleStepper<Double_v, StepperType /* , GvEquationType */ >(myStepper); //, magEquation);
+    bool okVecDouble = TestFlexibleStepper<Double_v, StepperType >(myStepper); 
 
-    bool good =  // okScalar && okVecFloat &&
+    bool good =  okScalar &&  // okVecFloat &&
        okVecDouble;
 
     // delete myStepper;  // Only if object was new'ed !!
