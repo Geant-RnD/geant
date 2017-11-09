@@ -1,0 +1,2826 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+  <define/>
+
+  <materials>
+    <isotope N="204" Z="82" name="Lead2040x2387d70">
+      <atom unit="g/mole" value="204"/>
+    </isotope>
+    <isotope N="206" Z="82" name="Lead2060x2387de0">
+      <atom unit="g/mole" value="206"/>
+    </isotope>
+    <isotope N="207" Z="82" name="Lead2070x23822c0">
+      <atom unit="g/mole" value="207"/>
+    </isotope>
+    <isotope N="208" Z="82" name="Lead2080x2382330">
+      <atom unit="g/mole" value="208"/>
+    </isotope>
+    <element name="PbNat0x2388c80">
+      <fraction n="0.014" ref="Lead2040x2387d70"/>
+      <fraction n="0.241" ref="Lead2060x2387de0"/>
+      <fraction n="0.221" ref="Lead2070x23822c0"/>
+      <fraction n="0.524" ref="Lead2080x2382330"/>
+    </element>
+    <material name="MetalLeadNat0x238b0f0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="823"/>
+      <D unit="g/cm3" value="11.34"/>
+      <fraction n="1" ref="PbNat0x2388c80"/>
+    </material>
+    <isotope N="14" Z="7" name="N140x238c930">
+      <atom unit="g/mole" value="14.0031"/>
+    </isotope>
+    <isotope N="15" Z="7" name="N150x238c9a0">
+      <atom unit="g/mole" value="15.0001"/>
+    </isotope>
+    <element name="Nitrogen0x238c5f0">
+      <fraction n="0.99632" ref="N140x238c930"/>
+      <fraction n="0.00368" ref="N150x238c9a0"/>
+    </element>
+    <isotope N="16" Z="8" name="O160x2381db0">
+      <atom unit="g/mole" value="15.9949"/>
+    </isotope>
+    <isotope N="17" Z="8" name="O170x2381e20">
+      <atom unit="g/mole" value="16.9991"/>
+    </isotope>
+    <isotope N="18" Z="8" name="O180x2381e90">
+      <atom unit="g/mole" value="17.9992"/>
+    </isotope>
+    <element name="Oxygen0x2381a10">
+      <fraction n="0.99757" ref="O160x2381db0"/>
+      <fraction n="0.00038" ref="O170x2381e20"/>
+      <fraction n="0.00205" ref="O180x2381e90"/>
+    </element>
+    <material name="AIR0x238c9e0" state="gas">
+      <T unit="K" value="300"/>
+      <MEE unit="eV" value="84.4502083493426"/>
+      <D unit="g/cm3" value="0.0012929"/>
+      <fraction n="0.8" ref="Nitrogen0x238c5f0"/>
+      <fraction n="0.2" ref="Oxygen0x2381a10"/>
+    </material>
+    <isotope N="1" Z="1" name="H10x2374020">
+      <atom unit="g/mole" value="1.00782503081372"/>
+    </isotope>
+    <isotope N="2" Z="1" name="H20x2374920">
+      <atom unit="g/mole" value="2.01410199966617"/>
+    </isotope>
+    <element name="H0x2374600">
+      <fraction n="0.999885" ref="H10x2374020"/>
+      <fraction n="0.000115" ref="H20x2374920"/>
+    </element>
+    <material name="Vacuum0x23741a0" state="gas">
+      <T unit="K" value="0.1"/>
+      <P unit="pascal" value="1e-15"/>
+      <MEE unit="eV" value="19.2"/>
+      <D unit="g/cm3" value="1e-20"/>
+      <fraction n="1" ref="H0x2374600"/>
+    </material>
+  </materials>
+
+  <solids>
+    <sphere aunit="deg" deltaphi="360" deltatheta="180" lunit="mm" name="sampleSphere0x239cc30" rmax="32" rmin="0" startphi="0" starttheta="0"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="sampleTube0x239ca20" rmax="32" rmin="0" startphi="0" z="150"/>
+    <box lunit="mm" name="blockA_box0x239bce0" x="299.999998" y="300" z="600"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="blockB_hole0x239bee0" rmax="32" rmin="0" startphi="0" z="602"/>
+    <subtraction name="blockB_box0x239c100">
+      <first ref="blockA_box0x239bce0"/>
+      <second ref="blockB_hole0x239bee0"/>
+      <position name="blockB_box0x239c100_pos" unit="mm" x="-150" y="0" z="0"/>
+    </subtraction>
+    <box lunit="mm" name="blockC_box0x239c820" x="150" y="300" z="600"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="blockB_beamhole0x239bff0" rmax="38.6" rmin="0" startphi="0" z="602"/>
+    <subtraction name="blockB_beambox0x239c320">
+      <first ref="blockB_box0x239c100"/>
+      <second ref="blockB_beamhole0x239bff0"/>
+    </subtraction>
+    <box lunit="mm" name="lead_box0x239ba40" x="3300" y="3300" z="3000"/>
+    <box lunit="mm" name="lab_box0x239b7a0" x="5000" y="5000" z="5000"/>
+    <box lunit="mm" name="world_box0x2390bf0" x="5480" y="5480" z="5480"/>
+  </solids>
+
+  <structure>
+    <volume name="sampleSphere_log0x239cdc0">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="sampleSphere0x239cc30"/>
+    </volume>
+    <volume name="sampleTube_log0x239cb30">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="sampleTube0x239ca20"/>
+    </volume>
+    <volume name="blockA_log0x239bd70">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="blockA_box0x239bce0"/>
+    </volume>
+    <volume name="sampleSphere_log20x239ced0">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="sampleSphere0x239cc30"/>
+    </volume>
+    <volume name="blockB_log0x239c540">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="blockB_box0x239c100"/>
+      <physvol name="sample_phys20x239d090">
+        <volumeref ref="sampleSphere_log20x239ced0"/>
+        <position name="sample_phys20x239d090_pos" unit="mm" x="0" y="0" z="-144"/>
+      </physvol>
+    </volume>
+    <volume name="blockC_log0x239c8b0">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="blockC_box0x239c820"/>
+    </volume>
+    <volume name="beamblockB_log0x239c640">
+      <materialref ref="MetalLeadNat0x238b0f0"/>
+      <solidref ref="blockB_beambox0x239c320"/>
+    </volume>
+    <volume name="lead_log0x239bad0">
+      <materialref ref="AIR0x238c9e0"/>
+      <solidref ref="lead_box0x239ba40"/>
+      <physvol name="sample_phys0x239cfd0">
+        <volumeref ref="sampleSphere_log0x239cdc0"/>
+        <position name="sample_phys0x239cfd0_pos" unit="mm" x="-450" y="0" z="-75"/>
+      </physvol>
+      <physvol name="sampleTube_phys0x239d150">
+        <volumeref ref="sampleTube_log0x239cb30"/>
+        <position name="sampleTube_phys0x239d150_pos" unit="mm" x="-450" y="0" z="75"/>
+      </physvol>
+      <physvol name="blockA_phys0x239d280">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d280_pos" unit="mm" x="900" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="1" name="blockA_phys0x239d350">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d350_pos" unit="mm" x="900" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="2" name="blockA_phys0x239d3f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d3f0_pos" unit="mm" x="900" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="3" name="blockA_phys0x239d4b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d4b0_pos" unit="mm" x="900" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="4" name="blockA_phys0x239d550">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d550_pos" unit="mm" x="900" y="-1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="5" name="blockA_phys0x239d5f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d5f0_pos" unit="mm" x="600" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="6" name="blockA_phys0x239d690">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d690_pos" unit="mm" x="600" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="7" name="blockA_phys0x239d7c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d7c0_pos" unit="mm" x="600" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="8" name="blockA_phys0x239d860">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d860_pos" unit="mm" x="600" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="9" name="blockA_phys0x239d900">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d900_pos" unit="mm" x="600" y="-1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="10" name="blockA_phys0x239d9a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d9a0_pos" unit="mm" x="-900" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="11" name="blockA_phys0x239da40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239da40_pos" unit="mm" x="-900" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="12" name="blockA_phys0x239dae0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239dae0_pos" unit="mm" x="-900" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="13" name="blockA_phys0x239db80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239db80_pos" unit="mm" x="-900" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="14" name="blockA_phys0x239dc20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239dc20_pos" unit="mm" x="-900" y="-1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="15" name="blockA_phys0x239d730">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239d730_pos" unit="mm" x="-600" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="16" name="blockA_phys0x239de00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239de00_pos" unit="mm" x="-600" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="17" name="blockA_phys0x239dea0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239dea0_pos" unit="mm" x="-600" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="18" name="blockA_phys0x239df40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239df40_pos" unit="mm" x="-600" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="19" name="blockA_phys0x239dfe0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239dfe0_pos" unit="mm" x="-600" y="-1500" z="1200"/>
+      </physvol>
+      <physvol name="blockB_phys0x239e080">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e080_pos" unit="mm" x="150" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="1" name="blockB_phys0x239e120">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e120_pos" unit="mm" x="150" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="2" name="blockB_phys0x239e1c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e1c0_pos" unit="mm" x="150" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="3" name="blockB_phys0x239e260">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e260_pos" unit="mm" x="150" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="4" name="blockB_phys0x239e300">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e300_pos" unit="mm" x="150" y="-1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="5" name="blockB_phys0x239e3a0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e3a0_pos" unit="mm" x="-150" y="-1500" z="-1200"/>
+        <rotation name="blockB_phys0x239e3a0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="6" name="blockB_phys0x239e440">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e440_pos" unit="mm" x="-150" y="-1500" z="-600"/>
+        <rotation name="blockB_phys0x239e440_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="7" name="blockB_phys0x239e530">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e530_pos" unit="mm" x="-150" y="-1500" z="0"/>
+        <rotation name="blockB_phys0x239e530_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="8" name="blockB_phys0x239e620">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e620_pos" unit="mm" x="-150" y="-1500" z="600"/>
+        <rotation name="blockB_phys0x239e620_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="9" name="blockB_phys0x239e710">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239e710_pos" unit="mm" x="-150" y="-1500" z="1200"/>
+        <rotation name="blockB_phys0x239e710_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol name="blockC_phys0x239e800">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239e800_pos" unit="mm" x="375" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="1" name="blockC_phys0x239dcc0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239dcc0_pos" unit="mm" x="375" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="2" name="blockC_phys0x239dd60">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239dd60_pos" unit="mm" x="375" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="3" name="blockC_phys0x239eae0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239eae0_pos" unit="mm" x="375" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="4" name="blockC_phys0x239eb80">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239eb80_pos" unit="mm" x="375" y="-1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="5" name="blockC_phys0x239ec20">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239ec20_pos" unit="mm" x="-375" y="-1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="6" name="blockC_phys0x239ecc0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239ecc0_pos" unit="mm" x="-375" y="-1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="7" name="blockC_phys0x239ed60">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239ed60_pos" unit="mm" x="-375" y="-1500" z="0"/>
+      </physvol>
+      <physvol copynumber="8" name="blockC_phys0x239ee00">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239ee00_pos" unit="mm" x="-375" y="-1500" z="600"/>
+      </physvol>
+      <physvol copynumber="9" name="blockC_phys0x239eea0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x239eea0_pos" unit="mm" x="-375" y="-1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="20" name="blockA_phys0x239ef40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239ef40_pos" unit="mm" x="1050" y="-1200" z="-1350"/>
+        <rotation name="blockA_phys0x239ef40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="21" name="blockA_phys0x239f030">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f030_pos" unit="mm" x="1050" y="-1200" z="-1050"/>
+        <rotation name="blockA_phys0x239f030_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="22" name="blockA_phys0x239f120">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f120_pos" unit="mm" x="1050" y="-1200" z="-750"/>
+        <rotation name="blockA_phys0x239f120_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="23" name="blockA_phys0x239f210">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f210_pos" unit="mm" x="1050" y="-1200" z="-450"/>
+        <rotation name="blockA_phys0x239f210_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="24" name="blockA_phys0x239f300">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f300_pos" unit="mm" x="1050" y="-1200" z="-150"/>
+        <rotation name="blockA_phys0x239f300_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="25" name="blockA_phys0x239f3f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f3f0_pos" unit="mm" x="1050" y="-1200" z="150"/>
+        <rotation name="blockA_phys0x239f3f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="26" name="blockA_phys0x239f4e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f4e0_pos" unit="mm" x="1050" y="-1200" z="450"/>
+        <rotation name="blockA_phys0x239f4e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="27" name="blockA_phys0x239f5d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f5d0_pos" unit="mm" x="1050" y="-1200" z="750"/>
+        <rotation name="blockA_phys0x239f5d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="28" name="blockA_phys0x239f6c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f6c0_pos" unit="mm" x="1050" y="-1200" z="1050"/>
+        <rotation name="blockA_phys0x239f6c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="29" name="blockA_phys0x239f7b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f7b0_pos" unit="mm" x="1050" y="-1200" z="1350"/>
+        <rotation name="blockA_phys0x239f7b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="30" name="blockA_phys0x239f8a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f8a0_pos" unit="mm" x="450" y="-1200" z="-1350"/>
+        <rotation name="blockA_phys0x239f8a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="31" name="blockA_phys0x239f990">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239f990_pos" unit="mm" x="450" y="-1200" z="-1050"/>
+        <rotation name="blockA_phys0x239f990_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="32" name="blockA_phys0x239fa80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239fa80_pos" unit="mm" x="450" y="-1200" z="-750"/>
+        <rotation name="blockA_phys0x239fa80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="33" name="blockA_phys0x239fb70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239fb70_pos" unit="mm" x="450" y="-1200" z="-450"/>
+        <rotation name="blockA_phys0x239fb70_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="34" name="blockA_phys0x239fc60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239fc60_pos" unit="mm" x="450" y="-1200" z="-150"/>
+        <rotation name="blockA_phys0x239fc60_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="35" name="blockA_phys0x239fd50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239fd50_pos" unit="mm" x="450" y="-1200" z="150"/>
+        <rotation name="blockA_phys0x239fd50_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="36" name="blockA_phys0x239fe40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239fe40_pos" unit="mm" x="450" y="-1200" z="450"/>
+        <rotation name="blockA_phys0x239fe40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="37" name="blockA_phys0x239ff30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239ff30_pos" unit="mm" x="450" y="-1200" z="750"/>
+        <rotation name="blockA_phys0x239ff30_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="38" name="blockA_phys0x23a0020">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0020_pos" unit="mm" x="450" y="-1200" z="1050"/>
+        <rotation name="blockA_phys0x23a0020_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="39" name="blockA_phys0x23a0110">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0110_pos" unit="mm" x="450" y="-1200" z="1350"/>
+        <rotation name="blockA_phys0x23a0110_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="40" name="blockA_phys0x23a0200">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0200_pos" unit="mm" x="-1050" y="-1200" z="-1350"/>
+        <rotation name="blockA_phys0x23a0200_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="41" name="blockA_phys0x23a02f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a02f0_pos" unit="mm" x="-1050" y="-1200" z="-1050"/>
+        <rotation name="blockA_phys0x23a02f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="42" name="blockA_phys0x23a03e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a03e0_pos" unit="mm" x="-1050" y="-1200" z="-750"/>
+        <rotation name="blockA_phys0x23a03e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="43" name="blockA_phys0x239e8a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239e8a0_pos" unit="mm" x="-1050" y="-1200" z="-450"/>
+        <rotation name="blockA_phys0x239e8a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="44" name="blockA_phys0x239e990">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239e990_pos" unit="mm" x="-1050" y="-1200" z="-150"/>
+        <rotation name="blockA_phys0x239e990_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="45" name="blockA_phys0x23a08b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a08b0_pos" unit="mm" x="-1050" y="-1200" z="150"/>
+        <rotation name="blockA_phys0x23a08b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="46" name="blockA_phys0x23a09a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a09a0_pos" unit="mm" x="-1050" y="-1200" z="450"/>
+        <rotation name="blockA_phys0x23a09a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="47" name="blockA_phys0x23a0a90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0a90_pos" unit="mm" x="-1050" y="-1200" z="750"/>
+        <rotation name="blockA_phys0x23a0a90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="48" name="blockA_phys0x23a0b80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0b80_pos" unit="mm" x="-1050" y="-1200" z="1050"/>
+        <rotation name="blockA_phys0x23a0b80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="49" name="blockA_phys0x23a0c70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0c70_pos" unit="mm" x="-1050" y="-1200" z="1350"/>
+        <rotation name="blockA_phys0x23a0c70_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="50" name="blockA_phys0x23a0d60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0d60_pos" unit="mm" x="-450" y="-1200" z="-1350"/>
+        <rotation name="blockA_phys0x23a0d60_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="51" name="blockA_phys0x23a0e50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0e50_pos" unit="mm" x="-450" y="-1200" z="-1050"/>
+        <rotation name="blockA_phys0x23a0e50_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="52" name="blockA_phys0x23a0f40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0f40_pos" unit="mm" x="-450" y="-1200" z="-750"/>
+        <rotation name="blockA_phys0x23a0f40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="53" name="blockA_phys0x23a1030">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1030_pos" unit="mm" x="-450" y="-1200" z="-450"/>
+        <rotation name="blockA_phys0x23a1030_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="54" name="blockA_phys0x23a1120">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1120_pos" unit="mm" x="-450" y="-1200" z="-150"/>
+        <rotation name="blockA_phys0x23a1120_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="55" name="blockA_phys0x23a1210">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1210_pos" unit="mm" x="-450" y="-1200" z="150"/>
+        <rotation name="blockA_phys0x23a1210_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="56" name="blockA_phys0x23a1300">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1300_pos" unit="mm" x="-450" y="-1200" z="450"/>
+        <rotation name="blockA_phys0x23a1300_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="57" name="blockA_phys0x23a13f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a13f0_pos" unit="mm" x="-450" y="-1200" z="750"/>
+        <rotation name="blockA_phys0x23a13f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="58" name="blockA_phys0x23a14e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a14e0_pos" unit="mm" x="-450" y="-1200" z="1050"/>
+        <rotation name="blockA_phys0x23a14e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="59" name="blockA_phys0x23a15d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a15d0_pos" unit="mm" x="-450" y="-1200" z="1350"/>
+        <rotation name="blockA_phys0x23a15d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="60" name="blockA_phys0x23a16c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a16c0_pos" unit="mm" x="0" y="-1200" z="-1200"/>
+      </physvol>
+      <physvol copynumber="61" name="blockA_phys0x23a1760">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1760_pos" unit="mm" x="0" y="-1200" z="-600"/>
+      </physvol>
+      <physvol copynumber="62" name="blockA_phys0x23a1800">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1800_pos" unit="mm" x="0" y="-1200" z="0"/>
+      </physvol>
+      <physvol copynumber="63" name="blockA_phys0x23a18a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a18a0_pos" unit="mm" x="0" y="-1200" z="600"/>
+      </physvol>
+      <physvol copynumber="64" name="blockA_phys0x23a1940">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1940_pos" unit="mm" x="0" y="-1200" z="1200"/>
+      </physvol>
+      <physvol copynumber="65" name="blockA_phys0x23a19e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a19e0_pos" unit="mm" x="1350" y="-900" z="-1350"/>
+        <rotation name="blockA_phys0x23a19e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="66" name="blockA_phys0x23a1ad0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1ad0_pos" unit="mm" x="1350" y="-900" z="-1050"/>
+        <rotation name="blockA_phys0x23a1ad0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="67" name="blockA_phys0x23a1bc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1bc0_pos" unit="mm" x="1350" y="-900" z="-750"/>
+        <rotation name="blockA_phys0x23a1bc0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="68" name="blockA_phys0x23a1cb0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1cb0_pos" unit="mm" x="1350" y="-900" z="-450"/>
+        <rotation name="blockA_phys0x23a1cb0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="69" name="blockA_phys0x23a1da0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1da0_pos" unit="mm" x="1350" y="-900" z="-150"/>
+        <rotation name="blockA_phys0x23a1da0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="70" name="blockA_phys0x23a1e90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1e90_pos" unit="mm" x="1350" y="-900" z="150"/>
+        <rotation name="blockA_phys0x23a1e90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="71" name="blockA_phys0x23a1f80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a1f80_pos" unit="mm" x="1350" y="-900" z="450"/>
+        <rotation name="blockA_phys0x23a1f80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="72" name="blockA_phys0x23a2070">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2070_pos" unit="mm" x="1350" y="-900" z="750"/>
+        <rotation name="blockA_phys0x23a2070_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="73" name="blockA_phys0x23a2160">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2160_pos" unit="mm" x="1350" y="-900" z="1050"/>
+        <rotation name="blockA_phys0x23a2160_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="74" name="blockA_phys0x23a2250">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2250_pos" unit="mm" x="1350" y="-900" z="1350"/>
+        <rotation name="blockA_phys0x23a2250_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="75" name="blockA_phys0x239b400">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239b400_pos" unit="mm" x="-1350" y="-900" z="-1350"/>
+        <rotation name="blockA_phys0x239b400_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="76" name="blockA_phys0x239b4f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239b4f0_pos" unit="mm" x="-1350" y="-900" z="-1050"/>
+        <rotation name="blockA_phys0x239b4f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="77" name="blockA_phys0x239b5e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239b5e0_pos" unit="mm" x="-1350" y="-900" z="-750"/>
+        <rotation name="blockA_phys0x239b5e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="78" name="blockA_phys0x23a2960">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2960_pos" unit="mm" x="-1350" y="-900" z="-450"/>
+        <rotation name="blockA_phys0x23a2960_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="79" name="blockA_phys0x23a2a20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2a20_pos" unit="mm" x="-1350" y="-900" z="-150"/>
+        <rotation name="blockA_phys0x23a2a20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="80" name="blockA_phys0x23a2b10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2b10_pos" unit="mm" x="-1350" y="-900" z="150"/>
+        <rotation name="blockA_phys0x23a2b10_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="81" name="blockA_phys0x23a2c00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2c00_pos" unit="mm" x="-1350" y="-900" z="450"/>
+        <rotation name="blockA_phys0x23a2c00_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="82" name="blockA_phys0x23a2cf0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2cf0_pos" unit="mm" x="-1350" y="-900" z="750"/>
+        <rotation name="blockA_phys0x23a2cf0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="83" name="blockA_phys0x23a2de0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2de0_pos" unit="mm" x="-1350" y="-900" z="1050"/>
+        <rotation name="blockA_phys0x23a2de0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="84" name="blockA_phys0x23a2ed0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2ed0_pos" unit="mm" x="-1350" y="-900" z="1350"/>
+        <rotation name="blockA_phys0x23a2ed0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="85" name="blockA_phys0x23a2fc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a2fc0_pos" unit="mm" x="900" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="86" name="blockA_phys0x23a3060">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3060_pos" unit="mm" x="900" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="87" name="blockA_phys0x23a3100">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3100_pos" unit="mm" x="900" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="88" name="blockA_phys0x23a31a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a31a0_pos" unit="mm" x="900" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="89" name="blockA_phys0x23a3240">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3240_pos" unit="mm" x="900" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="90" name="blockA_phys0x23a32e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a32e0_pos" unit="mm" x="600" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="91" name="blockA_phys0x23a3380">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3380_pos" unit="mm" x="600" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="92" name="blockA_phys0x23a3420">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3420_pos" unit="mm" x="600" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="93" name="blockA_phys0x23a34c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a34c0_pos" unit="mm" x="600" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="94" name="blockA_phys0x23a3560">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3560_pos" unit="mm" x="600" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="95" name="blockA_phys0x23a3600">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3600_pos" unit="mm" x="300" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="96" name="blockA_phys0x23a36a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a36a0_pos" unit="mm" x="300" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="97" name="blockA_phys0x23a3740">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3740_pos" unit="mm" x="300" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="98" name="blockA_phys0x23a37e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a37e0_pos" unit="mm" x="300" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="99" name="blockA_phys0x23a3880">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3880_pos" unit="mm" x="300" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="100" name="blockA_phys0x23a3920">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3920_pos" unit="mm" x="-900" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="101" name="blockA_phys0x23a39c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a39c0_pos" unit="mm" x="-900" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="102" name="blockA_phys0x23a3a60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3a60_pos" unit="mm" x="-900" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="103" name="blockA_phys0x23a3b00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3b00_pos" unit="mm" x="-900" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="104" name="blockA_phys0x23a3ba0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3ba0_pos" unit="mm" x="-900" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="105" name="blockA_phys0x23a3c40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3c40_pos" unit="mm" x="-600" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="106" name="blockA_phys0x23a3ce0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3ce0_pos" unit="mm" x="-600" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="107" name="blockA_phys0x23a04d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a04d0_pos" unit="mm" x="-600" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="108" name="blockA_phys0x23a0570">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0570_pos" unit="mm" x="-600" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="109" name="blockA_phys0x23a0610">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0610_pos" unit="mm" x="-600" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="110" name="blockA_phys0x23a06b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a06b0_pos" unit="mm" x="-300" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="111" name="blockA_phys0x23a0750">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a0750_pos" unit="mm" x="-300" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="112" name="blockA_phys0x23a07f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a07f0_pos" unit="mm" x="-300" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="113" name="blockA_phys0x23a4560">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4560_pos" unit="mm" x="-300" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="114" name="blockA_phys0x23a4600">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4600_pos" unit="mm" x="-300" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="115" name="blockA_phys0x23a46a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a46a0_pos" unit="mm" x="0" y="-900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="116" name="blockA_phys0x23a4740">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4740_pos" unit="mm" x="0" y="-900" z="-600"/>
+      </physvol>
+      <physvol copynumber="117" name="blockA_phys0x23a47e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a47e0_pos" unit="mm" x="0" y="-900" z="0"/>
+      </physvol>
+      <physvol copynumber="118" name="blockA_phys0x23a4880">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4880_pos" unit="mm" x="0" y="-900" z="600"/>
+      </physvol>
+      <physvol copynumber="119" name="blockA_phys0x23a4920">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4920_pos" unit="mm" x="0" y="-900" z="1200"/>
+      </physvol>
+      <physvol copynumber="10" name="blockC_phys0x23a49c0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a49c0_pos" unit="mm" x="1575" y="-600" z="-1200"/>
+      </physvol>
+      <physvol copynumber="11" name="blockC_phys0x23a4a60">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4a60_pos" unit="mm" x="1575" y="-600" z="-600"/>
+      </physvol>
+      <physvol copynumber="12" name="blockC_phys0x23a4b00">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4b00_pos" unit="mm" x="1575" y="-600" z="0"/>
+      </physvol>
+      <physvol copynumber="13" name="blockC_phys0x23a4ba0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4ba0_pos" unit="mm" x="1575" y="-600" z="600"/>
+      </physvol>
+      <physvol copynumber="14" name="blockC_phys0x23a4c40">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4c40_pos" unit="mm" x="1575" y="-600" z="1200"/>
+      </physvol>
+      <physvol copynumber="15" name="blockC_phys0x23a4ce0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4ce0_pos" unit="mm" x="-1575" y="-600" z="-1200"/>
+      </physvol>
+      <physvol copynumber="16" name="blockC_phys0x23a4d80">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4d80_pos" unit="mm" x="-1575" y="-600" z="-600"/>
+      </physvol>
+      <physvol copynumber="17" name="blockC_phys0x23a4e20">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4e20_pos" unit="mm" x="-1575" y="-600" z="0"/>
+      </physvol>
+      <physvol copynumber="18" name="blockC_phys0x23a4ec0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4ec0_pos" unit="mm" x="-1575" y="-600" z="600"/>
+      </physvol>
+      <physvol copynumber="19" name="blockC_phys0x23a4f60">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23a4f60_pos" unit="mm" x="-1575" y="-600" z="1200"/>
+      </physvol>
+      <physvol copynumber="120" name="blockA_phys0x23a5000">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5000_pos" unit="mm" x="1200" y="-600" z="-1350"/>
+        <rotation name="blockA_phys0x23a5000_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="121" name="blockA_phys0x23a50f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a50f0_pos" unit="mm" x="1200" y="-600" z="-1050"/>
+        <rotation name="blockA_phys0x23a50f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="122" name="blockA_phys0x23a51e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a51e0_pos" unit="mm" x="1200" y="-600" z="-750"/>
+        <rotation name="blockA_phys0x23a51e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="123" name="blockA_phys0x23a52d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a52d0_pos" unit="mm" x="1200" y="-600" z="-450"/>
+        <rotation name="blockA_phys0x23a52d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="124" name="blockA_phys0x23a53c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a53c0_pos" unit="mm" x="1200" y="-600" z="-150"/>
+        <rotation name="blockA_phys0x23a53c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="125" name="blockA_phys0x23a54b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a54b0_pos" unit="mm" x="1200" y="-600" z="150"/>
+        <rotation name="blockA_phys0x23a54b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="126" name="blockA_phys0x23a55a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a55a0_pos" unit="mm" x="1200" y="-600" z="450"/>
+        <rotation name="blockA_phys0x23a55a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="127" name="blockA_phys0x23a5690">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5690_pos" unit="mm" x="1200" y="-600" z="750"/>
+        <rotation name="blockA_phys0x23a5690_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="128" name="blockA_phys0x23a5780">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5780_pos" unit="mm" x="1200" y="-600" z="1050"/>
+        <rotation name="blockA_phys0x23a5780_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="129" name="blockA_phys0x23a5870">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5870_pos" unit="mm" x="1200" y="-600" z="1350"/>
+        <rotation name="blockA_phys0x23a5870_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="130" name="blockA_phys0x23a5960">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5960_pos" unit="mm" x="600" y="-600" z="-1350"/>
+        <rotation name="blockA_phys0x23a5960_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="131" name="blockA_phys0x23a5a50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5a50_pos" unit="mm" x="600" y="-600" z="-1050"/>
+        <rotation name="blockA_phys0x23a5a50_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="132" name="blockA_phys0x23a5b40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5b40_pos" unit="mm" x="600" y="-600" z="-750"/>
+        <rotation name="blockA_phys0x23a5b40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="133" name="blockA_phys0x23a5c30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5c30_pos" unit="mm" x="600" y="-600" z="-450"/>
+        <rotation name="blockA_phys0x23a5c30_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="134" name="blockA_phys0x23a5d20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5d20_pos" unit="mm" x="600" y="-600" z="-150"/>
+        <rotation name="blockA_phys0x23a5d20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="135" name="blockA_phys0x23a5e10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5e10_pos" unit="mm" x="600" y="-600" z="150"/>
+        <rotation name="blockA_phys0x23a5e10_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="136" name="blockA_phys0x23a5f00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5f00_pos" unit="mm" x="600" y="-600" z="450"/>
+        <rotation name="blockA_phys0x23a5f00_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="137" name="blockA_phys0x23a5ff0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a5ff0_pos" unit="mm" x="600" y="-600" z="750"/>
+        <rotation name="blockA_phys0x23a5ff0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="138" name="blockA_phys0x23a60e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a60e0_pos" unit="mm" x="600" y="-600" z="1050"/>
+        <rotation name="blockA_phys0x23a60e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="139" name="blockA_phys0x23a61d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a61d0_pos" unit="mm" x="600" y="-600" z="1350"/>
+        <rotation name="blockA_phys0x23a61d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="140" name="blockA_phys0x23a62c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a62c0_pos" unit="mm" x="-1200" y="-600" z="-1350"/>
+        <rotation name="blockA_phys0x23a62c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="141" name="blockA_phys0x23a63b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a63b0_pos" unit="mm" x="-1200" y="-600" z="-1050"/>
+        <rotation name="blockA_phys0x23a63b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="142" name="blockA_phys0x23a64a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a64a0_pos" unit="mm" x="-1200" y="-600" z="-750"/>
+        <rotation name="blockA_phys0x23a64a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="143" name="blockA_phys0x23a6590">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6590_pos" unit="mm" x="-1200" y="-600" z="-450"/>
+        <rotation name="blockA_phys0x23a6590_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="144" name="blockA_phys0x23a6680">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6680_pos" unit="mm" x="-1200" y="-600" z="-150"/>
+        <rotation name="blockA_phys0x23a6680_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="145" name="blockA_phys0x23a6770">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6770_pos" unit="mm" x="-1200" y="-600" z="150"/>
+        <rotation name="blockA_phys0x23a6770_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="146" name="blockA_phys0x23a6860">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6860_pos" unit="mm" x="-1200" y="-600" z="450"/>
+        <rotation name="blockA_phys0x23a6860_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="147" name="blockA_phys0x23a6950">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6950_pos" unit="mm" x="-1200" y="-600" z="750"/>
+        <rotation name="blockA_phys0x23a6950_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="148" name="blockA_phys0x23a6a40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6a40_pos" unit="mm" x="-1200" y="-600" z="1050"/>
+        <rotation name="blockA_phys0x23a6a40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="149" name="blockA_phys0x23a6b30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6b30_pos" unit="mm" x="-1200" y="-600" z="1350"/>
+        <rotation name="blockA_phys0x23a6b30_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="150" name="blockA_phys0x23a6c20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6c20_pos" unit="mm" x="-600" y="-600" z="-1350"/>
+        <rotation name="blockA_phys0x23a6c20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="151" name="blockA_phys0x23a6d10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6d10_pos" unit="mm" x="-600" y="-600" z="-1050"/>
+        <rotation name="blockA_phys0x23a6d10_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="152" name="blockA_phys0x23a6e00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6e00_pos" unit="mm" x="-600" y="-600" z="-750"/>
+        <rotation name="blockA_phys0x23a6e00_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="153" name="blockA_phys0x23a6ef0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6ef0_pos" unit="mm" x="-600" y="-600" z="-450"/>
+        <rotation name="blockA_phys0x23a6ef0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="154" name="blockA_phys0x23a6fe0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a6fe0_pos" unit="mm" x="-600" y="-600" z="-150"/>
+        <rotation name="blockA_phys0x23a6fe0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="155" name="blockA_phys0x23a70d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a70d0_pos" unit="mm" x="-600" y="-600" z="150"/>
+        <rotation name="blockA_phys0x23a70d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="156" name="blockA_phys0x23a71c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a71c0_pos" unit="mm" x="-600" y="-600" z="450"/>
+        <rotation name="blockA_phys0x23a71c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="157" name="blockA_phys0x23a72b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a72b0_pos" unit="mm" x="-600" y="-600" z="750"/>
+        <rotation name="blockA_phys0x23a72b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="158" name="blockA_phys0x23a73a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a73a0_pos" unit="mm" x="-600" y="-600" z="1050"/>
+        <rotation name="blockA_phys0x23a73a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="159" name="blockA_phys0x23a7490">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7490_pos" unit="mm" x="-600" y="-600" z="1350"/>
+        <rotation name="blockA_phys0x23a7490_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="10" name="blockB_phys0x23a7580">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a7580_pos" unit="mm" x="150" y="-600" z="-1200"/>
+      </physvol>
+      <physvol copynumber="11" name="blockB_phys0x23a7620">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a7620_pos" unit="mm" x="150" y="-600" z="-600"/>
+      </physvol>
+      <physvol copynumber="12" name="blockB_phys0x23a76c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a76c0_pos" unit="mm" x="150" y="-600" z="0"/>
+      </physvol>
+      <physvol copynumber="13" name="blockB_phys0x23a7760">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a7760_pos" unit="mm" x="150" y="-600" z="600"/>
+      </physvol>
+      <physvol copynumber="14" name="blockB_phys0x23a7800">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a7800_pos" unit="mm" x="150" y="-600" z="1200"/>
+      </physvol>
+      <physvol copynumber="15" name="blockB_phys0x23a2340">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a2340_pos" unit="mm" x="-150" y="-600" z="-1200"/>
+        <rotation name="blockB_phys0x23a2340_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="16" name="blockB_phys0x23a2430">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a2430_pos" unit="mm" x="-150" y="-600" z="-600"/>
+        <rotation name="blockB_phys0x23a2430_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="17" name="blockB_phys0x23a2520">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a2520_pos" unit="mm" x="-150" y="-600" z="0"/>
+        <rotation name="blockB_phys0x23a2520_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="18" name="blockB_phys0x23a2610">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a2610_pos" unit="mm" x="-150" y="-600" z="600"/>
+        <rotation name="blockB_phys0x23a2610_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="19" name="blockB_phys0x23a2700">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a2700_pos" unit="mm" x="-150" y="-600" z="1200"/>
+        <rotation name="blockB_phys0x23a2700_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="160" name="blockA_phys0x23a27f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a27f0_pos" unit="mm" x="1350" y="-300" z="-1350"/>
+        <rotation name="blockA_phys0x23a27f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="161" name="blockA_phys0x23a28e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a28e0_pos" unit="mm" x="1350" y="-300" z="-1050"/>
+        <rotation name="blockA_phys0x23a28e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="162" name="blockA_phys0x23a8580">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8580_pos" unit="mm" x="1350" y="-300" z="-750"/>
+        <rotation name="blockA_phys0x23a8580_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="163" name="blockA_phys0x23a8670">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8670_pos" unit="mm" x="1350" y="-300" z="-450"/>
+        <rotation name="blockA_phys0x23a8670_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="164" name="blockA_phys0x23a8760">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8760_pos" unit="mm" x="1350" y="-300" z="-150"/>
+        <rotation name="blockA_phys0x23a8760_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="165" name="blockA_phys0x23a8850">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8850_pos" unit="mm" x="1350" y="-300" z="150"/>
+        <rotation name="blockA_phys0x23a8850_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="166" name="blockA_phys0x23a8940">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8940_pos" unit="mm" x="1350" y="-300" z="450"/>
+        <rotation name="blockA_phys0x23a8940_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="167" name="blockA_phys0x23a8a30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8a30_pos" unit="mm" x="1350" y="-300" z="750"/>
+        <rotation name="blockA_phys0x23a8a30_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="168" name="blockA_phys0x23a8b20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8b20_pos" unit="mm" x="1350" y="-300" z="1050"/>
+        <rotation name="blockA_phys0x23a8b20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="169" name="blockA_phys0x23a8c10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8c10_pos" unit="mm" x="1350" y="-300" z="1350"/>
+        <rotation name="blockA_phys0x23a8c10_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="170" name="blockA_phys0x23a8d00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8d00_pos" unit="mm" x="-1350" y="-300" z="-1350"/>
+        <rotation name="blockA_phys0x23a8d00_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="171" name="blockA_phys0x23a8df0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8df0_pos" unit="mm" x="-1350" y="-300" z="-1050"/>
+        <rotation name="blockA_phys0x23a8df0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="172" name="blockA_phys0x23a8ee0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8ee0_pos" unit="mm" x="-1350" y="-300" z="-750"/>
+        <rotation name="blockA_phys0x23a8ee0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="173" name="blockA_phys0x23a8fd0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8fd0_pos" unit="mm" x="-1350" y="-300" z="-450"/>
+        <rotation name="blockA_phys0x23a8fd0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="174" name="blockA_phys0x23a90c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a90c0_pos" unit="mm" x="-1350" y="-300" z="-150"/>
+        <rotation name="blockA_phys0x23a90c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="175" name="blockA_phys0x23a91b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a91b0_pos" unit="mm" x="-1350" y="-300" z="150"/>
+        <rotation name="blockA_phys0x23a91b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="176" name="blockA_phys0x23a92a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a92a0_pos" unit="mm" x="-1350" y="-300" z="450"/>
+        <rotation name="blockA_phys0x23a92a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="177" name="blockA_phys0x23a9390">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9390_pos" unit="mm" x="-1350" y="-300" z="750"/>
+        <rotation name="blockA_phys0x23a9390_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="178" name="blockA_phys0x23a9480">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9480_pos" unit="mm" x="-1350" y="-300" z="1050"/>
+        <rotation name="blockA_phys0x23a9480_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="179" name="blockA_phys0x23a9570">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9570_pos" unit="mm" x="-1350" y="-300" z="1350"/>
+        <rotation name="blockA_phys0x23a9570_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="180" name="blockA_phys0x23a9660">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9660_pos" unit="mm" x="900" y="-300" z="-1200"/>
+      </physvol>
+      <physvol copynumber="181" name="blockA_phys0x23a9700">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9700_pos" unit="mm" x="900" y="-300" z="-600"/>
+      </physvol>
+      <physvol copynumber="182" name="blockA_phys0x23a97a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a97a0_pos" unit="mm" x="900" y="-300" z="0"/>
+      </physvol>
+      <physvol copynumber="183" name="blockA_phys0x23a9840">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9840_pos" unit="mm" x="900" y="-300" z="600"/>
+      </physvol>
+      <physvol copynumber="184" name="blockA_phys0x23a98e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a98e0_pos" unit="mm" x="900" y="-300" z="1200"/>
+      </physvol>
+      <physvol copynumber="185" name="blockA_phys0x23a9980">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9980_pos" unit="mm" x="-900" y="-300" z="-1200"/>
+      </physvol>
+      <physvol copynumber="186" name="blockA_phys0x23a9a20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9a20_pos" unit="mm" x="-900" y="-300" z="-600"/>
+      </physvol>
+      <physvol copynumber="187" name="blockA_phys0x23a9ac0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9ac0_pos" unit="mm" x="-900" y="-300" z="0"/>
+      </physvol>
+      <physvol copynumber="188" name="blockA_phys0x23a9b60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9b60_pos" unit="mm" x="-900" y="-300" z="600"/>
+      </physvol>
+      <physvol copynumber="189" name="blockA_phys0x23a9c00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9c00_pos" unit="mm" x="-900" y="-300" z="1200"/>
+      </physvol>
+      <physvol copynumber="190" name="blockA_phys0x23a9ca0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9ca0_pos" unit="mm" x="450" y="-300" z="-1350"/>
+        <rotation name="blockA_phys0x23a9ca0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="191" name="blockA_phys0x23a9d90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9d90_pos" unit="mm" x="450" y="-300" z="-1050"/>
+        <rotation name="blockA_phys0x23a9d90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="192" name="blockA_phys0x23a9e80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9e80_pos" unit="mm" x="450" y="-300" z="-750"/>
+        <rotation name="blockA_phys0x23a9e80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="193" name="blockA_phys0x23a9f70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a9f70_pos" unit="mm" x="450" y="-300" z="-450"/>
+        <rotation name="blockA_phys0x23a9f70_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="194" name="blockA_phys0x23aa060">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa060_pos" unit="mm" x="450" y="-300" z="-150"/>
+        <rotation name="blockA_phys0x23aa060_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="195" name="blockA_phys0x23aa150">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa150_pos" unit="mm" x="450" y="-300" z="150"/>
+        <rotation name="blockA_phys0x23aa150_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="196" name="blockA_phys0x23aa240">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa240_pos" unit="mm" x="450" y="-300" z="450"/>
+        <rotation name="blockA_phys0x23aa240_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="197" name="blockA_phys0x23aa330">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa330_pos" unit="mm" x="450" y="-300" z="750"/>
+        <rotation name="blockA_phys0x23aa330_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="198" name="blockA_phys0x23aa420">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa420_pos" unit="mm" x="450" y="-300" z="1050"/>
+        <rotation name="blockA_phys0x23aa420_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="199" name="blockA_phys0x23aa510">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa510_pos" unit="mm" x="450" y="-300" z="1350"/>
+        <rotation name="blockA_phys0x23aa510_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="200" name="blockA_phys0x23aa600">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa600_pos" unit="mm" x="-450" y="-300" z="-1350"/>
+        <rotation name="blockA_phys0x23aa600_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="201" name="blockA_phys0x23aa6f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa6f0_pos" unit="mm" x="-450" y="-300" z="-1050"/>
+        <rotation name="blockA_phys0x23aa6f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="202" name="blockA_phys0x23aa7e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa7e0_pos" unit="mm" x="-450" y="-300" z="-750"/>
+        <rotation name="blockA_phys0x23aa7e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="203" name="blockA_phys0x23aa8d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa8d0_pos" unit="mm" x="-450" y="-300" z="-450"/>
+        <rotation name="blockA_phys0x23aa8d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="204" name="blockA_phys0x23aa9c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aa9c0_pos" unit="mm" x="-450" y="-300" z="-150"/>
+        <rotation name="blockA_phys0x23aa9c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="205" name="blockA_phys0x23aaab0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aaab0_pos" unit="mm" x="-450" y="-300" z="150"/>
+        <rotation name="blockA_phys0x23aaab0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="206" name="blockA_phys0x23aaba0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aaba0_pos" unit="mm" x="-450" y="-300" z="450"/>
+        <rotation name="blockA_phys0x23aaba0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="207" name="blockA_phys0x23aac90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aac90_pos" unit="mm" x="-450" y="-300" z="750"/>
+        <rotation name="blockA_phys0x23aac90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="208" name="blockA_phys0x23aad80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aad80_pos" unit="mm" x="-450" y="-300" z="1050"/>
+        <rotation name="blockA_phys0x23aad80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="209" name="blockA_phys0x23aae70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aae70_pos" unit="mm" x="-450" y="-300" z="1350"/>
+        <rotation name="blockA_phys0x23aae70_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="210" name="blockA_phys0x23aaf60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aaf60_pos" unit="mm" x="0" y="-300" z="-1200"/>
+      </physvol>
+      <physvol copynumber="211" name="blockA_phys0x23ab000">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab000_pos" unit="mm" x="0" y="-300" z="-600"/>
+      </physvol>
+      <physvol copynumber="212" name="blockA_phys0x23ab0a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab0a0_pos" unit="mm" x="0" y="-300" z="0"/>
+      </physvol>
+      <physvol copynumber="213" name="blockA_phys0x23ab140">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab140_pos" unit="mm" x="0" y="-300" z="600"/>
+      </physvol>
+      <physvol copynumber="214" name="blockA_phys0x23ab1e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab1e0_pos" unit="mm" x="0" y="-300" z="1200"/>
+      </physvol>
+      <physvol copynumber="215" name="blockA_phys0x23a3d80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3d80_pos" unit="mm" x="1500" y="0" z="-1200"/>
+      </physvol>
+      <physvol copynumber="216" name="blockA_phys0x23a3e20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3e20_pos" unit="mm" x="1500" y="0" z="-600"/>
+      </physvol>
+      <physvol copynumber="217" name="blockA_phys0x23a3ec0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3ec0_pos" unit="mm" x="1500" y="0" z="0"/>
+      </physvol>
+      <physvol copynumber="218" name="blockA_phys0x23a3f60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a3f60_pos" unit="mm" x="1500" y="0" z="600"/>
+      </physvol>
+      <physvol copynumber="219" name="blockA_phys0x23a4000">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4000_pos" unit="mm" x="1500" y="0" z="1200"/>
+      </physvol>
+      <physvol copynumber="220" name="blockA_phys0x23a40a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a40a0_pos" unit="mm" x="-1500" y="0" z="-1200"/>
+      </physvol>
+      <physvol copynumber="221" name="blockA_phys0x23a4140">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4140_pos" unit="mm" x="-1500" y="0" z="-600"/>
+      </physvol>
+      <physvol copynumber="222" name="blockA_phys0x23a41e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a41e0_pos" unit="mm" x="-1500" y="0" z="0"/>
+      </physvol>
+      <physvol copynumber="223" name="blockA_phys0x23a4280">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4280_pos" unit="mm" x="-1500" y="0" z="600"/>
+      </physvol>
+      <physvol copynumber="224" name="blockA_phys0x23a4320">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a4320_pos" unit="mm" x="-1500" y="0" z="1200"/>
+      </physvol>
+      <physvol copynumber="20" name="blockB_phys0x23a43c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a43c0_pos" unit="mm" x="1200" y="0" z="-1200"/>
+      </physvol>
+      <physvol copynumber="21" name="blockB_phys0x23a4460">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a4460_pos" unit="mm" x="1200" y="0" z="-600"/>
+      </physvol>
+      <physvol copynumber="22" name="blockB_phys0x23a4500">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23a4500_pos" unit="mm" x="1200" y="0" z="0"/>
+      </physvol>
+      <physvol copynumber="23" name="blockB_phys0x23ac2c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac2c0_pos" unit="mm" x="1200" y="0" z="600"/>
+      </physvol>
+      <physvol copynumber="24" name="blockB_phys0x23ac360">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac360_pos" unit="mm" x="1200" y="0" z="1200"/>
+      </physvol>
+      <physvol copynumber="25" name="blockB_phys0x23ac400">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac400_pos" unit="mm" x="900" y="0" z="-1200"/>
+        <rotation name="blockB_phys0x23ac400_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="26" name="blockB_phys0x23ac4f0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac4f0_pos" unit="mm" x="900" y="0" z="-600"/>
+        <rotation name="blockB_phys0x23ac4f0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="27" name="blockB_phys0x23ac5e0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac5e0_pos" unit="mm" x="900" y="0" z="0"/>
+        <rotation name="blockB_phys0x23ac5e0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="28" name="blockB_phys0x23ac6d0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac6d0_pos" unit="mm" x="900" y="0" z="600"/>
+        <rotation name="blockB_phys0x23ac6d0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="29" name="blockB_phys0x23ac7c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac7c0_pos" unit="mm" x="900" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23ac7c0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="30" name="blockB_phys0x23ac8b0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac8b0_pos" unit="mm" x="-1200" y="0" z="-1200"/>
+        <rotation name="blockB_phys0x23ac8b0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="31" name="blockB_phys0x23ac9a0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ac9a0_pos" unit="mm" x="-1200" y="0" z="-600"/>
+        <rotation name="blockB_phys0x23ac9a0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="32" name="blockB_phys0x23aca90">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23aca90_pos" unit="mm" x="-1200" y="0" z="0"/>
+        <rotation name="blockB_phys0x23aca90_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="33" name="blockB_phys0x23acb80">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23acb80_pos" unit="mm" x="-1200" y="0" z="600"/>
+        <rotation name="blockB_phys0x23acb80_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="34" name="blockB_phys0x23acc70">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23acc70_pos" unit="mm" x="-1200" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23acc70_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="35" name="blockB_phys0x23acd60">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23acd60_pos" unit="mm" x="-900" y="0" z="-1200"/>
+        <rotation name="blockB_phys0x23acd60_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="36" name="blockB_phys0x23ace50">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ace50_pos" unit="mm" x="-900" y="0" z="-600"/>
+        <rotation name="blockB_phys0x23ace50_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="37" name="blockB_phys0x23acf40">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23acf40_pos" unit="mm" x="-900" y="0" z="0"/>
+        <rotation name="blockB_phys0x23acf40_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="38" name="blockB_phys0x23ad030">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad030_pos" unit="mm" x="-900" y="0" z="600"/>
+        <rotation name="blockB_phys0x23ad030_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="39" name="blockB_phys0x23ad120">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad120_pos" unit="mm" x="-900" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23ad120_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="40" name="blockB_phys0x23ad210">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad210_pos" unit="mm" x="-600" y="0" z="-1200"/>
+        <rotation name="blockB_phys0x23ad210_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="41" name="blockB_phys0x23ad300">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad300_pos" unit="mm" x="-600" y="0" z="-600"/>
+        <rotation name="blockB_phys0x23ad300_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="42" name="blockB_phys0x23ad3f0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad3f0_pos" unit="mm" x="-600" y="0" z="0"/>
+        <rotation name="blockB_phys0x23ad3f0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="43" name="blockB_phys0x23ad4e0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad4e0_pos" unit="mm" x="-600" y="0" z="600"/>
+        <rotation name="blockB_phys0x23ad4e0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="44" name="blockB_phys0x23ad5d0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad5d0_pos" unit="mm" x="-600" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23ad5d0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="45" name="blockB_phys0x23ad6c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad6c0_pos" unit="mm" x="-300" y="0" z="-1200"/>
+        <rotation name="blockB_phys0x23ad6c0_rot" unit="deg" x="0" y="0" z="4.21002557912093e-14"/>
+      </physvol>
+      <physvol copynumber="46" name="blockB_phys0x23ad7b0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad7b0_pos" unit="mm" x="-300" y="0" z="-600"/>
+        <rotation name="blockB_phys0x23ad7b0_rot" unit="deg" x="0" y="0" z="4.21002557912093e-14"/>
+      </physvol>
+      <physvol copynumber="47" name="blockB_phys0x23ad8a0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad8a0_pos" unit="mm" x="-300" y="0" z="0"/>
+        <rotation name="blockB_phys0x23ad8a0_rot" unit="deg" x="0" y="0" z="4.21002557912093e-14"/>
+      </physvol>
+      <physvol copynumber="48" name="blockB_phys0x23ad990">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ad990_pos" unit="mm" x="-300" y="0" z="600"/>
+        <rotation name="blockB_phys0x23ad990_rot" unit="deg" x="0" y="0" z="4.21002557912093e-14"/>
+      </physvol>
+      <physvol copynumber="49" name="blockB_phys0x23ada80">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23ada80_pos" unit="mm" x="-300" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23ada80_rot" unit="deg" x="0" y="0" z="4.21002557912093e-14"/>
+      </physvol>
+      <physvol name="beamblockB_phys0x23adb70">
+        <volumeref ref="beamblockB_log0x239c640"/>
+        <position name="beamblockB_phys0x23adb70_pos" unit="mm" x="0" y="0" z="-1200"/>
+        <rotation name="beamblockB_phys0x23adb70_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="1" name="beamblockB_phys0x23adc60">
+        <volumeref ref="beamblockB_log0x239c640"/>
+        <position name="beamblockB_phys0x23adc60_pos" unit="mm" x="0" y="0" z="-600"/>
+        <rotation name="beamblockB_phys0x23adc60_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="50" name="blockB_phys0x23add50">
+        <volumeref ref="blockB_log0x239c540"/>
+        <rotation name="blockB_phys0x23add50_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="51" name="blockB_phys0x23adee0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23adee0_pos" unit="mm" x="0" y="0" z="600"/>
+        <rotation name="blockB_phys0x23adee0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="52" name="blockB_phys0x23adf20">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23adf20_pos" unit="mm" x="0" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23adf20_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="225" name="blockA_phys0x1925b10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x1925b10_pos" unit="mm" x="600" y="0" z="-1200"/>
+      </physvol>
+      <physvol copynumber="226" name="blockA_phys0x23aea70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aea70_pos" unit="mm" x="600" y="0" z="-600"/>
+      </physvol>
+      <physvol copynumber="227" name="blockA_phys0x1925610">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x1925610_pos" unit="mm" x="600" y="0" z="0"/>
+      </physvol>
+      <physvol copynumber="228" name="blockA_phys0x19256b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x19256b0_pos" unit="mm" x="600" y="0" z="600"/>
+      </physvol>
+      <physvol copynumber="229" name="blockA_phys0x1925750">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x1925750_pos" unit="mm" x="600" y="0" z="1200"/>
+      </physvol>
+      <physvol copynumber="53" name="blockB_phys0x23af660">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23af660_pos" unit="mm" x="300" y="0" z="-1200"/>
+        <rotation name="blockB_phys0x23af660_rot" unit="deg" x="0" y="0" z="5.6133674388279e-14"/>
+      </physvol>
+      <physvol copynumber="54" name="blockB_phys0x23af700">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23af700_pos" unit="mm" x="300" y="0" z="-600"/>
+        <rotation name="blockB_phys0x23af700_rot" unit="deg" x="0" y="0" z="5.6133674388279e-14"/>
+      </physvol>
+      <physvol copynumber="55" name="blockB_phys0x23af7a0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23af7a0_pos" unit="mm" x="300" y="0" z="0"/>
+        <rotation name="blockB_phys0x23af7a0_rot" unit="deg" x="0" y="0" z="5.6133674388279e-14"/>
+      </physvol>
+      <physvol copynumber="56" name="blockB_phys0x23af890">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23af890_pos" unit="mm" x="300" y="0" z="600"/>
+        <rotation name="blockB_phys0x23af890_rot" unit="deg" x="0" y="0" z="5.6133674388279e-14"/>
+      </physvol>
+      <physvol copynumber="57" name="blockB_phys0x23af980">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23af980_pos" unit="mm" x="300" y="0" z="1200"/>
+        <rotation name="blockB_phys0x23af980_rot" unit="deg" x="0" y="0" z="5.6133674388279e-14"/>
+      </physvol>
+      <physvol copynumber="230" name="blockA_phys0x23afa70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23afa70_pos" unit="mm" x="1350" y="300" z="-1350"/>
+        <rotation name="blockA_phys0x23afa70_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="231" name="blockA_phys0x23afb60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23afb60_pos" unit="mm" x="1350" y="300" z="-1050"/>
+        <rotation name="blockA_phys0x23afb60_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="232" name="blockA_phys0x23afc50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23afc50_pos" unit="mm" x="1350" y="300" z="-750"/>
+        <rotation name="blockA_phys0x23afc50_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="233" name="blockA_phys0x23afd40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23afd40_pos" unit="mm" x="1350" y="300" z="-450"/>
+        <rotation name="blockA_phys0x23afd40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="234" name="blockA_phys0x23afe30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23afe30_pos" unit="mm" x="1350" y="300" z="-150"/>
+        <rotation name="blockA_phys0x23afe30_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="235" name="blockA_phys0x23aff20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aff20_pos" unit="mm" x="1350" y="300" z="150"/>
+        <rotation name="blockA_phys0x23aff20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="236" name="blockA_phys0x23b0010">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0010_pos" unit="mm" x="1350" y="300" z="450"/>
+        <rotation name="blockA_phys0x23b0010_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="237" name="blockA_phys0x23b0100">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0100_pos" unit="mm" x="1350" y="300" z="750"/>
+        <rotation name="blockA_phys0x23b0100_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="238" name="blockA_phys0x23b01f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b01f0_pos" unit="mm" x="1350" y="300" z="1050"/>
+        <rotation name="blockA_phys0x23b01f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="239" name="blockA_phys0x23b02e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b02e0_pos" unit="mm" x="1350" y="300" z="1350"/>
+        <rotation name="blockA_phys0x23b02e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="240" name="blockA_phys0x23b03d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b03d0_pos" unit="mm" x="-1350" y="300" z="-1350"/>
+        <rotation name="blockA_phys0x23b03d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="241" name="blockA_phys0x23b04c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b04c0_pos" unit="mm" x="-1350" y="300" z="-1050"/>
+        <rotation name="blockA_phys0x23b04c0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="242" name="blockA_phys0x23b05b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b05b0_pos" unit="mm" x="-1350" y="300" z="-750"/>
+        <rotation name="blockA_phys0x23b05b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="243" name="blockA_phys0x23b06a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b06a0_pos" unit="mm" x="-1350" y="300" z="-450"/>
+        <rotation name="blockA_phys0x23b06a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="244" name="blockA_phys0x23b0790">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0790_pos" unit="mm" x="-1350" y="300" z="-150"/>
+        <rotation name="blockA_phys0x23b0790_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="245" name="blockA_phys0x23b0880">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0880_pos" unit="mm" x="-1350" y="300" z="150"/>
+        <rotation name="blockA_phys0x23b0880_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="246" name="blockA_phys0x23b0970">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0970_pos" unit="mm" x="-1350" y="300" z="450"/>
+        <rotation name="blockA_phys0x23b0970_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="247" name="blockA_phys0x23b0a60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0a60_pos" unit="mm" x="-1350" y="300" z="750"/>
+        <rotation name="blockA_phys0x23b0a60_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="248" name="blockA_phys0x23b0b50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0b50_pos" unit="mm" x="-1350" y="300" z="1050"/>
+        <rotation name="blockA_phys0x23b0b50_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="249" name="blockA_phys0x23b0c40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b0c40_pos" unit="mm" x="-1350" y="300" z="1350"/>
+        <rotation name="blockA_phys0x23b0c40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="20" name="blockC_phys0x23b0d30">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b0d30_pos" unit="mm" x="975" y="300" z="-1200"/>
+      </physvol>
+      <physvol copynumber="21" name="blockC_phys0x23b0dd0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b0dd0_pos" unit="mm" x="975" y="300" z="-600"/>
+      </physvol>
+      <physvol copynumber="22" name="blockC_phys0x23b0e70">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b0e70_pos" unit="mm" x="975" y="300" z="0"/>
+      </physvol>
+      <physvol copynumber="23" name="blockC_phys0x23b0f10">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b0f10_pos" unit="mm" x="975" y="300" z="600"/>
+      </physvol>
+      <physvol copynumber="24" name="blockC_phys0x23b0fb0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b0fb0_pos" unit="mm" x="975" y="300" z="1200"/>
+      </physvol>
+      <physvol copynumber="25" name="blockC_phys0x23b1050">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b1050_pos" unit="mm" x="-975" y="300" z="-1200"/>
+      </physvol>
+      <physvol copynumber="26" name="blockC_phys0x23b10f0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b10f0_pos" unit="mm" x="-975" y="300" z="-600"/>
+      </physvol>
+      <physvol copynumber="27" name="blockC_phys0x23b1190">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b1190_pos" unit="mm" x="-975" y="300" z="0"/>
+      </physvol>
+      <physvol copynumber="28" name="blockC_phys0x23b1230">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b1230_pos" unit="mm" x="-975" y="300" z="600"/>
+      </physvol>
+      <physvol copynumber="29" name="blockC_phys0x23b12d0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b12d0_pos" unit="mm" x="-975" y="300" z="1200"/>
+      </physvol>
+      <physvol copynumber="58" name="blockB_phys0x23b1370">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1370_pos" unit="mm" x="750" y="300" z="-1200"/>
+      </physvol>
+      <physvol copynumber="59" name="blockB_phys0x23b1410">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1410_pos" unit="mm" x="750" y="300" z="-600"/>
+      </physvol>
+      <physvol copynumber="60" name="blockB_phys0x23b14b0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b14b0_pos" unit="mm" x="750" y="300" z="0"/>
+      </physvol>
+      <physvol copynumber="61" name="blockB_phys0x23b1550">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1550_pos" unit="mm" x="750" y="300" z="600"/>
+      </physvol>
+      <physvol copynumber="62" name="blockB_phys0x23b15f0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b15f0_pos" unit="mm" x="750" y="300" z="1200"/>
+      </physvol>
+      <physvol copynumber="63" name="blockB_phys0x23b1690">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1690_pos" unit="mm" x="450" y="300" z="-1200"/>
+        <rotation name="blockB_phys0x23b1690_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="64" name="blockB_phys0x23b1780">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1780_pos" unit="mm" x="450" y="300" z="-600"/>
+        <rotation name="blockB_phys0x23b1780_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="65" name="blockB_phys0x23b1870">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1870_pos" unit="mm" x="450" y="300" z="0"/>
+        <rotation name="blockB_phys0x23b1870_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="66" name="blockB_phys0x23b1960">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1960_pos" unit="mm" x="450" y="300" z="600"/>
+        <rotation name="blockB_phys0x23b1960_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="67" name="blockB_phys0x23b1a50">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1a50_pos" unit="mm" x="450" y="300" z="1200"/>
+        <rotation name="blockB_phys0x23b1a50_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="68" name="blockB_phys0x23b1b40">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1b40_pos" unit="mm" x="-750" y="300" z="-1200"/>
+        <rotation name="blockB_phys0x23b1b40_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="69" name="blockB_phys0x23b1c30">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1c30_pos" unit="mm" x="-750" y="300" z="-600"/>
+        <rotation name="blockB_phys0x23b1c30_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="70" name="blockB_phys0x23b1d20">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1d20_pos" unit="mm" x="-750" y="300" z="0"/>
+        <rotation name="blockB_phys0x23b1d20_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="71" name="blockB_phys0x23b1e10">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1e10_pos" unit="mm" x="-750" y="300" z="600"/>
+        <rotation name="blockB_phys0x23b1e10_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="72" name="blockB_phys0x23b1f00">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1f00_pos" unit="mm" x="-750" y="300" z="1200"/>
+        <rotation name="blockB_phys0x23b1f00_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="73" name="blockB_phys0x23b1ff0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b1ff0_pos" unit="mm" x="-450" y="300" z="-1200"/>
+        <rotation name="blockB_phys0x23b1ff0_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="74" name="blockB_phys0x23b20e0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b20e0_pos" unit="mm" x="-450" y="300" z="-600"/>
+        <rotation name="blockB_phys0x23b20e0_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="75" name="blockB_phys0x23b21d0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b21d0_pos" unit="mm" x="-450" y="300" z="0"/>
+        <rotation name="blockB_phys0x23b21d0_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="76" name="blockB_phys0x23b22c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b22c0_pos" unit="mm" x="-450" y="300" z="600"/>
+        <rotation name="blockB_phys0x23b22c0_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="77" name="blockB_phys0x23b23b0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b23b0_pos" unit="mm" x="-450" y="300" z="1200"/>
+        <rotation name="blockB_phys0x23b23b0_rot" unit="deg" x="0" y="0" z="2.80668371941395e-14"/>
+      </physvol>
+      <physvol copynumber="250" name="blockA_phys0x23b24a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b24a0_pos" unit="mm" x="0" y="300" z="-1350"/>
+        <rotation name="blockA_phys0x23b24a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="251" name="blockA_phys0x23b2590">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2590_pos" unit="mm" x="0" y="300" z="-1050"/>
+        <rotation name="blockA_phys0x23b2590_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="252" name="blockA_phys0x23b2680">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2680_pos" unit="mm" x="0" y="300" z="-750"/>
+        <rotation name="blockA_phys0x23b2680_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="253" name="blockA_phys0x23b2770">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2770_pos" unit="mm" x="0" y="300" z="-450"/>
+        <rotation name="blockA_phys0x23b2770_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="254" name="blockA_phys0x23b2860">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2860_pos" unit="mm" x="0" y="300" z="-150"/>
+        <rotation name="blockA_phys0x23b2860_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="255" name="blockA_phys0x23b2950">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2950_pos" unit="mm" x="0" y="300" z="150"/>
+        <rotation name="blockA_phys0x23b2950_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="256" name="blockA_phys0x23b2a40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2a40_pos" unit="mm" x="0" y="300" z="450"/>
+        <rotation name="blockA_phys0x23b2a40_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="257" name="blockA_phys0x23b2b30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2b30_pos" unit="mm" x="0" y="300" z="750"/>
+        <rotation name="blockA_phys0x23b2b30_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="258" name="blockA_phys0x23b2c20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2c20_pos" unit="mm" x="0" y="300" z="1050"/>
+        <rotation name="blockA_phys0x23b2c20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="259" name="blockA_phys0x23b2d10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b2d10_pos" unit="mm" x="0" y="300" z="1350"/>
+        <rotation name="blockA_phys0x23b2d10_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="30" name="blockC_phys0x23b2e00">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b2e00_pos" unit="mm" x="1575" y="600" z="-1200"/>
+      </physvol>
+      <physvol copynumber="31" name="blockC_phys0x23b2ea0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b2ea0_pos" unit="mm" x="1575" y="600" z="-600"/>
+      </physvol>
+      <physvol copynumber="32" name="blockC_phys0x23b2f40">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b2f40_pos" unit="mm" x="1575" y="600" z="0"/>
+      </physvol>
+      <physvol copynumber="33" name="blockC_phys0x23b2fe0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b2fe0_pos" unit="mm" x="1575" y="600" z="600"/>
+      </physvol>
+      <physvol copynumber="34" name="blockC_phys0x23b3080">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b3080_pos" unit="mm" x="1575" y="600" z="1200"/>
+      </physvol>
+      <physvol copynumber="35" name="blockC_phys0x23b3120">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b3120_pos" unit="mm" x="-1575" y="600" z="-1200"/>
+      </physvol>
+      <physvol copynumber="36" name="blockC_phys0x23b31c0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b31c0_pos" unit="mm" x="-1575" y="600" z="-600"/>
+      </physvol>
+      <physvol copynumber="37" name="blockC_phys0x23b3260">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b3260_pos" unit="mm" x="-1575" y="600" z="0"/>
+      </physvol>
+      <physvol copynumber="38" name="blockC_phys0x23b3300">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b3300_pos" unit="mm" x="-1575" y="600" z="600"/>
+      </physvol>
+      <physvol copynumber="39" name="blockC_phys0x23b33a0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b33a0_pos" unit="mm" x="-1575" y="600" z="1200"/>
+      </physvol>
+      <physvol copynumber="260" name="blockA_phys0x23b3440">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3440_pos" unit="mm" x="1200" y="600" z="-1350"/>
+        <rotation name="blockA_phys0x23b3440_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="261" name="blockA_phys0x23b3530">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3530_pos" unit="mm" x="1200" y="600" z="-1050"/>
+        <rotation name="blockA_phys0x23b3530_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="262" name="blockA_phys0x23b3620">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3620_pos" unit="mm" x="1200" y="600" z="-750"/>
+        <rotation name="blockA_phys0x23b3620_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="263" name="blockA_phys0x23b3710">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3710_pos" unit="mm" x="1200" y="600" z="-450"/>
+        <rotation name="blockA_phys0x23b3710_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="264" name="blockA_phys0x23b3800">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3800_pos" unit="mm" x="1200" y="600" z="-150"/>
+        <rotation name="blockA_phys0x23b3800_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="265" name="blockA_phys0x23b38f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b38f0_pos" unit="mm" x="1200" y="600" z="150"/>
+        <rotation name="blockA_phys0x23b38f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="266" name="blockA_phys0x23b39e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b39e0_pos" unit="mm" x="1200" y="600" z="450"/>
+        <rotation name="blockA_phys0x23b39e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="267" name="blockA_phys0x23b3ad0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3ad0_pos" unit="mm" x="1200" y="600" z="750"/>
+        <rotation name="blockA_phys0x23b3ad0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="268" name="blockA_phys0x23b3bc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3bc0_pos" unit="mm" x="1200" y="600" z="1050"/>
+        <rotation name="blockA_phys0x23b3bc0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="269" name="blockA_phys0x23b3cb0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3cb0_pos" unit="mm" x="1200" y="600" z="1350"/>
+        <rotation name="blockA_phys0x23b3cb0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="270" name="blockA_phys0x23b3da0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3da0_pos" unit="mm" x="600" y="600" z="-1350"/>
+        <rotation name="blockA_phys0x23b3da0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="271" name="blockA_phys0x23b3e90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3e90_pos" unit="mm" x="600" y="600" z="-1050"/>
+        <rotation name="blockA_phys0x23b3e90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="272" name="blockA_phys0x23b3f80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b3f80_pos" unit="mm" x="600" y="600" z="-750"/>
+        <rotation name="blockA_phys0x23b3f80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="273" name="blockA_phys0x23b4070">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b4070_pos" unit="mm" x="600" y="600" z="-450"/>
+        <rotation name="blockA_phys0x23b4070_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="274" name="blockA_phys0x23b4160">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b4160_pos" unit="mm" x="600" y="600" z="-150"/>
+        <rotation name="blockA_phys0x23b4160_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="275" name="blockA_phys0x19255d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x19255d0_pos" unit="mm" x="600" y="600" z="150"/>
+        <rotation name="blockA_phys0x19255d0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="276" name="blockA_phys0x23a7870">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7870_pos" unit="mm" x="600" y="600" z="450"/>
+        <rotation name="blockA_phys0x23a7870_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="277" name="blockA_phys0x23a7930">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7930_pos" unit="mm" x="600" y="600" z="750"/>
+        <rotation name="blockA_phys0x23a7930_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="278" name="blockA_phys0x23a7a20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7a20_pos" unit="mm" x="600" y="600" z="1050"/>
+        <rotation name="blockA_phys0x23a7a20_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="279" name="blockA_phys0x23a7b10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7b10_pos" unit="mm" x="600" y="600" z="1350"/>
+        <rotation name="blockA_phys0x23a7b10_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="280" name="blockA_phys0x23a7c00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7c00_pos" unit="mm" x="-1200" y="600" z="-1350"/>
+        <rotation name="blockA_phys0x23a7c00_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="281" name="blockA_phys0x23a7cf0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7cf0_pos" unit="mm" x="-1200" y="600" z="-1050"/>
+        <rotation name="blockA_phys0x23a7cf0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="282" name="blockA_phys0x23a7de0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7de0_pos" unit="mm" x="-1200" y="600" z="-750"/>
+        <rotation name="blockA_phys0x23a7de0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="283" name="blockA_phys0x23a7ed0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7ed0_pos" unit="mm" x="-1200" y="600" z="-450"/>
+        <rotation name="blockA_phys0x23a7ed0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="284" name="blockA_phys0x23a7fc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a7fc0_pos" unit="mm" x="-1200" y="600" z="-150"/>
+        <rotation name="blockA_phys0x23a7fc0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="285" name="blockA_phys0x23a80b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a80b0_pos" unit="mm" x="-1200" y="600" z="150"/>
+        <rotation name="blockA_phys0x23a80b0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="286" name="blockA_phys0x23a81a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a81a0_pos" unit="mm" x="-1200" y="600" z="450"/>
+        <rotation name="blockA_phys0x23a81a0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="287" name="blockA_phys0x23a8290">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8290_pos" unit="mm" x="-1200" y="600" z="750"/>
+        <rotation name="blockA_phys0x23a8290_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="288" name="blockA_phys0x23a8380">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8380_pos" unit="mm" x="-1200" y="600" z="1050"/>
+        <rotation name="blockA_phys0x23a8380_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="289" name="blockA_phys0x23a8470">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23a8470_pos" unit="mm" x="-1200" y="600" z="1350"/>
+        <rotation name="blockA_phys0x23a8470_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="290" name="blockA_phys0x23b5b90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b5b90_pos" unit="mm" x="-600" y="600" z="-1350"/>
+        <rotation name="blockA_phys0x23b5b90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="291" name="blockA_phys0x23b5c80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b5c80_pos" unit="mm" x="-600" y="600" z="-1050"/>
+        <rotation name="blockA_phys0x23b5c80_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="292" name="blockA_phys0x23b5d70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b5d70_pos" unit="mm" x="-600" y="600" z="-750"/>
+        <rotation name="blockA_phys0x23b5d70_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="293" name="blockA_phys0x23b5e60">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b5e60_pos" unit="mm" x="-600" y="600" z="-450"/>
+        <rotation name="blockA_phys0x23b5e60_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="294" name="blockA_phys0x23b5f50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b5f50_pos" unit="mm" x="-600" y="600" z="-150"/>
+        <rotation name="blockA_phys0x23b5f50_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="295" name="blockA_phys0x23b6040">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6040_pos" unit="mm" x="-600" y="600" z="150"/>
+        <rotation name="blockA_phys0x23b6040_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="296" name="blockA_phys0x23b6130">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6130_pos" unit="mm" x="-600" y="600" z="450"/>
+        <rotation name="blockA_phys0x23b6130_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="297" name="blockA_phys0x23b6220">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6220_pos" unit="mm" x="-600" y="600" z="750"/>
+        <rotation name="blockA_phys0x23b6220_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="298" name="blockA_phys0x23b6310">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6310_pos" unit="mm" x="-600" y="600" z="1050"/>
+        <rotation name="blockA_phys0x23b6310_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="299" name="blockA_phys0x23b6400">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6400_pos" unit="mm" x="-600" y="600" z="1350"/>
+        <rotation name="blockA_phys0x23b6400_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="78" name="blockB_phys0x23b64f0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b64f0_pos" unit="mm" x="150" y="600" z="-1200"/>
+      </physvol>
+      <physvol copynumber="79" name="blockB_phys0x23b6590">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6590_pos" unit="mm" x="150" y="600" z="-600"/>
+      </physvol>
+      <physvol copynumber="80" name="blockB_phys0x23b6630">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6630_pos" unit="mm" x="150" y="600" z="0"/>
+      </physvol>
+      <physvol copynumber="81" name="blockB_phys0x23b66d0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b66d0_pos" unit="mm" x="150" y="600" z="600"/>
+      </physvol>
+      <physvol copynumber="82" name="blockB_phys0x23b6770">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6770_pos" unit="mm" x="150" y="600" z="1200"/>
+      </physvol>
+      <physvol copynumber="83" name="blockB_phys0x23b6810">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6810_pos" unit="mm" x="-150" y="600" z="-1200"/>
+        <rotation name="blockB_phys0x23b6810_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="84" name="blockB_phys0x23b6900">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6900_pos" unit="mm" x="-150" y="600" z="-600"/>
+        <rotation name="blockB_phys0x23b6900_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="85" name="blockB_phys0x23b69f0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b69f0_pos" unit="mm" x="-150" y="600" z="0"/>
+        <rotation name="blockB_phys0x23b69f0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="86" name="blockB_phys0x23b6ae0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6ae0_pos" unit="mm" x="-150" y="600" z="600"/>
+        <rotation name="blockB_phys0x23b6ae0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="87" name="blockB_phys0x23b6bd0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b6bd0_pos" unit="mm" x="-150" y="600" z="1200"/>
+        <rotation name="blockB_phys0x23b6bd0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="300" name="blockA_phys0x23b6cc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6cc0_pos" unit="mm" x="1350" y="900" z="-1350"/>
+        <rotation name="blockA_phys0x23b6cc0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="301" name="blockA_phys0x23b6db0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6db0_pos" unit="mm" x="1350" y="900" z="-1050"/>
+        <rotation name="blockA_phys0x23b6db0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="302" name="blockA_phys0x23b6ea0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6ea0_pos" unit="mm" x="1350" y="900" z="-750"/>
+        <rotation name="blockA_phys0x23b6ea0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="303" name="blockA_phys0x23b6f90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b6f90_pos" unit="mm" x="1350" y="900" z="-450"/>
+        <rotation name="blockA_phys0x23b6f90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="304" name="blockA_phys0x23b7080">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7080_pos" unit="mm" x="1350" y="900" z="-150"/>
+        <rotation name="blockA_phys0x23b7080_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="305" name="blockA_phys0x23b7170">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7170_pos" unit="mm" x="1350" y="900" z="150"/>
+        <rotation name="blockA_phys0x23b7170_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="306" name="blockA_phys0x23b7260">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7260_pos" unit="mm" x="1350" y="900" z="450"/>
+        <rotation name="blockA_phys0x23b7260_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="307" name="blockA_phys0x23b7350">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7350_pos" unit="mm" x="1350" y="900" z="750"/>
+        <rotation name="blockA_phys0x23b7350_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="308" name="blockA_phys0x23b7440">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7440_pos" unit="mm" x="1350" y="900" z="1050"/>
+        <rotation name="blockA_phys0x23b7440_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="309" name="blockA_phys0x23b7530">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7530_pos" unit="mm" x="1350" y="900" z="1350"/>
+        <rotation name="blockA_phys0x23b7530_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="310" name="blockA_phys0x23b7620">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7620_pos" unit="mm" x="-1350" y="900" z="-1350"/>
+        <rotation name="blockA_phys0x23b7620_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="311" name="blockA_phys0x23b7710">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7710_pos" unit="mm" x="-1350" y="900" z="-1050"/>
+        <rotation name="blockA_phys0x23b7710_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="312" name="blockA_phys0x23b7800">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7800_pos" unit="mm" x="-1350" y="900" z="-750"/>
+        <rotation name="blockA_phys0x23b7800_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="313" name="blockA_phys0x23b78f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b78f0_pos" unit="mm" x="-1350" y="900" z="-450"/>
+        <rotation name="blockA_phys0x23b78f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="314" name="blockA_phys0x23b79e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b79e0_pos" unit="mm" x="-1350" y="900" z="-150"/>
+        <rotation name="blockA_phys0x23b79e0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="315" name="blockA_phys0x23b7ad0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7ad0_pos" unit="mm" x="-1350" y="900" z="150"/>
+        <rotation name="blockA_phys0x23b7ad0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="316" name="blockA_phys0x23b7bc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7bc0_pos" unit="mm" x="-1350" y="900" z="450"/>
+        <rotation name="blockA_phys0x23b7bc0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="317" name="blockA_phys0x23b7cb0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7cb0_pos" unit="mm" x="-1350" y="900" z="750"/>
+        <rotation name="blockA_phys0x23b7cb0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="318" name="blockA_phys0x23b7da0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7da0_pos" unit="mm" x="-1350" y="900" z="1050"/>
+        <rotation name="blockA_phys0x23b7da0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="319" name="blockA_phys0x23b7e90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7e90_pos" unit="mm" x="-1350" y="900" z="1350"/>
+        <rotation name="blockA_phys0x23b7e90_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="320" name="blockA_phys0x23b7f80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b7f80_pos" unit="mm" x="900" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="321" name="blockA_phys0x23b8020">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8020_pos" unit="mm" x="900" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="322" name="blockA_phys0x23b80c0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b80c0_pos" unit="mm" x="900" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="323" name="blockA_phys0x23b8160">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8160_pos" unit="mm" x="900" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="324" name="blockA_phys0x23b8200">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8200_pos" unit="mm" x="900" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="325" name="blockA_phys0x23b82a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b82a0_pos" unit="mm" x="-900" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="326" name="blockA_phys0x23b8340">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8340_pos" unit="mm" x="-900" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="327" name="blockA_phys0x23b83e0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b83e0_pos" unit="mm" x="-900" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="328" name="blockA_phys0x23b8480">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8480_pos" unit="mm" x="-900" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="329" name="blockA_phys0x23b8520">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8520_pos" unit="mm" x="-900" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="40" name="blockC_phys0x23b85c0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b85c0_pos" unit="mm" x="675" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="41" name="blockC_phys0x23b8660">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8660_pos" unit="mm" x="675" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="42" name="blockC_phys0x23b8700">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8700_pos" unit="mm" x="675" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="43" name="blockC_phys0x23b87a0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b87a0_pos" unit="mm" x="675" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="44" name="blockC_phys0x23b8840">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8840_pos" unit="mm" x="675" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="45" name="blockC_phys0x23b88e0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b88e0_pos" unit="mm" x="-675" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="46" name="blockC_phys0x23b8980">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8980_pos" unit="mm" x="-675" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="47" name="blockC_phys0x23b8a20">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8a20_pos" unit="mm" x="-675" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="48" name="blockC_phys0x23b8ac0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8ac0_pos" unit="mm" x="-675" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="49" name="blockC_phys0x23b8b60">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23b8b60_pos" unit="mm" x="-675" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="330" name="blockA_phys0x23b8c00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8c00_pos" unit="mm" x="450" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="331" name="blockA_phys0x23b8ca0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8ca0_pos" unit="mm" x="450" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="332" name="blockA_phys0x23b8d40">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8d40_pos" unit="mm" x="450" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="333" name="blockA_phys0x23b8de0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8de0_pos" unit="mm" x="450" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="334" name="blockA_phys0x23b8e80">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8e80_pos" unit="mm" x="450" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="335" name="blockA_phys0x23b8f20">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8f20_pos" unit="mm" x="-450" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="336" name="blockA_phys0x23b8fc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b8fc0_pos" unit="mm" x="-450" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="337" name="blockA_phys0x23b9060">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9060_pos" unit="mm" x="-450" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="338" name="blockA_phys0x23b9100">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9100_pos" unit="mm" x="-450" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="339" name="blockA_phys0x23b91a0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b91a0_pos" unit="mm" x="-450" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="88" name="blockB_phys0x23b9240">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9240_pos" unit="mm" x="150" y="900" z="-1200"/>
+      </physvol>
+      <physvol copynumber="89" name="blockB_phys0x23b92e0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b92e0_pos" unit="mm" x="150" y="900" z="-600"/>
+      </physvol>
+      <physvol copynumber="90" name="blockB_phys0x23b9380">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9380_pos" unit="mm" x="150" y="900" z="0"/>
+      </physvol>
+      <physvol copynumber="91" name="blockB_phys0x23b9420">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9420_pos" unit="mm" x="150" y="900" z="600"/>
+      </physvol>
+      <physvol copynumber="92" name="blockB_phys0x23b94c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b94c0_pos" unit="mm" x="150" y="900" z="1200"/>
+      </physvol>
+      <physvol copynumber="93" name="blockB_phys0x23b9560">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9560_pos" unit="mm" x="-150" y="900" z="-1200"/>
+        <rotation name="blockB_phys0x23b9560_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="94" name="blockB_phys0x23b9650">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9650_pos" unit="mm" x="-150" y="900" z="-600"/>
+        <rotation name="blockB_phys0x23b9650_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="95" name="blockB_phys0x23b9740">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9740_pos" unit="mm" x="-150" y="900" z="0"/>
+        <rotation name="blockB_phys0x23b9740_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="96" name="blockB_phys0x23b9830">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9830_pos" unit="mm" x="-150" y="900" z="600"/>
+        <rotation name="blockB_phys0x23b9830_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="97" name="blockB_phys0x23b9920">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23b9920_pos" unit="mm" x="-150" y="900" z="1200"/>
+        <rotation name="blockB_phys0x23b9920_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="340" name="blockA_phys0x23b9a10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9a10_pos" unit="mm" x="1200" y="1200" z="-1200"/>
+      </physvol>
+      <physvol copynumber="341" name="blockA_phys0x23b9ab0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9ab0_pos" unit="mm" x="1200" y="1200" z="-600"/>
+      </physvol>
+      <physvol copynumber="342" name="blockA_phys0x23b9b50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9b50_pos" unit="mm" x="1200" y="1200" z="0"/>
+      </physvol>
+      <physvol copynumber="343" name="blockA_phys0x23b9bf0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9bf0_pos" unit="mm" x="1200" y="1200" z="600"/>
+      </physvol>
+      <physvol copynumber="344" name="blockA_phys0x23b9c90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9c90_pos" unit="mm" x="1200" y="1200" z="1200"/>
+      </physvol>
+      <physvol copynumber="345" name="blockA_phys0x23b9d30">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9d30_pos" unit="mm" x="-1200" y="1200" z="-1200"/>
+      </physvol>
+      <physvol copynumber="346" name="blockA_phys0x23b9dd0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9dd0_pos" unit="mm" x="-1200" y="1200" z="-600"/>
+      </physvol>
+      <physvol copynumber="347" name="blockA_phys0x23b9e70">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9e70_pos" unit="mm" x="-1200" y="1200" z="0"/>
+      </physvol>
+      <physvol copynumber="348" name="blockA_phys0x23b9f10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9f10_pos" unit="mm" x="-1200" y="1200" z="600"/>
+      </physvol>
+      <physvol copynumber="349" name="blockA_phys0x23b9fb0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23b9fb0_pos" unit="mm" x="-1200" y="1200" z="1200"/>
+      </physvol>
+      <physvol copynumber="50" name="blockC_phys0x23ba050">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba050_pos" unit="mm" x="975" y="1200" z="-1200"/>
+      </physvol>
+      <physvol copynumber="51" name="blockC_phys0x23ba0f0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba0f0_pos" unit="mm" x="975" y="1200" z="-600"/>
+      </physvol>
+      <physvol copynumber="52" name="blockC_phys0x23ba190">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba190_pos" unit="mm" x="975" y="1200" z="0"/>
+      </physvol>
+      <physvol copynumber="53" name="blockC_phys0x23ba230">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba230_pos" unit="mm" x="975" y="1200" z="600"/>
+      </physvol>
+      <physvol copynumber="54" name="blockC_phys0x23ba2d0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba2d0_pos" unit="mm" x="975" y="1200" z="1200"/>
+      </physvol>
+      <physvol copynumber="55" name="blockC_phys0x23ba370">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba370_pos" unit="mm" x="-975" y="1200" z="-1200"/>
+      </physvol>
+      <physvol copynumber="56" name="blockC_phys0x23ba410">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23ba410_pos" unit="mm" x="-975" y="1200" z="-600"/>
+      </physvol>
+      <physvol copynumber="57" name="blockC_phys0x2397420">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x2397420_pos" unit="mm" x="-975" y="1200" z="0"/>
+      </physvol>
+      <physvol copynumber="58" name="blockC_phys0x23974c0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23974c0_pos" unit="mm" x="-975" y="1200" z="600"/>
+      </physvol>
+      <physvol copynumber="59" name="blockC_phys0x2397560">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x2397560_pos" unit="mm" x="-975" y="1200" z="1200"/>
+      </physvol>
+      <physvol copynumber="350" name="blockA_phys0x2397600">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x2397600_pos" unit="mm" x="600" y="1200" z="-1350"/>
+        <rotation name="blockA_phys0x2397600_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="351" name="blockA_phys0x23ab280">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab280_pos" unit="mm" x="600" y="1200" z="-1050"/>
+        <rotation name="blockA_phys0x23ab280_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="352" name="blockA_phys0x23ab370">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab370_pos" unit="mm" x="600" y="1200" z="-750"/>
+        <rotation name="blockA_phys0x23ab370_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="353" name="blockA_phys0x23ab460">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab460_pos" unit="mm" x="600" y="1200" z="-450"/>
+        <rotation name="blockA_phys0x23ab460_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="354" name="blockA_phys0x23ab550">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab550_pos" unit="mm" x="600" y="1200" z="-150"/>
+        <rotation name="blockA_phys0x23ab550_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="355" name="blockA_phys0x23ab640">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab640_pos" unit="mm" x="600" y="1200" z="150"/>
+        <rotation name="blockA_phys0x23ab640_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="356" name="blockA_phys0x23ab730">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab730_pos" unit="mm" x="600" y="1200" z="450"/>
+        <rotation name="blockA_phys0x23ab730_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="357" name="blockA_phys0x23ab820">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab820_pos" unit="mm" x="600" y="1200" z="750"/>
+        <rotation name="blockA_phys0x23ab820_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="358" name="blockA_phys0x23ab910">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ab910_pos" unit="mm" x="600" y="1200" z="1050"/>
+        <rotation name="blockA_phys0x23ab910_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="359" name="blockA_phys0x23aba00">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23aba00_pos" unit="mm" x="600" y="1200" z="1350"/>
+        <rotation name="blockA_phys0x23aba00_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="360" name="blockA_phys0x23abaf0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23abaf0_pos" unit="mm" x="-600" y="1200" z="-1350"/>
+        <rotation name="blockA_phys0x23abaf0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="361" name="blockA_phys0x23abbe0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23abbe0_pos" unit="mm" x="-600" y="1200" z="-1050"/>
+        <rotation name="blockA_phys0x23abbe0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="362" name="blockA_phys0x23abcd0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23abcd0_pos" unit="mm" x="-600" y="1200" z="-750"/>
+        <rotation name="blockA_phys0x23abcd0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="363" name="blockA_phys0x23abdc0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23abdc0_pos" unit="mm" x="-600" y="1200" z="-450"/>
+        <rotation name="blockA_phys0x23abdc0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="364" name="blockA_phys0x23abeb0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23abeb0_pos" unit="mm" x="-600" y="1200" z="-150"/>
+        <rotation name="blockA_phys0x23abeb0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="365" name="blockA_phys0x23abfa0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23abfa0_pos" unit="mm" x="-600" y="1200" z="150"/>
+        <rotation name="blockA_phys0x23abfa0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="366" name="blockA_phys0x23ac090">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ac090_pos" unit="mm" x="-600" y="1200" z="450"/>
+        <rotation name="blockA_phys0x23ac090_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="367" name="blockA_phys0x23ac180">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23ac180_pos" unit="mm" x="-600" y="1200" z="750"/>
+        <rotation name="blockA_phys0x23ac180_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="368" name="blockA_phys0x2399700">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x2399700_pos" unit="mm" x="-600" y="1200" z="1050"/>
+        <rotation name="blockA_phys0x2399700_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="369" name="blockA_phys0x23997f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x23997f0_pos" unit="mm" x="-600" y="1200" z="1350"/>
+        <rotation name="blockA_phys0x23997f0_rot" unit="deg" x="0" y="-90" z="0"/>
+      </physvol>
+      <physvol copynumber="98" name="blockB_phys0x23998e0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23998e0_pos" unit="mm" x="150" y="1200" z="-1200"/>
+      </physvol>
+      <physvol copynumber="99" name="blockB_phys0x2399980">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399980_pos" unit="mm" x="150" y="1200" z="-600"/>
+      </physvol>
+      <physvol copynumber="100" name="blockB_phys0x2399a20">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399a20_pos" unit="mm" x="150" y="1200" z="0"/>
+      </physvol>
+      <physvol copynumber="101" name="blockB_phys0x2399ac0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399ac0_pos" unit="mm" x="150" y="1200" z="600"/>
+      </physvol>
+      <physvol copynumber="102" name="blockB_phys0x2399b60">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399b60_pos" unit="mm" x="150" y="1200" z="1200"/>
+      </physvol>
+      <physvol copynumber="103" name="blockB_phys0x2399c00">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399c00_pos" unit="mm" x="-150" y="1200" z="-1200"/>
+        <rotation name="blockB_phys0x2399c00_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="104" name="blockB_phys0x2399cf0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399cf0_pos" unit="mm" x="-150" y="1200" z="-600"/>
+        <rotation name="blockB_phys0x2399cf0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="105" name="blockB_phys0x2399de0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399de0_pos" unit="mm" x="-150" y="1200" z="0"/>
+        <rotation name="blockB_phys0x2399de0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="106" name="blockB_phys0x2399ed0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399ed0_pos" unit="mm" x="-150" y="1200" z="600"/>
+        <rotation name="blockB_phys0x2399ed0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="107" name="blockB_phys0x2399fc0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x2399fc0_pos" unit="mm" x="-150" y="1200" z="1200"/>
+        <rotation name="blockB_phys0x2399fc0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="370" name="blockA_phys0x239a0b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a0b0_pos" unit="mm" x="900" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="371" name="blockA_phys0x239a150">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a150_pos" unit="mm" x="900" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="372" name="blockA_phys0x239a1f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a1f0_pos" unit="mm" x="900" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="373" name="blockA_phys0x239a290">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a290_pos" unit="mm" x="900" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="374" name="blockA_phys0x239a330">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a330_pos" unit="mm" x="900" y="1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="375" name="blockA_phys0x239a3d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a3d0_pos" unit="mm" x="600" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="376" name="blockA_phys0x239a470">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a470_pos" unit="mm" x="600" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="377" name="blockA_phys0x239a510">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a510_pos" unit="mm" x="600" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="378" name="blockA_phys0x239a5b0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a5b0_pos" unit="mm" x="600" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="379" name="blockA_phys0x239a650">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a650_pos" unit="mm" x="600" y="1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="380" name="blockA_phys0x239a6f0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a6f0_pos" unit="mm" x="-900" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="381" name="blockA_phys0x239a790">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a790_pos" unit="mm" x="-900" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="382" name="blockA_phys0x239a830">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a830_pos" unit="mm" x="-900" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="383" name="blockA_phys0x239a8d0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a8d0_pos" unit="mm" x="-900" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="384" name="blockA_phys0x239a970">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239a970_pos" unit="mm" x="-900" y="1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="385" name="blockA_phys0x239aa10">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239aa10_pos" unit="mm" x="-600" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="386" name="blockA_phys0x239aab0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239aab0_pos" unit="mm" x="-600" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="387" name="blockA_phys0x239ab50">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239ab50_pos" unit="mm" x="-600" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="388" name="blockA_phys0x239abf0">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239abf0_pos" unit="mm" x="-600" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="389" name="blockA_phys0x239ac90">
+        <volumeref ref="blockA_log0x239bd70"/>
+        <position name="blockA_phys0x239ac90_pos" unit="mm" x="-600" y="1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="108" name="blockB_phys0x239ad30">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239ad30_pos" unit="mm" x="150" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="109" name="blockB_phys0x239add0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239add0_pos" unit="mm" x="150" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="110" name="blockB_phys0x239ae70">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239ae70_pos" unit="mm" x="150" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="111" name="blockB_phys0x239af10">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239af10_pos" unit="mm" x="150" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="112" name="blockB_phys0x239afb0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239afb0_pos" unit="mm" x="150" y="1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="113" name="blockB_phys0x239b050">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239b050_pos" unit="mm" x="-150" y="1500" z="-1200"/>
+        <rotation name="blockB_phys0x239b050_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="114" name="blockB_phys0x239b140">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239b140_pos" unit="mm" x="-150" y="1500" z="-600"/>
+        <rotation name="blockB_phys0x239b140_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="115" name="blockB_phys0x239b230">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239b230_pos" unit="mm" x="-150" y="1500" z="0"/>
+        <rotation name="blockB_phys0x239b230_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="116" name="blockB_phys0x239b320">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x239b320_pos" unit="mm" x="-150" y="1500" z="600"/>
+        <rotation name="blockB_phys0x239b320_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="117" name="blockB_phys0x23c24c0">
+        <volumeref ref="blockB_log0x239c540"/>
+        <position name="blockB_phys0x23c24c0_pos" unit="mm" x="-150" y="1500" z="1200"/>
+        <rotation name="blockB_phys0x23c24c0_rot" unit="deg" x="0" y="0" z="-180"/>
+      </physvol>
+      <physvol copynumber="60" name="blockC_phys0x23c25b0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c25b0_pos" unit="mm" x="375" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="61" name="blockC_phys0x23c2650">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2650_pos" unit="mm" x="375" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="62" name="blockC_phys0x23c26f0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c26f0_pos" unit="mm" x="375" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="63" name="blockC_phys0x23c2790">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2790_pos" unit="mm" x="375" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="64" name="blockC_phys0x23c2830">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2830_pos" unit="mm" x="375" y="1500" z="1200"/>
+      </physvol>
+      <physvol copynumber="65" name="blockC_phys0x23c28d0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c28d0_pos" unit="mm" x="-375" y="1500" z="-1200"/>
+      </physvol>
+      <physvol copynumber="66" name="blockC_phys0x23c2970">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2970_pos" unit="mm" x="-375" y="1500" z="-600"/>
+      </physvol>
+      <physvol copynumber="67" name="blockC_phys0x23c2a10">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2a10_pos" unit="mm" x="-375" y="1500" z="0"/>
+      </physvol>
+      <physvol copynumber="68" name="blockC_phys0x23c2ab0">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2ab0_pos" unit="mm" x="-375" y="1500" z="600"/>
+      </physvol>
+      <physvol copynumber="69" name="blockC_phys0x23c2b50">
+        <volumeref ref="blockC_log0x239c8b0"/>
+        <position name="blockC_phys0x23c2b50_pos" unit="mm" x="-375" y="1500" z="1200"/>
+      </physvol>
+    </volume>
+    <volume name="lab_log0x239b830">
+      <materialref ref="AIR0x238c9e0"/>
+      <solidref ref="lab_box0x239b7a0"/>
+      <physvol name="lead_phys0x239bbd0">
+        <volumeref ref="lead_log0x239bad0"/>
+      </physvol>
+    </volume>
+    <volume name="world_log0x2390fb0">
+      <materialref ref="Vacuum0x23741a0"/>
+      <solidref ref="world_box0x2390bf0"/>
+      <physvol name="lab_phys0x239b930">
+        <volumeref ref="lab_log0x239b830"/>
+      </physvol>
+    </volume>
+  </structure>
+
+  <userinfo>
+    <auxiliary auxtype="Region" auxvalue="DefaultRegionForTheWorld0x191fd20">
+      <auxiliary auxtype="volume" auxvalue="world_log0x2390fb0"/>
+      <auxiliary auxtype="gamcut" auxunit="mm" auxvalue="0.7"/>
+      <auxiliary auxtype="ecut" auxunit="mm" auxvalue="0.7"/>
+      <auxiliary auxtype="poscut" auxunit="mm" auxvalue="0.7"/>
+      <auxiliary auxtype="pcut" auxunit="mm" auxvalue="0"/>
+    </auxiliary>
+  </userinfo>
+
+  <setup name="Default" version="1.0">
+    <world ref="world_log0x2390fb0"/>
+  </setup>
+
+</gdml>

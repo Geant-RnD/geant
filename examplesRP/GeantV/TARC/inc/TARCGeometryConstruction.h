@@ -20,7 +20,6 @@
 #include "Isotope.h"
 #include "Material.h"
 #include "MaterialProperties.h"
-#include "NISTElementProperties.h"
 #include "Region.h"
 #include "SystemOfUnits.h"
 #include "PhysicalConstants.h"
@@ -51,44 +50,38 @@ namespace geantphysics {
   }
 }
 
+namespace userapplication {
+class TARCGeometryConstruction : public Geant::GeantVDetectorConstruction {
+public:
+  // Constructor
+  TARCGeometryConstruction(Geant::GeantRunManager *runmgr);
+  // Destructor
+  ~TARCGeometryConstruction();
 
-namespace ApplicationTARC {
-  /********************************
-   * @author Abhijit Bhattacharyya
-   * @brief DetectorConstruction for TARC in GeantV
-   *        I am following TestEm5 example developed by Mihaly Novak
-   ********************************/
+  // interface method to define the geometry for the application
+  virtual void CreateGeometry();
 
-   class TARCGeometryConstruction : public Geant::GeantVDetectorConstruction {
-   public:
-     // Constructor
-     TARCGeometryConstruction(Geant::GeantRunManager *runmgr);
-     // Destructor
-    ~TARCGeometryConstruction();
+private:
+  //const char *
+  std::string GeomFileName = "tarc_geom.root";
+  std::string             fTargetMatName;
+  int                     fTargetLogicalVolumeID;
+  int                     fTargetRegionIndx;
+  double                  fTargetYZ;
+  double                  fTargetX;
+  double                  fWorldYZ;
+  double                  fWorldX;
 
-     // interface method to define the geometry for the application
-     virtual void CreateGeometry();
+  geantphysics::Material *fTargetMaterial;
+  geantphysics::Material *fWorldMaterial;
 
-   private:
-     const char *GeomFileName = "tarc_geom.root";
-     std::string             fTargetMatName;
-     int                     fTargetLogicalVolumeID;
-     int                     fTargetRegionIndx;
-     double                  fTargetYZ;
-     double                  fTargetX;
-     double                  fWorldYZ;
-     double                  fWorldX;
+  geantphysics::Material *fPb;
+  geantphysics::Material *fSteel;
+  geantphysics::Material *fAir;
+  geantphysics::Material *fGapMaterial;
+  geantphysics::Material *fAbsorberMaterial;
+};  // CLASS closes here
 
-     geantphysics::Material *fTargetMaterial;
-     geantphysics::Material *fWorldMaterial;
+} // namepsac eends here
 
-     geantphysics::Material *fPb;
-     geantphysics::Material *fSteel;
-     geantphysics::Material *fAir;
-     geantphysics::Material *fGapMaterial;
-     geantphysics::Material *fAbsorberMaterial;
-   };  // CLASS closes here
-
-   }        // namespace userapplication
-
-   #endif   // DETECTORCONSTRUCTION_
+#endif   // DETECTORCONSTRUCTION_

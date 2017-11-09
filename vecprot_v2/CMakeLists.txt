@@ -14,6 +14,7 @@ if (USE_REAL_PHYSICS)
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3RP/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/CaloRP/inc
+    ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
     )
 else()
   include_directories(
@@ -324,6 +325,7 @@ set(TEST_EXECUTABLES
   runAppRP.cc
   runAppTestEM3RP.cc
   runTestEm5.cc
+  runTARC.cc
   )
 
 macro(build_executables EXECUTABLES)
@@ -382,6 +384,12 @@ foreach(_script ${TestEm5_SCRIPTS})
     )
 endforeach()
 install(TARGETS runTestEm5 DESTINATION ${TestEm5_OUTPUT})
+
+### TARC
+set(TARC_OUTPUT bin/examples/TARC/GeantV)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${TARC_OUTPUT})
+install(TARGETS runTARC DESTINATION ${TARC_OUTPUT})
+
 ### The remaining ### (calo applications; runAppRP and runAppTestEM3RP will be removed soon)
 set(caloApp_OUTPUT bin/examples/Calorimeter/GeantV)
 set(caloApp_SCRIPTS caloApp.mac)

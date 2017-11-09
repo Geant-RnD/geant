@@ -7,22 +7,27 @@
 
 #include "TARC.h"
 
-namespace ApplicationTARC{
-  TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom){ // add primaryGenerator
-    fInitialized = false;
-    fTargetLogicalVolumeID = -1;
-  }
+namespace userapplication {
 
-  TARC::~TARC(){}
+TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom)
+: Geant::GeantVApplication(runmgr), fGeomSetup(geom){ // add primaryGenerator
+  fInitialized = false;
+  fTargetLogicalVolumeID = -1;
+}
 
-  bool TARC::Initialize() {
-    if (fInitialized) return true;
-    if (!fGeomSetup) {
-      Geant::Error("TARC::Initialize", "Geometry is not available!");
-      return false;
-    }
-    fTargetLogicalVolumeID = geom->GetTargetLogicalVolumeID();
-    fInitialized = true;
-    return true;
+TARC::~TARC(){}
+
+bool TARC::Initialize() {
+  if (fInitialized) return true;
+  std::cout << " Initializing......" << std::endl;
+  if (!fGeomSetup) {
+    Geant::Error("TARC::Initialize", "Geometry is not available!");
+    return false;
   }
-} // end of namespace
+  //    fTargetLogicalVolumeID = fGeomSetup->GetTargetLogicalVolumeID();
+  fInitialized = true;
+  return true;
+}
+
+
+} // namespace ends Here

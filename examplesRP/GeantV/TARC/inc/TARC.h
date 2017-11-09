@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <mutex>
 #include <cassert>
 
 #ifndef GEANT_VAPPLICATION
@@ -23,7 +24,7 @@
 #include "GeantTrackVec.h"
 #include "GeantRunManager.h"
 #include "GeantTaskData.h"
-#include "Globals.h"
+#include "globals.h"
 
 #include "Geant/Error.h"
 
@@ -31,7 +32,7 @@
 #include "PhysicsData.h"
 #include "MaterialCuts.h"
 #include "Material.h"
-#include "LighTrack.h"
+#include "LightTrack.h"
 #include "PhysicsProcess.h"
 #include "EMPhysicsProcess.h"
 #include "PhysicsManagerPerParticle.h"
@@ -49,10 +50,10 @@ namespace GEANT_IMPL_NAMESPACE {
   }
 }
 
-namespace ApplicationTARC {
+namespace userapplication {
   class TARCGeometryConstruction;
 
-  class TARC : public geant::GeantVApplication {
+  class TARC : public Geant::GeantVApplication {
   public:
     TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom); // add primaryGenerator
     virtual ~TARC();
@@ -60,12 +61,18 @@ namespace ApplicationTARC {
   public:
     virtual bool Initialize(); // @brief Interface to Initialize application
 
+
+  private:
+    TARC(const TARC &) = delete;
+    TARC &operator=(const TARC &) = delete;
+
   private:
     bool fInitialized;
     int fTargetLogicalVolumeID;
     TARCGeometryConstruction *fGeomSetup;
+    std::mutex fMutex;
 
-  }
+  };  // class ends
 
 } // namespace ends
 

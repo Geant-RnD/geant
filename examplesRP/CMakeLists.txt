@@ -6,6 +6,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/ExN03RP/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3RP/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
   ${CMAKE_SOURCE_DIR}/realphysics/dummies/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/EM/inc
@@ -41,6 +42,8 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/UserPhysicsList.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/StepMaxProcess.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/Hist.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARC.cxx  
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCGeometryConstruction.cxx
   )
 
 set(headers
@@ -60,6 +63,8 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/UserPhysicsList.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/StepMaxProcess.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/Hist.h
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCGeometryConstruction.h  
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARC.h
   )
 
 if (USE_ROOT)
@@ -122,3 +127,4 @@ if (WITH_GEANT4)
   add_subdirectory(Geant4/SimplyCalo)
   add_subdirectory(Geant4/TestEm5)
 endif()
+
