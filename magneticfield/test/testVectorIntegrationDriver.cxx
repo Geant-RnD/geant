@@ -31,7 +31,7 @@ using fieldUnits::degree;
 // #include "TemplateFieldEquationFactory.h"
 // #include "TemplateGUVIntegrationStepper.h"
 
-#include "CashKarpRKF45.h"
+#include "CashKarp.h"
 #include "FlexibleIntegrationDriver.h"
 
 // #include "FieldTrack.h"
