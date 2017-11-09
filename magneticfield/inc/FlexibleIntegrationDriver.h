@@ -23,10 +23,11 @@
 #define TemplateGUIntegrationDriver_Def
 
 #include "TemplateFieldTrack.h"
-#include "AlignedBase.h"
+#include "base/AlignedBase.h"
 #include "FieldTrack.h"
 
-#include "TemplateGUVIntegrationStepper.h"
+// #include "TemplateGUVIntegrationStepper.h"
+// #include "IntegrationStepper.h"
 
 #include "base/Vector.h"
 
@@ -43,7 +44,7 @@
 // template <class T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
-class FlexibleIntegrationDriver: public AlignedBase
+   class FlexibleIntegrationDriver : public vecgeom::AlignedBase
 {
 
   public:
@@ -53,7 +54,7 @@ class FlexibleIntegrationDriver: public AlignedBase
 
     using Real_v          = Backend;             // First adaptation
     // using Double_v        = Geant::Double_v;
-    using Bool_v          = Mask<Real_v>;
+    using Bool_v          = vecCore::Mask_v<Real_v>;
     using ThreeVectorSimd = Vector3D<Real_v>;
   
     FlexibleIntegrationDriver( double     hminimum,  //same 
@@ -175,8 +176,8 @@ class FlexibleIntegrationDriver: public AlignedBase
        // Create an independent copy of the current object -- including independent 'owned' objects
        // NOTE: Evaluate whether this method is needed - 2017.11.09
      
-     TemplateGUVEquationOfMotion<Backend>* GetEquationOfMotion() { return fpStepper->GetEquationOfMotion(); }
-     const TemplateGUVEquationOfMotion<Backend>* GetEquationOfMotion() const { return fpStepper->GetEquationOfMotion(); } 
+     // VEquationOfMotion<Backend>* GetEquationOfMotion() { return fpStepper->GetEquationOfMotion(); }
+     // const VEquationOfMotion<Backend>* GetEquationOfMotion() const { return fpStepper->GetEquationOfMotion(); } 
      
      // Auxiliary methods
      inline double GetHmin()        const { return fMinimumStep; } 
@@ -213,7 +214,7 @@ class FlexibleIntegrationDriver: public AlignedBase
      inline double ComputeAndSetErrcon();
 
      inline const T_Stepper* GetStepper() const;
-     inline T_Stepper* GetStepper();
+     inline       T_Stepper* GetStepper();
 
      void  OneGoodStep(       Real_v  ystart[], // Like old RKF45step()
                         const Real_v  dydx[],
@@ -255,19 +256,21 @@ class FlexibleIntegrationDriver: public AlignedBase
      void     SetSmallestFraction( double val ); 
 
    protected:  // without description
-     void WarnSmallStepSize( Real_v hnext, 
-                             Real_v hstep, 
-                             Real_v h,     
-                             Real_v xDone,
-                             int      noSteps) {} //;  //warnings per track, probably neeed to change all to double :ananya
-     void WarnTooManySteps ( Real_v x1start, 
+     void WarnSmallStepSize( Real_v , // hnext, 
+                             Real_v , // hstep, 
+                             Real_v , // h,     
+                             Real_v , // xDone,
+                             int    /*noSteps*/) {} //;  //warnings per track, probably neeed to change all to double :ananya
+     /* void WarnTooManySteps ( Real_v , x1start, 
                              Real_v x2end, 
-                             Real_v xCurrent) {} //;
-     void WarnEndPointTooFar( Real_v  endPointDist, 
+                             Real_v xCurrent) {} //; */
+     /* void WarnEndPointTooFar( Real_v  endPointDist, 
                               Real_v  hStepSize , 
                               Real_v  epsilonRelative,
-                              int     debugFlag) {} //;
+                              int     debugFlag) {}  */
      //  Issue warnings for undesirable situations
+
+  /***********
      //add index in order to print one at a time :ananya 
      void PrintStatus(  const Real_v*      StartArr,
                               Real_v       xstart,
@@ -285,6 +288,8 @@ class FlexibleIntegrationDriver: public AlignedBase
                                int         subStepNo,
                                double      subStepSize,
                                double      dotVelocities ) {} //;       
+  ***********/
+
      //  Verbose output for debugging
 
      void PrintStatisticsReport() {} //;
@@ -369,16 +374,16 @@ class FlexibleIntegrationDriver: public AlignedBase
 
 // #include "GUIntegratorDriver.icc"
 
-template<class Backend>
-constexpr double FlexibleIntegrationDriver<Backend>::fMaxSteppingIncrease;
+template <class Backend, class T_Stepper, unsigned int Nvar>
+constexpr double FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>::fMaxSteppingIncrease;
 
-template<class Backend>
-constexpr double FlexibleIntegrationDriver<Backend>::fMaxSteppingDecrease;
+template <class Backend, class T_Stepper, unsigned int Nvar>
+constexpr double FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>::fMaxSteppingDecrease;
 
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 inline
-double FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+double FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
    ::ComputeAndSetErrcon()
 {
   fErrcon = std::pow(fMaxSteppingIncrease/fSafetyFactor,1.0/fPowerGrow);
@@ -437,7 +442,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 inline
-const T_Stepper* FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+const T_Stepper* FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::GetStepper() const
 {
   return fpStepper;
@@ -445,7 +450,7 @@ const T_Stepper* FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 inline
-T_Stepper* FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+T_Stepper* FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::GetStepper() 
 {
   return fpStepper;
@@ -453,7 +458,7 @@ T_Stepper* FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 inline
-int FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+int FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::GetMaxNoSteps() const
 {
   return fMaxNoSteps;
@@ -461,7 +466,7 @@ int FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 inline
-void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::SetMaxNoSteps(int val)
 {
   fMaxNoSteps= val;
@@ -469,7 +474,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 inline
-void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::GetDerivatives(const TemplateFieldTrack<Backend> &y_curr, // const, INput
                          Real_v  charge, 
                          Real_v  dydx[])  // OUTput
@@ -481,7 +486,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
-const int  FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>::fMaxStepBase = 250;  // Was 5000
+const int  FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>::fMaxStepBase = 250;  // Was 5000
 
 #ifndef G4NO_FIELD_STATISTICS
 #define GVFLD_STATS  1
@@ -505,7 +510,7 @@ TH1F* gHistStepsInit=0;
 //  Constructor
 //
 template <class Backend, class T_Stepper, unsigned int Nvar>
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::FlexibleIntegrationDriver( double  hminimum, 
                                  T_Stepper *pStepper,
                                  int     numComponents,
@@ -567,8 +572,8 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 //  Copy Constructor - used by Clone
 template <class Backend, class T_Stepper, unsigned int Nvar>
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
-::FlexibleIntegrationDriver( const FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>& right ) 
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
+::FlexibleIntegrationDriver( const FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>& right ) 
  : fMinimumStep( right.fMinimumStep ),
    fSmallestFraction( right.fSmallestFraction ),
    fNoIntegrationVariables( right.fNoIntegrationVariables ),
@@ -613,7 +618,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 //  Destructor
 template <class Backend, class T_Stepper, unsigned int Nvar>
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::~FlexibleIntegrationDriver()
 { 
   if( fStatisticsVerboseLevel > 1 )
@@ -630,11 +635,11 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>* 
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>* 
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::Clone() const
 {
-   return new FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>(*this);
+   return new FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>(*this);
 }
 
 // ---------------------------------------------------------
@@ -919,7 +924,7 @@ FlexibleIntegrationDriver<double>  // scalar
 
 /*template <class Backend, class T_Stepper, unsigned int Nvar>
 void
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::WarnSmallStepSize( double hnext,
                        double hstep, 
                        double h,
@@ -948,7 +953,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
             << ",  req_tot_len: " << hstep 
             << ", done: " << xDone << ", min: " << GetHmin();
   }
-  // G4Exception("FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>::WarnSmallStepSize()", "GeomField1001",
+  // G4Exception("FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>::WarnSmallStepSize()", "GeomField1001",
   //             JustWarning, message);
   noWarningsIssued++;
 }
@@ -957,7 +962,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::WarnTooManySteps( double x1start, 
                       double x2end, 
                       double xCurrent)
@@ -986,7 +991,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::WarnEndPointTooFar( double endPointDist, 
                         double h , 
                         double epsilon,
@@ -1164,7 +1169,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 // QuickAdvance just tries one Step - it does not ensure accuracy
 template <class Backend, class T_Stepper, unsigned int Nvar>//
 typename Mask<Backend>
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::QuickAdvance( TemplateFieldTrack<Backend>&       y_posvel,         // INOUT
                   const Real_v  dydx[],  
                         Real_v  hstep,       // In
@@ -1234,7 +1239,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 #ifdef QUICK_ADV_ARRAY_IN_AND_OUT
 template <class Backend, class T_Stepper, unsigned int Nvar>
 typename Mask<Backend>  
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::QuickAdvance(       Real_v     yarrin[],    // In
                   const Real_v     dydx[],  
                         Real_v     hstep,       // In
@@ -1259,7 +1264,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 // 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 Real_v 
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::ComputeNewStepSize( Real_v  errMaxNorm,    // max error  (normalised)
                         Real_v  hstepCurrent)  // current step size
 {
@@ -1298,7 +1303,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 //
 template <class Backend, class T_Stepper, unsigned int Nvar>
 Real_v 
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::ComputeNewStepSize_WithinLimits( Real_v  errMaxNorm,    // max error  (normalised)
                                      Real_v  hstepCurrent)  // current step size
 {
@@ -1344,7 +1349,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 // ---------------------------------------------------------------------------
 /*template <class Backend, class T_Stepper, unsigned int Nvar>
 void 
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
 ::PrintStatus( const double*   StartArr,  
                      double    xstart,
                const double*   CurrentArr, 
@@ -1370,7 +1375,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 // ---------------------------------------------------------------------------
 template <class Backend, class T_Stepper, unsigned int Nvar>
-void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::PrintStatus( const TemplateFieldTrack<Backend>&  StartFT,
                  const TemplateFieldTrack<Backend>&  CurrentFT, 
                  double             requestStep, 
@@ -1448,7 +1453,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 // ---------------------------------------------------------------------------
 template <class Backend, class T_Stepper, unsigned int Nvar>
-void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::PrintStat_Aux( const TemplateFieldTrack<Backend>&  aGUFieldTrack,
                    double             requestStep, 
                    double             step_len,
@@ -1515,14 +1520,14 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 // ---------------------------------------------------------------------------
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void 
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::PrintStatisticsReport()
 {
   int noPrecBig= 6;
   int oldPrec= std::cout.precision(noPrecBig);
 
   std::cout << "FlexibleIntegrationDriver Statistics of steps undertaken. " << std::endl;
-  std::cout << "FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>: Number of Steps: "
+  std::cout << "FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>: Number of Steps: "
          << " Total= " <<  fNoTotalSteps
          << " Bad= "   <<  fNoBadSteps 
          << " Small= " <<  fNoSmallSteps 
@@ -1564,7 +1569,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
  
 // ---------------------------------------------------------------------------
 template <class Backend, class T_Stepper, unsigned int Nvar>
-void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::SetSmallestFraction(double newFraction)
 {
   if( (newFraction > 1.e-16) && (newFraction < 1e-8) )
@@ -1584,7 +1589,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 // #ifdef NEWACCURATEADVANCE
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void 
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::SetNTracks(int nTracks)
 // Set fNTracks 
 {
@@ -2615,7 +2620,7 @@ FlexibleIntegrationDrivertemplate <Backend, T_Stepper, Nvar>
 
 // New constructor. Takes in a scalar driver as well
 template <class Backend, class T_Stepper, unsigned int Nvar>
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::FlexibleIntegrationDriver( double  hminimum, 
                                  T_Stepper *pStepper,
                                  GUVIntegrationStepper                  *pScalarStepper,
@@ -2634,7 +2639,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::SetPartDebug(bool debugValue)
 {
   partDebug = debugValue;
@@ -2643,7 +2648,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void
    
-FlexibleIntegrationDriver<Backend, T_Stepper, unsigned int Nvar>
+FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   ::SetSteppingMethod(bool steppingMethod)
 {
   oneStep = steppingMethod;
