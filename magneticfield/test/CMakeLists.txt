@@ -59,7 +59,11 @@ message(STATUS "Created target for testFlexibleCashKarp")
 
 add_executable(testIntegrationDriverCashKarp testIntegrationDriverCashKarp.cxx)
 target_link_libraries(testIntegrationDriverCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-#message(STATUS "Created target for testIntegrationDriverCashKarp")
+message(STATUS "Created target for testIntegrationDriverCashKarp")
+
+add_executable(testVectorIntegrationDriver testVectorIntegrationDriver.cxx)
+target_link_libraries(testVectorIntegrationDriver Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+message(STATUS "Created target for testVectorIntegrationDriver")
 
 # add_executable(testToyClass testToyClass.cxx)
 # target_link_libraries(testToyClass Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -116,17 +120,20 @@ add_custom_target(testMagEq DEPENDS testMagFieldEquation)
 #install(TARGETS testFieldPropagator DESTINATION bin)
 install(TARGETS testMagFieldEquation DESTINATION bin)
 install(TARGETS testVectorMagFieldEquation DESTINATION bin)
+# Stepper tests
 install(TARGETS testScalarCashKarp DESTINATION bin)
 install(TARGETS testVectorCashKarp DESTINATION bin)
 install(TARGETS templatedTestVectorCashKarp DESTINATION bin)
 install(TARGETS testFlexibleCashKarp DESTINATION bin)
-install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
-install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
-install(TARGETS testStepperFixed DESTINATION bin)
+# Driver  tests
 install(TARGETS testIntegrationDriver DESTINATION bin)
-install(TARGETS testGUPropagateField DESTINATION bin)
+install(TARGETS testVectorIntegrationDriver DESTINATION bin)
+# Old tests - steppers
+install(TARGETS testStepperFixed DESTINATION bin)
 install(TARGETS testConstVecFieldStepper DESTINATION bin)
-
+# Old tests - drivers
+install(TARGETS testGUPropagateField DESTINATION bin)
+install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
 #----------------------------------------------------------------------------------------------
 # Add this directory to Doxygen
 #
