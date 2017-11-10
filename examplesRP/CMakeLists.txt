@@ -42,8 +42,9 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/UserPhysicsList.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/StepMaxProcess.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/Hist.cxx
-  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARC.cxx  
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARC.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCGeometryConstruction.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPrimaryGenerator.cxx
   )
 
 set(headers
@@ -63,7 +64,8 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/UserPhysicsList.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/StepMaxProcess.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/Hist.h
-  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCGeometryConstruction.h  
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCGeometryConstruction.h
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCPrimaryGenerator.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARC.h
   )
 
@@ -127,4 +129,3 @@ if (WITH_GEANT4)
   add_subdirectory(Geant4/SimplyCalo)
   add_subdirectory(Geant4/TestEm5)
 endif()
-

@@ -52,10 +52,11 @@ namespace GEANT_IMPL_NAMESPACE {
 
 namespace userapplication {
   class TARCGeometryConstruction;
+  class TARCPrimaryGenerator;
 
   class TARC : public Geant::GeantVApplication {
   public:
-    TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom); // add primaryGenerator
+    TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun);
     virtual ~TARC();
 
   public:
@@ -69,7 +70,10 @@ namespace userapplication {
   private:
     bool fInitialized;
     int fTargetLogicalVolumeID;
+    int fNumPrimaryPerEvent;
+    int fNumBufferedEvents;
     TARCGeometryConstruction *fGeomSetup;
+    TARCPrimaryGenerator *fPrimaryGun;
     std::mutex fMutex;
 
   };  // class ends

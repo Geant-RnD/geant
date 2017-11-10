@@ -9,10 +9,12 @@
 
 namespace userapplication {
 
-TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom)
-: Geant::GeantVApplication(runmgr), fGeomSetup(geom){ // add primaryGenerator
-  fInitialized = false;
+TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun)
+: Geant::GeantVApplication(runmgr), fGeomSetup(geom), fPrimaryGun(gun){
+  fInitialized           = false;
   fTargetLogicalVolumeID = -1;
+  fNumPrimaryPerEvent    = -1;
+  fNumBufferedEvents     = -1;
 }
 
 TARC::~TARC(){}

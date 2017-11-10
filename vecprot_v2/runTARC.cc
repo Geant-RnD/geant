@@ -21,7 +21,8 @@
 // application includes
 #include "TARC.h"
 #include "TARCGeometryConstruction.h"
-//#include "UserPrimaryGenerator.h"
+#include "TARCPrimaryGenerator.h"
+
 //#include "UserPhysicsList.h"
 
 // Parameters
@@ -33,7 +34,7 @@ void SetupUserPrimaryGenerator     (userapplication::TARCPrimaryGenerator*      
 void SetupUserApplication          (userapplication::TARC*                              app);
 Geant::GeantRunManager* RunManager();
 
-int main(int argc, int *argv[]) {
+int main(int argc, char* argv[]) {
 
   Geant::GeantRunManager *runManager = RunManager();
 
@@ -43,8 +44,8 @@ int main(int argc, int *argv[]) {
   runManager->SetDetectorConstruction(tarcGeom);
 
   // Here setup primary generator
-  userapplication::TARCPrimaryGenerator * primGenerator = new userapplication::TARCPrimaryGenerator(tarcGeom);
-  SetupUserPrimaryGenerator(tarcGUN);
+  userapplication::TARCPrimaryGenerator *primGenerator = new userapplication::TARCPrimaryGenerator(tarcGeom);
+  SetupUserPrimaryGenerator(primGenerator);
   runManager->SetPrimaryGenerator(primGenerator);
 
   // Here setup TARC application
