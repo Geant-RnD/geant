@@ -14,6 +14,7 @@
 #include "Constants.h"
 //  Update to GeantV units ASAP
 
+// #define OUTSIDE_MagFieldEquation 1
 
 template <class Field>
 class MagFieldEquation
@@ -46,12 +47,15 @@ public:
   void RightHandSide( const Real_v y[],
                             Real_v charge,
                             Real_v dydx[] ) const
+#ifdef OUTSIDE_MagFieldEquation
+     ;
+#else  
   {
     Vector3D<Real_v> Bfield;
     FieldFromY( y, Bfield );
     EvaluateRhsGivenB( y, Bfield, charge, dydx );
   }
-  
+#endif  
   template <typename Real_v>
   GEANT_FORCE_INLINE
   void EvaluateRhsGivenB(const Real_v            y[],
@@ -137,5 +141,23 @@ private:
   enum { G4maximum_number_of_field_components = 24 };
   Field    *fPtrField = nullptr; // The field object
 };
+
+#ifdef OUTSIDE_MagFieldEquation
+template <typename Real_v>
+GEANT_FORCE_INLINE
+void
+template <class Field>
+  MagFieldEquation<Field>::
+       RightHandSide( const Real_v y[],
+                            Real_v charge,
+                            Real_v dydx[] ) const
+  {
+    Vector3D<Real_v> Bfield;
+    FieldFromY( y, Bfield );
+    EvaluateRhsGivenB( y, Bfield, charge, dydx );
+  }
+#endif
+
+#undef OUTSIDE_MagFieldEquation
 
 #endif  // MagFieldEquation_H

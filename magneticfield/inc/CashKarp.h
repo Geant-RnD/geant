@@ -21,10 +21,10 @@
 
 // #include "AlignedBase.h"  // ==> Ensures alignment of storage for Vc objects
 
-// #define OUTSIDE     1
-// #define INHERITING  1    // ==> Inherit from GUVVectorIntegrationStepper
+// #define Outside_CashKarp     1
+// #define Inheriting_CashKarp  1    // ==> Inherit from GUVVectorIntegrationStepper
 
-#ifndef INHERITING
+#ifndef Inheriting_CashKarp
 #define override
 #define final
 #endif
@@ -32,7 +32,7 @@
 template
 <class T_Equation, unsigned int Nvar>
    class CashKarp
-#ifdef INHERITING
+#ifdef Inheriting_CashKarp
                    : public GUVVectorIntegrationStepper
 #endif   
 {
@@ -65,7 +65,7 @@ template
 
     template <typename Real_v> struct ScratchSpaceCashKarp; // defined below
 
-#ifdef OUTSIDE
+#ifdef Outside_CashKarp
     template <typename Real_v>
     // GEANT_FORCE_INLINE -- large method => do not force inline
     void StepWithErrorEstimate(const Real_v  yInput[],  // Consider __restrict__
@@ -165,18 +165,20 @@ template
 
         bool  fDebug= false;
 
-#ifdef OUTSIDE
+#ifdef Outside_CashKarp
 };
 #endif
 
 
 // template <class Real_v>
 // template <class T_Equation, unsigned int Nvar>   
-#ifdef OUTSIDE
-template <class Real_v, class T_Equation, unsigned int Nvar>
-inline void
+#ifdef Outside_CashKarp
+// template <class Real_v, class T_Equation, unsigned int Nvar>
+template <class Real_v>
+template <class T_Equation, unsigned int Nvar>
+void
 CashKarp<T_Equation,Nvar>::
-  template StepWithErrorEstimate<Real_v>(const Real_v  yInput[],       
+   /*template*/ StepWithErrorEstimate /*<Real_v>*/ (const Real_v  yInput[],       
 #else
    public:                     
          template <typename Real_v>
@@ -287,7 +289,7 @@ CashKarp<T_Equation,Nvar>::
     return ;
 }
 
-#ifndef OUTSIDE
+#ifndef Outside_CashKarp
 };   // End of class declaration
 
 //  The remaining functions / methods are defined below
@@ -299,7 +301,7 @@ CashKarp<T_Equation,Nvar>::
    CashKarp(  T_Equation   *EqRhs,
               unsigned int  numStateVariables )
    :
-#ifdef INHERITING   
+#ifdef Inheriting_CashKarp   
        GUVVectorIntegrationStepper( nullptr,       // EqRhs,   ==>>  Does not inherit !!
                                   sOrderMethod,
                                   Nvar,
@@ -327,7 +329,7 @@ void CashKarp<T_Equation,Nvar>::
   SetEquationOfMotion(T_Equation* equation)
 {
    fEquation_Rhs= equation;
-#ifdef INHERITING   
+#ifdef Inheriting_CashKarp   
    // this->GUVVectorIntegrationStepper::SetABCEquationOfMotion(nullptr); // fEquation_Rhs);
 #endif   
 }
@@ -339,7 +341,7 @@ inline
 CashKarp<T_Equation,Nvar>::
    CashKarp( const CashKarp& right )
    :
-#ifdef INHERITING
+#ifdef Inheriting_CashKarp
        GUVVectorIntegrationStepper( (GUVVectorEquationOfMotion*) nullptr,
                                               sOrderMethod,
                                               Nvar,
@@ -378,7 +380,7 @@ CashKarp<T_Equation,Nvar>::~CashKarp()
   std::cout<<"----- VectorCashKarp destructor (ended)"<<std::endl;
 }
 
-#ifdef INHERITING
+#ifdef Inheriting_CashKarp
 template <class T_Equation, unsigned int Nvar>
 GUVVectorIntegrationStepper* 
 CashKarp<T_Equation,Nvar>::Clone() const
@@ -421,9 +423,15 @@ CashKarp<T_Equation,Nvar>::
 }
 #endif    
 
-#ifndef INHERITING
+#ifndef Inheriting_CashKarp
 #undef override
 #undef final
+#else
+#undef Inheriting_CashKarp
+#endif
+
+#ifdef Outside_CashKarp
+#undef Outside_CashKarp
 #endif
 
 #endif /*GUV Vector CashKARP_RKF45 */
