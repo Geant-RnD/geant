@@ -63,7 +63,7 @@ public:
 
 private:
   //const char *
-  std::string GeomFileName = "tarc_geom.root";
+  std::string GeomFileName = "tarc_geometry.root";
   std::string             fTargetMatName;
   int                     fTargetLogicalVolumeID;
   int                     fTargetRegionIndx;

@@ -80,7 +80,7 @@ void SetupUserDetector(userapplication::TARCGeometryConstruction* tarcGeom) {
 
 //Setup primary generator
 void SetupUserPrimaryGenerator(userapplication::TARCPrimaryGenerator* tarcGUN) {
-  std::cout << "Inside primary Generator setting." << std::endl;
+  std::cout << " Inside primary Generator setting." << std::endl;
 }
 
 // Setup application
