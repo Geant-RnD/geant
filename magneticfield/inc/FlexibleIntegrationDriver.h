@@ -19,8 +19,8 @@
 // - Contributors: Ananya, J.Apostolakis                    2015-2017
 // --------------------------------------------------------------------
 
-#ifndef TemplateGUIntegrationDriver_Def
-#define TemplateGUIntegrationDriver_Def
+#ifndef FlexibleIntegrationDriver_Def
+#define FlexibleIntegrationDriver_Def
 
 #include "TemplateFieldTrack.h"
 #include "base/AlignedBase.h"
@@ -36,7 +36,7 @@
 
 // Adding to send in scalar driver to deal with 1/2 remaining lanes
 #include "GUIntegrationDriver.h"
-#include "GUFieldTrack.h"
+// #include "ScalarFieldTrack.h"
 
 // #define NEWACCURATEADVANCE
 
@@ -282,7 +282,7 @@ template <class Backend, class T_Stepper, unsigned int Nvar>
                         const TemplateFieldTrack<Backend>&  CurrentFT, 
                               double       requestStep, 
                               int          subStepNo ) {} //;
-     void PrintStat_Aux( const TemplateFieldTrack<Backend>& aGUFieldTrack,
+     void PrintStat_Aux( const TemplateFieldTrack<Backend>& aScalarFieldTrack,
                                double      requestStep, 
                                double      actualStep,
                                int         subStepNo,
@@ -1361,9 +1361,9 @@ FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   //                                 stepTaken(hdid)  - last step taken
   //                                 nextStep (hnext) - proposal for size
 {
-   GUFieldTrack  StartFT(ThreeVector(0,0,0),
+   ScalarFieldTrack  StartFT(ThreeVector(0,0,0),
                  ThreeVector(0,0,0), 0., 0. );
-   GUFieldTrack  CurrentFT (StartFT);
+   ScalarFieldTrack  CurrentFT (StartFT);
 
    StartFT.LoadFromArray( StartArr, fNoIntegrationVariables); 
    StartFT.SetCurveLength( xstart);
@@ -1454,15 +1454,15 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
 // ---------------------------------------------------------------------------
 template <class Backend, class T_Stepper, unsigned int Nvar>
 void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
-  ::PrintStat_Aux( const TemplateFieldTrack<Backend>&  aGUFieldTrack,
+  ::PrintStat_Aux( const TemplateFieldTrack<Backend>&  aScalarFieldTrack,
                    double             requestStep, 
                    double             step_len,
                    int                subStepNo,
                    double             subStepSize,
                    double             dotVeloc_StartCurr)
 {
-    const ThreeVector Position=      aGUFieldTrack.GetPosition();
-    const ThreeVector UnitVelocity=  aGUFieldTrack.GetMomentumDirection();
+    const ThreeVector Position=      aScalarFieldTrack.GetPosition();
+    const ThreeVector UnitVelocity=  aScalarFieldTrack.GetMomentumDirection();
  
     if( subStepNo >= 0)
     {
@@ -1472,7 +1472,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
     {
        std::cout << std::setw( 5) << "Start" << " ";
     }
-    double curveLen= aGUFieldTrack.GetCurveLength();
+    double curveLen= aScalarFieldTrack.GetCurveLength();
     std::cout << std::setw( 7) << curveLen;
     std::cout << std::setw( 9) << Position.x() << " "
            << std::setw( 9) << Position.y() << " "
@@ -1485,7 +1485,7 @@ void FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
     std::cout.precision(6);
     std::cout << std::setw(10) << dotVeloc_StartCurr << " ";
     std::cout.precision(oldprec);
-    // std::cout << std::setw( 7) << aGUFieldTrack.GetKineticEnergy();
+    // std::cout << std::setw( 7) << aScalarFieldTrack.GetKineticEnergy();
     std::cout << std::setw(12) << step_len << " ";
 
     static double oldCurveLength= 0.0;    // thread_local
@@ -1919,7 +1919,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 #ifdef PARTDEBUG
   if (partDebug)
   {
-    std::cout << "TemplateGUIntDrv: 1--step - Loop done at iter = " << iter << " with htry= " << htry <<std::endl;
+    std::cout << "FlexibleIntDrv: 1--step - Loop done at iter = " << iter << " with htry= " << htry <<std::endl;
   }
 #endif 
 
@@ -2245,7 +2245,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 #ifdef PARTDEBUG
   if (partDebug)
   {
-    std::cout << "TemplateGUIntDrv: 1--step - Loop done at iter = " << iter << " with htry= " << htry <<std::endl;
+    std::cout << "FlexibleIxntDrv: 1--step - Loop done at iter = " << iter << " with htry= " << htry <<std::endl;
     std::cout<< " hdid= "<<hdid<<" and hnext= "<<hnext<<  std::endl;
     std::cout<< "htryExhausted is: "<< htryExhausted << std::endl;
   }
@@ -2583,8 +2583,8 @@ FlexibleIntegrationDriver<vecgeom::kVc>
          Pos[i] = y[i][indLastLane];
          Mom[i] = y[i+3][indLastLane];
        } 
-      GUFieldTrack y_input(Pos, Mom); 
-      GUFieldTrack y_output(Pos, Mom);
+      ScalarFieldTrack y_input(Pos, Mom); 
+      ScalarFieldTrack y_output(Pos, Mom);
       // y_input.SetCurveLength( hTotalDoneSoFar[indLastLane] ) ;
       fpScalarDriver->AccurateAdvance(y_input, hstep[ fIndex[indLastLane] ] - hTotalDoneSoFar[indLastLane], epsilon, y_output );
 

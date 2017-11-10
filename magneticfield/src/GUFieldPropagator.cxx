@@ -61,11 +61,11 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
          )
 {
   // Do the work HERE
-  GUFieldTrack yTrackIn( startPosition, 
+  ScalarFieldTrack yTrackIn( startPosition, 
                         startDirection * startMomentumMag,
                         charge, 
                         0.0); // s_0  xo
-  GUFieldTrack yTrackOut( yTrackIn );
+  ScalarFieldTrack yTrackOut( yTrackIn );
   
   // Call the driver HERE
   //fDriver->InitializeCharge( charge );

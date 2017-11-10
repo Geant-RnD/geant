@@ -14,7 +14,7 @@
 #ifndef GUIntegrationDriver_Def
 #define GUIntegrationDriver_Def
 
-#include "GUFieldTrack.h"
+#include "ScalarFieldTrack.h"
 
 // class GUVIntegrationStepper;
 #include "GUVIntegrationStepper.h"
@@ -31,10 +31,10 @@ class GUIntegrationDriver
      ~GUIntegrationDriver();
 
      // Core methods
-     bool  AccurateAdvance( const GUFieldTrack& y_current,
+     bool  AccurateAdvance( const ScalarFieldTrack& y_current,
                                         double  hstep,
                                         double  eps, //same             // Requested y_err/hstep
-                                  GUFieldTrack& yOutput,                            
+                                  ScalarFieldTrack& yOutput,                            
                                         double  hinitial=0.0);  // take it out 
        // Above drivers for integrator (Runge-Kutta) with stepsize control. 
        // Integrates ODE starting values y_current
@@ -42,7 +42,7 @@ class GUIntegrationDriver
        // On output ystart is replaced by value at end of interval. 
        // The concept is similar to the odeint routine from NRC p.721-722.
 
-     bool  QuickAdvance(      GUFieldTrack& y_posvel,        // INOUT
+     bool  QuickAdvance(      ScalarFieldTrack& y_posvel,        // INOUT
                           const double      dydx[],  
                                 double      hstep,           // IN
 #ifdef USE_DCHORD
@@ -70,7 +70,7 @@ class GUIntegrationDriver
      inline double GetPowerGrow()   const { return fPowerGrow; } 
      inline double GetErrcon()      const { return fErrcon; }
      
-     inline void   GetDerivatives( const GUFieldTrack &y_curr,     // const, INput
+     inline void   GetDerivatives( const ScalarFieldTrack &y_curr,     // const, INput
                                         double    charge,
                                         double    dydx[]   );  //       OUTput
         // Accessors.
@@ -155,11 +155,11 @@ class GUIntegrationDriver
                               double       xcurrent, 
                               double       requestStep, 
                               int          subStepNo );
-     void PrintStatus(  const GUFieldTrack&  StartFT,
-                        const GUFieldTrack&  CurrentFT, 
+     void PrintStatus(  const ScalarFieldTrack&  StartFT,
+                        const ScalarFieldTrack&  CurrentFT, 
                               double       requestStep, 
                               int          subStepNo );
-     void PrintStat_Aux( const GUFieldTrack& aGUFieldTrack,
+     void PrintStat_Aux( const ScalarFieldTrack& aScalarFieldTrack,
                                double      requestStep, 
                                double      actualStep,
                                int         subStepNo,
@@ -200,7 +200,7 @@ class GUIntegrationDriver
         //  below this fraction the current step will be the last 
 
      const int  fNoIntegrationVariables;  // Number of Variables in integration
-     const int  fMinNoVars;               // Minimum number for GUFieldTrack
+     const int  fMinNoVars;               // Minimum number for ScalarFieldTrack
      const int  fNoVars;                  // Full number of variable
 
      int   fMaxNoSteps;
@@ -310,11 +310,11 @@ void GUIntegrationDriver::SetMaxNoSteps(int val)
 }
 
 inline
-void GUIntegrationDriver::GetDerivatives(const GUFieldTrack &y_curr, // const, INput
+void GUIntegrationDriver::GetDerivatives(const ScalarFieldTrack &y_curr, // const, INput
                                                double       charge,
                                                double       dydx[])  // OUTput
 { 
-  double  tmpValArr[GUFieldTrack::ncompSVEC];
+  double  tmpValArr[ScalarFieldTrack::ncompSVEC];
   y_curr.DumpToArray( tmpValArr  );
   fpStepper -> RightHandSideVIS( tmpValArr , charge, dydx );
 }
