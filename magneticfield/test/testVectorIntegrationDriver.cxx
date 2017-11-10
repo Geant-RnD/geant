@@ -35,7 +35,7 @@ using fieldUnits::degree;
 #include "FlexibleIntegrationDriver.h"
 
 // #include "FieldTrack.h"
-#include "TemplatedFieldTrack.h"
+#include "TemplateFieldTrack.h"
 
 // #define USECMSFIELD
 #ifdef   USECMSFIELD
