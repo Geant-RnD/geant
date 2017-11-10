@@ -32,7 +32,7 @@ typedef vecgeom::Vector3D<double>  ThreeVector;
 #include "GUVIntegrationStepper.h"
 #include "StepperFactory.h"
 
-#include "GUFieldTrack.h"
+#include "ScalarFieldTrack.h"
 #include "GUIntegrationDriver.h"
 
 
@@ -234,7 +234,7 @@ int main(int argc, char *args[])
 
     //Creating the baseline stepper
     auto exactStepperGV =
-        new GUTCashKarpRKF45<GvEquationType,Nposmom>(gvEquation2);       
+        new GUTCashKarpRKF45<GvEquationType,Nposmom>(gvEquation2);
         // new TClassicalRK4<GvEquationType,Nposmom>(gvEquation2);
     cout << "#  Reference stepper is: GUTCashKarpRKF45 <GvEquationType,Nposmom>(gvEquation2);" << endl;
     // cout << "#  Reference stepper is: TClassicalRK4 <GvEquationType,Nposmom>(gvEquation2);" << endl;    
@@ -360,7 +360,7 @@ int main(int argc, char *args[])
     const double momentumMagInit = startMomentum.Mag();
     cout << "# momentumMagInit = " << momentumMagInit << endl;
     
-    GUFieldTrack yStart( startPosition, startMomentum, particleCharge); 
+    ScalarFieldTrack yStart( startPosition, startMomentum, particleCharge); 
     double total_step =0;
     /*----------------NOW STEPPING-----------------*/
     
@@ -374,8 +374,8 @@ int main(int argc, char *args[])
         exactStepper->RightHandSideVIS(yInX, particleCharge, dydxRef);   //compute the value of dydx for the exact stepper
 
         // Driver begins at the start !
-        GUFieldTrack  yTrackIn(  startPosition, startMomentum, particleCharge );  // yStart
-        GUFieldTrack  yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
+        ScalarFieldTrack  yTrackIn(  startPosition, startMomentum, particleCharge );  // yStart
+        ScalarFieldTrack  yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
         
         if( j > 0 )  // Let's print the initial points!
         {
@@ -601,11 +601,7 @@ int main(int argc, char *args[])
     /*-----------------END-STEPPING------------------*/
 
     /*------ Clean up ------*/
-    myStepper->InformDone(); 
     
-#ifndef COMPARE_TO_G4
-    exactStepper->InformDone();
-#endif
     delete myStepper;
     delete exactStepper;
     // delete gvEquation;  // The stepper now takes ownership of the equation
