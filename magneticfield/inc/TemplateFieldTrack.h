@@ -6,8 +6,8 @@
 // Data structure bringing together a magnetic track's state.
 // (position, momentum direction & modulus, energy, spin, ... )
 // Uses/abilities:
-//  - does not maintain any relationship between its data (eg energy/momentum).
-//  - for use in Runge-Kutta solver (in passing it the values right now).
+//  - does not maintain any relationship between its data (eg E/p)
+//  - for use in Runge-Kutta solver (now in passing it the values).
 //
 // History:
 //
@@ -19,10 +19,10 @@
 //
 // History  - derived from G4FieldTrack
 // - First version: Dec 9, 2014 John Apostolakis
-// - First templated version:  Ananya Jan/Feb 2017, TemplateGUFieldTrack
+// - First templated version:  Ananya Jan/Feb 2017, (TemplateGUFieldTrack)
 //
 // - Contributors: Ananya, J.Apostolakis                    2015-2017
-// --------------------------------------------------------------------
+// -----------------------------------------------------------------------
 
 #ifndef TemplateFieldTrack_HH
 #define TemplateFieldTrack_HH
