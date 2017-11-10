@@ -11,24 +11,24 @@
 // - Created. J.Apostolakis.
 // --------------------------------------------------------------------
 
-#ifndef GUIntegrationDriver_Def
-#define GUIntegrationDriver_Def
+#ifndef ScalarIntegrationDriver_Def
+#define ScalarIntegrationDriver_Def
 
 #include "ScalarFieldTrack.h"
 
 // class GUVIntegrationStepper;
 #include "GUVIntegrationStepper.h"
 
-class GUIntegrationDriver
+class ScalarIntegrationDriver
 {
    public:  // with description
-     GUIntegrationDriver( double                 hminimum, //same
+     ScalarIntegrationDriver( double                 hminimum, //same
                           GUVIntegrationStepper *pStepper,
                           int                    numberOfComponents=6,
                           int                    statisticsVerbosity=1);
-     GUIntegrationDriver( const GUIntegrationDriver& );
+     ScalarIntegrationDriver( const ScalarIntegrationDriver& );
        // Copy constructor used to create Clone method
-     ~GUIntegrationDriver();
+     ~ScalarIntegrationDriver();
 
      // Core methods
      bool  AccurateAdvance( const ScalarFieldTrack& y_current,
@@ -55,7 +55,7 @@ class GUIntegrationDriver
        //    but does return the errors in  position and
        //        momentum (normalised: Delta_Integration(p^2)/(p^2) )
 
-     GUIntegrationDriver* Clone() const;
+     ScalarIntegrationDriver* Clone() const;
        // Create an independent copy of the current object -- including independent 'owned' objects
        // 
        // Question:  If the current object and all sub-objects are const, can it return 'this' ?
@@ -181,7 +181,7 @@ class GUIntegrationDriver
 
    private:
 
-     GUIntegrationDriver& operator=(const GUIntegrationDriver&);
+     ScalarIntegrationDriver& operator=(const ScalarIntegrationDriver&);
         // Private copy constructor and assignment operator.
 
    private:
@@ -243,14 +243,14 @@ class GUIntegrationDriver
 
 
 inline
-double GUIntegrationDriver::ComputeAndSetErrcon()
+double ScalarIntegrationDriver::ComputeAndSetErrcon()
 {
       fErrcon = std::pow(fMaxSteppingIncrease/fSafetyFactor,1.0/fPowerGrow);
       return fErrcon;
 } 
 
 inline
-void GUIntegrationDriver::ReSetParameters(double new_safety)
+void ScalarIntegrationDriver::ReSetParameters(double new_safety)
 {
       fSafetyFactor = new_safety;
       fPowerShrink  = -1.0 / fpStepper->IntegratorOrder();
@@ -259,58 +259,58 @@ void GUIntegrationDriver::ReSetParameters(double new_safety)
 }
 
 inline
-void GUIntegrationDriver::SetSafety(double val)
+void ScalarIntegrationDriver::SetSafety(double val)
 { 
       fSafetyFactor=val;
       ComputeAndSetErrcon();
 }
 
 inline
-void GUIntegrationDriver::SetPowerGrow(double  val)
+void ScalarIntegrationDriver::SetPowerGrow(double  val)
 { 
       fPowerGrow=val;
       ComputeAndSetErrcon(); 
 }
 
 inline
-void GUIntegrationDriver::SetErrcon(double val)
+void ScalarIntegrationDriver::SetErrcon(double val)
 { 
       fErrcon=val;
 }
 
 inline
-void GUIntegrationDriver::RenewStepperAndAdjust(GUVIntegrationStepper *pStepper)
+void ScalarIntegrationDriver::RenewStepperAndAdjust(GUVIntegrationStepper *pStepper)
 {  
       fpStepper = pStepper; 
       ReSetParameters();
 }
 
 inline
-const GUVIntegrationStepper* GUIntegrationDriver::GetStepper() const
+const GUVIntegrationStepper* ScalarIntegrationDriver::GetStepper() const
 {
   return fpStepper;
 }
 
 inline
-GUVIntegrationStepper* GUIntegrationDriver::GetStepper() 
+GUVIntegrationStepper* ScalarIntegrationDriver::GetStepper() 
 {
   return fpStepper;
 }
 
 inline
-int GUIntegrationDriver::GetMaxNoSteps() const
+int ScalarIntegrationDriver::GetMaxNoSteps() const
 {
   return fMaxNoSteps;
 }
 
 inline
-void GUIntegrationDriver::SetMaxNoSteps(int val)
+void ScalarIntegrationDriver::SetMaxNoSteps(int val)
 {
   fMaxNoSteps= val;
 }
 
 inline
-void GUIntegrationDriver::GetDerivatives(const ScalarFieldTrack &y_curr, // const, INput
+void ScalarIntegrationDriver::GetDerivatives(const ScalarFieldTrack &y_curr, // const, INput
                                                double       charge,
                                                double       dydx[])  // OUTput
 { 
@@ -318,4 +318,4 @@ void GUIntegrationDriver::GetDerivatives(const ScalarFieldTrack &y_curr, // cons
   y_curr.DumpToArray( tmpValArr  );
   fpStepper -> RightHandSideVIS( tmpValArr , charge, dydx );
 }
-#endif /* GUIntegrationDriver_Def */
+#endif /* ScalarIntegrationDriver_Def */

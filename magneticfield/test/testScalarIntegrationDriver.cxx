@@ -1,5 +1,5 @@
 //
-//  Test GUIntegrationDriver 
+//  Test ScalarIntegrationDriver 
 //   * compares with the output of a reference stepper (high accuracy) - ok for small steps
 // 
 //  Based on testStepperFixed.cc
@@ -33,7 +33,7 @@ typedef vecgeom::Vector3D<double>  ThreeVector;
 #include "StepperFactory.h"
 
 #include "ScalarFieldTrack.h"
-#include "GUIntegrationDriver.h"
+#include "ScalarIntegrationDriver.h"
 
 
 // #define  COMPARE_TO_G4  1
@@ -173,7 +173,7 @@ int main(int argc, char *args[])
     const double epsTol =  ( epsTolInp < 0.0 ) ? epsTolDef : epsTolInp; 
     cout << "#  Driver parameters:  eps_tol= "  << epsTol << "  h_min= " << hminimum << endl;
  
-    auto integrDriver= new GUIntegrationDriver( hminimum,
+    auto integrDriver= new ScalarIntegrationDriver( hminimum,
                                                 myStepper,
                                                 Nposmom,
                                                 statisticsVerbosity); 
@@ -215,10 +215,10 @@ int main(int argc, char *args[])
     g4Equation->SetChargeMomentumMass( chargeState,
                                        G4ThreeVector(x_mom, y_mom, z_mom).mag(), //momentum magnitude
                                        mass);  // unused
-//  auto g4exactStepper = new G4ExactHelixStepper(g4Equation);
-    auto g4exactStepper = new G4ClassicalRK4(g4Equation);
-    
-    auto exactStepper = g4ExactStepperGV;
+    auto g4exactStepper =
+                           new G4ClassicalRK4(g4Equation);
+                        // new G4ExactHelixStepper(g4Equation);
+    auto exactStepper = g4ExactStepper;
 #else
     // double yInX[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
     //                 x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};    
@@ -398,10 +398,12 @@ int main(int argc, char *args[])
 
            // Compare with a high-quality stepper -- expect it works well for this step size (check!)
            //   This builds on its previous step to create the solution !
+
+           // Call the reference stepper
 #ifdef COMPARE_TO_G4        
-           g4ExactStepper->Stepper(yInX,dydxRef,stepLengthRef,youtX,yerrX); //call the reference stepper
+           g4ExactStepper->Stepper(yInX,dydxRef,stepLengthRef,youtX,yerrX);
 #else
-           exactStepperGV->StepWithErrorEstimate(yInX,particleCharge,dydxRef,stepLengthRef,youtX,yerrX); //call the reference stepper
+           exactStepperGV->StepWithErrorEstimate(yInX,dydxRef,particleCharge,stepLengthRef,youtX,yerrX); 
 #endif
         }
         if( goodAdvance ) cout << " o";  // OK

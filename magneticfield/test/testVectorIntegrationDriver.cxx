@@ -32,7 +32,8 @@ using fieldUnits::degree;
 // #include "TemplateGUVIntegrationStepper.h"
 
 #include "CashKarp.h"
-#include "FlexibleIntegrationDriver.h"
+// #include "FlexibleIntegrationDriver.h"
+#include "SimpleIntegrationDriver.h"
 
 // #include "FieldTrack.h"
 #include "TemplateFieldTrack.h"
@@ -57,7 +58,7 @@ int main(/*int argc, char *args[]*/)
     using Double_v = Geant::Double_v;
     using Float_v =  Geant::Float_v;
 
-    using Bool_v = Mask<Double_v>;
+    using Bool_v = Mask_v<Double_v>;
     
     // typedef typename Backend::precision_v Double;
     // typedef vecgeom::Vector3D<Double> ThreeVectorSimd;
@@ -196,12 +197,13 @@ int main(/*int argc, char *args[]*/)
     testScalarDriver->InitializeCharge( particleCharge );
     //==========  Scalar Driver prepared =========================
 
-    auto myStepper = new TemplateGUTCashKarpRKF45<Double_v,GvEquationType,Nposmom>(gvEquation);
+    auto myStepper = new CashKarp<GvEquationType,Nposmom>(gvEquation);
+       // new TemplateGUTCashKarpRKF45<Double_v,GvEquationType,Nposmom>(gvEquation);       
 
     // myStepper->InitializeCharge( particleCharge );
 
     auto testVectorDriver =
-       new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar);
+       new SimpleIntegrationDriver<Double_v,StepperType,Nposmom>(hminimum, myStepper, myStepperScalar);
     // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, testScalarDriver);
 
     bool debugValue ; 

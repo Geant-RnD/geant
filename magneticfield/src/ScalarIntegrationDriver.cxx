@@ -15,12 +15,12 @@
 // #include "G4SystemOfUnits.hh"
 // #include "G4GeometryTolerance.hh"
 #include "ScalarFieldTrack.h"
-#include "GUIntegrationDriver.h"
+#include "ScalarIntegrationDriver.h"
 
 //  The (default) maximum number of steps is Base
 //  divided by the order of Stepper
 //
-const int  GUIntegrationDriver::fMaxStepBase = 250;  // Was 5000
+const int  ScalarIntegrationDriver::fMaxStepBase = 250;  // Was 5000
 
 // #ifndef G4NO_FIELD_STATISTICS
 // #define GVFLD_STATS  1
@@ -41,7 +41,7 @@ TH1F* gHistStepsInit=0;
 
 //  Constructor
 //
-GUIntegrationDriver::GUIntegrationDriver( double        hminimum, 
+ScalarIntegrationDriver::ScalarIntegrationDriver( double        hminimum, 
                                   GUVIntegrationStepper *pStepper,
                                   int                   numComponents,
                                   int                   statisticsVerbose)
@@ -97,7 +97,7 @@ GUIntegrationDriver::GUIntegrationDriver( double        hminimum,
 
 //  Copy Constructor - used by Clone
 //
-GUIntegrationDriver::GUIntegrationDriver( const GUIntegrationDriver& right ) 
+ScalarIntegrationDriver::ScalarIntegrationDriver( const ScalarIntegrationDriver& right ) 
    : fMinimumStep( right.fMinimumStep ),
      fSmallestFraction( right.fSmallestFraction ),
      fNoIntegrationVariables( right.fNoIntegrationVariables ),
@@ -142,7 +142,7 @@ GUIntegrationDriver::GUIntegrationDriver( const GUIntegrationDriver& right )
 
 //  Destructor
 //
-GUIntegrationDriver::~GUIntegrationDriver()
+ScalarIntegrationDriver::~ScalarIntegrationDriver()
 { 
   if( fStatisticsVerboseLevel > 1 )
   {
@@ -151,15 +151,15 @@ GUIntegrationDriver::~GUIntegrationDriver()
 }
 
 
-GUIntegrationDriver* GUIntegrationDriver::Clone() const
+ScalarIntegrationDriver* ScalarIntegrationDriver::Clone() const
 {
-   return new GUIntegrationDriver(*this);
+   return new ScalarIntegrationDriver(*this);
 }
 
 // ---------------------------------------------------------
 
 bool
-GUIntegrationDriver::AccurateAdvance(const ScalarFieldTrack& yInput,
+ScalarIntegrationDriver::AccurateAdvance(const ScalarFieldTrack& yInput,
                                               double     hstep,
                                               double     epsilon,
                                            ScalarFieldTrack& yOutput,
@@ -177,7 +177,7 @@ GUIntegrationDriver::AccurateAdvance(const ScalarFieldTrack& yInput,
   //  - the return value is 'true' if integration succeeded to the end of the interval,
   //    and 'false' otherwise.
   
-  // std::cout << "AccurateAdvance of GUIntegrationDriver" << std::endl;
+  // std::cout << "AccurateAdvance of ScalarIntegrationDriver" << std::endl;
 
   constexpr double perMillion  = 1.0e-6;
   constexpr double perThousand = 1.0e-3;
@@ -512,7 +512,7 @@ GUIntegrationDriver::AccurateAdvance(const ScalarFieldTrack& yInput,
 // ---------------------------------------------------------
 
 void
-GUIntegrationDriver::WarnSmallStepSize( double hnext,
+ScalarIntegrationDriver::WarnSmallStepSize( double hnext,
                                         double hstep, 
                                         double h,
                                         double xDone,
@@ -522,7 +522,7 @@ GUIntegrationDriver::WarnSmallStepSize( double hnext,
   const  int maxNoWarnings =  10;   // Number of verbose warnings
   // std::ostringstream message;
   // typedef std::cerr message;
-  std::cerr << " WARNING from GUIntegrationDriver::WarnSmallStepSize():  " ; // << std::endl;
+  std::cerr << " WARNING from scalarIntegrationDriver::WarnSmallStepSize():  " ; // << std::endl;
   if( (noWarningsIssued < maxNoWarnings) || fVerboseLevel > 10 )
   {
     std::cerr << "The stepsize for the next iteration, " << hnext
@@ -540,7 +540,7 @@ GUIntegrationDriver::WarnSmallStepSize( double hnext,
             << ",  req_tot_len: " << hstep 
             << ", done: " << xDone << ", min: " << GetHmin();
   }
-  // G4Exception("GUIntegrationDriver::WarnSmallStepSize()", "GeomField1001",
+  // G4Exception("ScalarIntegrationDriver::WarnSmallStepSize()", "GeomField1001",
   //             JustWarning, message);
   noWarningsIssued++;
 }
@@ -548,12 +548,12 @@ GUIntegrationDriver::WarnSmallStepSize( double hnext,
 // ---------------------------------------------------------
 
 void
-GUIntegrationDriver::WarnTooManySteps( double x1start, 
+ScalarIntegrationDriver::WarnTooManySteps( double x1start, 
                                   double x2end, 
                                   double xCurrent)
 {
    // std::ostringstream message;
-   std::cerr << "WARNING from GUIntegrationDriver::WarnTooManySteps()" << std::endl;
+   std::cerr << "WARNING from ScalarIntegrationDriver::WarnTooManySteps()" << std::endl;
    std::cerr << "The number of steps used in the Integration driver"
              << " (Runge-Kutta) is too many." << std::endl
              << "Integration of the interval was not completed !" << std::endl;
@@ -568,14 +568,14 @@ GUIntegrationDriver::WarnTooManySteps( double x1start,
              << std::endl;
    // std::cerr.unsetf (std::ios_base::scientific);
    std::cerr.precision(oldPrec);
-   // G4Exception("GUIntegrationDriver::WarnTooManySteps()", "GeomField1001",
+   // G4Exception("ScalarIntegrationDriver::WarnTooManySteps()", "GeomField1001",
    //             JustWarning, message);
 }
 
 // ---------------------------------------------------------
 
 void
-GUIntegrationDriver::WarnEndPointTooFar (double endPointDist, 
+ScalarIntegrationDriver::WarnEndPointTooFar (double endPointDist, 
                                          double   h , 
                                          double  epsilon,
                                          int     dbg)
@@ -592,7 +592,7 @@ GUIntegrationDriver::WarnEndPointTooFar (double endPointDist,
   { 
     static int noWarnings = 0;  // thread_local
     // std::ostringstream message;
-    std::cerr << "WARNING in GUIntegrationDriver::WarnEndPointTooFar()" << std::endl;
+    std::cerr << "WARNING in ScalarIntegrationDriver::WarnEndPointTooFar()" << std::endl;
     if( (noWarnings ++ < 10) || (dbg>2) )
     {
       std::cerr << "The integration produced an end-point which "
@@ -604,7 +604,7 @@ GUIntegrationDriver::WarnEndPointTooFar (double endPointDist,
               << "  Difference (curveLen-endpDist)= " << (h - endPointDist)
               << ", relative = " << (h-endPointDist) / h 
               << ", epsilon =  " << epsilon << std::endl;
-    // G4Exception("GUIntegrationDriver::WarnEndPointTooFar()", "GeomField1001",
+    // G4Exception("ScalarIntegrationDriver::WarnEndPointTooFar()", "GeomField1001",
     //             JustWarning, message);
   }
 }
@@ -612,7 +612,7 @@ GUIntegrationDriver::WarnEndPointTooFar (double endPointDist,
 // ---------------------------------------------------------
 
 void
-GUIntegrationDriver::OneGoodStep(  double y[],        // InOut
+ScalarIntegrationDriver::OneGoodStep(  double y[],        // InOut
                                    double charge,
                              const double dydx[],
                                    double& x,         // InOut
@@ -682,7 +682,7 @@ GUIntegrationDriver::OneGoodStep(  double y[],        // InOut
        // errmom_sq = sumerr_sq * inv_magmom_sq;
        errmom_sq = sumerr_sq / magmom_sq; 
     } else {
-       std::cerr << "** GUIntegrationDriver: found case of zero momentum." 
+       std::cerr << "** ScalarIntegrationDriver: found case of zero momentum." 
                  << " iteration=  " << iter << " h= " << h << std::endl; 
        errmom_sq = sumerr_sq;
     }
@@ -763,7 +763,7 @@ GUIntegrationDriver::OneGoodStep(  double y[],        // InOut
 
 // QuickAdvance just tries one Step - it does not ensure accuracy
 //
-bool  GUIntegrationDriver::QuickAdvance(       
+bool  ScalarIntegrationDriver::QuickAdvance(       
                             ScalarFieldTrack& y_posvel,         // INOUT
                             const double     dydx[],  
                                   double     hstep,       // In
@@ -851,7 +851,7 @@ bool  GUIntegrationDriver::QuickAdvance(
 // --------------------------------------------------------------------------
 
 #ifdef QUICK_ADV_ARRAY_IN_AND_OUT
-bool  GUIntegrationDriver::QuickAdvance(       
+bool  ScalarIntegrationDriver::QuickAdvance(       
                                   double     yarrin[],    // In
                             const double     dydx[],  
                                   double     hstep,       // In
@@ -859,7 +859,7 @@ bool  GUIntegrationDriver::QuickAdvance(
                                   double&    dchord_step,
                                   double&    dyerr )      // In length
 {
-   std::cerr << "ERROR in GUIntegrationDriver::QuickAdvance()" << std::endl;
+   std::cerr << "ERROR in ScalarIntegrationDriver::QuickAdvance()" << std::endl;
    std::cerr << "      Method is not yet implemented." << std::endl;
 
    //            FatalException, "Not yet implemented.");
@@ -875,7 +875,7 @@ bool  GUIntegrationDriver::QuickAdvance(
 //   within  certain factors
 // 
 double 
-GUIntegrationDriver::ComputeNewStepSize( 
+ScalarIntegrationDriver::ComputeNewStepSize( 
                           double  errMaxNorm,    // max error  (normalised)
                           double  hstepCurrent)  // current step size
 {
@@ -905,7 +905,7 @@ GUIntegrationDriver::ComputeNewStepSize(
 // They are kept separate currently for optimisation.
 //
 double 
-GUIntegrationDriver::ComputeNewStepSize_WithinLimits( 
+ScalarIntegrationDriver::ComputeNewStepSize_WithinLimits( 
                           double  errMaxNorm,    // max error  (normalised)
                           double  hstepCurrent)  // current step size
 {
@@ -937,7 +937,7 @@ GUIntegrationDriver::ComputeNewStepSize_WithinLimits(
 
 // ---------------------------------------------------------------------------
 
-void GUIntegrationDriver::PrintStatus( const double*   StartArr,  
+void ScalarIntegrationDriver::PrintStatus( const double*   StartArr,  
                                    double          xstart,
                                    const double*   CurrentArr, 
                                    double          xcurrent,
@@ -961,7 +961,7 @@ void GUIntegrationDriver::PrintStatus( const double*   StartArr,
 
 // ---------------------------------------------------------------------------
 
-void GUIntegrationDriver::PrintStatus(
+void ScalarIntegrationDriver::PrintStatus(
                   const ScalarFieldTrack&  StartFT,
                   const ScalarFieldTrack&  CurrentFT, 
                   double             requestStep, 
@@ -987,7 +987,7 @@ void GUIntegrationDriver::PrintStatus(
        subStepNo = - subStepNo;        // To allow printing banner
 
        std::cout << std::setw( 6)  << " " << std::setw( 25)
-              << " GUIntegrationDriver: Current Position  and  Direction" << " "
+              << " ScalarIntegrationDriver: Current Position  and  Direction" << " "
               << std::endl; 
        std::cout << std::setw( 5) << "Step#" << " "
               << std::setw( 7) << "s-curve" << " "
@@ -1039,7 +1039,7 @@ void GUIntegrationDriver::PrintStatus(
 
 // ---------------------------------------------------------------------------
 
-void GUIntegrationDriver::PrintStat_Aux(
+void ScalarIntegrationDriver::PrintStat_Aux(
                   const ScalarFieldTrack&  aScalarFieldTrack,
                   double             requestStep, 
                   double             step_len,
@@ -1105,13 +1105,13 @@ void GUIntegrationDriver::PrintStat_Aux(
 
 // ---------------------------------------------------------------------------
 
-void GUIntegrationDriver::PrintStatisticsReport()
+void ScalarIntegrationDriver::PrintStatisticsReport()
 {
   int noPrecBig= 6;
   int oldPrec= std::cout.precision(noPrecBig);
 
-  std::cout << "GUIntegrationDriver Statistics of steps undertaken. " << std::endl;
-  std::cout << "GUIntegrationDriver: Number of Steps: "
+  std::cout << "ScalarIntegrationDriver Statistics of steps undertaken. " << std::endl;
+  std::cout << "ScalarIntegrationDriver: Number of Steps: "
          << " Total= " <<  fNoTotalSteps
          << " Bad= "   <<  fNoBadSteps 
          << " Small= " <<  fNoSmallSteps 
@@ -1154,7 +1154,7 @@ void GUIntegrationDriver::PrintStatisticsReport()
  
 // ---------------------------------------------------------------------------
 
-void GUIntegrationDriver::SetSmallestFraction(double newFraction)
+void ScalarIntegrationDriver::SetSmallestFraction(double newFraction)
 {
   if( (newFraction > 1.e-16) && (newFraction < 1e-8) )
   {

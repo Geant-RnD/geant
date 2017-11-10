@@ -57,21 +57,20 @@ target_link_libraries(testFlexibleCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES
 message(STATUS "Created target for testFlexibleCashKarp")
 ## --------  End of Stepper Tests
 
-add_executable(testIntegrationDriverCashKarp testIntegrationDriverCashKarp.cxx)
-target_link_libraries(testIntegrationDriverCashKarp Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-message(STATUS "Created target for testIntegrationDriverCashKarp")
+## ########  Start of Integration Driver Tests #############
+## 
+add_executable(testScalarIntegrationDriver testScalarIntegrationDriver.cxx)
+target_link_libraries(testScalarIntegrationDriver Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+message(STATUS "Created target for testScalarIntegrationDriver")
 
 add_executable(testVectorIntegrationDriver testVectorIntegrationDriver.cxx)
 target_link_libraries(testVectorIntegrationDriver Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 message(STATUS "Created target for testVectorIntegrationDriver")
+## --------  End   of Integration Driver Tests -------------
 
 # add_executable(testToyClass testToyClass.cxx)
 # target_link_libraries(testToyClass Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 # message(STATUS "Created target for testToyClass")
-
-# add_executable(testVectorIntegrationDriver testVectorIntegrationDriver.cxx)
-# target_link_libraries(testVectorIntegrationDriver Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-# message(STATUS "Created target for testVectorIntegrationDriver")
 
 # add_executable(BenchmarkIntegrationDriver BenchmarkIntegrationDriver.cxx) ## ${sources} ${headers})
 # target_link_libraries(BenchmarkIntegrationDriver Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -79,7 +78,6 @@ message(STATUS "Created target for testVectorIntegrationDriver")
 
 #add_executable(TestConstBzStepper TestConstBzStepper.cxx) ## ${sources} ${headers})
 #target_link_libraries(TestConstBzStepper Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-
 
 add_executable(ReproduceError ReproduceError.cxx)
 target_link_libraries(ReproduceError Vmagfield Geant_v ${VECGEOM_LIBRARIES} ${VECGEOM_LIBRARIES_EXTERNAL} ${USERKERNELLIB} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -93,9 +91,10 @@ add_executable(testStepperFixed testStepperFixed.cxx)
 target_link_libraries(testStepperFixed -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Vmagfield Geant_v ${VECGEOM_LIBRARIES})
 message(STATUS "Created target for testStepperFixed")
 
-add_executable(testIntegrationDriver testIntegrationDriver.cxx) ## ${sources} ${headers})
-target_link_libraries(testIntegrationDriver -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Vmagfield Geant_v ${VECGEOM_LIBRARIES})
-message(STATUS "Created target for testIntegrationDriver")
+### Old test(s) ------
+# add_executable(testIntegrationDriver testIntegrationDriver.cxx) ## ${sources} ${headers})
+# target_link_libraries(testIntegrationDriver -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Vmagfield Geant_v ${VECGEOM_LIBRARIES})
+# message(STATUS "Created target for testIntegrationDriver")
 
 add_executable(testGUPropagateField testGUPropagateField.cxx) ## ${sources} ${headers})
 target_link_libraries(testGUPropagateField -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Vmagfield Geant_v ${VECGEOM_LIBRARIES})
@@ -126,14 +125,15 @@ install(TARGETS testVectorCashKarp DESTINATION bin)
 install(TARGETS templatedTestVectorCashKarp DESTINATION bin)
 install(TARGETS testFlexibleCashKarp DESTINATION bin)
 # Driver  tests
-install(TARGETS testIntegrationDriver DESTINATION bin)
+## install(TARGETS testFlexibleIntegrationDriver DESTINATION bin)
 install(TARGETS testVectorIntegrationDriver DESTINATION bin)
 # Old tests - steppers
 install(TARGETS testStepperFixed DESTINATION bin)
 install(TARGETS testConstVecFieldStepper DESTINATION bin)
 # Old tests - drivers
+install(TARGETS testScalarIntegrationDriver DESTINATION bin)
 install(TARGETS testGUPropagateField DESTINATION bin)
-install(TARGETS testIntegrationDriverCashKarp DESTINATION bin)
+
 #----------------------------------------------------------------------------------------------
 # Add this directory to Doxygen
 #

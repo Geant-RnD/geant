@@ -361,8 +361,8 @@ template <class Backend, class T_Stepper, unsigned int Nvar>
      // Could be varied during tracking - to help identify issues
 #ifdef NEWACCURATEADVANCE
      //Variables required for track insertion algorithm
-     int kVectorSize = 4; //can be templated on the backend somehow
-     int *fIndex; // or int fIndex[kVectorSize]
+     constexpr unsigned int kVectorSize = 4; // TODO: template it on the backend 
+     int fIndex[kVectorSize]; // int *fIndex; 
      int fNTracks;
      int fStepperCalls = 0;
      GUVIntegrationStepper *fpScalarStepper;
@@ -565,8 +565,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
 #endif
 
   //For track insertion
-  fIndex = new int[kVectorSize];
-
+  // fIndex = new int[kVectorSize];
 }
 
 
@@ -627,13 +626,12 @@ FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
   }
 
   // delete[] fIndex;
-  delete fIndex;
   // delete fpScalarDriver;
   // delete fpScalarStepper;
   // delete fpStepper;
 }
 
-
+#if 0
 template <class Backend, class T_Stepper, unsigned int Nvar>
 FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>* 
 FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
@@ -641,11 +639,12 @@ FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
 {
    return new FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>(*this);
 }
+#endif
 
 // ---------------------------------------------------------
-template<>
+template <class Backend, class T_Stepper, unsigned int Nvar>
 void
-FlexibleIntegrationDriver<double>::OneGoodStep(  double y[],        // InOut
+   FlexibleIntegrationDriver<double,T_Stepper,Nvar>::OneGoodStep(  double y[],        // InOut
                              const double dydx[],
                                    double& x,         // InOut
                                    double htry,
@@ -757,13 +756,14 @@ FlexibleIntegrationDriver<double>::OneGoodStep(  double y[],        // InOut
   return;
 }   // end of  OneGoodStep .............................
 
+// ----------------------------------------------------------------------------------
 
-template </*class Backend*/>
+template <class Backend, class T_Stepper, unsigned int Nvar>
 bool 
 FlexibleIntegrationDriver<double>  // scalar
   ::AccurateAdvance(const TemplateFieldTrack<double>& yInput,  // scalar
-                          double  hstep,
-                          double                         epsilon,
+                          double                      hstep,
+                          double                      epsilon,
                           TemplateFieldTrack<double>& yOutput )
                           // Real_v  hinitial)
 {
@@ -1030,7 +1030,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
 
 template </*class Backend*/>
 void
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::OneGoodStep(       Real_v y[],        // InOut
                  const Real_v dydx[],
                        Real_v& x,         // InOut
@@ -1056,8 +1056,8 @@ FlexibleIntegrationDriver<vecgeom::kVc>
   Real_v errmax_sq;
   Real_v h, htemp, xnew ;
 
-  Real_v yerr [TemplateFieldTrack<vecgeom::kVc>::ncompSVEC], 
-           ytemp[TemplateFieldTrack<vecgeom::kVc>::ncompSVEC];
+  Real_v yerr [TemplateFieldTrack<<Real_v, T_Stepper, Nvar>>::ncompSVEC], 
+           ytemp[TemplateFieldTrack<<Real_v, T_Stepper, Nvar>>::ncompSVEC];
 
   // std::cout << "OneGoodStep called with htry= " << htry << std::endl;
   
@@ -1600,7 +1600,7 @@ FlexibleIntegrationDriver<Backend, T_Stepper, Nvar>
 
 template </*class Backend*/>
 void 
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::InitializeAccurateAdvance(/*const*/ FieldTrack yInput[],
                               const double     hstep [],
                                     Real_vy[],
@@ -1632,7 +1632,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 
 template </*class Backend*/>
 bool 
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::InsertNewTrack( /*const*/ FieldTrack                    yInput[],
                     const double                        hstep[],
                     const int                           currIndex,
@@ -1697,13 +1697,13 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 
 template </*class Backend*/>
 void 
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::StoreOutput(const Real_vy[],
                 const Real_vx,
-                      FieldTrack                    yOutput[],
-                      int                           currIndex,
-                      double                        hstep[],
-                      bool                          succeeded[] )
+                      FieldTrack   yOutput[],
+                      int          currIndex,
+                      double       hstep[],
+                      bool         succeeded[] )
 // Called whenever a lane is finished.
 // Stores value of succeeded in the bool[nTracks]
 // Stores final curve length and end position and momentum
@@ -1746,7 +1746,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 
 template </*class Backend*/>
 void
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::OneStep(       Real_v y[],        // InOut
              const Real_v dydx[],
                    Real_v& x,         // InOut
@@ -1776,7 +1776,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
   Real_v errmax_sq;
   Real_v h, htemp, xnew ;
 
-  int ncompSVEC = TemplateFieldTrack<vecgeom::kVc>::ncompSVEC;
+  int ncompSVEC = TemplateFieldTrack<Real_v>::ncompSVEC;
 
   Real_v yerr [ncompSVEC], 
            ytemp[ncompSVEC];
@@ -1948,7 +1948,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 
 template </*class Backend*/>
 void
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::KeepStepping(       Real_v  y[],        // InOut
                         Real_v  dydx[],
                         Real_v& x,         // InOut
@@ -1973,8 +1973,8 @@ FlexibleIntegrationDriver<vecgeom::kVc>
   Real_v errmax_sq;
   Real_v h, htemp, xnew ;
 
-  Real_v yerr [TemplateFieldTrack<vecgeom::kVc>::ncompSVEC], 
-           ytemp[TemplateFieldTrack<vecgeom::kVc>::ncompSVEC];
+  Real_v yerr [TemplateFieldTrack<Real_v>::ncompSVEC], 
+           ytemp[TemplateFieldTrack<Real_v>::ncompSVEC];
 
   h = htry ; // Set stepsize to the initial trial value
 
@@ -1992,8 +1992,8 @@ FlexibleIntegrationDriver<vecgeom::kVc>
   int finished[kVectorSize] = {0}; // This makes all elements of array 0
 
   Real_v hFinal(0.), hnextFinal, xFinal, hdidFinal, errmax_sqFinal;
-  Real_v yFinal[TemplateFieldTrack<vecgeom::kVc>::ncompSVEC]; // = y[]
-  for (int i = 0; i < TemplateFieldTrack<vecgeom::kVc>::ncompSVEC; ++i)
+  Real_v yFinal[TemplateFieldTrack<Real_v>::ncompSVEC]; // = y[]
+  for (int i = 0; i < TemplateFieldTrack<Real_v>::ncompSVEC; ++i)
   {
     yFinal[i] = y[i];
   }
@@ -2093,7 +2093,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
               }
             #endif 
               errmax_sqFinal [i] = errmax_sq[i];
-              for (int j = 0; j < TemplateFieldTrack<vecgeom::kVc>::ncompSVEC; ++j)
+              for (int j = 0; j < TemplateFieldTrack<Real_v>::ncompSVEC; ++j)
               {
                 yFinal[j][i] = ytemp[j][i];
               }
@@ -2165,7 +2165,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
               }
             #endif 
               errmax_sqFinal [i] = errmax_sq[i];
-              for (int j = 0; j < TemplateFieldTrack<vecgeom::kVc>::ncompSVEC; ++j)
+              for (int j = 0; j < TemplateFieldTrack<Real_v>::ncompSVEC; ++j)
               {
                 yFinal[j][i] = ytemp[j][i];
               }
@@ -2258,7 +2258,7 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 #ifdef NEWACCURATEADVANCE
 template </*class Backend*/>
 void
-FlexibleIntegrationDriver<vecgeom::kVc>
+FlexibleIntegrationDriver<<Real_v, T_Stepper, Nvar>>
   ::AccurateAdvance(/*const*/ FieldTrack yInput[],
                           double     hstep[],
                           double     epsilon,
@@ -2283,13 +2283,11 @@ FlexibleIntegrationDriver<vecgeom::kVc>
 
   #define PARTDEBUG
 
-  typedef typename vecgeom::kVc::precision_v Real_v;
-  typedef typename vecgeom::kVc::bool_v      Bool_v;
-  typedef vecgeom::Vector3D<Real_v>   ThreeVector;
+  using ThreeVector = vecgeom::Vector3D<Real_v>;
 
   Real_v x, hnext, hdid, h;
 
-  int ncompSVEC = TemplateFieldTrack<vecgeom::kVc>::ncompSVEC; //12, to be derived from TemplateFieldTrack
+  int ncompSVEC = TemplateFieldTrack<Real_v>::ncompSVEC; //12, to be derived from TemplateFieldTrack
 
 #ifdef GUDEBUG_FIELD
   // static int dbg=1;
