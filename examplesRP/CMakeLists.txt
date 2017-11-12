@@ -7,6 +7,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3RP/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/inc
   ${CMAKE_SOURCE_DIR}/realphysics/dummies/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/EM/inc
@@ -45,6 +46,9 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARC.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCGeometryConstruction.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPrimaryGenerator.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/src/Troitsk.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/src/TroitskGeometryConstruction.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/src/TroitskPrimaryGenerator.cxx
   )
 
 set(headers
@@ -67,6 +71,9 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCGeometryConstruction.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCPrimaryGenerator.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARC.h
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/inc/TroitskGeometryConstruction.h
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/inc/TroitskPrimaryGenerator.h
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/inc/Troitsk.h
   )
 
 if (USE_ROOT)

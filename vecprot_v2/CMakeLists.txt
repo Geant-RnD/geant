@@ -15,6 +15,7 @@ if (USE_REAL_PHYSICS)
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/CaloRP/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
+    ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/Troitsk/inc
     )
 else()
   include_directories(
@@ -328,6 +329,7 @@ set(TEST_EXECUTABLES
   runAppTestEM3RP.cc
   runTestEm5.cc
   runTARC.cc
+  runTroitsk.cc
   )
 
 macro(build_executables EXECUTABLES)
@@ -391,6 +393,12 @@ install(TARGETS runTestEm5 DESTINATION ${TestEm5_OUTPUT})
 set(TARC_OUTPUT bin/examples/TARC/GeantV)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${TARC_OUTPUT})
 install(TARGETS runTARC DESTINATION ${TARC_OUTPUT})
+
+### Troitsk
+set(Troitsk_OUTPUT bin/examples/Troitsk/GeantV)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${Troitsk_OUTPUT})
+install(TARGETS runTroitsk DESTINATION ${Troitsk_OUTPUT})
+
 
 ### The remaining ### (calo applications; runAppRP and runAppTestEM3RP will be removed soon)
 set(caloApp_OUTPUT bin/examples/Calorimeter/GeantV)
