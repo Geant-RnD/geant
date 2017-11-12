@@ -580,7 +580,11 @@ endif()
 #
 include_directories("${PROJECT_SOURCE_DIR}/vecprot_v2/inc")
 include_directories("${PROJECT_SOURCE_DIR}/base/inc")
+if(USE_ROOT)
+  include_directories("${PROJECT_SOURCE_DIR}/Nudy/inc")
+endif()
 if(USE_REAL_PHYSICS)
+  include_directories("${PROJECT_SOURCE_DIR}/Nudy/inc")
   include_directories("${PROJECT_SOURCE_DIR}/examplesRP/inc")
 else()
   include_directories("${PROJECT_SOURCE_DIR}/xsec/inc")
@@ -599,18 +603,26 @@ add_custom_target(_headers ALL)
 message(STATUS "COMPILATION FLAGS ARE -${GEANTV_CXX_FLAGS} - ${GEANTV_COMPILATION_FLAGS}")
 add_subdirectory (base)
 add_subdirectory (numa)
+
+if (ROOT_mathmore_FOUND)
+  add_subdirectory (Nudy)
+endif()
+
 if(NOT USE_REAL_PHYSICS)
   add_subdirectory (xsec)
 endif()
+
 if(USE_TBB)
   add_subdirectory (vecprot_v2_tbb)
 endif()
 add_subdirectory (vecprot_v2)
+
 if(USE_REAL_PHYSICS)
   add_subdirectory (examplesRP)
 else()
   add_subdirectory (examples)
 endif()
+
 if(WITH_GEANT4 AND NOT (CUDA) AND USE_ROOT AND NOT (USE_REAL_PHYSICS))
   add_subdirectory (tabxsec)
   add_subdirectory (test-small)
@@ -620,10 +632,8 @@ if(WITH_GEANT4 AND NOT (CUDA) AND USE_ROOT AND NOT (USE_REAL_PHYSICS))
 endif()
 add_subdirectory (magneticfield)
 if(USE_ROOT AND NOT (USE_REAL_PHYSICS))
-  add_subdirectory (fastsim)
-endif()
-if (ROOT_mathmore_FOUND)
   add_subdirectory (Nudy)
+  add_subdirectory (fastsim)
 endif()
 
 if(USE_VECPHYS)
@@ -644,9 +654,6 @@ endif()
 if (USE_VECGEOM_NAVIGATOR)
   add_subdirectory(material)
 endif()
-
-
-
 
 #----------------------------------------------------------------------------------------------
 # Process Doxygen file

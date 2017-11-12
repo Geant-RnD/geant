@@ -30,6 +30,7 @@ file(GLOB headers
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/HAD/inc/*.h
   ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc/*.h
   ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc/*.h
+  ${CMAKE_SOURCE_DIR}/Nudy/inc/*.h
 )
 
 include_directories(
@@ -44,6 +45,7 @@ include_directories(
    ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc
    ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc
    ${CMAKE_SOURCE_DIR}/numa/inc
+   ${CMAKE_SOURCE_DIR}/Nudy/inc
 )
 
 #----------------------------------------------------------------------------------------------

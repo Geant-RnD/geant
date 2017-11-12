@@ -3,6 +3,8 @@
 
 #include "TNudyEndfRecoPoint.h"
 
+namespace NudyPhysics {
+
 class TNudyEndfDoppler : public TNudyEndfRecoPoint {
 
 public:
@@ -36,10 +38,14 @@ private:
   double EMAX;
   double EMIN;
   double Y;
-  double XSUM;
-  int ncrs, IPP, KPP, size;
+  double XSUM, sigDiff,xss;
+  int ncrs, IPP, KPP, size, mipp, jloop, mloop, kloop;
+  double recursionLinear1(std::vector<double> &x1, std::vector<double> &x2, double x,  double y,  double sig,  double xd,  double yd, double sigd );
+  double broadMore (std::vector<double> &x1 , std::vector<double> &x2 , double xp ) ;
 #ifdef USE_ROOT
   ClassDef(TNudyEndfDoppler, 1)
 #endif
 };
+
+} // namespace 
 #endif

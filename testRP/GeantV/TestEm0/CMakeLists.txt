@@ -16,6 +16,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
   )
 
 #----------------------------------------------------------------------------------------------
@@ -25,7 +26,7 @@ set(OUTPUT bin/testRP/TestEm0/GeantV)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 add_executable(TestEm0_GV ${CMAKE_SOURCE_DIR}/testRP/GeantV/TestEm0/TestEm0_GV.cc ${sources})
-target_link_libraries(TestEm0_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics)
+target_link_libraries(TestEm0_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Nudy)
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build/install directory.

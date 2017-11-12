@@ -3,19 +3,32 @@
 
 #include <vector>
 #include <fstream>
-class TNudyEndfNuPh;
-class TNudyEndfFissionYield;
-class TNudyEndfEnergy;
-class TNudyEndfEnergyAng;
-class TNudyEndfAng;
-class TNudyEndfFile;
-class TNudyEndfList;
+namespace Nudy {
+	class TNudyEndfFile;
+	class TNudyEndfList;
+}
+
 class TList;
+
+namespace NudyPhysics {
+	class TNudyEndfNuPh;
+	class TNudyEndfFissionYield;
+	class TNudyEndfEnergy;
+	class TNudyEndfEnergyAng;
+	class TNudyEndfAng;
+	class TNudyEndfPhYield;
+	class TNudyEndfPhProd;
+	class TNudyEndfPhAng;
+	class TNudyEndfPhEnergy;
+}
 
 #ifdef USE_ROOT
 #include "Rtypes.h"
 class TRandom3;
 #endif
+
+
+namespace NudyPhysics {
 
 #define PI acos(-1.0)
 typedef std::vector<double> rowd;
@@ -25,6 +38,8 @@ typedef std::vector<rowd> matrixd2;
 typedef std::vector<std::vector<rowd>> matrixd3;
 typedef std::vector<std::vector<std::vector<rowd>>> matrixd4;
 typedef std::vector<std::vector<std::vector<std::vector<rowd>>>> matrixd5;
+
+
 
 class TNudyEndfRecoPoint {
 
@@ -48,6 +63,7 @@ public:
   virtual int GetLaw6(int ielemId, int mt);
   virtual int GetZd6(int ielemId, int mt);
   virtual int GetAd6(int ielemId, int mt);
+  virtual int GetMt6Neutron(int ielemId, int mt);
   virtual double GetNuTotal(int elemid, double energyK);
   virtual double GetNuPrompt(int elemid, double energyK);
   virtual double GetNuDelayed(int elemid, double energyK);
@@ -58,6 +74,8 @@ public:
   std::fstream out, outtotal;
   std::string outstring, outstringTotal;
   matrixint MtValues; // MT values for which cross-section/ heating values are given  all elements
+
+
 protected:
   int elemId;
   const char *rENDF;                      // precision for cross-section reconstruction
@@ -92,8 +110,8 @@ protected:
   double AWRI;
 
 private:
-  void ReadFile2(TNudyEndfFile *file);
-  void ReadFile3(TNudyEndfFile *file);
+  void ReadFile2(Nudy::TNudyEndfFile *file);
+  void ReadFile3(Nudy::TNudyEndfFile *file);
   void fixupTotal(rowd &x1);
 
   int flagRead = -1;
@@ -110,11 +128,15 @@ private:
   rowd eLinearFile3;
   rowd xLinearFile3;
   rowd eneTemp, sigTemp;       // temporary vectors to store energy and sigma
-  TNudyEndfAng *recoAng;
-  TNudyEndfEnergy *recoEnergy;
-  TNudyEndfEnergyAng *recoEnergyAng;
-  TNudyEndfNuPh *recoNuPh;
-  TNudyEndfFissionYield *recoFissY;
+  NudyPhysics::TNudyEndfAng *recoAng;
+  NudyPhysics::TNudyEndfEnergy *recoEnergy;
+  NudyPhysics::TNudyEndfEnergyAng *recoEnergyAng;
+  NudyPhysics::TNudyEndfNuPh *recoNuPh;
+  NudyPhysics::TNudyEndfFissionYield *recoFissY;
+  NudyPhysics::TNudyEndfPhYield *recoPhYield;
+  NudyPhysics::TNudyEndfPhProd *recoPhProd;
+  NudyPhysics::TNudyEndfPhAng *recoPhAng;
+  NudyPhysics::TNudyEndfPhEnergy *recoPhEnergy;
 #ifdef USE_ROOT
   TRandom3 *fRnd;
 #endif
@@ -123,4 +145,6 @@ private:
   ClassDef(TNudyEndfRecoPoint, 1) // class for an ENDF reconstruction
 #endif
 };
+
+}
 #endif

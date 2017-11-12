@@ -19,6 +19,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/HAD/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
   )
 
 #----------------------------------------------------------------------------------------------
@@ -26,7 +27,7 @@ include_directories(
 #
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/testRP/TestHad0/GeantV)
 add_executable(TestHad0_GV ${CMAKE_SOURCE_DIR}/testRP/GeantV/TestHad0/TestHad0_GV.cc ${sources})
-target_link_libraries(TestHad0_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics)
+target_link_libraries(TestHad0_GV ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Nudy)
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
