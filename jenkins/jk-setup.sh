@@ -119,8 +119,4 @@ export CMAKE_BUILD_TYPE=$BUILDTYPE
 
 export CTEST_BUILD_OPTIONS=" -DCMAKE_CXX_STANDARD=14 -DUSE_ROOT=ON -DCTEST=ON ${ExtraCMakeOptions}"
 export CMAKE_INSTALL_PREFIX=$WORKSPACE/geant/installation
-#export BACKEND=$BACKEND
 export LD_LIBRARY_PATH=$WORKSPACE/lib:$LD_LIBRARY_PATH
-
-#echo ${THIS}/setup.py -o ${LABEL} -c ${COMPILER} -b ${BUILDTYPE} -v ${EXTERNALS} -w ${WORKSPACE} -t ${TYPE}
-#eval `${THIS}/setup.py -o ${LABEL} -c ${COMPILER} -b ${BUILDTYPE} -v ${EXTERNALS} -w ${WORKSPACE} -t ${TYPE}`
