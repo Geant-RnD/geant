@@ -58,6 +58,9 @@ public:
   // Destructor
   ~TARCGeometryConstruction();
 
+  // create materials for the setup
+  //virtual void CreateMaterials();
+
   // interface method to define the geometry for the application
   virtual void CreateGeometry();
 

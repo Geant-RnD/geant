@@ -7,12 +7,15 @@
 
 #include "TARC.h"
 
+using namespace vecgeom;
+using namespace geantphysics;
+using namespace Geant;
+
 namespace userapplication {
 
 TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun)
 : Geant::GeantVApplication(runmgr), fGeomSetup(geom), fPrimaryGun(gun){
   fInitialized           = false;
-  fTargetLogicalVolumeID = -1;
   fNumPrimaryPerEvent    = -1;
   fNumBufferedEvents     = -1;
 }
@@ -26,7 +29,22 @@ bool TARC::Initialize() {
     Geant::Error("TARC::Initialize", "Geometry is not available!");
     return false;
   }
-  //    fTargetLogicalVolumeID = fGeomSetup->GetTargetLogicalVolumeID();
+
+ RetrieveLogicalVolumesFromGDML(); // Retrieve asscoiated Logical volumes and place in array
+
+std::cout << " There are in total " << fLogiVolumeList.size() << " logical volumes \n";
+
+ for (size_t i=0; i<fLogiVolumeList.size(); ++i) {
+    Material *mat = (Material*)fLogiVolumeList[i]->GetMaterialPtr();
+    vecgeom::Region *reg = fLogiVolumeList[i]->GetRegion();
+
+    std::cout << " LogicalVolume with name = " << fLogiVolumeList[i]->GetLabel()
+              << " id-> " << fLogiVolumeList[i]->id()
+              << " has material -> " << mat->GetName()
+              << " in Region = " << reg->GetName() << " index " << reg->GetIndex()
+              << std::endl;
+  }
+
   fInitialized = true;
   return true;
 }

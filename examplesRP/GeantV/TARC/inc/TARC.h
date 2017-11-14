@@ -19,7 +19,16 @@
 #include "GeantVApplication.h"
 #endif
 
+#include "base/TypeMap.h" // VECGEOM_IMPL_NAMESPACE
+#include "Geant/Config.h" // GEANT_IMPL_NAMESPACE
+
 #include "management/GeoManager.h"  // vecgeom::GeoManager
+#include "volumes/LogicalVolume.h"
+#include "volumes/PlacedVolume.h"
+
+
+#include "Region.h"
+
 #include "GeantEvent.h"
 #include "GeantTrackVec.h"
 #include "GeantRunManager.h"
@@ -32,6 +41,7 @@
 #include "PhysicsData.h"
 #include "MaterialCuts.h"
 #include "Material.h"
+#include "MaterialCuts.h"
 #include "LightTrack.h"
 #include "PhysicsProcess.h"
 #include "EMPhysicsProcess.h"
@@ -40,6 +50,18 @@
 #include "Geant/Typedefs.h"
 #include "GeantFwd.h"
 #include "GeantTaskData.h"
+
+namespace vecgeom {
+  inline namespace VECGEOM_IMPL_NAMESPACE {
+    class Region;
+  }
+}
+
+namespace geantphysics {
+  inline namespace GEANT_IMPL_NAMESPACE {
+    class Material;
+  }
+}
 
 namespace GEANT_IMPL_NAMESPACE {
   namespace Geant {
@@ -60,7 +82,15 @@ namespace userapplication {
     virtual ~TARC();
 
   public:
+    void RetrieveLogicalVolumesFromGDML(){
+      vecgeom::GeoManager::Instance().GetAllLogicalVolumes(fLogiVolumeList);
+    }
+
+
+
+  public:
     virtual bool Initialize(); // @brief Interface to Initialize application
+
 
 
   private:
@@ -69,7 +99,7 @@ namespace userapplication {
 
   private:
     bool fInitialized;
-    int fTargetLogicalVolumeID;
+    std::vector<vecgeom::LogicalVolume*> fLogiVolumeList;
     int fNumPrimaryPerEvent;
     int fNumBufferedEvents;
     TARCGeometryConstruction *fGeomSetup;

@@ -81,7 +81,7 @@ namespace userapplication{
     double      fMomentumTotal;       // Total momentum of the primary in internal [energy] unit
 
     const geantphysics::Particle   *fParticle;  // the primary Particle
-    const TARCGeometryConstruction *fGeometry;  // The geometry
+    const TARCGeometryConstruction *fGeomSetup;  // The geometry
 
   }; // class ends
 

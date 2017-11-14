@@ -1,5 +1,9 @@
 #include "TARCPrimaryGenerator.h"
 
+using namespace vecgeom;
+using namespace geantphysics;
+using namespace geant;
+
 namespace userapplication {
   TARCPrimaryGenerator::TARCPrimaryGenerator( const TARCGeometryConstruction *geomTARC) : fGeometry(geomTARC) {
     fPrimaryParticleName          = "proton";
