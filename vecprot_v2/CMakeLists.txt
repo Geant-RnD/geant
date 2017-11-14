@@ -399,25 +399,23 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${fullCMS_OUTPUT})
 foreach(_script ${fullCMS_SCRIPTS})
   configure_file(
     ${_script}
-    ${CMAKE_BINARY_DIR}/${fullCMS_OUTPUT}/${_script}
+    ${CMAKE_BINARY_DIR}/${TestEm5_OUTPUT}/${_script}
     COPYONLY
     )
 endforeach()
-install(TARGETS fullCMS DESTINATION ${fullCMS_OUTPUT})
-install(FILES ${fullCMS_SCRIPTS} DESTINATION ${fullCMS_OUTPUT})
-### TestEm3_GV ###
-set(TestEm3_GV_OUTPUT bin/examples/Calorimeter/GeantV)
-set(TestEm3_GV_SCRIPTS TestEm3_GV_ATLASbar.mac README_TestEm3_GV)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${TestEm3_GV_OUTPUT})
-foreach(_script ${TestEm3_GV_SCRIPTS})
+install(TARGETS runTestEm5 DESTINATION ${TestEm5_OUTPUT})
+install(FILES ${TestEm5_SCRIPTS} DESTINATION ${TestEm5_OUTPUT})
+### The remaining ### (calo applications; runAppRP and runAppTestEM3RP will be removed soon)
+set(caloApp_OUTPUT bin/examples/Calorimeter/GeantV)
+set(caloApp_SCRIPTS caloApp.mac)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${caloApp_OUTPUT})
   configure_file(
-    ${_script}
-    ${CMAKE_BINARY_DIR}/${TestEm3_GV_OUTPUT}/${_script}
+    caloApp.mac
+    ${CMAKE_BINARY_DIR}/${caloApp_OUTPUT}/caloApp.mac
     COPYONLY
     )
-endforeach()
-install(TARGETS TestEm3_GV DESTINATION ${TestEm3_GV_OUTPUT})
-install(FILES ${TestEm3_GV_SCRIPTS} DESTINATION ${TestEm3_GV_OUTPUT})
+install(TARGETS caloAppRP runAppRP runAppTestEM3RP DESTINATION ${caloApp_OUTPUT})
+install(FILES caloApp.mac DESTINATION ${caloApp_OUTPUT})
 # -------  END == WITH REAL PHYSICS -------------------------------------------------------
 endif()
 

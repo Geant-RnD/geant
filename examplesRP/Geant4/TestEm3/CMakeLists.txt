@@ -60,5 +60,5 @@ set(TestEm3_SCRIPTS
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS TestEm3 DESTINATION ${OUTPUT})
-install(FILES ${TestEm3_SCRIPTS} DESTINATION ${OUTPUT})
+install(TARGETS SimplyCalo DESTINATION ${OUTPUT})
+install(FILES ${SimplyCalo_SCRIPTS} DESTINATION ${OUTPUT})
