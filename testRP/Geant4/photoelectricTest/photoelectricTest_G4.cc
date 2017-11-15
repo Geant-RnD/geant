@@ -107,7 +107,7 @@ static struct option options[] = {
     {"primary-energy    (in internal energy units i.e. [MeV])       - default: 10"                  , required_argument, 0, 'E'},
     {"number-of-samples (number of required final state samples)    - default: 1.e+7"               , required_argument, 0, 'f'},
     {"number-of-bins    (number of bins in the histogram)           - default: 100"                 , required_argument, 0, 'n'},
-    {"model-name        (photoelectricFluo, photoelectricLiv)        - default: photoelectricFluo"   , required_argument, 0, 'b'},
+    {"model-name        (photoelectricFluo, photoelectricLiv)       - default: photoelectricLiv"    , required_argument, 0, 'b'},
     {"cut-vale          (secondary production threshold [mm])       - default: 1.0"                 , required_argument, 0, 'c'},
     {"isangular         (angular distribution is required ?)        - default: false"               , no_argument      , 0, 'a'},
     {"help"                                                                                         , no_argument      , 0, 'h'},
