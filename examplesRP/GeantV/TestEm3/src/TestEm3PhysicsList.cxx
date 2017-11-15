@@ -28,6 +28,9 @@
 #include "GammaPhotoElectricProcess.h"
 #include "SauterGavrilaPhotoElectricModel.h"
 
+#include "GammaPhotoElectricProcess.h"
+#include  "SauterGavrilaPhotoElectricModel.h"
+
 #include "MSCProcess.h"
 #include "MSCModel.h"
 #include "GSMSCModel.h"
@@ -195,7 +198,7 @@ void TestEm3PhysicsList::Initialize() {
       //
       // create photoelectric effect process for gamma with 1 model:
       //
-      geantphysics::EMPhysicsProcess *photoelectricProc = new geantphysics::GammaPhotoElectricProcess();
+      geantphysics::EMPhysicsProcess *photoelectricProc = new geantphysics::GammaPhotoElectricProcess("phot");
       // create the Sauter-Gavrila model for photoelectric effect
       geantphysics::EMModel           *sgModel = new geantphysics::SauterGavrilaPhotoElectricModel();
       // set min/max energies of the model

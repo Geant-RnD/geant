@@ -45,6 +45,8 @@
 #include "G4GoudsmitSaundersonMscModel.hh"
 #include "G4eIonisation.hh"
 #include "G4eBremsstrahlung.hh"
+#include "G4PhotoElectricEffect.hh"
+#include "G4LivermorePhotoElectricModel.hh"
 //#include "G4eplusAnnihilation.hh"
 
 #include "G4EmParameters.hh"
