@@ -57,7 +57,7 @@ include_directories("/Users/lima/work/geantv/xsec/inc")
 include_directories("/Users/lima/work/geantv/vecprot_v2/inc")
 include_directories("/Users/lima/work/geantv/vecprot_v2_tbb/inc")
 include_directories("/Users/lima/work/geantv/examples/inc")
-set(GEANTV_LIBRARIES ${GEANTV_LIBRARIES} ${GeantV_DIR}/lib/libGeant_v.so ${GeantV_DIR}/lib/libGeant_tbb.so ${GeantV_DIR}/lib/libGeantExamples.so ${GeantV_DIR}/lib/libXsec.so)
+set(GEANTV_LIBRARIES ${GEANTV_LIBRARIES} ${GeantV_DIR}/lib/libGeant_v.so ${GeantV_DIR}/lib/libGeantExamples.so ${GeantV_DIR}/lib/libXsec.so)
 
 include_directories("/opt/local/vecgeom/install/include")
 
