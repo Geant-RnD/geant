@@ -26,14 +26,56 @@
 // some helper methods to get the possible input arguments and configure the user defined components of the application,
 // set up the run manager and run the simulation.
 void GetArguments(int argc, char *argv[]);
-void SetupPhysicsList         (userapplication::TestEm3PhysicsList* physlist);
-void SetupUserDetector        (userapplication::TestEm3DetectorConstruction* detector);
-void SetupUserPrimaryGenerator(userapplication::TestEm3PrimaryGenerator* primarygun, int numprimsperevt);
-void SetupMCTruthHandling     (Geant::GeantRunManager* runMgr);
-void SetupUserApplication     (userapplication::TestEm3App* app);
-void PrintRunInfo(userapplication::TestEm3PrimaryGenerator *gun, Geant::GeantRunManager *rmg);
+void SetupCaloPhysicsList     (userapplication::CaloPhysicsList*            physlist);
+void SetupUserDetector        (userapplication::CaloDetectorConstruction*   detector);
+void SetupUserPrimaryGenerator(userapplication::CaloPrimaryGenerator*     primarygun);
+void SetupUserApplication     (userapplication::CaloApp*                     caloapp);
+void PrintRunInfo();
 void PreSet(int num);
 Geant::GeantRunManager* RunManager();
+
+// The main application: gets the possible input arguments, sets up the run-manager, physics-list, detector, primary
+//                       generator, application and starts the simulation.
+int main(int argc, char *argv[]) {
+  //
+  // Read in user arguments
+  PreSet(userapplication::CaloDetectorConstruction::GetMaxNumberOfAbsorbers());
+  GetArguments(argc, argv);
+  //
+  // Create and configure run manager
+  Geant::GeantRunManager* runMgr = RunManager();
+
+  // Create user defined physics list
+  userapplication::CaloPhysicsList *userPhysList = new userapplication::CaloPhysicsList("CaloPhysicsList");
+  SetupCaloPhysicsList(userPhysList);
+  geantphysics::PhysicsListManager::Instance().RegisterPhysicsList(userPhysList);
+
+  // Create Calo detector construction
+  userapplication::CaloDetectorConstruction *calo = new userapplication::CaloDetectorConstruction(runMgr);
+  SetupUserDetector(calo);
+  runMgr->SetDetectorConstruction(calo);
+
+  // Create Calo primary generator
+  userapplication::CaloPrimaryGenerator *caloGun = new userapplication::CaloPrimaryGenerator(calo);
+  SetupUserPrimaryGenerator(caloGun);
+  runMgr->SetPrimaryGenerator(caloGun);
+
+  // Create the real physics Calo application
+  userapplication::CaloApp *caloApplication = new userapplication::CaloApp(runMgr,calo,caloGun);
+  SetupUserApplication(caloApplication);
+  runMgr->SetUserApplication(caloApplication);
+
+  // Print basic parameters for the simulation
+  PrintRunInfo();
+
+  // Run the simulation
+  runMgr->RunSimulation();
+
+  // Delete the run manager
+  delete runMgr;
+  return 0;
+}
+
 
 //
 // Optional input arguments that make possible the configuration of detector(parDet), primary generator(parGun), the
@@ -57,15 +99,12 @@ double      mctruthminE               =     1.;  // i.e. default application val
 std::string mctruthFile               =     "testEm3.hepmc3"; // i.e. default application value
 //
 // run configuration parameters
-int         parConfigNumBufferedEvt   =     5;  // number of events taken to be transported on the same time (buffered)
-int         parConfigNumRunEvt        =    10;  // total number of events to be transported during the run
-int         parConfigNumPrimaryPerEvt =    10;  // number of primary particles per event
-int         parConfigNumThreads       =     4;  // number of working threads
-int         parConfigNumPropagators   =     1;  // number of propagators per working threads
-int         parConfigNumTracksPerBasket =  16;  // default number of tracks per basket
-int         parConfigIsPerformance    =     0;  // run without any user actions
-int         parConfigVectorizedGeom   =     0;  // activate geometry basketizing
-int         parConfigExternalLoop     =     0;  // activate external loop mode
+int         parConfigNumBufferedEvt   = 4;     // number of events taken to be transported on the same time (buffered)
+int         parConfigNumRunEvt        = 10;    // total number of events to be transported during the run
+int         parConfigNumPrimaryPerEvt = 100;   // number of primary particles per event
+int         parConfigNumThreads       = 4;     // number of working threads
+int         parConfigNumPropagators   = 1;     // number of propagators per working threads
+bool        parConfigIsPerformance    = false; // run without any user actions
 //
 // physics process configuration parameters:
 std::string parProcessMSCStepLimit    = "";    // i.e. default application value
@@ -144,11 +183,9 @@ static struct option options[] = {
          {"config-number-of-primary-per-events" , required_argument, 0,  'o'},
          {"config-number-of-threads"            , required_argument, 0,  'p'},
          {"config-number-of-propagators"        , required_argument, 0,  'q'},
-         {"config-tracks-per-basket"            , required_argument, 0,  'r'},
-         {"config-run-performance"              , required_argument, 0,  's'},
-         {"config-vectorized-geom"              , required_argument, 0,  't'},
-         {"config-external-loop"                , required_argument, 0,  'u'},
-	 {"process-MSC-step-limit"              , required_argument, 0,  'A'},
+         {"config-run-performance"              , no_argument      , 0,  'r'},
+
+				 {"particle-process-MSC-step-limit"    , required_argument, 0, 'A'},
 
          {"help", no_argument, 0, 'h'},
          {0, 0, 0, 0}
@@ -179,11 +216,11 @@ void PrintRunInfo(userapplication::TestEm3PrimaryGenerator *gun, Geant::GeantRun
   long int nprimtotal = nevents*nprimpere;
   std::cout<< "\n\n"
            << " ===================================================================================  \n"
-           << "  primary              : " << gun->GetPrimaryParticleName()                << "       \n"
-           << "  primary energy       : " << gun->GetPrimaryParticleEnergy()              << " [GeV] \n"
-           << "  #events              : " << nevents                                      << "       \n"
-           << "  #primaries per event : " << nprimpere                                    << "       \n"
-           << "  total # primaries    : " << nprimtotal                                   << "       \n"
+           << "  primary GV code      : " << parGunPrimaryParticleName                    << "       \n"
+           << "  primary energy       : " << parGunPrimaryKinEnergy                       << " [GeV] \n"
+           << "  #events              : " << parConfigNumRunEvt                           << "       \n"
+           << "  #primaries per event : " << parConfigNumPrimaryPerEvt                    << "       \n"
+           << "  total # primaries    : " << parConfigNumRunEvt*parConfigNumPrimaryPerEvt << "       \n"
            << "  performance mode?    : " << parConfigIsPerformance                       << "       \n"
            << " ===================================================================================\n\n";
 }
@@ -282,12 +319,9 @@ void GetArguments(int argc, char *argv[]) {
        case 'B':
          mctruthOn    = (int)strtol(optarg, NULL, 10);
          break;
-       case 'C':
-         mctruthminE  = strtod(optarg, NULL);
-         break;	 
-       case 'D':
-         mctruthFile  = optarg;
-         break;	 
+       case 'r':
+         parConfigIsPerformance    = true;
+         break;
        //---- Physics
        case 'A':
          parProcessMSCStepLimit = optarg;
@@ -328,7 +362,7 @@ Geant::GeantRunManager* RunManager() {
   runConfig->fUseVectorizedGeom = parConfigVectorizedGeom;
   //
   // Activate standard scoring
-  //runConfig->fUseStdScoring = !parConfigIsPerformance;
+  runConfig->fUseStdScoring = !parConfigIsPerformance;
 
   return runManager;
 }
@@ -391,8 +425,8 @@ void SetupPhysicsList(userapplication::TestEm3PhysicsList *userPhysList){
   }
 }
 
-void SetupUserApplication(userapplication::TestEm3App *app) {
+void SetupUserApplication(userapplication::CaloApp *caloapp) {
   if (parConfigIsPerformance) {
-    app->SetPerformanceMode(true);
+    caloapp->SetPerformanceMode(true);
   }
 }

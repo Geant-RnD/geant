@@ -51,7 +51,7 @@ TestEm3App::~TestEm3App() {
 }
 
 
-void TestEm3App::AttachUserData(Geant::GeantTaskData *td) {
+void CaloApp::AttachUserData(Geant::GeantTaskData *td) {
   if (fIsPerformance)
    return;
   // Create application specific thread local data structure to collecet/handle thread local multiple per-event data
@@ -60,7 +60,7 @@ void TestEm3App::AttachUserData(Geant::GeantTaskData *td) {
   fDataHandlerEvents->AttachUserData(eventData, td);
 }
 
-bool TestEm3App::Initialize() {
+bool CaloApp::Initialize() {
   if (fIsPerformance)
     return true;
   // Initialize application. Geometry must be loaded.
@@ -101,7 +101,7 @@ bool TestEm3App::Initialize() {
 }
 
 
-void TestEm3App::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td) {
+void CaloApp::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData *td) {
   if (fIsPerformance)
    return;
   // it is still a bit tricky but try to get the ID of the logical volume in which the current step was done
@@ -163,7 +163,7 @@ void TestEm3App::SteppingActions(Geant::GeantTrack &track, Geant::GeantTaskData 
 }
 
 
-void TestEm3App::FinishEvent(Geant::GeantEvent *event) {
+void CaloApp::FinishEvent(Geant::GeantEvent *event) {
   if (fIsPerformance)
    return;
   // merge the thread local data (filled in the SteppingActions() and distributed now in the different threads) that
@@ -182,7 +182,7 @@ void TestEm3App::FinishEvent(Geant::GeantEvent *event) {
   return;
 }
 
-void TestEm3App::FinishRun() {
+void CaloApp::FinishRun() {
   if (fIsPerformance)
    return;
   double norm = (double)fRunMgr->GetNprimaries();
