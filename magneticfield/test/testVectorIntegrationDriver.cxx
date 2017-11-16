@@ -23,9 +23,6 @@ using fieldUnits::degree;
 #include "MagFieldEquation.h"
 
 // #include "IntegrationStepper.h"
-// #include "StepperFactory.h"
-// #include "GUFieldTrack.h"
-// #include "GUIntegrationDriver.h"
 
 // #include "TemplateTMagFieldEquation.h"
 // #include "TemplateFieldEquationFactory.h"
@@ -35,30 +32,44 @@ using fieldUnits::degree;
 // #include "FlexibleIntegrationDriver.h"
 #include "SimpleIntegrationDriver.h"
 
-// #include "FieldTrack.h"
-#include "TemplateFieldTrack.h"
+#include "FieldTrack.h"
+// #include "TemplateFieldTrack.h"
+
+// #define  NEW_SCALAR_FIELD 1
 
 // #define USECMSFIELD
 #ifdef   USECMSFIELD
 #include "TemplateCMSmagField.h"
 #include "ScalarCMSmagField.h"
+#else
+  #ifndef NEW_SCALAR_FIELD
+  //  Transition measure --- compare to old Scalar field types 2017.11.16
+  #include "TUniformMagField.h"
+  #include "TMagFieldEquation.h"
+  #include "StepperFactory.h"
+  #include "ScalarFieldTrack.h"
+  #include "ScalarIntegrationDriver.h"
+  #endif
 #endif
 
 #include <stdlib.h>
 
-using namespace std;
+// using namespace std;
+// using std::cout;
+// using std::cerr;
+// using std::endl;
 
 int main(/*int argc, char *args[]*/)
 {
     constexpr unsigned int Nposmom= 6; // Position 3-vec + Momentum 3-vec
 
-    template <typename T>
-       using Vector3D = vecgeom::Vector3D<T>;
+    // template <typename T>
+    //    using Vector3D = vecgeom::Vector3D<T>;
 
     using Double_v = Geant::Double_v;
     using Float_v =  Geant::Float_v;
 
-    using Bool_v = Mask_v<Double_v>;
+    using Bool_v = vecCore::Mask_v<Double_v>;
     
     // typedef typename Backend::precision_v Double;
     // typedef vecgeom::Vector3D<Double> ThreeVectorSimd;
@@ -70,11 +81,16 @@ int main(/*int argc, char *args[]*/)
     using Field_Type_Scalar = ScalarCMSmagField;
     // using Field_Type_Scalar = TemplateCMSmagField<vecgeom::kScalar>;
   #else
-    using Field_Type_Scalar = UniformMagField;
     using Field_Type        = UniformMagField;  // TemplateTUniformMagField<Backend>;
+  #ifdef NEW_SCALAR_FIELD
+    // New types ... under development  2017.11.16
+    using Field_Type_Scalar = UniformMagField;
+  #else
+    using Field_Type_Scalar = TUniformMagField;
+  #endif
   #endif 
 
-    using GvEquationType    = MagFieldEquation<Double_v, Field_Type, Nposmom>;
+    using GvEquationType    = MagFieldEquation<Field_Type>; // , Nposmom>;
    
     /* -----------------------------SETTINGS-------------------------------- */
     
@@ -146,11 +162,8 @@ int main(/*int argc, char *args[]*/)
     // cout << "#  Initial  momentum * c = " << x_mom << " , " << y_mom << " , " << z_mom << " GeV " << endl;
     //Create an Equation :
  
-    auto gvEquation =
-       TemplateFieldEquationFactory<Double_v>::CreateMagEquation<Field_Type >(gvField);
-
-    // gvEquation->InitializeCharge( particleCharge );  // Send it via Stepper instead    
-    
+    auto gvEquation = new MagFieldEquation<Field_Type>(gvField);
+    // TemplateFieldEquationFactory<Double_v>::CreateMagEquation<Field_Type >(gvField);
 
 /*    double yIn[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
                     x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};*/
@@ -166,53 +179,66 @@ int main(/*int argc, char *args[]*/)
 
     //=======================Test part for Integration driver====================
     double hminimum = 0.2;
-    // auto testVectorDriver = new TemplateGUIntegrationDriver<Double_v>(hminimum, myStepper);
+    // auto vectorDriver = new TemplateGUIntegrationDriver<Double_v>(hminimum, myStepper);
 
     //========= Preparing scalar Integration Driver ============
-    using  GvEquationTypeScalar=  TMagFieldEquation<Field_Type_Scalar, Nposmom>;
-    
-  #ifdef USECMSFIELD
+#ifdef USECMSFIELD
     auto gvFieldScalar    = new Field_Type_Scalar("../VecMagFieldRoutine/cmsmagfield2015.txt");
-  #else
-    // Now it is the same as 'vector':
-    #if 1
-        #define gvFieldScalar gvField;
-    #else
-       // If we plan to test against 'plain' scalar objects: field, equation, stepper, ... 
-        auto fieldValueVec = fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field);
-        auto gvFieldScalar = ScalarUniformMagField( fieldValueVec );
-    #endif
-    //                      new Field_Type_Scalar( fieldValueVec );
-  #endif
+    using  GvEquationTypeScalar=  MagFieldEquation<Field_Type_Scalar>;   // New equation ...
+    auto gvEquationScalar = new GvEquationTypeScalar(gvFieldScalar);    
+#else
+#ifdef NEW_SCALAR_FIELD
+    using  GvEquationTypeScalar=  MagFieldEquation<Field_Type_Scalar>;   // New scalar
+    #define gvFieldScalar gvField;
+    auto   gvFieldScalar =  new UniformMagField( fieldValueVec );
+    auto gvEquationScalar = new MagFieldEquation(gvFieldScalar);   // Same as vector, yes
+    auto  myStepperScalar= CashKarp<GvEquationTypeScalar,Nposmom>(gvEquationScalar);
+#else
+    using  GvEquationTypeScalar=  TMagFieldEquation<Field_Type_Scalar, Nposmom>; // Old scalar
+    // If we plan to test against 'plain' scalar objects: field, equation, stepper, ... 
+    auto fieldValueVec = fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field);
+    auto gvFieldScalar = new TUniformMagField( fieldValueVec );
+//                      new Field_Type_Scalar( fieldValueVec );
     auto gvEquationScalar = new GvEquationTypeScalar(gvFieldScalar);
 
     GUVIntegrationStepper *myStepperScalar; 
     myStepperScalar= StepperFactory::CreateStepper<GvEquationTypeScalar>(gvEquationScalar, stepper_no);
+#endif
+#endif
 
     int statisticsVerbosity = 1;
-    auto testScalarDriver= new GUIntegrationDriver( hminimum,
+    auto refScalarDriver= new ScalarIntegrationDriver( hminimum,
                                                     myStepperScalar,
                                                     Nposmom,
                                                     statisticsVerbosity); 
-    testScalarDriver->InitializeCharge( particleCharge );
+    // refScalarDriver->InitializeCharge( particleCharge );
     //==========  Scalar Driver prepared =========================
 
-    auto myStepper = new CashKarp<GvEquationType,Nposmom>(gvEquation);
+    using StepperType = CashKarp<GvEquationType,Nposmom>;
+       
+    auto myStepper = new StepperType(gvEquation);
+       // new CashKarp<GvEquationType,Nposmom>(gvEquation);
        // new TemplateGUTCashKarpRKF45<Double_v,GvEquationType,Nposmom>(gvEquation);       
 
     // myStepper->InitializeCharge( particleCharge );
+    int statsVerbose=1;
+    
+    auto vectorDriver =
+       new SimpleIntegrationDriver<Double_v,StepperType,Nposmom>(hminimum, myStepper, // myStepperScalar);
+                                                                     Nposmom, statsVerbose);
+    // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, refScalarDriver);
 
-    auto testVectorDriver =
-       new SimpleIntegrationDriver<Double_v,StepperType,Nposmom>(hminimum, myStepper, myStepperScalar);
-    // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, testScalarDriver);
-
-    bool debugValue ; 
-    cout<< "Debug? " << endl;
-    cin >> debugValue;
-    testVectorDriver->SetPartDebug(debugValue);
+    bool debugValue= true; 
+    // cout << "Debug? " << endl;
+    // cin  >> debugValue;
+    // vectorDriver->SetPartDebug(debugValue);
     // ========== Vector Driver prepared ========================
 
+    // -- Call internal Test code of Driver
+    // int numTracks;       
+    bool ok= vectorDriver->TestInitializeLanes(); // 
 
+    // 
     double total_step = 0.;
 
     Bool_v goodAdvance(true);
@@ -251,8 +277,8 @@ int main(/*int argc, char *args[]*/)
     std::fill_n(hstep, nTracks, 20);
     const ThreeVector_d  startPosition( posMom[0], posMom[1], posMom[2]);
     const ThreeVector_d  startMomentum( posMom[3], posMom[4], posMom[5]);
-    GUFieldTrack yTrackIn ( startPosition, startMomentum );  // yStart
-    GUFieldTrack yTrackOut( startPosition, startMomentum );  // yStart
+    ScalarFieldTrack yTrackIn ( startPosition, startMomentum, particleCharge );  // yStart
+    ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
 
     for (int j = 0; j < nTracks; ++j)
     {
@@ -260,8 +286,10 @@ int main(/*int argc, char *args[]*/)
       yOutput[j].LoadFromArray(posMom);
     }
 
-    testVectorDriver->AccurateAdvance( yInput,   hstep,    epsTol, yOutput, nTracks, succeeded );
-    bool scalarResult = testScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
+    vectorDriver->AccurateAdvance( yInput, hstep, charge, epsTol, yOutput, nTracks, succeeded );
+    
+    bool scalarResult =
+       refScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
     cout<<" yOutput is   : "<< yOutput[0]<<" for yInput: "  <<yInput[0]<< endl;
     cout<<" yTrackOut is : "<< yTrackOut <<" for yTrackIn: "<<yTrackIn << endl;
     cout<<" Success of Vector: "<< succeeded[0] << endl;
@@ -295,8 +323,8 @@ int main(/*int argc, char *args[]*/)
 
       const ThreeVector_d  startPosition( posMom[0], posMom[1], posMom[2]);
       const ThreeVector_d  startMomentum( posMom[3], posMom[4], posMom[5]);
-      GUFieldTrack yTrackIn ( startPosition, startMomentum );  // yStart
-      GUFieldTrack yTrackOut( startPosition, startMomentum );  // yStart
+      ScalarFieldTrack yTrackIn ( startPosition, startMomentum );  // yStart
+      ScalarFieldTrack yTrackOut( startPosition, startMomentum );  // yStart
 
       for (int j = 0; j < nTracks; ++j)
       {
@@ -345,7 +373,7 @@ int main(/*int argc, char *args[]*/)
 #endif 
 
 #ifndef DebuggingSection
-      testVectorDriver->AccurateAdvance( yInput, hstep, epsTol, yOutput, nTracks, succeeded );
+      vectorDriver->AccurateAdvance( yInput, hstep, epsTol, yOutput, nTracks, succeeded );
 #endif 
 
 #ifdef CALCULATETIME
@@ -353,7 +381,7 @@ int main(/*int argc, char *args[]*/)
       float clock1InFloat = ((float)clock1)/CLOCKS_PER_SEC;
       cout<<"Vector time is: "<<clock1InFloat<<endl;
 #endif 
-/*      testScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
+/*      refScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
 
       cout<<" yOutput[0] is: "<< yOutput[0]<<" for yInput: "  <<yInput[0]<< endl;
       cout<<" yTrackOut is: " << yTrackOut <<" for yTrackIn: "<<yTrackIn << endl;*/
@@ -362,10 +390,10 @@ int main(/*int argc, char *args[]*/)
       {
         const ThreeVector_d  startPosition( posMomMatrix[i][0], posMomMatrix[i][1], posMomMatrix[i][2]);
         const ThreeVector_d  startMomentum( posMomMatrix[i][3], posMomMatrix[i][4], posMomMatrix[i][5]);
-        GUFieldTrack yTrackIn ( startPosition, startMomentum ); 
-        GUFieldTrack yTrackOut( startPosition, startMomentum ); 
+        ScalarFieldTrack yTrackIn ( startPosition, startMomentum ); 
+        ScalarFieldTrack yTrackOut( startPosition, startMomentum ); 
 
-        testScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
+        refScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
 
         cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for yInput: "  <<yInput[i]<< endl;
         cout<<" yTrackOut is: " << yTrackOut <<" for yTrackIn: "<<yTrackIn << endl;
@@ -377,7 +405,7 @@ int main(/*int argc, char *args[]*/)
       for (int i = 0; i < nTracks; ++i)
       {
 #ifndef DebuggingSection
-        testScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
+        refScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
 
         cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for yInput: "  <<yInput[i]<< endl;
         cout<<" yTrackOut is : "      << yTrackOut <<" for yTrackIn: "<<yTrackIn <<" for hstep: "<<hstep[i]<< endl;
@@ -433,28 +461,28 @@ int main(/*int argc, char *args[]*/)
 
       const ThreeVector_d  startPosition( posMomt[0], posMomt[1], posMomt[2]);
       const ThreeVector_d  startMomentum( posMomt[3], posMomt[4], posMomt[5]);
-      GUFieldTrack yTrackIn ( startPosition, startMomentum );  // yStart
-      GUFieldTrack yTrackOut( startPosition, startMomentum );  // yStart
+      ScalarFieldTrack yTrackIn ( startPosition, startMomentum );  // yStart
+      ScalarFieldTrack yTrackOut( startPosition, startMomentum );  // yStart
 
-      testVectorDriver->AccurateAdvance( yInput,
+      vectorDriver->AccurateAdvance( yInput,
                                          charge,
                                          hstep,
                                          epsTol,
                                          yOutput,
                                          nTracks,
                                          succeeded );
-      // testScalarDriver->AccurateAdvance( yTrackIn, hstep[11], epsTol, yTrackOut );
+      // refScalarDriver->AccurateAdvance( yTrackIn, hstep[11], epsTol, yTrackOut );
 
       for (int i = 0; i < nTracks; ++i)
       {
-        // testScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
+        // refScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
 
         // cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for hstep: "<<hstep[i]<< endl ;
         cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for hstep: "<<hstep[i]<< endl ;
         cout<<" yTrackOut is : "      << yTrackOut << endl;
       }
 
-      // GUFieldTrack randNew = yTrackIn + yTrackOut;
+      // ScalarFieldTrack randNew = yTrackIn + yTrackOut;
 
       // cout<<yOutput[0]<<endl;
       // cout<<yOutput[1]<<endl;
@@ -463,8 +491,8 @@ int main(/*int argc, char *args[]*/)
     }
 #endif 
 
-    cout<<" Scalar Stepper function calls are: "<< testScalarDriver->fStepperCalls <<" and OneGoodStep calls are "<<testScalarDriver->fNoTotalSteps << endl;
-    cout<<" Vector Stepper function calls are: "<< testVectorDriver->fStepperCalls <<" and OneStep calls are "<<testVectorDriver->fNoTotalSteps << endl;
+    cout<<" Scalar Stepper function calls are: "<< refScalarDriver->fStepperCalls <<" and OneGoodStep calls are "<<refScalarDriver->fNoTotalSteps << endl;
+    cout<<" Vector Stepper function calls are: "<< vectorDriver->fStepperCalls <<" and OneStep calls are "<<vectorDriver->fNoTotalSteps << endl;
 
 
     //========================End testing IntegrationDriver=======================
@@ -474,8 +502,9 @@ int main(/*int argc, char *args[]*/)
     delete gvField;
 
     // deleting IntegrationDriver
-    delete testVectorDriver;
-    delete testScalarDriver;      
+    delete vectorDriver;
+    delete refScalarDriver;      
     
     cout<<"\n\n#-------------End of output-----------------\n";
 }
+
