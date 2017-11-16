@@ -211,7 +211,7 @@ namespace geantphysics {
                 << " is opened by SauterGavrilaPhotoElectricModel" << std::endl;}
         
             fCSVector[Z]= new XSectionsVector;
-            fin >> fCSVector[Z]->edgeMin >> fCSVector[Z]->edgeMax >> fCSVector[Z]->numberOfNodes;
+            fin >> fCSVector[Z]->fEdgeMin >> fCSVector[Z]->fEdgeMax >> fCSVector[Z]->fNumberOfNodes;
             
             int siz=0;
             fin >> siz;
@@ -243,13 +243,13 @@ namespace geantphysics {
             }
             
             // to remove any inconsistency
-            fCSVector[Z]->numberOfNodes = siz;
-            fCSVector[Z]->edgeMin = fCSVector[Z]->fBinVector[0];
-            fCSVector[Z]->edgeMax = fCSVector[Z]->fBinVector[fCSVector[Z]->numberOfNodes-1];
+            fCSVector[Z]->fNumberOfNodes = siz;
+            fCSVector[Z]->fEdgeMin = fCSVector[Z]->fBinVector[0];
+            fCSVector[Z]->fEdgeMax = fCSVector[Z]->fBinVector[fCSVector[Z]->fNumberOfNodes-1];
             
             
             //Use spline interpolator for Cross-sections vector
-            fCSVector[Z]->sp= new Spline((fCSVector[Z]->fBinVector.data()),(fCSVector[Z]->fDataVector.data()),fCSVector[Z]->numberOfNodes);
+            fCSVector[Z]->fSplineInt= new Spline((fCSVector[Z]->fBinVector.data()),(fCSVector[Z]->fDataVector.data()),fCSVector[Z]->fNumberOfNodes);
             fin.close();
         }
         
@@ -357,7 +357,7 @@ namespace geantphysics {
         {
             fShellVector[Z][i]->fDataVector.clear();
             fShellVector[Z][i]->fBinVector.clear();
-            fShellVector[Z][i]->numberOfNodes=0;
+            fShellVector[Z][i]->fNumberOfNodes=0;
         }
         
         fNShellsUsed[Z] = n2;
@@ -388,16 +388,16 @@ namespace geantphysics {
                     fShellVector[Z][i]->fDataVector.clear();
                     fShellVector[Z][i]->fBinVector.reserve(n3);
                     fShellVector[Z][i]->fDataVector.reserve(n3);
-                    fShellVector[Z][i]->edgeMin=x*MeV;
-                    fShellVector[Z][i]->edgeMax=y*MeV;
-                    if(fVerboseLevel>3) std::cout<<"fShellVector["<<Z<<"]["<<i<<"]->edgeMin: "<<fShellVector[Z][i]->edgeMin<<"\t fShellVector["<<Z<<"]["<<i<<"]->edgeMax: "<<fShellVector[Z][i]->edgeMax<<std::endl;
+                    fShellVector[Z][i]->fEdgeMin=x*MeV;
+                    fShellVector[Z][i]->fEdgeMax=y*MeV;
+                    if(fVerboseLevel>3) std::cout<<"fShellVector["<<Z<<"]["<<i<<"]->fEdgeMin: "<<fShellVector[Z][i]->fEdgeMin<<"\t fShellVector["<<Z<<"]["<<i<<"]->fEdgeMax: "<<fShellVector[Z][i]->fEdgeMax<<std::endl;
                     
                     for(int j=0; j<n3; ++j)
                     {
                         fin2 >> x >> y;
                         fShellVector[Z][i]->fBinVector.push_back(x*MeV);
                         fShellVector[Z][i]->fDataVector.push_back(y*barn);
-                        fShellVector[Z][i]->numberOfNodes++;
+                        fShellVector[Z][i]->fNumberOfNodes++;
                     }
                     fShellVector[Z][i]->fCompID=n4;
                 }
@@ -426,7 +426,7 @@ namespace geantphysics {
                 fCrossSectionLE[Z] = true;
                 fLECSVector[Z]= new XSectionsVector;
                 
-                fin3 >> fLECSVector[Z]->edgeMin >> fLECSVector[Z]->edgeMax >> fLECSVector[Z]->numberOfNodes;
+                fin3 >> fLECSVector[Z]->fEdgeMin >> fLECSVector[Z]->fEdgeMax >> fLECSVector[Z]->fNumberOfNodes;
                 int siz=0;
                 fin3 >> siz;
                 if (fin3.fail() || siz<=0)
@@ -611,10 +611,10 @@ namespace geantphysics {
         else if(energy >= (*(fParamHigh[Z]))[1]) {
             
             //this is an extra-check - if energy<fCSVector[Z]->edgeMin it should go to the next else (****)
-            if(energy<fCSVector[Z]->edgeMin)
+            if(energy<fCSVector[Z]->fEdgeMin)
                 cs=x3*fCSVector[Z]->fDataVector[0];
             else
-                cs=x3*fCSVector[Z]->sp->GetValueAt(energy);
+                cs=x3*fCSVector[Z]->fSplineInt->GetValueAt(energy);
         }
         
         //(****) Tabulated values below k-shell ionization energy
@@ -622,7 +622,7 @@ namespace geantphysics {
         {
             //this check is needed to have a constant cross-section(cs) value for energies below the lowest cs point.
             //in this way the gamma is always absorbed - instead of giving zero cs -
-            if(energy<fLECSVector[Z]->edgeMin)
+            if(energy<fLECSVector[Z]->fEdgeMin)
                 cs=x3*fLECSVector[Z]->fDataVector[0];
             else
                 cs=x3*fLECSVector[Z]->GetValueAt(energy);
@@ -871,10 +871,10 @@ namespace geantphysics {
                 // (***) Tabulated values above k-shell ionization energy
                 if(gammaekin0 >= (*(fParamHigh[Z]))[1]) {
                     //this is an extra-check - if energy<fCSVector[Z]->edgeMin it should go to the next else (****)
-                    if(gammaekin0<fCSVector[Z]->edgeMin)
+                    if(gammaekin0<fCSVector[Z]->fEdgeMin)
                         cs*=fCSVector[Z]->fDataVector[0];
                     else
-                        cs*=fCSVector[Z]->sp->GetValueAt(gammaekin0);
+                        cs*=fCSVector[Z]->fSplineInt->GetValueAt(gammaekin0);
                     
                 }
                 //(****) Tabulated values below k-shell ionization energy
@@ -882,7 +882,7 @@ namespace geantphysics {
                 {
                     //this check is needed to have a constant cross-section(cs) value for energies below the lowest cs point.
                     //in this way the gamma is always absorbed - instead of giving zero cs -
-                    if(gammaekin0<fLECSVector[Z]->edgeMin)
+                    if(gammaekin0<fLECSVector[Z]->fEdgeMin)
                         cs*=fLECSVector[Z]->fDataVector[0];
                     else
                         cs*=fLECSVector[Z]->GetValueAt(gammaekin0);
