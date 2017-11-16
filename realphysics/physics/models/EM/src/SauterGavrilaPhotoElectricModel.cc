@@ -708,7 +708,7 @@ namespace geantphysics {
         size_t index=0;
         double sum=0;
         //retrieve the elements vector
-        const Vector_t<Element*> theElements = matcut->GetMaterial()->GetElementVector();
+        const Vector_t<Element*> &theElements = matcut->GetMaterial()->GetElementVector();
         //retrieve the number of elements in the material
         int num    = matcut->GetMaterial()->GetNumberOfElements();
         double xsec[num];
@@ -780,6 +780,7 @@ namespace geantphysics {
         //SAMPLING OF THE SHELL
         size_t shellIdx = 0;
         size_t nn = fNShellsUsed[Z];
+    
         if(nn > 1)
         {
             // sample gamma energy
