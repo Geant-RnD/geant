@@ -32,6 +32,7 @@
 
 using namespace std;
 namespace geantphysics {
+    
     std::vector<double>*  SauterGavrilaPhotoElectricModel::fParamHigh[] = {nullptr};
     std::vector<double>*  SauterGavrilaPhotoElectricModel::fParamLow[] = {nullptr};
     
@@ -51,8 +52,6 @@ namespace geantphysics {
     : EMModel(modelname){
         
         SetUseSamplingTables(aliasActive);
-        fNumSamplingPrimEnergiesPerDecade = 75;    // Number of primary gamma kinetic energy grid points per decade. 75 table per energy decade assures accuracy within 5% (alias sampling)        fNumSamplingPrimEnergies = 60;
-        fNumSamplingAngles = 80;                   // At each energy grid points. This is dinamically set at initialization time.
         fMinPrimEnergy           =  1.e-12*geant::eV;  // Minimum of the gamma kinetic energy grid, used to sample the photoelectron direction
         fMaxPrimEnergy           =  100*geant::MeV;    // Maximum of the gamma kinetic energy grid (after this threshold the e- is considered to follow the same direction as the incident gamma)
         
@@ -61,11 +60,11 @@ namespace geantphysics {
         fSamplingPrimEnergies    = nullptr;  // will be set in InitSamplingTables if needed
         fLSamplingPrimEnergies   = nullptr;  // will be set in InitSamplingTables if needed
         
-        fAliasData                = nullptr;    // will be set in InitSamplingTables if needed
-        fAliasSampler             = nullptr;
+        fAliasData               = nullptr;  // will be set in InitSamplingTables if needed
+        fAliasSampler            = nullptr;
         
-        fCrossSection             = nullptr;
-        fCrossSectionLE           = nullptr;
+        fCrossSection            = nullptr;
+        fCrossSectionLE          = nullptr;
         
     }
     
@@ -114,11 +113,6 @@ namespace geantphysics {
         if (fCrossSection) {
             delete [] fCrossSection;
             fCrossSection = nullptr;
-        }
-        
-        fCrossSection = new bool [gMaxSizeData];
-        for (int i=0; i<gMaxSizeData; ++i) {
-            fCrossSection[i] = false;
         }
         
         //ALLOCATION fCrossSectionLE
@@ -474,7 +468,7 @@ namespace geantphysics {
     
     //____________________
     //NB: cosTheta is supposed to contain the dirZ of the incoming photon
-    void SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Rejection(double gammaEnIn, double &cosTheta, Geant::GeantTaskData *td){
+    void SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Rejection(double gammaEnIn, double &cosTheta, Geant::GeantTaskData *td) const{
         
         //1) initialize energy-dependent variables
         // Variable naming according to Eq. (2.24) of Penelope Manual
@@ -510,7 +504,7 @@ namespace geantphysics {
     
     
     //____________________
-    double SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Alias(double primekin, double r1, double r2, double r3){
+    double SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Alias(double primekin, double r1, double r2, double r3) const{
         
         // determine primary energy lower grid point
         if (primekin > 100*geant::MeV) {
@@ -658,7 +652,7 @@ namespace geantphysics {
     }
     
     
-    size_t SauterGavrilaPhotoElectricModel::SampleTargetElementIndex (const MaterialCuts *matCut, double gammaekin0, Geant::GeantTaskData *td)
+    size_t SauterGavrilaPhotoElectricModel::SampleTargetElementIndex (const MaterialCuts *matCut, double gammaekin0, Geant::GeantTaskData *td) const
     {
         size_t index =0;
         std::vector<double> mxsec(20,0.);
@@ -715,7 +709,7 @@ namespace geantphysics {
   */
   }
     
-    void SauterGavrilaPhotoElectricModel::TestSampleTargetElementIndex(const MaterialCuts *matcut, double energy, Geant::GeantTaskData *td){
+    void SauterGavrilaPhotoElectricModel::TestSampleTargetElementIndex(const MaterialCuts *matcut, double energy, Geant::GeantTaskData *td) const{
         
         std::cout<<"testSampleTargetElementIndex\n";
         size_t index=0;
