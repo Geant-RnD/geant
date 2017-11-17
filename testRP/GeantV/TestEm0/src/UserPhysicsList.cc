@@ -28,9 +28,6 @@
 #include "GammaPhotoElectricProcess.h"
 #include "SauterGavrilaPhotoElectricModel.h"
 
-#include "GammaPhotoElectricProcess.h"
-#include "SauterGavrilaPhotoElectricModel.h"
-
 
 namespace userapplication {
 
@@ -128,7 +125,6 @@ void UserPhysicsList::Initialize() {
       AddProcessToParticle(particle, eBremProc);
     }
     if (particle==geantphysics::Gamma::Definition()) {
-        
       //
       // create photoelectric effect process for gamma with 1 model:
       //
@@ -143,8 +139,7 @@ void UserPhysicsList::Initialize() {
       //
       // add the process to the gamma particle
       AddProcessToParticle(particle, photoelectricProc);
-      
-        // create compton scattering process for gamma with 1 model:
+      // create compton scattering process for gamma with 1 model:
       //
       geantphysics::EMPhysicsProcess *comptProc = new geantphysics::ComptonScatteringProcess("compt");
       // create the Klein-Nishina model for Compton scattering i.e. for g + e- -> g + e- intercation
@@ -161,7 +156,7 @@ void UserPhysicsList::Initialize() {
       // create gamma conversion process for gamma with 1 model:
       //
       geantphysics::EMPhysicsProcess *convProc = new geantphysics::GammaConversionProcess("conv");
-      // create the Bethe-Heitler model for pair production i.e. for g + A -> e- + e+ intercation
+      // create the Bethe-Heitler model for pair production i.e. for g + A -> e- + e+ interaction
       geantphysics::EMModel           *bhModel = new geantphysics::BetheHeitlerPairModel();
       // set min/max energies of the model
       bhModel->SetLowEnergyUsageLimit (  2.0*geant::kElectronMassC2);
@@ -179,7 +174,6 @@ void UserPhysicsList::Initialize() {
       //
       // add the process to the gamma particle
       AddProcessToParticle(particle, convProc);
-        
     }
   }
 }

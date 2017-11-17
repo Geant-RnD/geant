@@ -28,9 +28,6 @@
 #include "GammaPhotoElectricProcess.h"
 #include "SauterGavrilaPhotoElectricModel.h"
 
-#include "GammaPhotoElectricProcess.h"
-#include  "SauterGavrilaPhotoElectricModel.h"
-
 #include "MSCProcess.h"
 #include "MSCModel.h"
 #include "GSMSCModel.h"
