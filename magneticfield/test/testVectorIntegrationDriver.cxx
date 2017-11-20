@@ -461,8 +461,8 @@ int main(/*int argc, char *args[]*/)
 
       const ThreeVector_d  startPosition( posMomt[0], posMomt[1], posMomt[2]);
       const ThreeVector_d  startMomentum( posMomt[3], posMomt[4], posMomt[5]);
-      ScalarFieldTrack yTrackIn ( startPosition, startMomentum );  // yStart
-      ScalarFieldTrack yTrackOut( startPosition, startMomentum );  // yStart
+      ScalarFieldTrack yTrackIn ( startPosition, startMomentum, particleCharge );  // yStart
+      ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
 
       vectorDriver->AccurateAdvance( yInput,
                                          charge,
