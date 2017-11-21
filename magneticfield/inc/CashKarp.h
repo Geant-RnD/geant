@@ -50,6 +50,7 @@ template
                // (GUIntegrationNms::NumVarBase > Nvar) ? GUIntegrationNms::NumVarBase : Nvar;
     // std::max( GUIntegrationNms::NumVarBase,  Nvar);
     // static const double IntegratorCorrection = 1./((1<<4)-1);
+    inline int    GetIntegratorOrder()   { return sOrderMethod; }
     inline double IntegratorCorrection() { return 1./((1<<sOrderMethod)-1); }
 
   public:

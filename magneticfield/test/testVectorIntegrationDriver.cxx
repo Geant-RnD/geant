@@ -228,7 +228,7 @@ int main(/*int argc, char *args[]*/)
                                                                      Nposmom, statsVerbose);
     // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, refScalarDriver);
 
-    bool debugValue= true; 
+    // bool debugValue= true; 
     // cout << "Debug? " << endl;
     // cin  >> debugValue;
     // vectorDriver->SetPartDebug(debugValue);
@@ -236,68 +236,76 @@ int main(/*int argc, char *args[]*/)
 
     // -- Call internal Test code of Driver
     // int numTracks;       
-    bool ok= vectorDriver->TestInitializeLanes(); // 
-
+    bool ok= vectorDriver->TestInitializeLanes();
+    if( !ok ) {
+       std::cerr << "vectorDriver->TestInitializeLanes() returned " << ok << std::endl;
+    }
     // 
-    double total_step = 0.;
+    // double total_step = 0.;
 
     Bool_v goodAdvance(true);
     double epsTol = 1.0e-5;
 
-    // goodAdvance = testDriver->AccurateAdvance( yTrackIn, total_step, epsTol, yTrackOut );
+    // Double_v  hStep1( 10.0 ); 
+    // goodAdvance = testDriver->AccurateAdvance( yTrackIn, hStep1, epsTol, yTrackOut );
 
     constexpr int nTracks = 16;
     FieldTrack yInput[nTracks], yOutput[nTracks];
     // double posMom[] ={0., 0., 0., 0., 1., 1.};
 
+    // std::fill_n(hstep, nTracks, 20);    
     double hstep[nTracks] = { 11.0, 2.0, 33.0, 4.0, 55.0, 6.0, 77.0, 8.0, 9.0, 100.0, 11.0, 12.0, 13.0, 14.0, 15.3, 16.9 };
+
     double charge[nTracks] = { 1.0, -2.0, 3.0, -4.0, 5.0, -6.0, 7.0, -8.0, 9.0, -10.0, 11.0, -12.0, 13.0, -14.0, 15., -16. };    
         // = {0, 0, 0, 1, -.3, .4, 20, 178., 920.}; 
     bool   succeeded[nTracks];
 
-#define DebuggingSection
-// #define CALCULATETIME 
+    bool firstTrial= true;
+#ifdef MAINTESTING
+    firstTrial= false;  // Just go to the loop of calls.
+#endif    
+    
+    if( firstTrial )
+    {
+       double
+          x_pos = 20.,                 //pos - position  : input unit = mm
+          y_pos = 20.,
+          z_pos = 20.;
+       double x_mom = 0. ;               //mom - momentum  : input unit = GeV / c
+       double y_mom = 1. ;
+       double z_mom = 1. ;
+       const double mmGVf = fieldUnits::millimeter;
+       const double ppGVf = fieldUnits::GeV ; 
 
-#ifndef DebuggingSection
-#ifndef MAINTESTING    
-    double
-      x_pos = 20.,                 //pos - position  : input unit = mm
-      y_pos = 20.,
-      z_pos = 20.;  */
-    //  double x_mom = 0. ;               //mom - momentum  : input unit = GeV / c
-    //  double y_mom = 1. ;
-    //  double z_mom = 1. ;
-    // const double mmGVf = fieldUnits::millimeter;
-    // const double ppGVf = fieldUnits::GeV ; 
-
-    double posMom[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
-                       x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};
+       double posMom[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
+                          x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};
     // double posMom[] = {0.0513401, 0.095223, 0.0916195, 0.635712, 0.717297, 0.141603 };
 
-    std::fill_n(hstep, nTracks, 20);
-    const ThreeVector_d  startPosition( posMom[0], posMom[1], posMom[2]);
-    const ThreeVector_d  startMomentum( posMom[3], posMom[4], posMom[5]);
-    ScalarFieldTrack yTrackIn ( startPosition, startMomentum, particleCharge );  // yStart
-    ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
+       for (int j = 0; j < nTracks; ++j)
+       {
+          yInput [j].LoadFromArray(posMom);
+          yOutput[j].LoadFromArray(posMom);
+       }
+          
+       vectorDriver->AccurateAdvance( yInput, hstep, charge, epsTol, yOutput, nTracks, succeeded );
+       // ==========================
 
-    for (int j = 0; j < nTracks; ++j)
-    {
-      yInput [j].LoadFromArray(posMom);
-      yOutput[j].LoadFromArray(posMom);
+       const ThreeVector_d  startPosition( posMom[0], posMom[1], posMom[2]);
+       const ThreeVector_d  startMomentum( posMom[3], posMom[4], posMom[5]);
+       ScalarFieldTrack yTrackIn ( startPosition, startMomentum, particleCharge );  // yStart
+       ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
+          
+       bool scalarResult =
+             refScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
+       cout<<" yOutput is   : "<< yOutput[0]<<" for yInput: "  <<yInput[0]<< endl;
+       cout<<" yTrackOut is : "<< yTrackOut <<" for yTrackIn: "<<yTrackIn << endl;
+       cout<<" Success of Vector: "<< succeeded[0] << endl;
+       cout<<" Success of scalar: "<< scalarResult << endl;
     }
 
-    vectorDriver->AccurateAdvance( yInput, hstep, charge, epsTol, yOutput, nTracks, succeeded );
+// #define CALCULATETIME 
     
-    bool scalarResult =
-       refScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
-    cout<<" yOutput is   : "<< yOutput[0]<<" for yInput: "  <<yInput[0]<< endl;
-    cout<<" yTrackOut is : "<< yTrackOut <<" for yTrackIn: "<<yTrackIn << endl;
-    cout<<" Success of Vector: "<< succeeded[0] << endl;
-    cout<<" Success of scalar: "<< scalarResult << endl;
-#endif 
-#endif 
-
-#ifdef MAINTESTING 
+#ifdef MAINTESTING
   #ifdef CALCULATETIME
     std::vector<double> ratioVector;
   #endif 
@@ -465,12 +473,12 @@ int main(/*int argc, char *args[]*/)
       ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
 
       vectorDriver->AccurateAdvance( yInput,
-                                         charge,
-                                         hstep,
-                                         epsTol,
-                                         yOutput,
-                                         nTracks,
-                                         succeeded );
+                                     charge,
+                                     hstep,
+                                     epsTol,
+                                     yOutput,
+                                     nTracks,
+                                     succeeded );
       // refScalarDriver->AccurateAdvance( yTrackIn, hstep[11], epsTol, yTrackOut );
 
       for (int i = 0; i < nTracks; ++i)
@@ -492,7 +500,7 @@ int main(/*int argc, char *args[]*/)
 #endif 
 
     cout<<" Scalar Stepper function calls are: "<< refScalarDriver->fStepperCalls <<" and OneGoodStep calls are "<<refScalarDriver->fNoTotalSteps << endl;
-    cout<<" Vector Stepper function calls are: "<< vectorDriver->fStepperCalls <<" and OneStep calls are "<<vectorDriver->fNoTotalSteps << endl;
+    cout<<" Vector Stepper function calls are: "<< vectorDriver->GetNumberOfStepperCalls() <<" and OneStep calls are "<<vectorDriver->GetNumberOfTotalSteps() << endl;
 
 
     //========================End testing IntegrationDriver=======================
