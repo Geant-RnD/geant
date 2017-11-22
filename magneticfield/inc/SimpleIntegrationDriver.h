@@ -229,11 +229,11 @@ private:
      SimpleIntegrationDriver& operator=(const SimpleIntegrationDriver&);
      // Private copy constructor and assignment operator.
 
-     void StoreFinalValues( const                  Real_v & yWork, 
+     void StoreFinalValues( const                  Real_v   yWork[],
                             const                  Real_v & hValue,
                             const                  Real_v & epsSqVal,
                             const vecCore::Mask_v<Real_v> & storeFlag,                     
-                                                   Real_v & yFinal,     
+                                                   Real_v   yFinal[],
                                                    Real_v & hFinalStore,  
                                                    Real_v & epsSqStore );
      // Auxiliary method, to store results of some 'lanes'
@@ -634,19 +634,21 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 {
   // using std::cout;
   // using std::cerr;
-  // using std::endl;  
+  // using std::endl;
+  using vecCore::math::Min;
+  using vecCore::math::Max;  
+  using vecCore::math::Exp;
+  using vecCore::math::Log;     
+   
   if (partDebug) { cout<<"\n"<<endl; }
 
   // const int kVectorSize = vecgeom::kVectorSize;
+  // const int ncompSVEC = TemplateFieldTrack<Real_v>::ncompSVEC;
   
   Real_v errmax_sq;
   Real_v htemp, xnew ;
-
-  // const int ncompSVEC = TemplateFieldTrack<Real_v>::ncompSVEC;
-
   Real_v yerr [ncompSVEC], 
          ytemp[ncompSVEC];
-
   Real_v h = htry ; // Set stepsize to the initial trial value
   // Renamed it to hStep
 
@@ -688,7 +690,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
             << yerr[3][0] << " " << yerr[4][0] << " " << yerr[5][0]  << endl;
      }
 
-     Real_v epsPosition = eps_rel_max * Max(h, fMinimumStep);  // Uses remaining step 'h'
+     Real_v epsPosition = eps_rel_max * vecCore::math::Max(h, Real_v(fMinimumStep)); // Uses remaining step 'h'
      // Could change it to use full step size ==> move it outside loop !!   2017.11.10 JA
      Real_v invEpsPositionSq = 1.0 / (epsPosition*epsPosition);
      
@@ -705,7 +707,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
      errmom_sq = sumerr_sq / ( magmom_sq + tinyValue );
      
      errmom_sq *= invEpsilonRelSq;
-     errmax_sq =  Max( errpos_sq, errmom_sq ); // Square of maximum error
+     errmax_sq =  vecCore::math::Max( errpos_sq, errmom_sq ); // Square of maximum error
 
      if (partDebug)
      {
@@ -761,13 +763,15 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 
      // Some of the steps failed
      // Compute the size of retrial Step.
-     
+
      // htemp = fSafetyFactor *h* vecCore::Pow( errmax_sq, 0.5*fPowerShrink );
-     Real_v errPower = exp( (0.5*fPowerShrink) * Log(errmax_sq) ); 
+     // Real_v errPower = vecCore::math::Exp( (0.5*fPowerShrink) * vecCore::math::Log(errmax_sq) );
+     Real_v errPower = Exp( (0.5*fPowerShrink) * Log(errmax_sq) );      
      htemp = fSafetyFactor * h * errPower;
-     // Does it make sense to calculate these also for succesful steps
-     //  ( when some have failed - landing you here )
-     //   Or are these operations too costly ?  
+     
+     // Does it make sense to calculate these for all steps (which include succesful steps)
+     //  ( note that some have failed - landing you here )
+     // Or are these operations too costly ?  
      // The alternative is to loop (as below) to avoid calling power (or log/exp)
      //   when not needed, as they are (very) expensive operation.
      /*******
@@ -778,10 +782,8 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
          }
       }******/
 
-      // using Max = vecCore::Math::Max;
-      
       h = Max( htemp, 0.1 * h );
-      
+      // h = vecCore::math::Max( htemp, 0.1 * h );      
       xnew = x + h;
 
       stepSizeUnderflow = Active && (xnew == x);
@@ -839,7 +841,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
      // int numUnder= NumberTrue( stepSizeUnderlow );
      std::cerr << "== Check after iteration loop: found " // << numUnder
                << "underflow lanes." << std::endl;
-     ReportConditionLanes( stepSizeUnderflow, x, h, htry );     
+     ReportConditionLanes( stepSizeUnderflow, x, xnew, h, htry );     
   }
   
   if (partDebug)
@@ -849,9 +851,10 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
   errmax_sq = errmax_sqFinal;
 
   // Compute size of next Step
-  Real_v errStretch = fSafetyFactor * vecCore::math::Pow(errmax_sq, 0.5*fPowerGrow);
-  //                = fSafetyFactor * vecCore::math::Exp( (0.5*fPowerGrow)* vecCore::math::Log(errmax_sq));
-  hnext = vecCore::math::Min( errStretch,  fMaxSteppingIncrease) * h;
+  Real_v errStretch = fSafetyFactor * Exp( (0.5*fPowerGrow) * Log(errmax_sq) );
+  //     errStretch = fSafetyFactor * vecCore::math::Exp( (0.5*fPowerGrow)* vecCore::math::Log(errmax_sq));  
+  //                = fSafetyFactor * vecCore::math::Pow(errmax_sq, 0.5*fPowerGrow);
+  hnext = Min( errStretch,  Real_v(fMaxSteppingIncrease) ) * h ;
 
   // Could use check against fErrcon to avoid calling power ... if few/none are 'under'
   // Bool_v  errUnderThreshold = errmax_sq <= fErrcon*fErrcon;
@@ -870,19 +873,21 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 template <class Real_v, class T_Stepper, unsigned int Nvar>
 void
 SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>::
-   StoreFinalValues( const                  Real_v & yWork, 
+   StoreFinalValues( const                  Real_v   yWork[], 
                      const                  Real_v & hValue,
                      const                  Real_v & epsSqValue,
                      const vecCore::Mask_v<Real_v> & storeFlag,                     
-                                            Real_v & yFinal,     
+                                            Real_v   yFinal[],     
                                             Real_v & hFinalStore,  
                                             Real_v & epsSqStore
       )
    // yWork,  hValue,      epsSqVal   represent the output variables   
    // yFinal, hFinalStore, epsSqStore represent the output variables
 {
-   for (int j = 0; j < Nvar; ++j)
-      MaskedAssign( yFinal[j],   storeFlag, yWork[j] );
+   using vecCore::MaskedAssign;
+   
+   for (unsigned int j = 0; j < Nvar; ++j)
+      MaskedAssign( yFinal[j], storeFlag, yWork[j] );
 
    MaskedAssign( hFinalStore, storeFlag, hValue );
    MaskedAssign( epsSqStore,  storeFlag, epsSqValue );
@@ -1041,6 +1046,8 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 // returns isDoneLane = true for h<=0 case, false otherwise
 // because in former case, no further work is required
 {
+  using vecCore::Set;
+   
   if( partDebug ) 
      std::cout<<"----Inserting New Track "<< trackNextInput << " at position "<< slot <<std::endl;
 
@@ -1124,10 +1131,10 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
    {
       // need to get a yEnd : scalar array
       double yOutOneArr[ncompSVEC];
-      for (int i = 0; i < Nvar; ++i ) // Was: i < fNoIntegrationVariables; ++i)
+      for (unsigned int i = 0; i < Nvar; ++i ) // Was: i < fNoIntegrationVariables; ++i)
       {
          // yOutOneArr[i] =    yEnd[i] [currIndex]; // Constant col no., varying row no. for required traversal
-         yOutOneArr[i]  = Get( yEnd[i], currIndex ) ;
+         yOutOneArr[i]  = vecCore::Get( yEnd[i], currIndex ) ;
       }
       yOutput[indOut].LoadFromArray ( yOutOneArr, Nvar ); // fNoIntegrationVariables);
       yOutput[indOut].SetCurveLength( x[currIndex]); // x is a double_v variable
@@ -1170,7 +1177,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
   //    and 'false' otherwise.
 
   const std::string methodName= "SID::AccurateAdvance";
-  using ThreeVector = vecgeom::Vector3D<Real_v>;
+  // using ThreeVector = vecgeom::Vector3D<Real_v>;
 
   fNTracks = nTracks;  // Keep in state (pass easily)
 
@@ -1213,7 +1220,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
   
   if( idNext > (int) kVectorSize ) // Some lanes had hstep <= 0.0 
   {
-    for (int i = 0; i < kVectorSize; ++i)
+    for (unsigned int i = 0; i < kVectorSize; ++i)
     {
       if ( hstep[i] <= 0.0 )
       {
@@ -1276,7 +1283,6 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
      fNoTotalSteps++;
 
      // ThreeVector EndPos( y[0], y[1], y[2] );
-
      /***
      // Check the endpoint
      const Real_v edx= yNext[0] - y[0]; // StartPosAr[0];
@@ -1333,7 +1339,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 
      if (partDebug) std::cout<<" lastStep : "<< isLastStepLane << std::endl;
 
-     nstp++;
+     nstp += 1; // nstp++;
 
      // Real_v x2= x1 + hStepLane;     
      succeededLane = (x>=x2); // If it was a "forced" last step ?
@@ -1362,7 +1368,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
         // InsertSeveralTracks( yInput, hstep,     charge,     i, idNext, stillOK,
         //                      y,      hStepLane, chargeLane, xStartLane );  .......
 // #else // SINGLE_INSERT
-        for (int i = 0; i < kVectorSize; ++i)
+        for (unsigned int i = 0; i < kVectorSize; ++i)
         {
            cout << " [ "<< i << " ]  nstp = " << vecCore::Get(nstp, i) << " <= ? ( = fMaxNoSteps ) "
                 << endl;

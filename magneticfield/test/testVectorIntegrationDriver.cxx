@@ -67,7 +67,7 @@ int main(/*int argc, char *args[]*/)
     //    using Vector3D = vecgeom::Vector3D<T>;
 
     using Double_v = Geant::Double_v;
-    using Float_v =  Geant::Float_v;
+    // using Float_v =  Geant::Float_v;
 
     using Bool_v = vecCore::Mask_v<Double_v>;
     
