@@ -64,7 +64,7 @@
 
 PhysListGVStandard::PhysListGVStandard(const G4String& name) : G4VPhysicsConstructor(name)
 {
-    
+
 std::cout<<"PhysListGVStandard::PhysListGVStandard........."<<std::endl;
   G4EmParameters* param = G4EmParameters::Instance();
   param->SetDefaults();
@@ -116,8 +116,6 @@ void PhysListGVStandard::ConstructProcess()
       theLivermorePhotoElectricModel->SetHighEnergyLimit(LivermoreHighEnergyLimit);
       thePhotoElectricEffect->AddEmModel(0, theLivermorePhotoElectricModel);
       ph->RegisterProcess(thePhotoElectricEffect, particle);
-      //Standard PE
-      //ph->RegisterProcess(new G4PhotoElectricEffect, particle);
       ph->RegisterProcess(new G4ComptonScattering(), particle);
       ph->RegisterProcess(new G4GammaConversion, particle);
     } else if (particleName == "e-") {
@@ -142,14 +140,22 @@ void PhysListGVStandard::ConstructProcess()
       ph->RegisterProcess(new G4eBremsstrahlung(), particle);
       //
 //      ph->RegisterProcess(new G4eplusAnnihilation(), particle);
-    } else if (particleName=="proton" || particleName=="pi-"   || particleName=="pi+" ||
-	             particleName=="pi0"    || particleName=="kaon+" || particleName=="kaon-") {
+
+    } else if( particleName == "proton" ||
+               particleName == "pi-" ||
+               particleName == "pi+" ||
+	       particleName == "pi0" ||
+	       particleName == "kaon+" ||
+	       particleName == "kaon-"
+	       ) {
+
       G4HadronElastic* lhep = new G4HadronElastic();
       G4HadronElasticProcess* hel = new G4HadronElasticProcess();
       hel->AddDataSet(new G4CrossSectionElastic(new G4ComponentGGHadronNucleusXsc()));
       hel->RegisterMe(lhep);
 
       ph->RegisterProcess(hel, particle);
+
     }
   }
 

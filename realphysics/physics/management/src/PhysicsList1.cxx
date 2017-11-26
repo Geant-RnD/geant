@@ -25,6 +25,9 @@
 #include "BetheHeitlerPairModel.h"
 #include "RelativisticPairModel.h"
 
+#include "GammaPhotoElectricProcess.h"
+#include "SauterGavrilaPhotoElectricModel.h"
+
 #include "MSCProcess.h"
 #include "MSCModel.h"
 #include "GSMSCModel.h"
@@ -180,6 +183,7 @@ void PhysicsList1::Initialize() {
       // set min/max energies of the model
       relModel->SetLowEnergyUsageLimit (  80.0*geant::GeV);
       relModel->SetHighEnergyUsageLimit( 100.0*geant::TeV);
+      relModel->SetUseSamplingTables(false);
       // add the model to the process
       convProc->AddModel(relModel);
       // add the process to the gamma particle
