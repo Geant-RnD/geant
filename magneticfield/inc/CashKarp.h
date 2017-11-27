@@ -24,10 +24,12 @@
 // #define Outside_CashKarp     1
 // #define Inheriting_CashKarp  1    // ==> Inherit from GUVVectorIntegrationStepper
 
+/****
 #ifndef Inheriting_CashKarp
 #define override
 #define final
 #endif
+ ****/
 
 template
 <class T_Equation, unsigned int Nvar>
@@ -62,7 +64,7 @@ template
     
     virtual ~CashKarp();
 
-    // GUVVectorIntegrationStepper* Clone() const override;
+    // GUVVectorIntegrationStepper* Clone() const /*override*/ ;
 
     template <typename Real_v> struct ScratchSpaceCashKarp; // defined below
 
@@ -87,12 +89,12 @@ template
                                const Double_v& charge,
                                const Double_v& hStep,
                                      Double_v  yOut[],
-                                     Double_v  yErr[]) override final
+                                     Double_v  yErr[]) // override final
     {
        StepWithErrorEstimate<Double_v>(yInput,dydx,charge,hStep,yOut,yErr);
     }
 
-    Double_v DistChord() const override final { return Double_v(0.0); }; 
+    Double_v DistChord() const /*override final*/ { return Double_v(0.0); }; 
     //  -------- End of mandatory methods ( for transitional period. ) ------------
     
     
@@ -103,7 +105,10 @@ template
     template <typename Real_v>    
     GEANT_FORCE_INLINE
     void RightHandSideInl(Real_v y[], const Real_v& charge, Real_v dydx[]) 
-    { fEquation_Rhs->T_Equation::template RightHandSide<Real_v>(y, charge, dydx); }
+    {
+       assert( fEquation_Rhs != nullptr );
+       fEquation_Rhs->T_Equation::template RightHandSide<Real_v>(y, charge, dydx);
+    }
 
     void SetEquationOfMotion(T_Equation* equation);
     
@@ -170,9 +175,8 @@ template
 };
 #endif
 
+// -------------------------------------------------------------------------------
 
-// template <class Real_v>
-// template <class T_Equation, unsigned int Nvar>   
 #ifdef Outside_CashKarp
 // template <class Real_v, class T_Equation, unsigned int Nvar>
 template <class Real_v>
@@ -296,6 +300,8 @@ CashKarp<T_Equation,Nvar>::
 //  The remaining functions / methods are defined below
 #endif
 
+// -------------------------------------------------------------------------------
+
 template <class T_Equation, unsigned int Nvar>
 inline
 CashKarp<T_Equation,Nvar>::
@@ -321,19 +327,24 @@ CashKarp<T_Equation,Nvar>::
    fLastStepLength= Double_v(0.);
 #endif
    assert( (numStateVariables == 0) || (numStateVariables >= Nvar) );
-  
+   assert( fEquation_Rhs != nullptr );
    std::cout<<"----end of constructor of CashKarp"<<std::endl;
 }
+
+// -------------------------------------------------------------------------------
 
 template <class T_Equation, unsigned int Nvar>
 void CashKarp<T_Equation,Nvar>::
   SetEquationOfMotion(T_Equation* equation)
 {
    fEquation_Rhs= equation;
+   assert( fEquation_Rhs != nullptr );   
 #ifdef Inheriting_CashKarp   
    // this->GUVVectorIntegrationStepper::SetABCEquationOfMotion(nullptr); // fEquation_Rhs);
 #endif   
 }
+
+// -------------------------------------------------------------------------------
 
 //  Copy - Constructor
 // 
@@ -348,13 +359,14 @@ CashKarp<T_Equation,Nvar>::
                                               Nvar,
                                               right.GetNumberOfStateVariables() ),
 #endif   
-     fEquation_Rhs( (T_Equation*) nullptr ),
+     // fEquation_Rhs( (T_Equation*) nullptr ),
      fOwnTheEquation(false)
 {
    if( fDebug ) {
       std::cout << "----Entered *copy* constructor of CashKarp " << std::endl;
    }
    SetEquationOfMotion( new T_Equation( *(right.fEquation_Rhs)) );
+   assert( fEquation_Rhs != nullptr );
     // fEquation_Rhs= right.GetEquationOfMotion()->Clone());
    
    // assert( dynamic_cast<GUVVectorEquationOfMotion*>(fEquation_Rhs) != 0 );   // No longer Deriving
@@ -370,6 +382,8 @@ CashKarp<T_Equation,Nvar>::
                 << " Own-the-Equation = " << fOwnTheEquation << std::endl;
 }
 
+// -------------------------------------------------------------------------------
+
 template <class T_Equation,unsigned int Nvar>
 GEANT_FORCE_INLINE
 CashKarp<T_Equation,Nvar>::~CashKarp()
@@ -377,9 +391,11 @@ CashKarp<T_Equation,Nvar>::~CashKarp()
    std::cout<<"----- Vector CashKarp destructor"<<std::endl;
    if( fOwnTheEquation )
       delete fEquation_Rhs; // Expect to own the equation, except if auxiliary (then sharing the equation)
-
-  std::cout<<"----- VectorCashKarp destructor (ended)"<<std::endl;
+   fEquation_Rhs= nullptr;
+   std::cout<<"----- VectorCashKarp destructor (ended)"<<std::endl;
 }
+
+// -------------------------------------------------------------------------------
 
 #ifdef Inheriting_CashKarp
 template <class T_Equation, unsigned int Nvar>
@@ -390,6 +406,8 @@ CashKarp<T_Equation,Nvar>::Clone() const
    return new CashKarp<T_Equation,Nvar>( *this );   
 }
 #endif
+
+// -------------------------------------------------------------------------------
 
 #if ENABLE_CHORD_DIST    
 template <class Real_v, class T_Equation, unsigned int Nvar>
@@ -424,13 +442,16 @@ CashKarp<T_Equation,Nvar>::
 }
 #endif    
 
+// -------------------------------------------------------------------------------
+
+/***
 #ifndef Inheriting_CashKarp
 #undef override
 #undef final
 #else
 #undef Inheriting_CashKarp
 #endif
-
+ ***/
 #ifdef Outside_CashKarp
 #undef Outside_CashKarp
 #endif

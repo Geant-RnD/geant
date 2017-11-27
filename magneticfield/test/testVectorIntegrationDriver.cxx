@@ -67,9 +67,7 @@ int main(/*int argc, char *args[]*/)
     //    using Vector3D = vecgeom::Vector3D<T>;
 
     using Double_v = Geant::Double_v;
-    // using Float_v =  Geant::Float_v;
-
-    using Bool_v = vecCore::Mask_v<Double_v>;
+    using Bool_v   = vecCore::Mask_v<Double_v>;
     
     // typedef typename Backend::precision_v Double;
     // typedef vecgeom::Vector3D<Double> ThreeVectorSimd;
@@ -154,33 +152,56 @@ int main(/*int argc, char *args[]*/)
     auto gvField = new Field_Type( fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field) );
   #endif
 
-
     cout << "#  Initial  Field strength (GeantV) = "
          << x_field << " , " << y_field << " , " << z_field 
        // << (1.0/fieldUnits::tesla) * gvField->GetValue()->X() << ",  "
          << " Tesla " << endl;
     // cout << "#  Initial  momentum * c = " << x_mom << " , " << y_mom << " , " << z_mom << " GeV " << endl;
+    
     //Create an Equation :
- 
     auto gvEquation = new MagFieldEquation<Field_Type>(gvField);
     // TemplateFieldEquationFactory<Double_v>::CreateMagEquation<Field_Type >(gvField);
 
+    cout << " Equation object created - address = " << gvEquation << endl;
+    
 /*    double yIn[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
                     x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};*/
 
-    std::cout << "# step_len_mm = " << step_len_mm;
-    
+    cout << "# step_len_mm = " << step_len_mm << endl;
     
     //Empty buckets for results
 /*    Double_v dydx[8] = {0.,0.,0.,0.,0.,0.,0.,0.},  // 2 extra safety buffer
            yout[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
            yerr[8] = {0.,0.,0.,0.,0.,0.,0.,0.};*/
-  
 
     //=======================Test part for Integration driver====================
     double hminimum = 0.2;
     // auto vectorDriver = new TemplateGUIntegrationDriver<Double_v>(hminimum, myStepper);
 
+    //==========  Vector Driver: start preparation ===============
+    using StepperType = CashKarp<GvEquationType,Nposmom>;
+    auto myStepper = new StepperType(gvEquation);
+       // new CashKarp<GvEquationType,Nposmom>(gvEquation);
+       // new TemplateGUTCashKarpRKF45<Double_v,GvEquationType,Nposmom>(gvEquation);       
+
+    // myStepper->InitializeCharge( particleCharge );
+    int statsVerbose=1;
+    
+    auto vectorDriver =
+       new SimpleIntegrationDriver<Double_v,StepperType,Nposmom>(hminimum,
+                                                                 myStepper, // myStepperScalar);
+                                                                 Nposmom,
+                                                                 statsVerbose);
+    // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, refScalarDriver);
+
+    // bool debugValue= true; 
+    // cout << "Debug? " << endl;
+    // cin  >> debugValue;
+    // vectorDriver->SetPartDebug(debugValue);
+    cout << " Vector Driver created." << endl;
+    // ========== Vector Driver prepared ========================
+
+    
     //========= Preparing scalar Integration Driver ============
 #ifdef USECMSFIELD
     auto gvFieldScalar    = new Field_Type_Scalar("../VecMagFieldRoutine/cmsmagfield2015.txt");
@@ -214,32 +235,16 @@ int main(/*int argc, char *args[]*/)
     // refScalarDriver->InitializeCharge( particleCharge );
     //==========  Scalar Driver prepared =========================
 
-    using StepperType = CashKarp<GvEquationType,Nposmom>;
-       
-    auto myStepper = new StepperType(gvEquation);
-       // new CashKarp<GvEquationType,Nposmom>(gvEquation);
-       // new TemplateGUTCashKarpRKF45<Double_v,GvEquationType,Nposmom>(gvEquation);       
 
-    // myStepper->InitializeCharge( particleCharge );
-    int statsVerbose=1;
-    
-    auto vectorDriver =
-       new SimpleIntegrationDriver<Double_v,StepperType,Nposmom>(hminimum, myStepper, // myStepperScalar);
-                                                                     Nposmom, statsVerbose);
-    // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, refScalarDriver);
-
-    // bool debugValue= true; 
-    // cout << "Debug? " << endl;
-    // cin  >> debugValue;
-    // vectorDriver->SetPartDebug(debugValue);
-    // ========== Vector Driver prepared ========================
 
     // -- Call internal Test code of Driver
-    // int numTracks;       
+    // int numTracks;
+#if 0    
     bool ok= vectorDriver->TestInitializeLanes();
     if( !ok ) {
-       std::cerr << "vectorDriver->TestInitializeLanes() returned " << ok << std::endl;
+       std::cerr << "WARNING> vectorDriver->TestInitializeLanes() returned " << ok << std::endl;
     }
+#endif    
     // 
     // double total_step = 0.;
 
