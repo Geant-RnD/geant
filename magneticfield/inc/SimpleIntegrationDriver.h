@@ -690,15 +690,25 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
   unsigned int iter= 0;
   int itersLeft= max_trials;
 
+  // ReportManyRowsOfDoubles( "yStart",  yStart, Nvar );
+  
   do
   {
      Real_v errpos_sq=0.0;    // square of displacement error
      Real_v errmom_sq=0.0;    // square of momentum vector difference
 
+     Bool_v alreadyFinished = finished;  // State at start of iteration
      Bool_v Active = ! finished;
      
      itersLeft--;
-     iter++; 
+     iter++;
+
+     cout << " OneGoodStep - iteration = " << iter << endl;
+      
+// #ifdef STORE_ONCE
+     vecCore::MaskedAssign( h, finished, Real_v(0.0) ); // Set h = 0.0 for finished lanes -- ensure no change !
+// #endif
+     
      // if ( !vecCore::IsFull(stepSizeUnderflow || goodStep) )
      // {
      fpStepper-> StepWithErrorEstimate(yStart,dydx,charge,h,ytemp,yerr);  // CAREFUL -> changes for others ?
@@ -708,7 +718,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
         cout << "1st Report - after call to Step-With-Error-Estimate" << endl;
         ReportRowOfBools<Real_v>( "finished", finished );        
         // ReportArray( methodName, "h", h, nVar, );
-        ReportManyRowsOfDoubles( "yStart",  yStart, Nvar );
+        // ReportManyRowsOfDoubles( "yStart",  yStart, Nvar );
         cout<< "----h    is: " << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " "
             << " at iter: " << iter << endl;
         ReportRowOfDoubles( "h",          h );
@@ -759,53 +769,29 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 
      ReportRowOfBools<Real_v>( "goodStep", goodStep );
      ReportRowOfBools<Real_v>( "finished", finished );
-     
-     // Store (only) steps which have just finished
+
+#if 0 // ndef STORE_ONCE
+     // Idea 1: 
+     //   Store (only) steps which have just finished
      if ( !vecCore::MaskEmpty(goodStep && !finished) )
      {
-#if 1
-        // Idea 1
+        if (partDebug)     
+           cout << "Store and Report Stored lanes - after call to Step-Final-Values" << endl;
+     
         StoreFinalValues( ytemp, h, errmax_sq, goodStep, yFinal, hFinal, errmax_sqFinal );
-        finished = finished || goodStep;
         // Can replacement of logic below using multiple MaskedAssigns
-
-        if (partDebug) {
-           cout << "Report of Stored lanes - after call to Step-Final-Values" << endl;
-           ReportRowOfBools<Real_v>( "goodStep", goodStep );           
-           // ReportArray( methodName, "hFinal", hFinal );
-           ReportRowOfDoubles( "hFinal", hFinal );
-           ReportManyRowsOfDoubles( "yFinal",  yFinal, Nvar );
-           ReportRowOfDoubles( "errmaxSq/Final", errmax_sqFinal );
-           // cout<< " yerr is: " << yerr[0] << endl;
-        }
-        
-#else              
-        for (int i = 0; i < kVectorSize; ++i)
-        {
-           if ( goodStep[i] ==1 && ! finished[i] )
-           {
-              cout << "Storing lane " << i << " :  " << " h = " << h[i]
-                   << " errMaxSq = " << errmax_sq[i] << endl;
-
-              // finishedArr[i] = true;
-              Set( finished, i, true);  //  finished[i] = true;
-              hFinal        [i] = h[i];
-              errmax_sqFinal[i] = errmax_sq[i];
-              for (int j = 0; j < ncompSVEC; ++j)
-              {
-                 yFinal[j][i] = ytemp[j][i];
-                 Set( yFinal[j],i,  Get( ytemp[j], i));
-              }
-           }
-        }
-#endif              
      }
-
+#endif        
+     finished = laneDone;
+     
      if ( allDone ) // All (or remaining) steps succeeded.
      {
-        // Idea 2
-        // StoreFinalValues( ytemp, h, errmax_sq, goodStep, yFinal, hFinal, errmax_sqFinal );
-        // finished = finished || goodstep;        
+        // Idea 1.5
+        if (partDebug)     
+           cout << "Store and Report Stored lanes - v1.5 allDone - about to break." << endl;
+     
+        StoreFinalValues( ytemp, h, errmax_sq, goodStep, yFinal, hFinal, errmax_sqFinal );
+
         break;
      } 
 
@@ -836,38 +822,30 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
 
       stepSizeUnderflow = Active && (xnew == x);
 
-#if 0     
-      StoreFinalValues( ytemp,      h,        errmax_sq,
-                        stepSizeUnderflow, // && !finished,
-                        yFinal,     hFinal,   errmax_sqFinal );
+#ifndef STORE_ONCE
+      if( !vecCore::MaskEmpty(stepSizeUnderflow) )
+      {
+         int numUnder= 0;
+         for( unsigned int i=0; i<kVectorSize; i++ ) {
+            if( vecCore::Get(stepSizeUnderflow, i) ) { numUnder++; }
+         }
+         cout << "WARNING> Underflow detected in " << numUnder << " lanes." << endl;
+         // Idea 1.0         
+         // StoreFinalValues( ytemp,      h,        errmax_sq,
+         //                   stepSizeUnderflow, // && !finished,
+         //                   yFinal,     hFinal,   errmax_sqFinal );
+      }
+      // Idea 1.5
+      if( !vecCore::MaskEmpty(stepSizeUnderflow || goodStep) ) {
+        if (partDebug)     
+           cout << "Store and Report Stored lanes - v1.5 allDone - good or Underflow." << endl;         
+         StoreFinalValues( ytemp,      h,        errmax_sq,
+                           (goodStep || stepSizeUnderflow) , // && !alreadyFinished,
+                           yFinal,     hFinal,   errmax_sqFinal );
+      }
+#endif      
       finished = finished || stepSizeUnderflow;
 
-/********
-      //  'Idea 2' - Store only once (except on loop exit) 
-      StoreFinalValues( ytemp,      h,        errmax_sq,
-                        stepSizeUnderflow | goodLane, 
-                        yFinal,     hFinal,   errmax_sqFinal );
- *******/
-#else      
-      if ( !vecCore::MaskEmpty(stepSizeUnderflow) )
-      {
-         for (unsigned int i = 0; i < kVectorSize; ++i)
-         {
-            // Probably could use several MaskedAssigns as well
-            if ( stepSizeUnderflow[i] && !finished[i] )
-            {
-               /* StoreFinalValues() */
-               finished      [i] = true;
-               hFinal        [i] = h[i];
-               errmax_sqFinal[i] = errmax_sq[i];
-               for (int j = 0; j < ncompSVEC; ++j)
-               {
-                  yFinal[j][i] = ytemp[j][i];
-               }
-            }
-         }
-      }
-#endif
       // Interim Report of problem lanes -- For debugging only !!
       Bool_v problemLanes = stepSizeUnderflow && Active ;
       if(! vecCore::MaskEmpty(problemLanes)) {
@@ -879,17 +857,25 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
       }
 
   } while (    itersLeft > 0
-            && ( ! vecCore::MaskFull( stepSizeUnderflow || goodStep ) )
+               && ( ! vecCore::MaskFull( finished ) ) //  was MaskFull( stepSizeUnderflow || goodStep ) )
           );
 
   tot_no_trials += iter;
 
+#ifdef STORE_ONCE
+  //  'Idea 3' - Store exactly one time ( here - except on loop exit) 
+  StoreFinalValues( ytemp,      h,        errmax_sq,
+                    finished,
+                    yFinal,     hFinal,   errmax_sqFinal );
+  //   Why not store all ? 
+#endif
+      
   if( ! vecCore::MaskEmpty(stepSizeUnderflow) )
   {
      // int numUnder= NumberTrue( stepSizeUnderlow );
      std::cerr << "== Check after iteration loop: found " // << numUnder
                << "underflow lanes." << std::endl;
-     ReportConditionLanes( stepSizeUnderflow, x, xnew, h, htry );     
+     ReportConditionLanes( stepSizeUnderflow, x, xnew, h, htry );
   }
   
   if (partDebug)
@@ -952,6 +938,17 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>::
       
       MaskedAssign( hFinalStore, storeFlag, hValue );
       MaskedAssign( epsSqStore,  storeFlag, epsSqValue );
+   }
+
+   
+   if (partDebug) {
+      // cout << "Report of Stored lanes - after call to Step-Final-Values" << endl;
+      ReportRowOfBools<Real_v>( "goodStep", goodStep );           
+      // ReportArray( methodName, "hFinal", hFinal );
+      ReportRowOfDoubles( "hFinal", hFinal );
+      ReportManyRowsOfDoubles( "yFinal",  yFinal, Nvar );
+      ReportRowOfDoubles( "errmaxSq/Final", errmax_sqFinal );
+           // cout<< " yerr is: " << yerr[0] << endl;
    }
 }
 
@@ -1392,14 +1389,13 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
      lastStepOK = (hdid == h);   
      fNoTotalSteps++;
 
-     // ThreeVector EndPos( y[0], y[1], y[2] );
-     /***
-     // Check the endpoint
-     const Real_v edx= yNext[0] - y[0]; // StartPosAr[0];
-     const Real_v edy= yNext[1] - y[1]; // StartPosAr[1];
-     const Real_v edz= yNext[2] - y[2]; // StartPosAr[2];
-     Real_v endPointDist2= vecgeom::Sqrt(edx*edx+edy*edy+edz*edz) ;
-      ***/
+     // ThreeVector EndPos( y[0], y[1], y[2] ); // Check the endpoint
+     const Real_v edx= yNext[0] - y[0], edy= yNext[1] - y[1], edz= yNext[2] - y[2]; 
+     Real_v endPointDist= vecgeom::Sqrt(edx*edx+edy*edy+edz*edz);
+     ReportRowOfDoubles( "Move-x",  edx );
+     ReportRowOfDoubles( "Move-y",  edy );
+     ReportRowOfDoubles( "Move-z",  edz );     
+     ReportRowOfDoubles( "Move-L",  endPointDist);
      
      // Note: xStartLane must be positive. ( Ok - expect starting value = 0 )
      Real_v  stepThreshold =  vecCore::math::Min( epsilon * hStepLane ,
