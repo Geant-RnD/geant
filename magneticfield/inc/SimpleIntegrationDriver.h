@@ -651,15 +651,17 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
   // using std::cout;
   // using std::cerr;
   // using std::endl;
-  using vecCore::math::Min;
+  // using vecCore::math; // ??
+  using vecCore::math::Min;  
   using vecCore::math::Max;  
   using vecCore::math::Exp;
   using vecCore::math::Log;     
-  using ReportValuesOfVectors::ReportRowOfBools;
+  // using ReportValuesOfVectors; // All of them ... how ? 
   using ReportValuesOfVectors::ReportRowOfDoubles;
   using ReportValuesOfVectors::ReportRowOfSquareRoots;  
   using ReportValuesOfVectors::ReportManyRowsOfDoubles;
-
+  using ReportValuesOfVectors::ReportRowOfBools;
+  
   if (partDebug) { cout<<"\n"<<endl; }
 
   // const int kVectorSize = vecgeom::kVectorSize;
@@ -1361,7 +1363,9 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
   using ReportValuesOfVectors::ReportRowOfBools;
   using ReportValuesOfVectors::ReportRowOfDoubles;
   using ReportValuesOfVectors::ReportRowOfSquareRoots;
-  using ReportValuesOfVectors::ReportManyRowsOfDoubles;  
+  using ReportValuesOfVectors::ReportManyRowsOfDoubles;
+  using ReportValuesOfVectors::ReportRowsOfPositionsMomenta;
+  using ReportValuesOfVectors::GetMomentumMag;
   // using ThreeVector = vecgeom::Vector3D<Real_v>;
 
   fNTracks = nTracks;  // Keep in state (pass easily)
@@ -1469,17 +1473,14 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
         ReportManyRowsOfDoubles( "dydx", dydx, Nvar);        
         ReportRowOfDoubles( "h-ask", h);                
         ReportRowOfDoubles( "h-did", hdid);        
-        ReportRowOfDoubles( "x", x);
+        ReportRowOfDoubles( "x",  x);
+        ReportRowOfDoubles( "(end) x2", x2);
         cout << "##-------------------------------------------------------------------------------" << endl;
-        ReportManyRowsOfDoubles( "yNext", yNext, Nvar);
-        using vecCore::math::Sqrt;
-        Real_v momEnd= Sqrt(yNext[3] * yNext[3] + yNext[4] * yNext[4] + yNext[5] * yNext[5]);
-        Real_v momStart= Sqrt( y[3] * y[3] + y[4] * y[4] + y[5] * y[5] );
-        ReportRowOfDoubles( "diff|p|", momEnd - momStart );        
-        ReportRowOfDoubles( "|momEnd|",   momEnd  );
-        ReportRowOfDoubles( "|momStart|", momStart );
+        // ReportManyRowsOfDoubles( "yNext", yNext, Nvar);
+        Real_v momStart= GetMomentumMag( y );        
+        ReportRowsOfPositionsMomenta( "yNext", yNext, Nvar, momStart );
      }
-     
+
      lastStepOK = (hdid == h);
      fNoTotalSteps++;
 
@@ -1492,6 +1493,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
         ReportRowOfDoubles( "Move-y",  edy );
         ReportRowOfDoubles( "Move-z",  edz );     
         ReportRowOfDoubles( "Move-L",  endPointDist);
+        ReportRowOfDoubles( "Move-L/hdid",  endPointDist/hdid );        
      }
      
      // Note: xStartLane must be positive. ( Ok - expect starting value = 0 )
