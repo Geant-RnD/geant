@@ -1470,6 +1470,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
         ReportRowOfDoubles( "h-ask", h);                
         ReportRowOfDoubles( "h-did", hdid);        
         ReportRowOfDoubles( "x", x);
+        cout << "##-------------------------------------------------------------------------------" << endl;
         ReportManyRowsOfDoubles( "yNext", yNext, Nvar);
         using vecCore::math::Sqrt;
         Real_v momEnd= Sqrt(yNext[3] * yNext[3] + yNext[4] * yNext[4] + yNext[5] * yNext[5]);
@@ -1544,7 +1545,7 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
      // Prepare next loop step.  Needed only if some lanes are continuing
      // if ( ! vecCore::MaskEmpty( laneContinues ) )  // At least one lane continues
      {
-        for (unsigned int i = 0; i < kVectorSize; ++i) {
+        for (unsigned int i = 0; i < Nvar; ++i) {
            y[i]= yNext[i];
         }
      }
@@ -1570,8 +1571,8 @@ SimpleIntegrationDriver<Real_v, T_Stepper, Nvar>
         for (unsigned int i = 0; i < kVectorSize; ++i)
         {
            using vecCore::Set;
-           cout << " [ "<< i << " ]  nstp = " << vecCore::Get(nstp, i) << " <= ? ( = fMaxNoSteps ) "
-                << endl;
+           cout << "Checking for storing lane [ "<< i << " ]  nstp = " << vecCore::Get(nstp, i)
+                << " <= ? ( = fMaxNoSteps ) " << endl;
                 // << (x < x1 + hStepLane );  //   ( x < x2 )
            
            if ( finishedLane[i] &&  fIndexArr[i] != -1)
