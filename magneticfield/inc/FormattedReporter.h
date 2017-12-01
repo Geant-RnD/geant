@@ -7,7 +7,7 @@
 namespace ReportValuesOfVectors
 {
 
-const int sDefaultNameLength= 10;
+const int sDefaultNameLength= 14;
 const int sDefaultVarSize =   12;
 
 // using std::setw;
