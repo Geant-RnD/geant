@@ -4,7 +4,10 @@
 
 //  Auxiliary methods - should be encapsulated into a separate helper class
 
-namespace ReportValuesOfVectors
+#ifndef  FORMATTED_REPORTER_H
+#define  FORMATTED_REPORTER_H
+
+namespace FormattedReporter   // Was ReportValuesOfVectors
 {
 
 const int sDefaultNameLength= 14;
@@ -16,10 +19,10 @@ const int sDefaultVarSize =   12;
 
 template< typename Real_v >
    void
-   ReportRowOfDoubles( std::string  varName,
-                       const Real_v varValue, 
-                       int          charName = -1,
-                       int          widthVal = -1 )
+   ReportRowOfDoubles( std::string    varName,
+                       const Real_v & varValue, 
+                       int            charName = -1,
+                       int            widthVal = -1 )
 {
    using std::cout;
    using std::endl;
@@ -32,9 +35,9 @@ template< typename Real_v >
    prec = std::min( 5, prec );
    widthVal = prec + 7;
    
-   std::cout << std::setw( charName ) << varName << " : ";
+   cout << std::setw( charName ) << varName << " : ";
    for (int i = 0; i < vecgeom::kVectorSize; ++i) {   
-      std::cout << " " << std::setw( widthVal )
+      cout << " " << std::setw( widthVal )
                 << std::setprecision( prec )
                 << vecCore::Get( varValue, i ) << " | ";      
    }
@@ -47,10 +50,10 @@ template< typename Real_v >
 // ---------------------------------------------
 template< typename Real_v >
    void
-   ReportRowOfSquareRoots( std::string  varName,
-                           const Real_v valueSq,      // Square of interesting value
-                           int          charName = -1,
-                           int          widthVal = -1 )
+   ReportRowOfSquareRoots( std::string    varName,
+                           const Real_v & valueSq,      // Square of interesting value
+                           int            charName = -1,
+                           int            widthVal = -1 )
 {
    if( vecCore::MaskEmpty( valueSq < 0.0)  ) {
       Real_v value= vecCore::math::Sqrt( valueSq );
@@ -65,11 +68,11 @@ template< typename Real_v >
 
 template< typename Real_v >
    void
-   ReportManyRowsOfDoubles( std::string  varArrName,
-                            const Real_v varArr[],
-                            int          arrLen, 
-                            int          charName = -1,
-                            int          widthVal = -1 )
+   ReportManyRowsOfDoubles( std::string    varArrName,
+                            const Real_v   varArr[],
+                            int            arrLen, 
+                            int            charName = -1,
+                            int            widthVal = -1 )
 {
    for( int i=0; i< arrLen; i++ ) {
       // std::ostringstream nameAndIndex;
@@ -82,42 +85,60 @@ template< typename Real_v >
 }
 
 // ---------------------------------------------
+template< typename Real_v >
+   Real_v GetMomentumMag( const Real_v varPositionsMomenta[6] )
+{
+   Real_v px = varPositionsMomenta[3];
+   Real_v py = varPositionsMomenta[4];
+   Real_v pz = varPositionsMomenta[5];   
 
+   return vecCore::math::Sqrt( px * px + py * py + pz * pz );
+}
 
 template< typename Real_v >
    void
-   ReportManyRowsOfPositionsMomenta( std::string  varName, 
-                                     const Real_v varPositionsMomenta[],
-                                     int          arrLen,
-                                     int          widthNm  = -1,
-                                     int          widthVal = -1 )
+   ReportRowsOfPositionsMomenta( std::string    varName, 
+                                 const Real_v   varPositionsMomenta[],
+                                 int            arrLen,
+                                 const Real_v & momentumMagStart, // 
+                                 int            widthNm  = -1,
+                                 int            widthVal = -1 )
 {
    using vecCore::math::Sqrt;
-
-   ReportManyRowsOfPositionsMomenta( varName,
-                                     varPositionsMomenta,
-                                     arrLen,
-                                     widthNm, 
-                                     widthVal );
+   using vecCore::MaskEmpty;
+   using vecCore::MaskFull;   
+   if( widthVal < 0 ) { widthVal = sDefaultVarSize; }
    
-   Real_v momEnd= Sqrt(yNext[3] * yNext[3] + yNext[4] * yNext[4] + yNext[5] * yNext[5]);
-   Real_v momStart= Sqrt( y[3] * y[3] + y[4] * y[4] + y[5] * y[5] );
-
-   Real_v diffMagP = momEnd - momStart;
+   ReportManyRowsOfDoubles( varName,
+                            varPositionsMomenta,
+                            arrLen,
+                            widthNm, 
+                            widthVal );
+   assert( arrLen >= 6 ); 
+   
+   Real_v momEnd= GetMomentumMag( varPositionsMomenta );
+   
+   Real_v diffMagP = momEnd - momentumMagStart;
    ReportRowOfDoubles( "diff|p|", diffMagP );
 
-   double tinyVal = 1.0e-80;
-   Real_v relDiff = diffMagP / ( momStart + Real_v(tinyVal) ) ;
-   ReportRowOfDoubles( "d|p|/|p|",   relDiff  );
-
-   double thresholdRelativeDiff = 1.0e-5;   //  Later: 3 * epsilon ?? 
-   if( ! MaskEmpty( relDiff < 1.0e-5 * momStart ) )
+   if( ! MaskFull( momentumMagStart == Real_v( 0.0 ) ) )
    {
-      int extraWidth= widthVal + 8;
-      ReportRowOfDoubles( "|momEnd|",   momEnd,   widthNm, extraWidth  );
-      ReportRowOfDoubles( "|momStart|", momStart, widthNm, extraWidth  );
+      double tinyVal = 1.0e-80;
+      Real_v relDiff = diffMagP / ( momentumMagStart + Real_v(tinyVal) ) ;
+      ReportRowOfDoubles( "d|p|/|p|",   relDiff  );
+      
+      double thresholdRelativeDiff = 1.0e-5;   //  Later: 3 * epsilon ??         
+      if( ! MaskEmpty( abs(relDiff) > thresholdRelativeDiff ) )
+      {
+         int extraWidth= widthVal + 12;
+         ReportRowOfDoubles( "|momEnd|",   momEnd,           widthNm, extraWidth  );
+         ReportRowOfDoubles( "|momStart|", momentumMagStart, widthNm, extraWidth  );
+      }else{
+         ReportRowOfDoubles( "|momEnd|",   momEnd  );
+      }
+      std::cout << "##-------------------------------------------------------------------------------"
+                << std::endl;
    }
-   std::cout << "##-------------------------------------------------------------------------------" << std::endl;
 }
 
 // ---------------------------------------------
@@ -125,19 +146,21 @@ template< typename Real_v >
 
 template< typename Real_v >
    void
-   ReportRowOfBools( std::string  varName,
-                    const vecCore::Mask_v<Real_v> var,
-                    int          charName= -1,
-                    int          widthVal= -1)
+   ReportRowOfBools( std::string                     varName,
+                     const vecCore::Mask_v<Real_v> & var,
+                     int          widthName= -1,
+                     int          widthVal= -1)
 {
-   if( charName < 0 ) { charName  =  sDefaultNameLength; }
+   using std::cout;
+   
+   if( widthName < 0 ) { widthName  =  sDefaultNameLength; }
    if( widthVal < 0 ) { widthVal = sDefaultVarSize; }
    
-   std::cout << std::setw( charName ) << varName << " : ";
+   cout << std::setw( widthName ) << varName << " : ";
    for (int i = 0; i < vecgeom::kVectorSize; ++i) {
-      std::cout << " " << std::setw( widthVal ) << vecCore::Get( var, i ) << " | ";
+      cout << " " << std::setw( widthVal ) << vecCore::Get( var, i ) << " | ";
    }
-   std::cout << std::endl;
+   cout << std::endl;
 }
 
 // ---------------------------------------------
@@ -150,20 +173,60 @@ void
 ReportRowOfDoublesIf( std::string    varName,
                       const Real_v   var, 
                       vecCore::Mask_v<Real_v> cond,
-                      int            charName = -1,
+                      int            widthName = -1,
                       int            widthVal = -1                 
    )
 {
-   if( charName < 0 ) { charName  =  sDefaultNameLength; }
-   if( widthVal < 0 ) { widthVal = sDefaultVarSize; }
+   using std::cout;
+   if( widthName < 0 ) { widthName  =  sDefaultNameLength; }
+   if( widthVal < 0 )  { widthVal = sDefaultVarSize; }
    
-   std::cout << std::setw( charName ) << varName << " : ";
+   cout << std::setw( widthName ) << varName << " : ";
    for (int i = 0; i < vecgeom::kVectorSize; ++i) {
       if( Get( cond, i ) )
-         std::cout << " " << std::setw( widthVal ) << Get(var, i) << " | ";      
+         cout << " " << std::setw( widthVal ) << Get(var, i) << " | ";      
    }
-   std::cout << std::endl;
+   cout << std::endl;
 }
 
 
+// ----------------------------------------------------------------------------------
+
+void ReportArray( const std::string& methodName,
+                  const std::string& variableName,                  
+                  const double       Arr[],
+                  int                numTracks,
+                  bool               banner= false)
+{
+   using std::cout;
+   using std::endl;
+
+   const int precisionVal = 4;
+   const int wdName= 12;
+   const int charWidth    = precisionVal + 2;
+
+   if( banner ) {
+      
+      cout << " **** Method " 
+         << std::setw(wdName) << methodName << " values of arrays: " << endl;
+      cout << std::setw(wdName) << "Variable Name" << " :";      
+      for (int i = 0; i < numTracks; ++i)
+      {
+         cout << " [" << std::setw(charWidth-3) << i << "] ";
+      }
+      cout << endl;
+   }
+   cout << std::setw(wdName) << variableName << " : ";
+   int oldPrec= cout.precision( precisionVal );
+   for (int i = 0; i < numTracks; ++i)
+   {
+      // cout << " [" << i << "]= ";
+      cout << std::setw(charWidth) << Arr[i] << " ";
+   }
+   cout<< std::endl;
+   cout.precision( oldPrec ); 
+}
+
 };  // End of namespace
+
+#endif // FORMATTED_REPORTER_H

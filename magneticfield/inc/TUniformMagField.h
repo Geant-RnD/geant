@@ -88,7 +88,7 @@ private:
 };
 
 TUniformMagField& 
-TUniformMagField:: operator = (const TUniformMagField &p)
+TUniformMagField::operator = (const TUniformMagField &p)
    // Copy constructor and assignment operator.
 {
    if (&p == this) return *this;
