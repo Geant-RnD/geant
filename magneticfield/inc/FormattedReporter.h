@@ -29,7 +29,7 @@ template< typename Real_v >
    if( widthVal <= 0 ) { widthVal = sDefaultVarSize; }
 
    int prec = (widthVal - 7);
-   prec = std::max( 5, prec );
+   prec = std::min( 5, prec );
    widthVal = prec + 7;
    
    std::cout << std::setw( charName ) << varName << " : ";
@@ -82,6 +82,46 @@ template< typename Real_v >
 }
 
 // ---------------------------------------------
+
+
+template< typename Real_v >
+   void
+   ReportManyRowsOfPositionsMomenta( std::string  varName, 
+                                     const Real_v varPositionsMomenta[],
+                                     int          arrLen,
+                                     int          widthNm  = -1,
+                                     int          widthVal = -1 )
+{
+   using vecCore::math::Sqrt;
+
+   ReportManyRowsOfPositionsMomenta( varName,
+                                     varPositionsMomenta,
+                                     arrLen,
+                                     widthNm, 
+                                     widthVal );
+   
+   Real_v momEnd= Sqrt(yNext[3] * yNext[3] + yNext[4] * yNext[4] + yNext[5] * yNext[5]);
+   Real_v momStart= Sqrt( y[3] * y[3] + y[4] * y[4] + y[5] * y[5] );
+
+   Real_v diffMagP = momEnd - momStart;
+   ReportRowOfDoubles( "diff|p|", diffMagP );
+
+   double tinyVal = 1.0e-80;
+   Real_v relDiff = diffMagP / ( momStart + Real_v(tinyVal) ) ;
+   ReportRowOfDoubles( "d|p|/|p|",   relDiff  );
+
+   double thresholdRelativeDiff = 1.0e-5;   //  Later: 3 * epsilon ?? 
+   if( ! MaskEmpty( relDiff < 1.0e-5 * momStart ) )
+   {
+      int extraWidth= widthVal + 8;
+      ReportRowOfDoubles( "|momEnd|",   momEnd,   widthNm, extraWidth  );
+      ReportRowOfDoubles( "|momStart|", momStart, widthNm, extraWidth  );
+   }
+   std::cout << "##-------------------------------------------------------------------------------" << std::endl;
+}
+
+// ---------------------------------------------
+
 
 template< typename Real_v >
    void
