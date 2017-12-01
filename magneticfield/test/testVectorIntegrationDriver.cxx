@@ -29,7 +29,6 @@ using fieldUnits::degree;
 // #include "TemplateGUVIntegrationStepper.h"
 
 #include "CashKarp.h"
-// #include "FlexibleIntegrationDriver.h"
 #include "SimpleIntegrationDriver.h"
 
 #include "FieldTrack.h"
@@ -44,35 +43,29 @@ using fieldUnits::degree;
 #else
   #ifndef NEW_SCALAR_FIELD
   //  Transition measure --- compare to old Scalar field types 2017.11.16
-  #include "TUniformMagField.h"
-  #include "TMagFieldEquation.h"
-  #include "StepperFactory.h"
-  #include "ScalarFieldTrack.h"
-  #include "ScalarIntegrationDriver.h"
+    #include "TUniformMagField.h"
+    #include "TMagFieldEquation.h"
+    #include "StepperFactory.h"
+    #include "ScalarFieldTrack.h"
+    #include "ScalarIntegrationDriver.h"
   #endif
 #endif
 
 #include <stdlib.h>
 
 // using namespace std;
-// using std::cout;
-// using std::cerr;
-// using std::endl;
+using std::cout;
+using std::cerr;
+using std::endl;
+
+using Double_v = Geant::Double_v;
+using Bool_v   = vecCore::Mask_v<Double_v>;
 
 int main(/*int argc, char *args[]*/)
 {
     constexpr unsigned int Nposmom= 6; // Position 3-vec + Momentum 3-vec
-
-    // template <typename T>
-    //    using Vector3D = vecgeom::Vector3D<T>;
-
-    using Double_v = Geant::Double_v;
-    using Bool_v   = vecCore::Mask_v<Double_v>;
-    
-    // typedef typename Backend::precision_v Double;
-    // typedef vecgeom::Vector3D<Double> ThreeVectorSimd;
-    typedef vecgeom::Vector3D<double> ThreeVector_d;
-    // using ThreeVectorSimd = Vector3D<Double_v>;
+    // template <typename T> using Vector3D = vecgeom::Vector3D<T>;
+    using ThreeVector_d = vecgeom::Vector3D<double>;
     
   #ifdef USECMSFIELD
     using Field_Type        = FlexibleCMSmagField; // TO-DO 
@@ -99,51 +92,12 @@ int main(/*int argc, char *args[]*/)
     double step_len_mm = 200.;    // meant as millimeter;  //Step length 
     double z_field_in  = DBL_MAX;
     
-    //Checking for command line values :
-/*    if(argc>1)
-        stepper_no = atoi(args[1]);
-    if(argc > 2)
-       step_len_mm = (float)(stof(args[2]));   // *mm);
-    if(argc > 3)
-        no_of_steps = atoi(args[3]);
-    if(argc > 4)
-       z_field_in = (float) (stof(args[4]));     // tesla*/
-    // double step_len = step_len_mm * fieldUnits::millimeter;
-    
-    //Set Charge etc.
-    double particleCharge = +1.0;      // in e+ units
-    
-    //Choice of output coordinates
-/*    int
-    columns[] =
-    {
-       1 , 1 , 1 ,  // position  x, y, z 
-       1 , 1 , 1 ,  // momentum  x, y, z
-       0 , 0 , 0 ,  // dydx pos  x, y, z
-       1 , 1 , 0    // dydx mom  x, y, z
-    };*/ //Variables in yOut[] & dydx[] we want to display - 0 for No, 1 for yes
+    double x_field = 0.,               //Uniform Magnetic Field (x,y,z)
+           y_field = 0.,               //  Tesla // *tesla ;
+           z_field;
 
-    // const unsigned int nwdf= 12;  // Width for float/double
-    
-    //Set coordinates here
-/*    double
-       x_pos = 0.,                 //pos - position  : input unit = mm
-       y_pos = 0.,
-       z_pos = 0.;
-    double   
-       x_mom = 0.,                 //mom - momentum  : input unit = GeV / c
-       y_mom = 1.,
-       z_mom = 1.;*/
-    double          
-       x_field = 0.,               //Uniform Magnetic Field (x,y,z)
-       y_field = 0.;               //  Tesla // *tesla ;
-    double z_field;
-    // vecgeom::MaskedAssign(z_field_in < DBL_MAX, z_field_in, &z_field);
-
-    if( z_field_in < DBL_MAX )
-       z_field = z_field_in;
-    else
-       z_field = -1.0;  //  Tesla // *tesla ;
+    if( z_field_in < DBL_MAX ) z_field = z_field_in;
+    else                       z_field = -1.0;  //  * Tesla
 
     // Field
   #ifdef USECMSFIELD
@@ -163,20 +117,10 @@ int main(/*int argc, char *args[]*/)
     // TemplateFieldEquationFactory<Double_v>::CreateMagEquation<Field_Type >(gvField);
 
     cout << " Equation object created - address = " << gvEquation << endl;
-    
-/*    double yIn[] = {x_pos * mmGVf, y_pos * mmGVf ,z_pos * mmGVf,
-                    x_mom * ppGVf ,y_mom * ppGVf ,z_mom * ppGVf};*/
-
     cout << "# step_len_mm = " << step_len_mm << endl;
     
-    //Empty buckets for results
-/*    Double_v dydx[8] = {0.,0.,0.,0.,0.,0.,0.,0.},  // 2 extra safety buffer
-           yout[8] = {0.,0.,0.,0.,0.,0.,0.,0.},
-           yerr[8] = {0.,0.,0.,0.,0.,0.,0.,0.};*/
-
     //=======================Test part for Integration driver====================
     double hminimum = 0.2;
-    // auto vectorDriver = new TemplateGUIntegrationDriver<Double_v>(hminimum, myStepper);
 
     //==========  Vector Driver: start preparation ===============
     using StepperType = CashKarp<GvEquationType,Nposmom>;
@@ -186,21 +130,17 @@ int main(/*int argc, char *args[]*/)
 
     // myStepper->InitializeCharge( particleCharge );
     int statsVerbose=1;
-    
-    auto vectorDriver =
-       new SimpleIntegrationDriver<Double_v,StepperType,Nposmom>(hminimum,
-                                                                 myStepper, // myStepperScalar);
-                                                                 Nposmom,
-                                                                 statsVerbose);
-    // new FlexibleIntegrationDriver<Double_v>(hminimum, myStepper, myStepperScalar, refScalarDriver);
 
-    // bool debugValue= true; 
-    // cout << "Debug? " << endl;
-    // cin  >> debugValue;
-    // vectorDriver->SetPartDebug(debugValue);
+    using  DriverType = SimpleIntegrationDriver<StepperType,Nposmom>;
+    auto vectorDriver =
+       // new SimpleIntegrationDriver<StepperType,Nposmom>
+       new DriverType
+                                                        (hminimum,
+                                                         myStepper,
+                                                         Nposmom,
+                                                         statsVerbose);
     cout << " Vector Driver created." << endl;
     // ========== Vector Driver prepared ========================
-
     
     //========= Preparing scalar Integration Driver ============
 #ifdef USECMSFIELD
@@ -211,11 +151,12 @@ int main(/*int argc, char *args[]*/)
 #ifdef NEW_SCALAR_FIELD
     using  GvEquationTypeScalar=  MagFieldEquation<Field_Type_Scalar>;   // New scalar
     #define gvFieldScalar gvField;
-    auto   gvFieldScalar =  new UniformMagField( fieldValueVec );
-    auto gvEquationScalar = new MagFieldEquation(gvFieldScalar);   // Same as vector, yes
+    auto    gvFieldScalar =  new UniformMagField( fieldValueVec );
+    auto gvEquationScalar = new  GvEquationTypeScalar(gvFieldScalar);    // Same as vector, yes
+    //                           ^was MagFieldEquation
     auto  myStepperScalar= CashKarp<GvEquationTypeScalar,Nposmom>(gvEquationScalar);
 #else
-    using  GvEquationTypeScalar=  TMagFieldEquation<Field_Type_Scalar, Nposmom>; // Old scalar
+    using GvEquationTypeScalar=  TMagFieldEquation<Field_Type_Scalar, Nposmom>;
     // If we plan to test against 'plain' scalar objects: field, equation, stepper, ... 
     auto fieldValueVec = fieldUnits::tesla * ThreeVector_d(x_field, y_field, z_field);
     auto gvFieldScalar = new TUniformMagField( fieldValueVec );
@@ -239,10 +180,10 @@ int main(/*int argc, char *args[]*/)
 
     // -- Call internal Test code of Driver
     // int numTracks;
-#if 0    
-    bool ok= vectorDriver->TestInitializeLanes();
+#if 0        
+    bool ok= vectorDriver->TestInitializeLanes<Double_v>();
     if( !ok ) {
-       std::cerr << "WARNING> vectorDriver->TestInitializeLanes() returned " << ok << std::endl;
+       std::cerr << "WARNING> vectorDriver<Double_v>->TestInitializeLanes() returned " << ok << std::endl;
     }
 #endif    
     // 
@@ -260,7 +201,7 @@ int main(/*int argc, char *args[]*/)
 
     // std::fill_n(hstep, nTracks, 20);    
     double hstep[nTracks] = { 11.0, 20.0, 33.0, 44.44, 55.555, 66.6666, 77.77777, 88.888888, 99.9999999, 101.0, 111.0, 122.0, 133.0, 144.0, 155.0, 166.0 };
-    // { 11.0, 200.0, 330.0, 444.40, 555.55, 666.666, 777.7777, 888.88888, 999.999999, 100.0, 11.0, 12.0, 13.0, 14.0, 15.3, 16.9 };
+    // double hstep[] = { 11.0, 200.0, 330.0, 444.40, 555.55, 666.666, 777.7777, 888.88888, 999.999999, 100.0, 11.0, 12.0, 13.0, 14.0, 15.3, 16.9 };
 
     double charge[nTracks] = { 1.0, -2.0, 3.0, -4.0, 5.0, -6.0, 7.0, -8.0, 9.0, -10.0, 11.0, -12.0, 13.0, -14.0, 15., -16. };    
         // = {0, 0, 0, 1, -.3, .4, 20, 178., 920.}; 
@@ -290,25 +231,37 @@ int main(/*int argc, char *args[]*/)
        for (int j = 0; j < nTracks; ++j)
        {
           yInput [j].LoadFromArray(posMom);
-          yOutput[j].LoadFromArray(posMom);
+          yOutput[j].LoadFromArray(posMom); // Not strictly needed
        }
           
-       vectorDriver->AccurateAdvance( yInput, hstep, charge, epsTol, yOutput, nTracks, succeeded );
+       vectorDriver
+          ->AccurateAdvance<Double_v>( yInput, hstep, charge, epsTol, yOutput, nTracks, succeeded );
        // ==========================
+       cout<<"-- Vector Driver done (advanced)." << endl;
 
+       
        const ThreeVector_d  startPosition( posMom[0], posMom[1], posMom[2]);
        const ThreeVector_d  startMomentum( posMom[3], posMom[4], posMom[5]);
-       ScalarFieldTrack yTrackIn ( startPosition, startMomentum, particleCharge );  // yStart
-       ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
-          
+       ScalarFieldTrack yTrackIn ( startPosition, startMomentum, charge[0] );  // yStart
+       ScalarFieldTrack yTrackOut( startPosition, startMomentum, charge[0] );  // yStart
+
        bool scalarResult =
              refScalarDriver->AccurateAdvance( yTrackIn, hstep[0], epsTol, yTrackOut );
+       
+       cout<<"-- Scalar Driver done (advanced)." << endl;
        cout<<" yOutput is   : "<< yOutput[0]<<" for yInput: "  <<yInput[0]<< endl;
        cout<<" yTrackOut is : "<< yTrackOut <<" for yTrackIn: "<<yTrackIn << endl;
        cout<<" Success of Vector: "<< succeeded[0] << endl;
        cout<<" Success of scalar: "<< scalarResult << endl;
+       
+       for (int i = 0; i < nTracks; ++i)
+       {
+          refScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
+          
+          cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for yInput: "  <<yInput[i]<< endl;
+          cout<<" yTrackOut is : "      << yTrackOut <<" for yTrackIn: "<<yTrackIn <<" for hstep: "<<hstep[i]<< endl;
+       }
     }
-
 // #define CALCULATETIME 
     
 #ifdef MAINTESTING
@@ -387,7 +340,7 @@ int main(/*int argc, char *args[]*/)
 #endif 
 
 #ifndef DebuggingSection
-      vectorDriver->AccurateAdvance( yInput, hstep, epsTol, yOutput, nTracks, succeeded );
+      vectorDriver->AccurateAdvance<Double_v>( yInput, hstep, epsTol, yOutput, nTracks, succeeded );
 #endif 
 
 #ifdef CALCULATETIME
@@ -475,8 +428,8 @@ int main(/*int argc, char *args[]*/)
 
       const ThreeVector_d  startPosition( posMomt[0], posMomt[1], posMomt[2]);
       const ThreeVector_d  startMomentum( posMomt[3], posMomt[4], posMomt[5]);
-      ScalarFieldTrack yTrackIn ( startPosition, startMomentum, particleCharge );  // yStart
-      ScalarFieldTrack yTrackOut( startPosition, startMomentum, particleCharge );  // yStart
+      ScalarFieldTrack yTrackIn ( startPosition, startMomentum, charge );
+      ScalarFieldTrack yTrackOut( startPosition, startMomentum, charge );
 
       vectorDriver->AccurateAdvance( yInput,
                                      charge,
@@ -489,7 +442,7 @@ int main(/*int argc, char *args[]*/)
 
       for (int i = 0; i < nTracks; ++i)
       {
-        // refScalarDriver->AccurateAdvance( yTrackIn, hstep[i], epsTol, yTrackOut );
+        refScalarDriver->AccurateAdvance( yTrackIn[i], hstep[i], epsTol, yTrackOutScalar[i] );
 
         // cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for hstep: "<<hstep[i]<< endl ;
         cout<<" yOutput["<<i<<"] is: "<< yOutput[i]<<" for hstep: "<<hstep[i]<< endl ;

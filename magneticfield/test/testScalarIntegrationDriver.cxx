@@ -147,7 +147,7 @@ int main(int argc, char *args[])
     // gvEquation->InitializeCharge( particleCharge );
 
     /*-------------------------PREPARING STEPPER-----------------------------*/
-    
+
     //Create a stepper :
     GUVIntegrationStepper *myStepper; // , *exactStepper;
     // G4MagIntegrationStepper *g4refStepper;    
@@ -156,7 +156,7 @@ int main(int argc, char *args[])
     bool useClonedStepper= (stepper_no > cloneBump);
     if(  useClonedStepper )
        stepper_no -= cloneBump;
- 
+
     myStepper= StepperFactory::CreateStepper<GvEquationType>(gvEquation, stepper_no);
     //         *****************************
     if( useClonedStepper ){
@@ -174,9 +174,9 @@ int main(int argc, char *args[])
     cout << "#  Driver parameters:  eps_tol= "  << epsTol << "  h_min= " << hminimum << endl;
  
     auto integrDriver= new ScalarIntegrationDriver( hminimum,
-                                                myStepper,
-                                                Nposmom,
-                                                statisticsVerbosity); 
+                                                    myStepper,
+                                                    Nposmom,
+                                                    statisticsVerbosity); 
     // myStepper->InitializeCharge( particleCharge );
     //integrDriver->InitializeCharge( particleCharge );
  
