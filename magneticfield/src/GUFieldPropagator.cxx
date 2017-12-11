@@ -78,9 +78,9 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   return goodAdvance;
 }
 
-GUVField* GUFieldPropagator::GetField() 
+VScalarField* GUFieldPropagator::GetField() 
 {
-   GUVField* pField = nullptr;
+   VScalarField* pField = nullptr;
    auto driver= GetIntegrationDriver();
    if( driver ){
      auto equation= driver->GetEquationOfMotion();

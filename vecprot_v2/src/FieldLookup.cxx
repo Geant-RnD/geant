@@ -1,4 +1,4 @@
-#include "GUVField.h"
+#include "VScalarField.h"
 #include "FieldLookup.h"
 
 #include "GeantTaskData.h"

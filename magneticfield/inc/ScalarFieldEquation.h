@@ -113,7 +113,7 @@ private:
 
 template <class Field, unsigned int Size>
    ScalarFieldEquation<Field,Size>::ScalarFieldEquation(const ScalarFieldEquation& right)
-     : VScalarEquationOfMotion( (GUVField*) 0 ),
+     : VScalarEquationOfMotion( (VScalarField*) 0 ),
        fPtrField( right.fPtrField->CloneOrSafeSelf( (bool *)0 ) )
       // fPtrField( new Field(right.fPtrField) )
 {
