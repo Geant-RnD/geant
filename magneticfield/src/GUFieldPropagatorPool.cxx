@@ -6,7 +6,7 @@
 #include "GUFieldPropagator.h"
 // #include "ScalarIntegrationDriver.h"
 #include "VScalarEquationOfMotion.h"
-#include "GUVField.h"
+#include "VScalarField.h"
 
 #include <iostream>
 
