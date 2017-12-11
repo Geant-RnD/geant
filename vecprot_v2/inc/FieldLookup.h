@@ -14,7 +14,7 @@
 #define FIELD_LOOKUP_H
 
 #include "Geant/Typedefs.h"
-#include "GUVField.h"
+#include "VScalarField.h"
 
 namespace Geant {
 inline namespace GEANT_IMPL_NAMESPACE {

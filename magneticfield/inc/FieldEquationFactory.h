@@ -2,7 +2,7 @@
 #define FIELDEQUATIONFACTORY_H 1
 
 // Base types
-// #include "GUVField.h"
+// #include "VScalarField.h"
 #include "VScalarEquationOfMotion.h"
 
 // Concrete Types
