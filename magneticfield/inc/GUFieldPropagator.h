@@ -18,13 +18,13 @@ template <class Backend>
 class TemplateGUIntegrationDriver;
 
 class ScalarIntegrationDriver;
-class GUVField;
+class VScalarField;
 
 class GUFieldPropagator
 {
   public:
-    // GUFieldPropagator(GUVField *); // First idea -- sidelined, at least for now
-    GUFieldPropagator(ScalarIntegrationDriver* driver, double epsilon); // (GUVField* field)
+    // GUFieldPropagator(VScalarField *); // First idea -- sidelined, at least for now
+    GUFieldPropagator(ScalarIntegrationDriver* driver, double epsilon); // (VScalarField* field)
 
     template <typename Backend>
     GUFieldPropagator(TemplateGUIntegrationDriver<Backend>* driver, double epsilon);
@@ -53,7 +53,7 @@ class GUFieldPropagator
     const ScalarIntegrationDriver* GetIntegrationDriver() const { return fDriver; }
     double GetEpsilon() { return fEpsilon; }
 
-    GUVField* GetField();
+    VScalarField* GetField();
     GUFieldPropagator* Clone() const;
 
   /******

@@ -12,7 +12,7 @@
 #include "TrackStat.h"
 
 #include "GUFieldPropagator.h"
-#include "GUVField.h"
+#include "VScalarField.h"
 
 #ifdef USE_ROOT
 #include "TRandom.h"

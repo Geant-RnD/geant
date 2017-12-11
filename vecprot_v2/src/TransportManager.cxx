@@ -42,7 +42,7 @@
 #include "GUFieldPropagatorPool.h"
 #include "GUFieldPropagator.h"
 
-#include "GUVField.h"
+#include "VScalarField.h"
 #include "FieldLookup.h"
 
 // #endif
