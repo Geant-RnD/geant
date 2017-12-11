@@ -1,5 +1,5 @@
 /*
- * ConstVecFieldHelixStepper.h
+ * ScalarConstFieldHelixStepper.h
  *
  *  Created on: January 29, 2016
  *      Author: J. Apostolakis
@@ -23,15 +23,15 @@ inline namespace GEANT_IMPL_NAMESPACE {
   * ( neglecting energy loss of particle )
   * This class is roughly equivalent to TGeoHelix in ROOT
   */
-  class ConstVecFieldHelixStepper
+  class ScalarConstFieldHelixStepper
   {
 
     public:
       VECCORE_ATT_HOST_DEVICE
-      ConstVecFieldHelixStepper( double Bx, double By, double Bz );
+      ScalarConstFieldHelixStepper( double Bx, double By, double Bz );
 
       VECCORE_ATT_HOST_DEVICE
-      ConstVecFieldHelixStepper( double Bfield[3] );
+      ScalarConstFieldHelixStepper( double Bfield[3] );
 
       void SetBx( double Bx ){ fBx = Bx; CalculateDerived(); }
       void SetBy( double By ){ fBy = By; CalculateDerived(); }
@@ -107,7 +107,7 @@ inline namespace GEANT_IMPL_NAMESPACE {
   }; // end class declaration
 
 inline 
-void ConstVecFieldHelixStepper::CalculateDerived()
+void ScalarConstFieldHelixStepper::CalculateDerived()
   {
      fBmag = std::sqrt( fBx * fBx + fBy * fBy + fBz * fBz );
      if ( fBmag > 0.0 ) {
@@ -124,14 +124,14 @@ void ConstVecFieldHelixStepper::CalculateDerived()
   }
 
 inline
-ConstVecFieldHelixStepper::ConstVecFieldHelixStepper( double Bx, double By, double Bz )
+ScalarConstFieldHelixStepper::ScalarConstFieldHelixStepper( double Bx, double By, double Bz )
    :  fBx(Bx), fBy(By), fBz(Bz)
   {
      CalculateDerived();
   }
 
 inline
-ConstVecFieldHelixStepper::ConstVecFieldHelixStepper( double B[3] )
+ScalarConstFieldHelixStepper::ScalarConstFieldHelixStepper( double B[3] )
    :  fBx(B[0]), fBy(B[1]), fBz(B[2])
   {
      CalculateDerived();
@@ -145,7 +145,7 @@ ConstVecFieldHelixStepper::ConstVecFieldHelixStepper( double B[3] )
 template<typename Vector3D, typename BaseDType, typename BaseIType>
    inline
    __attribute__((always_inline))
-   void ConstVecFieldHelixStepper::DoStep(
+   void ScalarConstFieldHelixStepper::DoStep(
                BaseDType const & x0, BaseDType const & y0, BaseDType const & z0,
                BaseDType const & dx0, BaseDType const & dy0, BaseDType const & dz0,
                BaseIType const & charge, BaseDType const & momentum, BaseDType const & step,
@@ -170,7 +170,7 @@ template<typename Vector3D, typename BaseDType, typename BaseIType>
   template<typename Vector3D, typename BaseDType, typename BaseIType>
   inline
   __attribute__((always_inline))
-  void ConstVecFieldHelixStepper::DoStep( Vector3D  const & startPosition,
+  void ScalarConstFieldHelixStepper::DoStep( Vector3D  const & startPosition,
                                           Vector3D  const & startDirection,
                                           BaseIType const & charge,
                                           BaseDType const & momentum,
@@ -245,7 +245,7 @@ template<typename Vector3D, typename BaseDType, typename BaseIType>
    SW: commented out due to explicit Vc dependence and since it is not currently used
        leaving the code here to show how one would dispatch to the kernel with Vc
 #define _R_ __restrict__
-  void ConstVecFieldHelixStepper::DoStep_v(
+  void ScalarConstFieldHelixStepper::DoStep_v(
                         double const * _R_ posx, double const * _R_ posy, double const * _R_ posz,
                         double const * _R_ dirx, double const * _R_ diry, double const * _R_ dirz,
                         int const * _R_ charge, double const * _R_ momentum, double const * _R_ step,
