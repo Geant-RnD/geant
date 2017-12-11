@@ -33,7 +33,7 @@
 #include "GeantTaskData.h"
 #include "StepChecker.h"
 #include "ConstBzFieldHelixStepper.h"
-#include "ConstVecFieldHelixStepper.h"
+#include "ScalarConstFieldHelixStepper.h"
 #include "GeantScheduler.h"
 
 #include "VScalarField.h"
@@ -1431,7 +1431,7 @@ void GeantTrack_v::PropagateInVolumeSingle(int i, double crtstep, GeantTaskData 
 
         // Printf("Called Helix-General.  Bz= %g , Bx = %g, By= %g ", Bz, Bx, By );
         
-        Geant::ConstVecFieldHelixStepper stepper( BfieldInitial );
+        Geant::ScalarConstFieldHelixStepper stepper( BfieldInitial );
         stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  fChargeV[i], fPV[i], crtstep,
                                                PositionNew, DirectionNew);
      }
