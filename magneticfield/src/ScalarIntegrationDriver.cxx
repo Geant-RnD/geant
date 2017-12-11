@@ -1,7 +1,7 @@
 //
-// $Id:    $
+// $Id: GVIntegratorDriver.cxx
 //
-// Implementation for class ScalarIntegrationDriver  (old name was GUIntegrationDriver)
+// Implementation for class ScalarIntegrationDriver
 //   Tracking in space dependent magnetic field
 //
 // History of major changes:
@@ -522,7 +522,7 @@ ScalarIntegrationDriver::WarnSmallStepSize( double hnext,
   const  int maxNoWarnings =  10;   // Number of verbose warnings
   // std::ostringstream message;
   // typedef std::cerr message;
-  std::cerr << " WARNING from scalarIntegrationDriver::WarnSmallStepSize():  " ; // << std::endl;
+  std::cerr << " WARNING from ScalarIntegrationDriver::WarnSmallStepSize():  " ; // << std::endl;
   if( (noWarningsIssued < maxNoWarnings) || fVerboseLevel > 10 )
   {
     std::cerr << "The stepsize for the next iteration, " << hnext
