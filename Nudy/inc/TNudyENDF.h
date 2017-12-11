@@ -228,6 +228,7 @@ public:
   void DumpENDF(int flags);
 
 private:
+  bool isDollar = false;
   static const char fkElNam[119][4];
   static const char fkElIso[4][2];
   unsigned char fLogLev; //  Log Level Flag

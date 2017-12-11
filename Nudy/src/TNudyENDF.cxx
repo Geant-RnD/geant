@@ -60,6 +60,13 @@ TNudyENDF::TNudyENDF(const char *nFileENDF, const char *nFileRENDF, const char *
   fRENDF = TFile::Open(nFileRENDF, opt);
   if (!fRENDF) ::Fatal("ctor", "Could not open output file %s", nFileRENDF);
 
+  // this is checking the first line for the ENDF data file\
+  // so that version 6 and version 7 first line issue gets resolved
+  fENDF.getline(fLine, LINLEN);
+  char firstCharFirstLine = fLine[1];
+  isDollar = (firstCharFirstLine == '$') ? true : false;
+  if (!isDollar) fENDF.seekg(0);
+
   // Read to Tape Identifier
   for (int i = 0; i < 6; i++) {
     fENDF.getline(fLine, LINLEN);
@@ -77,6 +84,10 @@ void TNudyENDF::Process()
   //
   // Process a tape
   //
+
+  fENDF.seekg(0);
+  if (isDollar) fENDF.getline(fLine, LINLEN);
+
   if (sub == true) {
     const char *EndfSub;
     std::string subname = GetEndfSubName();
