@@ -10,6 +10,7 @@ Functions DumpToArray and LoadFromArray can be removed
           if this is changed into a struct - i.e. PosMomVector is made public data member.
 Same goes for SetCurveLength and GetCurveLength functions.
 ----------------*/
+#include <vector>
 #include <iostream>
 
 struct FieldTrack{
@@ -21,7 +22,7 @@ public:
   FieldTrack() : fDistanceAlongCurve(0.0) { LoadZeroes(); } 
   FieldTrack( double PositionMomentum[NumCompFT], double length= 0.0) : fDistanceAlongCurve(length)
                         { LoadFromArray( PositionMomentum ); }
-  FieldTrack( std::vector<double> PositionMomentumVec, double length= 0.0) : fDistanceAlongCurve(length)
+  FieldTrack( std::vector<double>& PositionMomentumVec, double length= 0.0) : fDistanceAlongCurve(length)
                         { LoadFromVector( PositionMomentumVec ); }   
   ~FieldTrack(){};
 
@@ -54,7 +55,7 @@ public:
     }
   }
 
-  void LoadFromVector( const std::vector<double> valVec, double valRest = 0.0 )
+  void LoadFromVector( const std::vector<double>& valVec, double valRest = 0.0 )
   {
     int top= std::min( (int)(valVec.size()) , NumCompFT ); 
     for (int i = 0; i < top; ++i)

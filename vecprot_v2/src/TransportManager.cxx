@@ -34,7 +34,7 @@
 #include "Basket.h"
 #include "GeantTaskData.h"
 #include "ConstBzFieldHelixStepper.h"
-#include "ConstVecFieldHelixStepper.h"
+#include "ScalarConstFieldHelixStepper.h"
 #include "GeantScheduler.h"
 
 // #ifdef  RUNGE_KUTTA
@@ -435,7 +435,7 @@ void TransportManager::PropagateInVolumeSingle(GeantTrack &track, double crtstep
                                                PositionNew, DirectionNew);
         // propagationType= 2;
      } else {
-        ConstVecFieldHelixStepper stepper( BfieldInitial );
+        ScalarConstFieldHelixStepper stepper( BfieldInitial );
         stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), crtstep,
                                          PositionNew, DirectionNew);
         // propagationType= 3;        

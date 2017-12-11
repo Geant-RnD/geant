@@ -3,7 +3,7 @@
 #include "GUFieldPropagatorPool.h"
 #include "GUFieldPropagator.h"
 #include "ConstBzFieldHelixStepper.h"
-#include "ConstVecFieldHelixStepper.h"
+#include "ScalarConstFieldHelixStepper.h"
 
 #ifdef USE_VECGEOM_NAVIGATOR
 #include "navigation/NavigationState.h"
@@ -303,7 +303,7 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
                                                PositionNew, DirectionNew);
      } else {
         // Geant::
-        ConstVecFieldHelixStepper stepper( BfieldInitial );
+        ScalarConstFieldHelixStepper stepper( BfieldInitial );
         stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), crtstep,                                           
                                                PositionNew, DirectionNew);        
      }
