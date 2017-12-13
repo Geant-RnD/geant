@@ -79,6 +79,21 @@ double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double te
   return XSvalue;
 }
 
+void NudyPhysics::NudyInterface::ConvertENDF2ROOT(std::string fENDF, std::string rENDF){
+  const char* fileENDF = fENDF.c_str();
+  const char* fileROOT = rENDF.c_str();
+  Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fileENDF, fileROOT, "recreate");
+  tn->SetLogLev(2);
+  tn->Process();
+}
+
+void NudyPhysics::NudyInterface::printE2RErr() {
+  std::cout << "SYNTAX: convertENDF2ROOT < ENDF file name > " << std::endl
+            << "        convertENDF2ROOT < ENDF file name > < ROOT file name > " << std::endl
+			<< "......................... Exiting." << std::endl;
+			exit(0);
+}
+
 std::string NudyPhysics::NudyInterface::SetDataFileNameENDF( int projCode, std::string isoName){
   std::string fstyle = "ENDF";
   SetProjIDFn( projCode, fstyle);

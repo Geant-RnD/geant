@@ -63,12 +63,21 @@ int main(int /*argc*/, char** /*argv*/) {
 // @brief Z for element name
 // @brief A for Mass number for the element.
 
+//
+//
+//
 
-/*
-*nudyxs = new NudyPhysics::NudyInterface(
-  projectileCode, EnergyValue, temperature, eleName, AtomicNumber, MassNumber, pType
-);
-*/
+
+std::string fInENDF="";
+std::string fOutROOT="";
+std::cout << "Enter ENDF data file name: "; std::getline (std::cin,fInENDF);
+if (fInENDF.length() < 1) nudyxs.printE2RErr();
+fOutROOT = fInENDF + ".root";
+nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
+exit(0);
+//
+//
+//
 
 double Eval = EnergyValue/geant::eV;
 

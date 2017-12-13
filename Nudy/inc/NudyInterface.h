@@ -129,6 +129,8 @@ namespace NudyPhysics{
     void SetProjIDFn( int projCode, std::string style);
     double ComputeCrossSection( );
     void SetMTValues(geantphysics::NudyProcessType pType);
+	void ConvertENDF2ROOT(std::string fENDF, std::string rENDF);
+	void printE2RErr();
   public:
     inline std::string GetIsotopeName ();
     inline int GetProjectileCode ();
