@@ -29,6 +29,8 @@ using geantphysics::NudyProcessType;
 //using geantphysics::HadronicProcessType;
 
 
+NudyPhysics::NudyInterface  nudyxs;
+geantphysics::NudyProcessType pType ;
 
 template<typename T>
 std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::ostream>::type& stream, const T& e)
@@ -36,61 +38,109 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
     return stream << static_cast<typename std::underlying_type<T>::type>(e);
 }
 
+void dumpVerb(){
+  // This simply transforms the raw ENDF data file to raw ROOT file
+  // without linearization etc.
+  std::string fInENDF="";
+  std::string fOutROOT="";
+
+  std::cout << "Enter ENDF data file name: ";
+  std::getline (std::cin,fInENDF);
+  std::cout << "Enter ROOT file name to produce: ";
+  std::getline(std::cin, fOutROOT);
+  if (fInENDF.length() < 1) nudyxs.printE2RErr();
+
+  nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
+}
+
+void DumpProcE2R() {
+    ////////////////////////////////////
+    // This is an example to show dumping of ENDF data file
+    // to ROOT file after computing resonance parameters, linearization etc.
+      // DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName,
+      // int tA, int tZ, double temp, std::string isotopeN)
+    std::string fEndfIN = "";
+    std::string fRootOUT = "";
+    std::string fEndfSubIN = "";
+    std::string isotopeName = "";
+    int tA = 0;
+    int tZ = 0;
+    double temp = 293.60608;
+    std::cout << " ENDF data file name as INPUT: ";
+    std::cin >> fEndfIN;
+    std::cout << " ROOT data file name as OUTPUT: ";
+    std::cin >> fRootOUT;
+    std::cout << " ENDFSUB data file name for fission data as INPUT: ";
+    std::cin >> fEndfSubIN;
+    std::cout << "Isotope name: "; std::cin >> isotopeName;
+    std::cout << "Atomic Number: "; std::cin >> tA;
+    std::cout << "Mass Number: "; std::cin >> tZ;
+    std::cout << "Temperature: "; std::cin >> temp;
+    temp = (temp == 0.0) ? 293.60608 : temp;
+    nudyxs.DumpEndf2Root(fEndfIN, fRootOUT, fEndfSubIN, tA, tZ, temp, isotopeName);
+    //////////////////////////////////
+}
+
+void CalXS() {
+    int projectileCode = 2112;
+    std::string eleName =  "Pu";
+    int AtomicNumber  =  94; // 4; //
+    int MassNumber = 241; // 7;   //
+    double temperature = 293.60608;
+    double EnergyValue = 14.0 * geant::MeV; // 1.0e+5; // 2.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
+
+    //pType = geantphysics::HadronicProcessType::kElastic;  // kFission;
+    //pType = geantphysics::HadronicProcessType::kFission;  // kElastic;
+    //pType = geantphysics::HadronicProcessType::kCapture;
+    //pType = geantphysics::HadronicProcessType::kRadioactiveDecay;
+
+  // @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
+  // @brief Then we provide temperature which is required for fission etc.
+  // @brief Then we provide element name like Pu , U etc. for which cross section is required
+  // @brief Z for element name
+  // @brief A for Mass number for the element.
+
+  double Eval = EnergyValue/geant::eV;
+
+  pType = geantphysics::NudyProcessType::kElastic;
+  double xse = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
+  pType = geantphysics::NudyProcessType::kFission;
+  double xsf = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
+  pType = geantphysics::NudyProcessType::kCapture;
+  double xsc = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
+  std::cout << "Neutron Energy = " << EnergyValue/geant::MeV << " MeV " << " Isotope "
+            << AtomicNumber << "-" << eleName << "-" << MassNumber
+            << " Elastic :: XS = " << xse << " Fission :: XS = " << xsf << " Capture :: XS = " << xsc
+            << std::endl;
+}
+
 
 int main(int /*argc*/, char** /*argv*/) {
+std::cout << " Select choise:----"                                                   << std::endl
+          << "\t 1. Dump ENDF data file to ROOT verbatim. "                          << std::endl
+		      << "\t 2. Dump ENDF data file to ROOT after processing, linearizing etc. " << std::endl
+		      << "\t 3. Compute cross section example for 94-Pu-241 for 14 Mev neutron." << std::endl
+		      << "\t 4. Quit."                                                           << std::endl
+          << "\t \t ENTER CHOICE:--->";
+int cInput;
+do {
+  std::cin >> cInput ;
+} while (cInput < 1 || cInput > 4);
 
-  int projectileCode = 2112;
-  std::string eleName =  "Pu";
-  int AtomicNumber  =  94; // 4; //
-  int MassNumber = 241; // 7;   //
-  double temperature = 293.60608;
-  /*  This is showing energy as 0.004 and not as 4.0E=6 and so
-  for the time being I am testing using raw number.
-  double EnergyValue = 4.0 * geant::MeV;
-  */
-  double EnergyValue = 14.0 * geant::MeV; // 1.0e+5; // 2.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
+std::cout << std::endl;
+std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-  geantphysics::NudyProcessType pType ;
-  NudyPhysics::NudyInterface  nudyxs;
-  //pType = geantphysics::HadronicProcessType::kElastic;  // kFission;
-  //pType = geantphysics::HadronicProcessType::kFission;  // kElastic;
-  //pType = geantphysics::HadronicProcessType::kCapture;
-  //pType = geantphysics::HadronicProcessType::kRadioactiveDecay;
-
-// @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
-// @brief Then we provide temperature which is required for fission etc.
-// @brief Then we provide element name like Pu , U etc. for which cross section is required
-// @brief Z for element name
-// @brief A for Mass number for the element.
-
-//
-//
-//
+switch (cInput) {
+  case 1: dumpVerb();
+          exit(0);
+  case 2: DumpProcE2R();
+          exit(0);
+  case 3: CalXS();
+  case 4: exit(0);
+}
 
 
-std::string fInENDF="";
-std::string fOutROOT="";
-std::cout << "Enter ENDF data file name: "; std::getline (std::cin,fInENDF);
-if (fInENDF.length() < 1) nudyxs.printE2RErr();
-fOutROOT = fInENDF + ".root";
-nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
-exit(0);
-//
-//
-//
 
-double Eval = EnergyValue/geant::eV;
-
-pType = geantphysics::NudyProcessType::kElastic;
-double xse = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
-pType = geantphysics::NudyProcessType::kFission;
-double xsf = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
-pType = geantphysics::NudyProcessType::kCapture;
-double xsc = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
-std::cout << "Neutron Energy = " << EnergyValue/geant::MeV << " MeV " << " Isotope "
-          << AtomicNumber << "-" << eleName << "-" << MassNumber
-          << " Elastic :: XS = " << xse << " Fission :: XS = " << xsf << " Capture :: XS = " << xsc
-          << std::endl;
 
 /*
   double kinEnergy = 10.* geant::MeV;

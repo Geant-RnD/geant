@@ -38,7 +38,6 @@
 #pragma link C++ class NudyPhysics::TNudyEndfPhAng+ ;
 #pragma link C++ class NudyPhysics::TNudyEndfPhEnergy+ ;
 #pragma link C++ class NudyPhysics::TNudySampling+ ;
-
 #pragma link C++ class NudyPhysics::NudyInterface+;
 
 //#pragma link C++ class geantphysics::PhysicsProcess+;

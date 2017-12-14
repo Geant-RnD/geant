@@ -35,6 +35,59 @@ NudyPhysics::NudyInterface::NudyInterface(
 
 NudyPhysics::NudyInterface::~NudyInterface() {}
 
+void NudyPhysics::NudyInterface::setFileNames(std::string fIN, std::string fOUT, std::string fSubName) {
+  //SetEndfDataFileName(fIN);
+  NudyInterface::fEndfFileN = fIN.c_str();
+  // fEndfFileN = fIN.c_str();
+  if (!fOUT.length()) {
+    fOUT = fIN + ".root";
+  }
+  fRootFileName = fOUT.c_str();
+  //SetRootFileName(fOUT);
+  //fRootFileName = fOUT.c_str();
+
+  //fEndfSubDataFileName = fSubName.c_str();
+  //SetEndfSubDataFileName(fSubName);
+  fEndfSubDataFileName = fSubName.c_str();
+  std::cout << "endf: " << NudyInterface::fEndfFileN << "     root: " << fRootFileName << std::endl;
+}
+
+
+////////////////////////
+void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName,
+  int tA, int tZ, double temp, std::string isotopeN) {
+  SetA(tA);
+  SetZ(tZ);
+  SetTemp(temp);
+  SetIsotopeName(isotopeN);
+  SetIsFissKey(false);
+
+  //NudyInterface::setFileNames(fIN, fOUT, fSUBName);
+  fEndfFileN = fIN.c_str();
+  if (!fOUT.length()) fOUT = fIN + ".root";
+  fRootFileName = fOUT.c_str();
+  fEndfSubDataFileName = fSUBName.c_str();
+
+  Nudy::TNudyENDF *proc = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
+  proc->SetPreProcess(0);
+  proc->SetLogLev(0);
+  proc->Process();
+
+  bool LFIval = proc->GetLFI();
+  SetIsFissKey(LFIval);
+  proc->SetEndfSub(fEndfSubDataFileName);
+  proc->Process();
+
+  double iSigDiff = 0.001;  // documentation required
+  NudyPhysics::TNudyEndfSigma *xsec = new NudyPhysics::TNudyEndfSigma(fRootFileName, iSigDiff);
+  xsec->SetsigPrecision(iSigDiff);
+  xsec->SetPreProcess(0);
+  xsec->SetInitTempDop(temp);
+  xsec->GetData(fRootFileName, iSigDiff);
+  NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
+}
+
+
 ////////////////////////////////////
 double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double temp,
   std::string isoName, int tZ, int tA, geantphysics::NudyProcessType pType
@@ -48,24 +101,18 @@ double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double te
   SetIsotopeName(isoName);
   SetIsFissKey(false); // initializing to false first
 
-  Nudy::TNudyENDF *proc;
+  // Nudy::TNudyENDF *proc;
 
   //  Fix the name of the ENDF, ROOT and ENDFSUB filenames here
   std::string fileENDF1 = SetDataFileNameENDF(projCode, isoName);
-  SetEndfDataFileName(fileENDF1.c_str());
+  SetEndfDataFileName(fileENDF1);
   std::string fileENDF2 = SetDataFileNameROOT(isoName);
-  SetRootFileName (fileENDF2.c_str());
+  SetRootFileName (fileENDF2);
   std::string fileENDF3 = SetDataFileNameENDFSUB( isoName);
-  SetEndfSubDataFileName (fileENDF3.c_str());
+  SetEndfSubDataFileName (fileENDF3);
 
-/*
-  std::cout << "1. ENDF      --> " << fEndfDataFileName    << "\n"
-            << "2. ENDFSUB   --> " << fEndfSubDataFileName << "\n"
-            << "3. ROOT      --> " << fRootFileName        << std::endl;
-
-*/
   // Create and process with NUDY with keywords
-  proc = new Nudy::TNudyENDF (fEndfDataFileName, fRootFileName, "recreate");
+  Nudy::TNudyENDF *proc = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
   proc->SetPreProcess (0) ;
   proc->SetLogLev(0);
   proc->Process();
@@ -79,10 +126,12 @@ double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double te
   return XSvalue;
 }
 
-void NudyPhysics::NudyInterface::ConvertENDF2ROOT(std::string fENDF, std::string rENDF){
-  const char* fileENDF = fENDF.c_str();
-  const char* fileROOT = rENDF.c_str();
-  Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fileENDF, fileROOT, "recreate");
+void NudyPhysics::NudyInterface::ConvertENDF2ROOT(std::string fENDFD, std::string rENDFD){
+  // setFileNames(fENDFD, rENDFD, "");
+  fEndfFileN = fENDFD.c_str();
+  if (!rENDFD.length()) rENDFD = fENDFD + ".root";
+  fRootFileName = rENDFD.c_str();
+  Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fEndfFileN, fRootFileName, "recreate");
   tn->SetLogLev(2);
   tn->Process();
 }
@@ -132,9 +181,7 @@ double NudyPhysics::NudyInterface::ComputeCrossSection() {
   double xsvalue = 0.0;
   double iSigDiff = 0.001;   // trial value for test documentation reqd.
 
-  NudyPhysics::TNudyEndfSigma();
-  TNudyEndfSigma  *xsec;
-  xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
+  NudyPhysics::TNudyEndfSigma *xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
   xsec->SetsigPrecision(0.001) ;
   iSigDiff = xsec->GetsigPrecision ();
   xsec->SetPreProcess (0) ;
@@ -143,8 +190,7 @@ double NudyPhysics::NudyInterface::ComputeCrossSection() {
   xsec->GetData(fRootFileName, iSigDiff) ;
 
 //NudyPhysics::TNudyEndfRecoPoint();
-  NudyPhysics::TNudyEndfRecoPoint *recoPoint; // = new NudyPhysics::TNudyEndfRecoPoint(iElementID, fRootFileName);
-  recoPoint = new TNudyEndfRecoPoint(iElementID, fRootFileName);
+  NudyPhysics::TNudyEndfRecoPoint *recoPoint = new TNudyEndfRecoPoint(iElementID, fRootFileName);
   // This is  under testing to check Harphool code for interfacing to GV :: Abhijit
 
   for ( unsigned int crsp = 0; crsp < recoPoint->MtValues[iElementID].size(); crsp++) {

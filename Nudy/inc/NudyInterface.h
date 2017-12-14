@@ -51,7 +51,10 @@
 //#include "NudyXSProcess.h"
 
 #include "TSystem.h"
-//class TFile;
+#include "TFile.h"
+#include "TList.h"
+#include "TKey.h"
+class TList;
 #endif
 
 
@@ -129,8 +132,10 @@ namespace NudyPhysics{
     void SetProjIDFn( int projCode, std::string style);
     double ComputeCrossSection( );
     void SetMTValues(geantphysics::NudyProcessType pType);
-	void ConvertENDF2ROOT(std::string fENDF, std::string rENDF);
-	void printE2RErr();
+    void setFileNames(std::string fIN, std::string fOUT, std::string fSubName);
+    void DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSubName, int tA, int tZ, double temp, std::string isotopeN);
+	  void ConvertENDF2ROOT(std::string fENDF, std::string rENDF);
+	  void printE2RErr();
   public:
     inline std::string GetIsotopeName ();
     inline int GetProjectileCode ();
@@ -150,9 +155,9 @@ namespace NudyPhysics{
     inline void SetProjectileKE ( const double projKE );
     inline void SetTemp ( const double temp );
     inline void SetCrossSection ( const double XSvalue );
-    inline void SetEndfDataFileName ( const char * fileName );
-    inline void SetEndfSubDataFileName ( const char * fileName );
-    inline void SetRootFileName ( const char * fileName );
+    inline void SetEndfDataFileName ( std::string  fileName );
+    inline void SetEndfSubDataFileName ( std::string fileName );
+    inline void SetRootFileName ( std::string fileName );
     inline void SetIsFissKey( const bool theKey);
     inline void SetProjID (const std::string &theID);
     inline void AppendXS ( const double xsvalue );
@@ -160,6 +165,7 @@ namespace NudyPhysics{
 
 
   private :
+
     unsigned int fNumberOfReactionChannels = 895;
     geantphysics::NudyProcessType fProcType;
     std::string fIsoName;
@@ -167,11 +173,12 @@ namespace NudyPhysics{
     int fProjCode;
     int ftZ;
     int ftA;
+    int MTChargeFlag[10];
     double fProjKE;
     double fTemperature;
     double fXS;
     std::string fProjID;
-    const char* fEndfDataFileName;
+    const char* fEndfFileN;
     const char* fEndfSubDataFileName;
     const char* fRootFileName;
     std::vector<int> fFissionFragmentsMass;
@@ -200,9 +207,9 @@ namespace NudyPhysics{
   inline void NudyInterface::SetProjectileKE ( const double projKE ) { fProjKE = projKE; }
   inline void NudyInterface::SetTemp (const double temp ) { fTemperature = temp; }
   inline void NudyInterface::SetCrossSection ( const double XSvalue ) { fXS = XSvalue; }
-  inline void NudyInterface::SetEndfDataFileName ( const char * fileName ) { fEndfDataFileName = fileName; }
-  inline void NudyInterface::SetEndfSubDataFileName ( const char * fileName ) { fEndfSubDataFileName = fileName; }
-  inline void NudyInterface::SetRootFileName ( const char * fileName ) { fRootFileName = fileName; }
+  inline void NudyInterface::SetEndfDataFileName ( std::string fileName ) { fEndfFileN = fileName.c_str(); }
+  inline void NudyInterface::SetEndfSubDataFileName ( std::string fileName ) { fEndfSubDataFileName = fileName.c_str(); }
+  inline void NudyInterface::SetRootFileName ( std::string fileName ) { fRootFileName = fileName.c_str(); }
   inline void NudyInterface::SetIsFissKey( const bool theKey ) { fIsFiss = theKey; }
   inline void NudyInterface::SetProjID (const std::string &theID ) { fProjID = theID; }
   //inline void NudyInterface::AppendXS ( const double xsvalue ) { fChannelFiss.push_back(xsvalue); }
