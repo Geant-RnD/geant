@@ -133,7 +133,7 @@ namespace NudyPhysics{
     double ComputeCrossSection( );
     void SetMTValues(geantphysics::NudyProcessType pType);
     void setFileNames(std::string fIN, std::string fOUT, std::string fSubName);
-    void DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSubName, int tA, int tZ, double temp, std::string isotopeN);
+    void DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSubName, double temp);
 	  void ConvertENDF2ROOT(std::string fENDF, std::string rENDF);
 	  void printE2RErr();
   public:

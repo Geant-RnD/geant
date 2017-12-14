@@ -62,9 +62,6 @@ void DumpProcE2R() {
     std::string fEndfIN = "";
     std::string fRootOUT = "";
     std::string fEndfSubIN = "";
-    std::string isotopeName = "";
-    int tA = 0;
-    int tZ = 0;
     double temp = 293.60608;
     std::cout << " ENDF data file name as INPUT: ";
     std::cin >> fEndfIN;
@@ -72,12 +69,9 @@ void DumpProcE2R() {
     std::cin >> fRootOUT;
     std::cout << " ENDFSUB data file name for fission data as INPUT: ";
     std::cin >> fEndfSubIN;
-    std::cout << "Isotope name: "; std::cin >> isotopeName;
-    std::cout << "Atomic Number: "; std::cin >> tA;
-    std::cout << "Mass Number: "; std::cin >> tZ;
     std::cout << "Temperature: "; std::cin >> temp;
     temp = (temp == 0.0) ? 293.60608 : temp;
-    nudyxs.DumpEndf2Root(fEndfIN, fRootOUT, fEndfSubIN, tA, tZ, temp, isotopeName);
+    nudyxs.DumpEndf2Root(fEndfIN, fRootOUT, fEndfSubIN, temp);
     //////////////////////////////////
 }
 

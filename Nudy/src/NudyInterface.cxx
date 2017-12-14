@@ -54,12 +54,8 @@ void NudyPhysics::NudyInterface::setFileNames(std::string fIN, std::string fOUT,
 
 
 ////////////////////////
-void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName,
-  int tA, int tZ, double temp, std::string isotopeN) {
-  SetA(tA);
-  SetZ(tZ);
+void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName, double temp) {
   SetTemp(temp);
-  SetIsotopeName(isotopeN);
   SetIsFissKey(false);
 
   //NudyInterface::setFileNames(fIN, fOUT, fSUBName);
