@@ -17,14 +17,16 @@
 template <class Backend>
 class TemplateGUIntegrationDriver;
 
-class ScalarIntegrationDriver;
 class VScalarField;
+class ScalarIntegrationDriver;
+class FlexIntegrationDriver;
 
 class GUFieldPropagator
 {
   public:
-    // GUFieldPropagator(VScalarField *); // First idea -- sidelined, at least for now
-    GUFieldPropagator(ScalarIntegrationDriver* driver, double epsilon); // (VScalarField* field)
+    GUFieldPropagator(ScalarIntegrationDriver* scalarDriver,
+                      FlexIntegrationDriver*   flexDriver,
+                      double                   epsilon);
 
     template <typename Backend>
     GUFieldPropagator(TemplateGUIntegrationDriver<Backend>* driver, double epsilon);
@@ -49,8 +51,8 @@ class GUFieldPropagator
                   vecgeom::Vector3D<double>      & endDiretion
         ) ;   //  Goal => make it 'const';  -- including all classes it uses
 
-    ScalarIntegrationDriver* GetIntegrationDriver(){ return fDriver; }
-    const ScalarIntegrationDriver* GetIntegrationDriver() const { return fDriver; }
+    ScalarIntegrationDriver* GetScalarIntegrationDriver(){ return fScalarDriver; }
+    const ScalarIntegrationDriver* GetScalarIntegrationDriver() const { return fScalarDriver; }
     double GetEpsilon() { return fEpsilon; }
 
     VScalarField* GetField();
@@ -85,7 +87,8 @@ class GUFieldPropagator
    *****/
 
 private:
-    ScalarIntegrationDriver* fDriver;
+    ScalarIntegrationDriver* fScalarDriver;
+    FlexIntegrationDriver*   fVectorDriver;
     double                  fEpsilon;
 };
 

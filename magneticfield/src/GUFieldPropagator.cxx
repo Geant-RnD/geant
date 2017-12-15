@@ -13,12 +13,20 @@
 #include "VScalarEquationOfMotion.h"
 
 #include "ScalarMagFieldEquation.h"
-#include "TClassicalRK4.h"
+#include "GUTCashKarpRKF45.h"  //  ie ScalarCashKarp
 
+#include "MagFieldEquation.h"
+#include "CashKarp.h"
+#include "SimpleIntegrationDriver.h"
+
+// template <class Equation, unsigned int> using ScalarCashKarp= GUTCashKarpRKF45;
+
 using ThreeVector = vecgeom::Vector3D<double>;
 
-GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver, double eps)
-  : fDriver(driver), fEpsilon(eps)
+GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver,
+                                     SimpleIntegrationDriver* flexDriver,
+                                     double eps)
+  : fScalarDriver(driver), fEpsilon(eps)
 {
 }
 
@@ -29,25 +37,42 @@ template<typename FieldType>  // , typename StepperType>
 GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hminimum)
    : fEpsilon(eps)
 {
-   constexpr int NumEq= 6;
-   using  EquationType=  ScalarMagFieldEquation<FieldType, NumEq>;
-   
-   int statVerbose= 1;
-   auto *pEquation = new EquationType(magField, NumEq);
-      // new ScalarFieldEquation<FieldType,NumEq>(magField, NumEq);
+   constexpr unsigned int Nposmom = 6; // Number of Integration variables - 3 position, 3 momentum
+  
+   using  ScalarEquationType=  ScalarMagFieldEquation<FieldType, Nposmom>;
 
-   // auto stepper = new StepperType<GvEquationType,NumEq>(gvEquation);
-   auto stepper =      new TClassicalRK4<EquationType,NumEq>(pEquation);      
-   auto integrDriver = new ScalarIntegrationDriver( hminimum,
-                                               stepper,
-                                               NumEq,
-                                               statVerbose);
-   fDriver= integrDriver;
+#if 0
+   int statVerbose= 1;
+   auto *pEquation = new ScalarEquationType(magField, Nposmom);
+      // new ScalarFieldEquation<FieldType,Nposmom>(magField, Nposmom);
+
+   // auto stepper = new StepperType<ScalarEquationType,Nposmom>(gvEquation);
+   auto scalarStepper =      new // ScalarCashKarp
+           GUTCashKarpRKF45<ScalarEquationType,Nposmom>(pEquation);
+   auto scalarDriver = new ScalarIntegrationDriver( hminimum,
+                                                    scalarStepper,
+                                                    Nposmom,
+                                                    statVerbose);
+   fScalarDriver= scalarDriver;
+#else
+  fScalarDriver= nullptr;
+#endif
+   // Create the flexible (vector or scalar) objects
+   using EquationType = MagFieldEquation<FieldType>;
+   using FlexStepperType = CashKarp<FlexEquationType,Nposmom>;
+   auto myFlexStepper = new FlexStepperType(gvEquation);
+   int statsVerbose=1;
+   auto flexDriver =
+      new SimpleIntegrationDriver<FlexStepperType,Nposmom> (hminimum,
+                                                    myFlexStepper,
+                                                    Nposmom,
+                                                    statsVerbose);
+   fVectorDriver= flexDriver;
 }
 
 GUFieldPropagator* GUFieldPropagator::Clone() const 
 {
-   return new GUFieldPropagator( fDriver->Clone(), fEpsilon );
+   return new GUFieldPropagator( fScalarDriver->Clone(), fEpsilon );
 }
 
 // Make a step from current point along the path and compute new point, direction and angle
@@ -68,9 +93,9 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   ScalarFieldTrack yTrackOut( yTrackIn );
   
   // Call the driver HERE
-  //fDriver->InitializeCharge( charge );
+  //fScalarDriver->InitializeCharge( charge );
   bool goodAdvance=
-     fDriver->AccurateAdvance( yTrackIn, step, fEpsilon, yTrackOut ); // , hInitial );
+     fScalarDriver->AccurateAdvance( yTrackIn, step, fEpsilon, yTrackOut ); // , hInitial );
 
   // fInitialCurvature; 
   endPosition=  yTrackOut.GetPosition();
@@ -81,7 +106,7 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
 VScalarField* GUFieldPropagator::GetField() 
 {
    VScalarField* pField = nullptr;
-   auto driver= GetIntegrationDriver();
+   auto driver= GetScalarIntegrationDriver();
    if( driver ){
      auto equation= driver->GetEquationOfMotion();
      if( equation ) {

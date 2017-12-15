@@ -42,7 +42,7 @@ class FieldLookup
    void GetFieldValue( const vecgeom::Vector3D<double>& Position,
                              vecgeom::Vector3D<double>& MagFieldValue, // Out
                              double                   & bmag,
-                       const Geant::GeantTaskData     * td );
+                       const GeantTaskData            * td );
 
 #if 0   
    /**

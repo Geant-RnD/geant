@@ -32,13 +32,15 @@
 #include "base/Vector.h"
 
 // Adding because adding scalar stepper for new constructor (KeepStepping)
-#include "VScalarIntegrationStepper.h"
+// #include "VScalarIntegrationStepper.h"
 
 // Adding to send in scalar driver to deal with 1/2 remaining lanes
-#include "ScalarIntegrationDriver.h"
+// #include "ScalarIntegrationDriver.h"
 // #include "ScalarFieldTrack.h"
 
-// #include "FormattedReporter.h"
+#include "FlexIntegrationDriver.h"
+
+#include "FormattedReporter.h"
 
 #ifndef NO_FIELD_STATISTICS
 #define GVFLD_STATS  1
@@ -46,9 +48,10 @@
 
 // --------------------------------------------------------------
 template < class T_Stepper, unsigned int Nvar>   
-   class SimpleIntegrationDriver : public vecgeom::AlignedBase
+   class SimpleIntegrationDriver :
+            public FlexIntegrationDriver,
+            public vecgeom::AlignedBase
 {
-
   public:
 
     template <typename T>
@@ -160,8 +163,7 @@ protected:
     template <class Real_v>    
      int  InitializeLanes( const  FieldTrack  yInput[],
                            const  double      hstep [],
-                       //  const  double      xStart [],       // Assumed always 0.0
-                           const  double      charge [],                                                  
+                           const  double      charge [],
                                   int         nTracks,         
                        //         bool        badStepSize[],   // Output - redundant
                                   int         indexArr[], // [kVectorSize] - Output
@@ -333,7 +335,7 @@ private:
 
 }; // End of class definition -- SimpleIntegrationDriver
 
-#include "FormattedReporter.h"
+// #include "FormattedReporter.h"
 
 template <class T_Stepper, unsigned int Nvar>
 template <class Real_v>
@@ -416,8 +418,6 @@ SimpleIntegrationDriver<T_Stepper, Nvar>::
    }
    
 }
-
-// ---- }; // End of class definition -- SimpleIntegrationDriver
 
 template <class T_Stepper, unsigned int Nvar>
 template <class Real_v>
