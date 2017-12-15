@@ -72,8 +72,8 @@ private:
 
   /** @brief Curvature for general field    */
   VECCORE_ATT_HOST_DEVICE
-  double FieldPropagationHandler::Curvature(const GeantTrack & track
-                                            GeantTaskData    * td) const;
+  double Curvature(const GeantTrack     & track,
+                         GeantTaskData * td) const;
    
   /** @brief Function that returns safe length */
   VECCORE_ATT_HOST_DEVICE
@@ -88,7 +88,7 @@ VECCORE_ATT_HOST_DEVICE
 GEANT_FORCE_INLINE          
 double
 FieldPropagationHandler::
-SafeLength(const GeantTrack &track, double Bz, GeantTaskData *td, double eps = 1.E-4)
+SafeLength(const GeantTrack &track, double Bz, GeantTaskData *td, double eps)
 {
    // Returns the propagation length in field such that the propagated point is
    // shifted less than eps with respect to the linear propagation.
