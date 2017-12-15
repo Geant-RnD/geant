@@ -6,6 +6,7 @@
 #include "GUFieldPropagator.h"
 #include "ConstBzFieldHelixStepper.h"
 #include "ScalarConstFieldHelixStepper.h"
+#include "FieldTrack.h"
 
 #ifdef USE_VECGEOM_NAVIGATOR
 #include "navigation/NavigationState.h"
@@ -38,8 +39,8 @@ FieldPropagationHandler::~FieldPropagationHandler()
 //______________________________________________________________________________
 // Curvature for general field   
 VECCORE_ATT_HOST_DEVICE
-double FieldPropagationHandler::Curvature(const GeantTrack & track
-                                          GeantTaskData    * td) const
+double FieldPropagationHandler::Curvature(const GeantTrack  & track,
+                                          GeantTaskData     * td) const
 {
   using ThreeVector_d = vecgeom::Vector3D<double>;
   constexpr double tiny = 1.E-30;
@@ -47,20 +48,20 @@ double FieldPropagationHandler::Curvature(const GeantTrack & track
   double bmag= 0.0;
 
   ThreeVector_d Position(track.fXpos, track.fYpos, track.fZpos);
-  FieldLookup::GetFieldValue(td, Position, MagFld, bmag);  
+  FieldLookup::GetFieldValue(Position, MagFld, bmag, td);
   // GetFieldValue(track, MagFld, bmag, td);
 
   //  Calculate transverse momentum 'Pt' for field 'B'
   // 
   ThreeVector_d Momentum( track.fXdir, track.fYdir, track.fZdir );
-  Momentum *= fP;
+  Momentum *= track.fP;
   ThreeVector_d PtransB;  //  Transverse wrt direction of B
   double ratioOverFld = 0.0;
   if( bmag > 0 ) ratioOverFld = Momentum.Dot( MagFld ) / (bmag*bmag);
   PtransB = Momentum - ratioOverFld * MagFld ;
   double Pt_mag = PtransB.Mag();
 
-  return fabs(GeantTrack::kB2C * fCharge * bmag / (Pt_mag + tiny));
+  return fabs(GeantTrack::kB2C * track.fCharge * bmag / (Pt_mag + tiny));
 }
 
 //______________________________________________________________________________
@@ -393,18 +394,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double
   // double yInput[8*nTracks], yOutput[8*nTracks];
   bool       succeeded[nTracks];
 
-  constexprt Nposmom = 6; // Number of Integration variables - 3 position, 3 momentum
 
-  using GvEquationType    = MagFieldEquation<Field_Type>;
-  using StepperType = CashKarp<GvEquationType,Nposmom>;
-  auto myStepper = new StepperType(gvEquation);
-  int statsVerbose=1;  
-  auto vectorDriver =
-       new SimpleIntegrationDriver<StepperType,Nposmom> (hminimum,
-                                                         myStepper,
-                                                         Nposmom,
-                                                         statsVerbose);
-  
   for (int itr=0; itr<ntracks; ++itr)
   {
      // Load

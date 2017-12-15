@@ -558,7 +558,7 @@ ScalarIntegrationDriver::WarnTooManySteps( double x1start,
              << " (Runge-Kutta) is too many." << std::endl
              << "Integration of the interval was not completed !" << std::endl;
 
-   unsigned int oldPrec= std::cerr.precision(16);
+   std::streamsize oldPrec= std::cerr.precision(16);
    
    std::cerr << "Only a " << (xCurrent-x1start)*100.0/(x2end-x1start)
              << " % fraction of it was done.";
