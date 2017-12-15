@@ -54,27 +54,37 @@ void NudyPhysics::NudyInterface::setFileNames(std::string fIN, std::string fOUT,
 
 
 ////////////////////////
-void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName, double temp) {
+//void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName, double temp) {
+void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fEndfSub, std::string fOUT, double temp) {
   SetTemp(temp);
   SetIsFissKey(false);
 
   //NudyInterface::setFileNames(fIN, fOUT, fSUBName);
   fEndfFileN = fIN.c_str();
+  fEndfSubDataFileName = fEndfSub.c_str();
   if (!fOUT.length()) fOUT = fIN + ".root";
   fRootFileName = fOUT.c_str();
-  fEndfSubDataFileName = fSUBName.c_str();
+  //fEndfSubDataFileName = fSUBName.c_str();
 
   Nudy::TNudyENDF *proc = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
   proc->SetPreProcess(0);
-  proc->SetLogLev(0);
+  proc->SetLogLev(3);
   proc->Process();
 
-  bool LFIval = proc->GetLFI();
-  SetIsFissKey(LFIval);
-  proc->SetEndfSub(fEndfSubDataFileName);
-  proc->Process();
+  if (fEndfSub.find("ZZ") == std::string::npos){
+      bool LFIval = proc->GetLFI();
+      SetIsFissKey(LFIval);
+      proc->SetEndfSub(fEndfSubDataFileName);
+      proc->Process();
+    } else {
+      // Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fEndfFileN, fRootFileName, "recreate");
+      // tn->SetLogLev(2);
+      // tn->Process();
+      return;
+    }
 
   double iSigDiff = 0.001;  // documentation required
+
   NudyPhysics::TNudyEndfSigma *xsec = new NudyPhysics::TNudyEndfSigma(fRootFileName, iSigDiff);
   xsec->SetsigPrecision(iSigDiff);
   xsec->SetPreProcess(0);

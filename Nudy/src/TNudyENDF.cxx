@@ -146,13 +146,13 @@ void TNudyENDF::Process()
   }
 
   // Write the tape to disk
-  fENDF.close();
-  if (sub == true) {
+  //fENDF.close();
+
+
     fTape->Print();
     fTape->Write();
-    fENDF.close();
-    fRENDF->Close();
-  }
+    if (!fMat->GetLFI()) fRENDF->Close();
+    fENDF.close();  
 }
 
 //_______________________________________________________________________________

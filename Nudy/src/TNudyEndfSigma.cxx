@@ -39,13 +39,11 @@ ClassImp(TNudyEndfSigma)
 
 #include <algorithm>
 
-TNudyEndfSigma::TNudyEndfSigma()
-    : rENDF(), sigDiff(0)
-{
-}
+TNudyEndfSigma::TNudyEndfSigma() : rENDF(), sigDiff(0){ }
+
 TNudyEndfSigma::TNudyEndfSigma(const char *irENDF, double isigDiff) : rENDF(irENDF), sigDiff(isigDiff)
 {
-//  GetData(irENDF, isigDiff);
+  GetData(irENDF, isigDiff);
 }
 
 //____________________________________________________________________________________________________________________
@@ -2641,8 +2639,13 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 {
   sigDiff = isigDiff;
   for (int i = 0; i < 10; i++){ MTChargeFlag[i] = 0;}
+  std::cout << " file " << rENDF << " to be opened." << std::endl;
   TFile *rEND = TFile::Open(rENDF, "UPDATE");
-  if (!rEND || rEND->IsZombie()) printf("Error: TFile :: Cannot open file %s\n", rENDF);
+  if (!rEND || rEND->IsZombie()) {
+    printf("Error: TFile :: Cannot open file %s\n", rENDF);
+  } else {
+    std::cout << " file " << rENDF << " opened successfully." << std::endl;
+  }
   TKey *rkey              = (TKey *)rEND->GetListOfKeys()->First();
   TNudyEndfTape *rENDFVol = (TNudyEndfTape *)rkey->ReadObj();
   TNudyEndfMat *tMat      = 0;
@@ -2655,8 +2658,8 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
     std::vector<int>().swap(MtNumAng4Photon);
     while ((file = (TNudyEndfFile *)iter.Next())) {
       if (file->GetMF() > 13 && (file->GetMF() <= 15 || file->GetMF() <= 33)){
-	//std::cout<< "add file 2 called "<< file->GetMF() << std::endl;
-	tMat->Add(file2);
+	       //std::cout<< "add file 2 called "<< file->GetMF() << std::endl;
+	        tMat->Add(file2);
       }
       switch (file->GetMF()) {
       case 1:
@@ -2666,31 +2669,31 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 	    int mtn	= tMat->GetMTn(nxc) ;
 	    if(mfn == 3 ){
 	      if(mtn == 103){
-		MTChargeFlag[0] = -1;
+		        MTChargeFlag[0] = -1;
 	      } else if (mtn == 104){
-		MTChargeFlag[1] = -1;
+		        MTChargeFlag[1] = -1;
 	      } else if (mtn == 105){
-		MTChargeFlag[2] = -1;
+		        MTChargeFlag[2] = -1;
 	      } else if (mtn == 106){
-		MTChargeFlag[3] = -1;
+		        MTChargeFlag[3] = -1;
 	      } else if (mtn == 107){
-		MTChargeFlag[4] = -1;
+		        MTChargeFlag[4] = -1;
 	      } else if (mtn >= 600 && mtn < 650) {
-		MTChargeFlag[5] = -1;
+		        MTChargeFlag[5] = -1;
 	      } else if (mtn >= 650 && mtn < 700) {
-		MTChargeFlag[6] = -1;
+		        MTChargeFlag[6] = -1;
 	      } else if (mtn >= 700 && mtn < 750) {
-		MTChargeFlag[7] = -1;
+		        MTChargeFlag[7] = -1;
 	      } else if (mtn >= 750 && mtn < 800) {
-		MTChargeFlag[8] = -1;
+		        MTChargeFlag[8] = -1;
 	      } else if (mtn >= 800 && mtn < 850) {
-		MTChargeFlag[9] = -1;
+		        MTChargeFlag[9] = -1;
 	      }
 	    } else if (mfn == 12 || mfn == 13) {
-	      MtNumSig4Photon.push_back (mtn) ;
+	       MtNumSig4Photon.push_back (mtn) ;
 	      // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
 	    } else if (mfn == 14) {
-	      MtNumAng4Photon.push_back (mtn) ;
+	       MtNumAng4Photon.push_back (mtn) ;
 	      // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
 	    } else if (mfn == 15) {
 	      MtNumEng4Photon.push_back (mtn) ;
@@ -2945,15 +2948,15 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
       }
     }
   }
-  for (unsigned int i = 0; i < MtNumSig4Photon.size () ; i++){
+  //for (unsigned int i = 0; i < MtNumSig4Photon.size () ; i++){
     // std::cout <<"Photon Sig MT = \t"<< MtNumSig4Photon[i] << std::endl;
-  }
-  for (unsigned int i = 0; i < MtNumAng4Photon.size () ; i++){
+  //}
+  //for (unsigned int i = 0; i < MtNumAng4Photon.size () ; i++){
     //std::cout <<"Photon Ang MT = \t"<< MtNumAng4Photon[i] << std::endl;
-  }
-  for (unsigned int i = 0; i < MtNumEng4Photon.size () ; i++){
+  //}
+  //for (unsigned int i = 0; i < MtNumEng4Photon.size () ; i++){
     //std::cout <<"Photon Ene MT = \t"<< MtNumEng4Photon[i] << std::endl;
-  }
+  //}
   rENDFVol->Write();
   rEND->Close();
 }

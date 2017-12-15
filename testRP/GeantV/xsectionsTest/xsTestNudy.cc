@@ -64,14 +64,16 @@ void DumpProcE2R() {
     std::string fEndfSubIN = "";
     double temp = 293.60608;
     std::cout << " ENDF data file name as INPUT: ";
-    std::cin >> fEndfIN;
+    std::getline(std::cin, fEndfIN);
     std::cout << " ROOT data file name as OUTPUT: ";
-    std::cin >> fRootOUT;
-    std::cout << " ENDFSUB data file name for fission data as INPUT: ";
-    std::cin >> fEndfSubIN;
+    std::getline(std::cin,fRootOUT);
+    std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ>: ";
+    std::getline(std::cin, fEndfSubIN);
+    //std::cout << " ENDFSUB data file name for fission data as INPUT: ";
+    //std::cin >> fEndfSubIN;
     std::cout << "Temperature: "; std::cin >> temp;
     temp = (temp == 0.0) ? 293.60608 : temp;
-    nudyxs.DumpEndf2Root(fEndfIN, fRootOUT, fEndfSubIN, temp);
+    nudyxs.DumpEndf2Root(fEndfIN, fEndfSubIN, fRootOUT, temp);
     //////////////////////////////////
 }
 
