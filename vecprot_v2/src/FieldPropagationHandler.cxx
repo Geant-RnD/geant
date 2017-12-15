@@ -1,5 +1,7 @@
 #include "FieldPropagationHandler.h"
 
+#include "FieldLookup.h"
+
 #include "GUFieldPropagatorPool.h"
 #include "GUFieldPropagator.h"
 #include "ConstBzFieldHelixStepper.h"
@@ -32,6 +34,34 @@ FieldPropagationHandler::~FieldPropagationHandler()
 // Destructor
 }
 
+        
+//______________________________________________________________________________
+// Curvature for general field   
+VECCORE_ATT_HOST_DEVICE
+double FieldPropagationHandler::Curvature(const GeantTrack & track
+                                          GeantTaskData    * td) const
+{
+  using ThreeVector_d = vecgeom::Vector3D<double>;
+  constexpr double tiny = 1.E-30;
+  ThreeVector_d MagFld;
+  double bmag= 0.0;
+
+  ThreeVector_d Position(track.fXpos, track.fYpos, track.fZpos);
+  FieldLookup::GetFieldValue(td, Position, MagFld, bmag);  
+  // GetFieldValue(track, MagFld, bmag, td);
+
+  //  Calculate transverse momentum 'Pt' for field 'B'
+  // 
+  ThreeVector_d Momentum( track.fXdir, track.fYdir, track.fZdir );
+  Momentum *= fP;
+  ThreeVector_d PtransB;  //  Transverse wrt direction of B
+  double ratioOverFld = 0.0;
+  if( bmag > 0 ) ratioOverFld = Momentum.Dot( MagFld ) / (bmag*bmag);
+  PtransB = Momentum - ratioOverFld * MagFld ;
+  double Pt_mag = PtransB.Mag();
+
+  return fabs(GeantTrack::kB2C * fCharge * bmag / (Pt_mag + tiny));
+}
 
 //______________________________________________________________________________
 VECCORE_ATT_HOST_DEVICE
@@ -207,17 +237,6 @@ void FieldPropagationHandler::DoIt(Basket &input, Basket& output, GeantTaskData 
 #endif
 }
 
-//______________________________________________________________________________
-VECCORE_ATT_HOST_DEVICE
-void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double *crtstep,
-                                                GeantTaskData *td)
-{
-// THIS IS THE VECTORIZED IMPLEMENTATION PLACEHOLDER FOR MAGNETIC FIELD PROPAGATION.
-// Now implemented just as a loop
-  int ntracks = tracks.size();
-  for (int itr=0; itr<ntracks; ++itr)
-    PropagateInVolume(*tracks[itr], crtstep[itr], td);
-}
 
 //______________________________________________________________________________
 VECCORE_ATT_HOST_DEVICE
@@ -254,9 +273,9 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
     track.fPstep = 0;
     track.fStatus = kPhysics;
   }
-  track.fSafety -= crtstep;
-  if (track.fSafety < 1.E-10)
-    track.fSafety = 0;
+  // track.fSafety -= crtstep;     // Overestimate --> moved below for better estimate
+  // if (track.fSafety < 1.E-10)
+  //   track.fSafety = 0;
   track.fSnext -= crtstep;
   if (track.fSnext < 1.E-10) {
     track.fSnext = 0;
@@ -283,7 +302,7 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 #ifdef DEBUG_FIELD
   printf("--PropagateInVolume(Single): \n");
   printf("Curvature= %8.4g   CurvPlus= %8.4g  step= %f   Bmag=%8.4g   momentum mag=%f  angle= %g\n"
-         Curvature(td, i), curvaturePlus, crtstep, bmag, fPV[i], angle );
+         Curvature(td, i), curvaturePlus, crtstep, bmag, track.fP, angle );
 #endif
 
   ThreeVector Direction(track.fXdir, track.fYdir, track.fZdir);
@@ -314,25 +333,29 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
      }
   }
 
+  //  may normalize direction here  // vecCore::math::Normalize(dirnew);
+  ThreeVector DirectionUnit = DirectionNew.Unit();
+  double posShift = (PositionNew - Position).Mag();  
+  
   track.fXpos = PositionNew.x();
   track.fYpos = PositionNew.y();
   track.fZpos = PositionNew.z();
 
-  //  maybe normalize direction here  // vecCore::math::Normalize(dirnew);
-  ThreeVector DirectionUnit = DirectionNew.Unit();
   track.fXdir = DirectionUnit.x();
   track.fYdir = DirectionUnit.y();
   track.fZdir = DirectionUnit.z();
 
+  track.fSafety -= posShift; //  Was crtstep;
+  if (track.fSafety < 1.E-10)
+    track.fSafety = 0;
+  
 #ifdef REPORT_AND_CHECK
   double origMag= Direction.Mag();
   double oldMag= DirectionNew.Mag();
   double newMag= DirectionUnit.Mag();  
   Printf(" -- State after propagation in field:  Position= %f, %f, %f   Direction= %f, %f, %f  - mag original, integrated, integr-1.0, normed-1 = %10.8f %10.8f %7.2g %10.8f %7.2g",
-         track.fXpos,  track.fYpos,  track.fZpos,
-         track.fXdir,  track.fYdir,  track.fZdir,         
+         track.fXpos,  track.fYpos,  track.fZpos, track.fXdir,  track.fYdir,  track.fZdir,
          origMag, oldMag, oldMag-1.0, newMag, newMag-1.0 );
-         // DirectionNew.Mag()-1.0  );
 
   const char* Msg[4]= { "After propagation in field - type Unknown(ERROR) ",
                         "After propagation in field - with RK           ",
@@ -354,6 +377,52 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
                    diffpos, diffpos/crtstep, crtstep);
   }
 #endif
+}
+
+//______________________________________________________________________________
+VECCORE_ATT_HOST_DEVICE
+void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double *crtstep,
+                                                GeantTaskData *td)
+{
+// THIS IS THE VECTORIZED IMPLEMENTATION PLACEHOLDER FOR MAGNETIC FIELD PROPAGATION.
+// Now implemented just as a loop
+  int ntracks = tracks.size();
+#if 1 // VECTOR_FIELD_PROPAGATION
+  FieldTrack fldTracksIn[nTracks], fldTracksOut[nTracks];
+  // double yInput[8*nTracks], yOutput[8*nTracks];
+  bool       succeeded[nTracks];
+
+  constexprt Nposmom = 6; // Number of Integration variables - 3 position, 3 momentum
+
+  using GvEquationType    = MagFieldEquation<Field_Type>;
+  using StepperType = CashKarp<GvEquationType,Nposmom>;
+  auto myStepper = new StepperType(gvEquation);
+  int statsVerbose=1;  
+  auto vectorDriver =
+       new SimpleIntegrationDriver<StepperType,Nposmom> (hminimum,
+                                                         myStepper,
+                                                         Nposmom,
+                                                         statsVerbose);
+  
+  for (int itr=0; itr<ntracks; ++itr)
+  {
+     // Load
+     // yInput[itr].LoadFromTrack(*tracks[itr]);
+     fldTrackIn[itr].LoadFromArray( tracks[itr] );
+
+     SOA3D_t position(const_cast<double*>(x),const_cast<double*>(y),const_cast<double*>(z),ntracks),
+     SOA3D_t momentum(const_cast<double*>(dirx),const_cast<double*>(diry),const_cast<double*>(dirz),ntracks),
+     
+  }
+
+  vectorDriver
+     ->AccurateAdvance<Double_v>( fldTracksIn, hstep, charge, epsTol,
+                                  fldTracksOut, nTracks, succeeded );  
+#else   
+
+  for (int itr=0; itr<ntracks; ++itr)
+    PropagateInVolume(*tracks[itr], crtstep[itr], td);
+#endif  
 }
 
 //______________________________________________________________________________
