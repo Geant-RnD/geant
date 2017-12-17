@@ -49,7 +49,6 @@ void dumpVerb(){
   std::cout << "Enter ROOT file name to produce: ";
   std::getline(std::cin, fOutROOT);
   if (fInENDF.length() < 1) nudyxs.printE2RErr();
-
   nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
 }
 

@@ -58,7 +58,6 @@ void NudyPhysics::NudyInterface::setFileNames(std::string fIN, std::string fOUT,
 void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fEndfSub, std::string fOUT, double temp) {
   SetTemp(temp);
   SetIsFissKey(false);
-
   //NudyInterface::setFileNames(fIN, fOUT, fSUBName);
   fEndfFileN = fIN.c_str();
   fEndfSubDataFileName = fEndfSub.c_str();
@@ -84,7 +83,6 @@ void NudyPhysics::NudyInterface::DumpEndf2Root(std::string fIN, std::string fEnd
     }
 
   double iSigDiff = 0.001;  // documentation required
-
   NudyPhysics::TNudyEndfSigma *xsec = new NudyPhysics::TNudyEndfSigma(fRootFileName, iSigDiff);
   xsec->SetsigPrecision(iSigDiff);
   xsec->SetPreProcess(0);
@@ -117,15 +115,21 @@ double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double te
   std::string fileENDF3 = SetDataFileNameENDFSUB( isoName);
   SetEndfSubDataFileName (fileENDF3);
 
+  fEndfFileN = fileENDF1.c_str();
+  fRootFileName = fileENDF2.c_str();
+  fEndfSubDataFileName = fileENDF3.c_str();
+
   // Create and process with NUDY with keywords
-  Nudy::TNudyENDF *proc = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
-  proc->SetPreProcess (0) ;
-  proc->SetLogLev(0);
-  proc->Process();
-  bool LFIval = proc->GetLFI();
+  Nudy::TNudyENDF *procX = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
+  //procX->SetPreProcess (0) ;
+  procX->SetLogLev(0);
+  procX->Process();
+
+  bool LFIval = procX->GetLFI();
   SetIsFissKey(LFIval);
-  proc->SetEndfSub(fEndfSubDataFileName);
-  proc->Process();
+  procX->SetEndfSub(fEndfSubDataFileName);
+
+  procX->Process();
 
   //SetProjIDFn(projCode, projKE,"");
   double XSvalue = ComputeCrossSection();  // call routines from Nudy
@@ -138,7 +142,7 @@ void NudyPhysics::NudyInterface::ConvertENDF2ROOT(std::string fENDFD, std::strin
   if (!rENDFD.length()) rENDFD = fENDFD + ".root";
   fRootFileName = rENDFD.c_str();
   Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fEndfFileN, fRootFileName, "recreate");
-  tn->SetLogLev(2);
+  tn->SetLogLev(0);
   tn->Process();
 }
 
@@ -188,7 +192,7 @@ double NudyPhysics::NudyInterface::ComputeCrossSection() {
   double iSigDiff = 0.001;   // trial value for test documentation reqd.
 
   NudyPhysics::TNudyEndfSigma *xsec = new TNudyEndfSigma(fRootFileName, iSigDiff);
-  xsec->SetsigPrecision(0.001) ;
+  xsec->SetsigPrecision(iSigDiff) ;
   iSigDiff = xsec->GetsigPrecision ();
   xsec->SetPreProcess (0) ;
   xsec->SetInitTempDop(0.0) ;
