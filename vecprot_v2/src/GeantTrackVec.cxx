@@ -33,7 +33,7 @@
 #include "GeantTaskData.h"
 #include "StepChecker.h"
 #include "ConstBzFieldHelixStepper.h"
-#include "ScalarConstFieldHelixStepper.h"
+#include "ConstFieldHelixStepper.h"
 #include "GeantScheduler.h"
 
 #include "VScalarField.h"
@@ -1285,7 +1285,7 @@ VECCORE_ATT_HOST_DEVICE
 void GeantTrack_v::GetFieldValue(GeantTaskData *td, int i, double BfieldOut[3], double *bmagOut) const
 {
    vecgeom::Vector3D<double> Position (fXposV[i], fYposV[i], fZposV[i]);
-   FieldLookup::GetFieldValue(td, Position, BfieldOut, bmagOut);
+   FieldLookup::GetFieldValue( Position, BfieldOut, bmagOut, td);
 }
 
 //______________________________________________________________________________
@@ -1413,7 +1413,7 @@ void GeantTrack_v::PropagateInVolumeSingle(int i, double crtstep, GeantTaskData 
 
         // Printf("Called Helix-General.  Bz= %g , Bx = %g, By= %g ", Bz, Bx, By );
         
-        Geant::ScalarConstFieldHelixStepper stepper( BfieldInitial );
+        Geant::ConstFieldHelixStepper stepper( BfieldInitial );
         stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  fChargeV[i], fPV[i], crtstep,
                                                PositionNew, DirectionNew);
      }

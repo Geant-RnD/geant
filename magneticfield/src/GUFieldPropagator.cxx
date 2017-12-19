@@ -17,16 +17,19 @@
 
 #include "MagFieldEquation.h"
 #include "CashKarp.h"
+#include "FlexIntegrationDriver.h"
 #include "SimpleIntegrationDriver.h"
 
 // template <class Equation, unsigned int> using ScalarCashKarp= GUTCashKarpRKF45;
-
+
 using ThreeVector = vecgeom::Vector3D<double>;
 
 GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver,
-                                     SimpleIntegrationDriver* flexDriver,
+                                       FlexIntegrationDriver* flexDriver,
                                      double eps)
-  : fScalarDriver(driver), fEpsilon(eps)
+  : fScalarDriver(driver),
+    fVectorDriver(flexDriver),
+    fEpsilon(eps)
 {
 }
 
@@ -39,9 +42,8 @@ GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hmi
 {
    constexpr unsigned int Nposmom = 6; // Number of Integration variables - 3 position, 3 momentum
   
-   using  ScalarEquationType=  ScalarMagFieldEquation<FieldType, Nposmom>;
-
 #if 0
+   using  ScalarEquationType=  ScalarMagFieldEquation<FieldType, Nposmom>;
    int statVerbose= 1;
    auto *pEquation = new ScalarEquationType(magField, Nposmom);
       // new ScalarFieldEquation<FieldType,Nposmom>(magField, Nposmom);
@@ -55,10 +57,11 @@ GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hmi
                                                     statVerbose);
    fScalarDriver= scalarDriver;
 #else
-  fScalarDriver= nullptr;
+   fScalarDriver= nullptr;
 #endif
    // Create the flexible (vector or scalar) objects
-   using EquationType = MagFieldEquation<FieldType>;
+   using FlexEquationType = MagFieldEquation<FieldType>;
+   auto  gvEquation = new FlexEquationType(magField);
    using FlexStepperType = CashKarp<FlexEquationType,Nposmom>;
    auto myFlexStepper = new FlexStepperType(gvEquation);
    int statsVerbose=1;
@@ -70,10 +73,10 @@ GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hmi
    fVectorDriver= flexDriver;
 }
 
-GUFieldPropagator* GUFieldPropagator::Clone() const 
-{
-   return new GUFieldPropagator( fScalarDriver->Clone(), fEpsilon );
-}
+// GUFieldPropagator* GUFieldPropagator::Clone() const 
+// {
+//    return new GUFieldPropagator( fScalarDriver->Clone(), fEpsilon );
+// }
 
 // Make a step from current point along the path and compute new point, direction and angle
 // VECCORE_ATT_HOST_DEVICE                 

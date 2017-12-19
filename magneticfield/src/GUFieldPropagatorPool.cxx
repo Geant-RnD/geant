@@ -107,10 +107,6 @@ GUFieldPropagatorPool::Extend(size_t noNeeded)
 
     while ( num < noNeeded )
     {
-      //  if( (banks != 0) && (banks[num]!=0) )
-      //    fFieldPropagatorVec.push( new(banks(num)) GUFieldPropagator() );
-      //  else
-      //    fFieldPropagatorVec.push_back( new GUFieldPropagator() );
       auto prop= fPrototype->Clone();
       fFieldPropagatorVec.push_back( prop );
 
