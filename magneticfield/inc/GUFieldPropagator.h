@@ -53,10 +53,14 @@ class GUFieldPropagator
 
     ScalarIntegrationDriver* GetScalarIntegrationDriver(){ return fScalarDriver; }
     const ScalarIntegrationDriver* GetScalarIntegrationDriver() const { return fScalarDriver; }
+
+    FlexIntegrationDriver* GetFlexibleIntegrationDriver(){ return fVectorDriver; }
+    const FlexIntegrationDriver* GetFlexibleIntegrationDriver() const { return fVectorDriver; }
+    
     double GetEpsilon() { return fEpsilon; }
 
     VScalarField* GetField();
-    GUFieldPropagator* Clone() const;
+    // GUFieldPropagator* Clone() const { return this; }  // No longer allowing cloning !!
 
   /******
     template<typename Vector3D, typename DblType, typename IntType>
