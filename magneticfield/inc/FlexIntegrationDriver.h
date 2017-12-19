@@ -8,25 +8,32 @@
 #ifndef FlexIntegrationDriver_h
 #define FlexIntegrationDriver_h
 
+class  ScalarFieldTrack;
+struct FieldTrack;
+
 class FlexIntegrationDriver
 {
  public:
 
+/**   
   // Scalar method
+  virtual
   bool  AccurateAdvance( const ScalarFieldTrack& y_current,
                         double  hstep,
                         double  eps, //same             // Requested y_err/hstep
                         ScalarFieldTrack& yOutput,
-                        double  hinitial=0.0);
-
+                        double  hinitial=0.0) = 0;
+ **/
+   
   // Method for array / vector
+  virtual
   void AccurateAdvance( const  FieldTrack  yInput[],
                        double      hstep[],
                        const  double      charge[],
                        double      epsilon,
                        FieldTrack  yOutput[],
                        int         nTracks,
-                       bool        succeeded[] );
+                       bool        succeeded[] ) = 0;
   // Drive Runge-Kutta integration of ODE for several tracks (ntracks)
   // with starting values yInput, from current 's'=0 to s=h with variable
   // stepsize to control error, so that it is bounded by the relative

@@ -39,8 +39,9 @@
 // #include "ScalarFieldTrack.h"
 
 #include "FlexIntegrationDriver.h"
-
 #include "FormattedReporter.h"
+
+#include "Geant/VectorTypes.h"   //  Defines Geant::Double_v
 
 #ifndef NO_FIELD_STATISTICS
 #define GVFLD_STATS  1
@@ -63,17 +64,26 @@ template < class T_Stepper, unsigned int Nvar>
                              int        statsVerbosity = 1     );
 
     ~SimpleIntegrationDriver();
- 
-    //   Involves track insertion etc 
-    // succeeded[] of length nTracks
-    template <class Real_v>    
+
+    virtual
     void AccurateAdvance( const  FieldTrack  yInput[],
                                  double      hstep[],
                           const  double      charge[],                            
                                  double      epsilon,
                                  FieldTrack  yOutput[],
                                  int         nTracks, 
-                                 bool        succeeded[] );
+                                 bool        succeeded[] ) override final;
+
+    // Implemented in terms of the following templated function:
+    template <class Real_v>
+    void AccurateAdvance( const  FieldTrack  yInput[],
+                                 double      hstep[],
+                          const  double      charge[],                            
+                                 double      epsilon,
+                                 FieldTrack  yOutput[],
+                                 bool        succeeded[],
+                                 int         nTracks
+       );
       // Drive Runge-Kutta integration of ODE for several tracks (ntracks) 
       // with starting values yInput, from current 's'=0 to s=h with variable 
       // stepsize to control error, so that it is bounded by the relative 
@@ -1370,8 +1380,9 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
                     const double     charge[],
                           double     epsilon,   // Can be scalar or varying 
                           FieldTrack yOutput[],
-                          int        nTracks,
-                          bool       stillOK[])
+                          bool       stillOK[],
+                          int        nTracks
+     )
 {
   // Built on original AccurateAdvance. Takes buffer stream of nTracks
   // Converts them to Vc vectors for processing
@@ -2161,6 +2172,30 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
    allOk = allOk && ok1 && ok2 && ok3;
    
    return allOk;
+}
+
+
+
+template <class T_Stepper, unsigned int Nvar>
+void
+SimpleIntegrationDriver<T_Stepper, Nvar>      
+  ::AccurateAdvance(const FieldTrack yInput[],
+                          double     hstep[],
+                    const double     charge[],
+                          double     epsilon,   // Can be scalar or varying 
+                          FieldTrack yOutput[],
+                          int        nTracks,
+                          bool       stillOK[]
+     )
+{
+    AccurateAdvance<Geant::Double_v>( yInput,
+                                      hstep,
+                                      charge,
+                                      epsilon,   // Can be scalar or varying 
+                                      yOutput,
+                                      stillOK,
+                                      nTracks
+    );  
 }
 
 #endif /* SimpleIntegrationDriver_Def */
