@@ -62,7 +62,7 @@ class FieldLookup
 
    /* @brief Ensure that either a uniform field is set or a field class is registered. */
    static   
-      bool CheckConfig();
+      bool CheckConfig( const Geant::GeantTaskData * td );
 };
 
 }

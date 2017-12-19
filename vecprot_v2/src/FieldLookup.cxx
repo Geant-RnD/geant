@@ -25,7 +25,7 @@ void FieldLookup::GetFieldValue( const vecgeom::Vector3D<double>& Position,
    }
    else
    {
-      td->fFieldObj->GetFieldValue(Position, MagFldD);
+      td->fFieldObj->GetFieldValue(Position, MagFieldOut);
       bmag= MagFieldOut.Mag();
       // printf(" GeantTrack_v::GetFieldValue> Field at ( %f %f %f ) is (%f %f %f) kGauss - mag = %f \n",
          //       Position.x(), Position.y(), Position.z(), MagFldD.x(), MagFldD.y(), MagFldD.z(), *bmag );
@@ -54,7 +54,7 @@ void FieldLookup::GetFieldValue( const vecgeom::Vector3D<double>& Position,
 
 //______________________________________________________________________________          
 bool
-FieldLookup::CheckConfig()
+FieldLookup::CheckConfig( const Geant::GeantTaskData * td )
 {
    bool ok= ( td->fBfieldIsConst || ( td->fFieldObj != nullptr ) );
    if( !ok )
