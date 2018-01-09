@@ -25,8 +25,8 @@ class GUFieldPropagator
 {
   public:
     GUFieldPropagator(ScalarIntegrationDriver* scalarDriver,
-                      FlexIntegrationDriver*   flexDriver,
-                      double                   epsilon);
+                      double                   epsilon, 
+                      FlexIntegrationDriver*   flexDriver = nullptr);
 
     template <typename Backend>
     GUFieldPropagator(TemplateGUIntegrationDriver<Backend>* driver, double epsilon);
@@ -54,13 +54,16 @@ class GUFieldPropagator
     ScalarIntegrationDriver* GetScalarIntegrationDriver(){ return fScalarDriver; }
     const ScalarIntegrationDriver* GetScalarIntegrationDriver() const { return fScalarDriver; }
 
-    FlexIntegrationDriver* GetFlexibleIntegrationDriver(){ return fVectorDriver; }
-    const FlexIntegrationDriver* GetFlexibleIntegrationDriver() const { return fVectorDriver; }
+    // static FlexIntegrationDriver* GetFlexibleIntegrationDriver(){ return fVectorDriver; }
+    static const FlexIntegrationDriver* GetFlexibleIntegrationDriver() /*const*/ { return fVectorDriver; }
+    static void SetFlexIntegrationDriver( FlexIntegrationDriver * flexDrv);
     
     double GetEpsilon() { return fEpsilon; }
 
     VScalarField* GetField();
-    // GUFieldPropagator* Clone() const { return this; }  // No longer allowing cloning !!
+    GUFieldPropagator* Clone() const; // { return this; }
+         // Choice 1:  No longer allowing cloning !!  -- later solution
+         // Choice 2:  Clone only the scalar 'old' stepper.  Share the flexible stepper 
 
   /******
     template<typename Vector3D, typename DblType, typename IntType>
@@ -91,9 +94,9 @@ class GUFieldPropagator
    *****/
 
 private:
-    ScalarIntegrationDriver* fScalarDriver;
-    FlexIntegrationDriver*   fVectorDriver;
-    double                  fEpsilon;
+    ScalarIntegrationDriver*       fScalarDriver= nullptr;
+    static FlexIntegrationDriver*  fVectorDriver;
+    double                         fEpsilon;
 };
 
 // } // GEANT_IMPL_NAMESPACE
