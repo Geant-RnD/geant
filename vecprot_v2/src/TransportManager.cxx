@@ -425,8 +425,9 @@ void TransportManager::PropagateInVolumeSingle(GeantTrack &track, double crtstep
      **/   
 #endif
   } else {
-     double BfieldInitial[3], bmag= 0.0;
-     FieldLookup::GetFieldValue(td, Position, BfieldInitial, &bmag);
+     ThreeVector BfieldInitial; // [3],
+     double bmag= 0.0;
+     FieldLookup::GetFieldValue( Position, BfieldInitial, bmag, td );
      double Bx= BfieldInitial[0], By= BfieldInitial[1], Bz= BfieldInitial[2];
      if ( std::fabs( Bz ) > 1.0e6 * std::max( std::fabs(Bx), std::fabs(By) ) )
      {
@@ -737,7 +738,8 @@ int TransportManager::PropagateSingleTrack(TrackVec_t &tracks, int &itr, GeantTa
   double step, lmax;
   const double eps = 1.E-2; // 1 micron
 
-  double Bfield[3], bmag= 0.0;
+  vecgeom::Vector3D<double> Bfield;  
+  double bmag= 0.0;
   // const double bmag = td->fBfieldMag;
   
 // Compute transport length in geometry, limited by the physics step
@@ -771,7 +773,7 @@ int TransportManager::PropagateSingleTrack(TrackVec_t &tracks, int &itr, GeantTa
     if( !neutral ) {
        // printf( " PropagateSingleTrack> getting Field. Charge= %3d ", track.fCharge );
        vecgeom::Vector3D<double> Position( tracks[itr]->fXpos, tracks[itr]->fYpos, tracks[itr]->fZpos );
-       FieldLookup::GetFieldValue(td, Position, Bfield, &bmag);       
+       FieldLookup::GetFieldValue( Position, Bfield, bmag, td);
        // if( bmag < 1.E-10) { printf("TransportMgr::TrSnglTrk> Tiny field - mag = %f\n", bmag); }
     }
     if ( neutral || bmag < 1.E-10) {       
