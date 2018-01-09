@@ -167,7 +167,7 @@ ConstFieldHelixStepper::ConstFieldHelixStepper( vecgeom::Vector3D<double> Bfield
 
   /**
    * this function propagates the track along the "helix-solution" by a step step
-   * input: current position (x0, y0, z0), current direction ( dx0, dy0, dz0 ), some particle properties
+   * input: current position (x0, y0, z0), current direction ( dirX0, dirY0, dirZ0 ), some particle properties
    * output: new position, new direction of particle
    */
 template<typename Vector3D_t, typename BaseDType, typename BaseIType>
@@ -175,15 +175,18 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
    __attribute__((always_inline))
    void ConstFieldHelixStepper::DoStep(
                BaseDType const & x0, BaseDType const & y0, BaseDType const & z0,
-               BaseDType const & dx0, BaseDType const & dy0, BaseDType const & dz0,
+               BaseDType const & dirX0, BaseDType const & dirY0, BaseDType const & dirZ0,
                BaseIType const & charge, BaseDType const & momentum, BaseDType const & step,
                BaseDType & x, BaseDType & y, BaseDType & z,
                BaseDType & dx, BaseDType & dy, BaseDType & dz
              ) const
   {
-     Vector3D_t startPosition( x0, y0, z0);
-     Vector3D_t startDirection( dx0, dy0, dz0);
-     Vector3D_t endPosition, endDirection;
+     Vector3D_t startPosition = { x0, y0, z0 };
+     Vector3D_t startDirection( dirX0, dirY0, dirZ0 );
+     Vector3D_t   endPosition,   endDirection;
+
+     // startPosition.Set( x0, y0, z0);
+     // startDirection.Set( dirX0, dirY0, dirZ0);
 
      DoStep( startPosition, startDirection, charge, momentum, step,
              endPosition, endDirection);
@@ -221,7 +224,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
 
       Vector3D_t  dir1Field( fUnitX, fUnitY, fUnitZ );
       BaseDType UVdotUB = startDirection.Dot(dir1Field);   //  Limit cases 0.0 and 1.0
-      BaseDType dt2   = Max( startDirection.Mag2() - UVdotUB * UVdotUB, 0.0 );
+      BaseDType dt2   = Max( startDirection.Mag2() - UVdotUB * UVdotUB, BaseDType(0.0) );
       BaseDType sinVB = sqrt( dt2 ) + kSmall;
  
       // BaseDType invnorm = 1. / sinVB;
@@ -290,29 +293,47 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                         int np
                      ) const
    {
-       const int vectorSize= Real_v::VectorSize;
+       const int vectorSize= vecgeom::kVectorSize;
+       using vecCore::Load;
+       using vecCore::Store;
+       using vecCore::Set;
+
        int i;
        for ( i=0; i < np ; i+= vectorSize )
        {
             // results cannot not be temporaries
             //    Vector3D<Real_v> newPosition, newDirection;
+            Real_v oldPosx_v, oldPosy_v, oldPosz_v,
+                   oldDirx_v, oldDiry_v, oldDirz_v;
             Real_v newposx_v, newposy_v, newposz_v,
-                   newdirx_v, newdiry_v,newdirz_v;
-            vecCore::Index<Real_v> chargeVint;
-            Load( chargeVint, charge[i] );
+                   newdirx_v, newdiry_v, newdirz_v;
+            Real_v momentum_v, stepSz_v;
             
-            DoStep( Real_v(posx[i]), Real_v(posy[i]), Real_v(posz[i]),
-                    Real_v(dirx[i]), Real_v(diry[i]), Real_v(dirz[i]),
-                    chargeVint, // Geant::Int_v(charge[i]),
-                    Real_v(momentum[i]),
-                    Real_v(step[i]),
-                    newposx_v,
-                    newposy_v,
-                    newposz_v,
-                    newdirx_v,
-                    newdiry_v,
-                    newdirz_v
-                   );
+            vecCore::Index<Real_v> chargeVint;
+            Load( chargeVint, &charge[i] );  // ==> Does not work for index Type !!
+            for( size_t j = 0; j < vectorSize; ++j )
+               Set( chargeVint, j, charge[i+j] );
+               
+            Load( oldPosx_v, &posx[i] );
+            Load( oldPosy_v,  &posy[i] );
+            Load( oldPosz_v,  &posz[i] );
+            Load( oldDirx_v,  &dirx[i] );
+            Load( oldDiry_v,  &diry[i] );
+            Load( oldDirz_v,  &dirz[i] );
+            Load( momentum_v, &momentum[i] );
+            Load( stepSz_v,   &step[i] );
+            
+            DoStep<vecgeom::Vector3D<Real_v>, Real_v, vecCore::Index<Real_v>>
+               ( oldPosx_v, oldPosy_v, oldPosz_v,
+                    // Real_v(posx[i]), Real_v(posy[i]), Real_v(posz[i]),
+                 oldDirx_v, oldDiry_v, oldDirz_v,
+                    // Real_v(dirx[i]), Real_v(diry[i]), Real_v(dirz[i]),
+                 chargeVint, // Geant::Int_v(charge[i]),
+                 momentum_v, // Real_v(momentum[i]),
+                 stepSz_v,   // Real_v(step[i]),
+                 newposx_v, newposy_v, newposz_v,
+                 newdirx_v, newdiry_v, newdirz_v
+               );
             // write results
             Store(newposx_v, &newposx[i]);
             Store(newposy_v, &newposy[i]);
@@ -324,7 +345,8 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
 
        // tail part
        for (; i < np ; i++ )
-          DoStep<double>( posx[i], posy[i], posz[i],
+          DoStep<vecgeom::Vector3D<double>, double, vecCore::Index<double>>
+             ( posx[i], posy[i], posz[i],
                   dirx[i], diry[i], dirz[i],
                   charge[i],
                   momentum[i],
@@ -355,7 +377,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
      // template <typename Real_vecTp> using Vector3D = vecgeom::Vector3D<Real_vecTp>;
      
      // Use the values in the SOA3D directly - without minimum of copying
-     const int vectorSize= Real_v::VectorSize;
+     const int vectorSize= vecgeom::VectorSize;
      int i;
      for ( i=0; i < numTracks ; i+= vectorSize )
      {

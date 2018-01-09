@@ -235,7 +235,9 @@ int main(/*int argc, char *args[]*/)
        }
           
        vectorDriver
-          ->AccurateAdvance<Double_v>( yInput, hstep, charge, epsTol, yOutput, nTracks, succeeded );
+          ->AccurateAdvance<Double_v>( yInput, hstep, charge, epsTol, yOutput, 
+                                       succeeded, nTracks
+             );
        // ==========================
        cout<<"-- Vector Driver done (advanced)." << endl;
 

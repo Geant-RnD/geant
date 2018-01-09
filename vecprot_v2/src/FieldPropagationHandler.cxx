@@ -374,19 +374,21 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 //______________________________________________________________________________
 VECCORE_ATT_HOST_DEVICE
 void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
-                                                const double *crtstep,
+                                                const double *stepSize,
                                                 GeantTaskData *td)
 {
-// THIS IS THE VECTORIZED IMPLEMENTATION PLACEHOLDER FOR MAGNETIC FIELD PROPAGATION.
-// Now implemented just as a loop
+// The Vectorized Implementation for Magnetic Field Propagation
+
   int nTracks = tracks.size();
 #if 1 // VECTOR_FIELD_PROPAGATION
   using vecgeom::SOA3D;
   const int Npm= 6;
+  const double epsTol= 3.0e-5;
   
   // double yInput[8*nTracks], yOutput[8*nTracks];
   bool       succeeded[nTracks];
   int        intCharge[nTracks];
+  double     fltCharge[nTracks];
   
   // Choice 1.   SOA3D
   SOA3D<double> position3D(nTracks);   // To-Do: Move into TaskData: 
@@ -407,6 +409,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
      GeantTrack* pTrack= tracks[itr];
 
      intCharge[itr]= pTrack->fCharge;
+     fltCharge[itr]= pTrack->fCharge;
      momentumMag[itr] = pTrack->fP;
 
      // PositMom6D.push_back( pTrack->fXpos, pTrack->fYpos, pTrack->fZpos, px, py, pz );
@@ -418,14 +421,14 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   if( td->fBfieldIsConst ) {
      vecgeom::Vector3D<double> BfieldUniform= td->fConstFieldValue;
      ConstFieldHelixStepper stepper( BfieldUniform );
-     // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.fCharge, track.fP, crtstep,
+     // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.fCharge, track.fP, stepSize,
      //                                        PositionNew, DirectionNew);
      
      stepper.DoStepArr</*Geant::*/Double_v>( position3D.x(),  position3D.y(),  position3D.z(),
                                          direction3D.x(), direction3D.y(), direction3D.z(),
                                          intCharge,
                                          momentumMag,
-                                         crtstep,
+                                         stepSize,
                                          PositionOut.x(),  PositionOut.y(),  PositionOut.z(),
                                          DirectionOut.x(), DirectionOut.y(), DirectionOut.z(),
                                          nTracks
@@ -460,16 +463,18 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
      if( vectorDriver ) {
         // Integrate using Runge Kutta method
         vectorDriver
-           ->AccurateAdvance( fldTracksIn, hstep, charge, epsTol,
+           ->AccurateAdvance( fldTracksIn, stepSize, fltCharge, epsTol,
                               fldTracksOut, nTracks, succeeded );
      } else {
-        Geant::Error("FieldPropagationHandler: no Flexible/Vector Integration Driver found.");
+        // Geant::Error( ... );
+        std::cerr << "FieldPropagationHandler: no Flexible/Vector Integration Driver found."
+                  << std::endl;
      }
   }
 #else   
-
+  // Placeholder - implemented just as a loop
   for (int itr=0; itr<nTracks; ++itr)
-    PropagateInVolume(*tracks[itr], crtstep[itr], td);
+    PropagateInVolume(*tracks[itr], stepSize[itr], td);
 #endif  
 }
 

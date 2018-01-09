@@ -24,13 +24,37 @@
 
 using ThreeVector = vecgeom::Vector3D<double>;
 
+FlexIntegrationDriver*  GUFieldPropagator::fVectorDriver= nullptr;
+
+//____________________________________________________________________________________
+//------------------------------------------------------------------------------------
 GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver,
-                                       FlexIntegrationDriver* flexDriver,
-                                     double eps)
+                                     double eps,
+                                     FlexIntegrationDriver* flexDriver )
   : fScalarDriver(driver),
-    fVectorDriver(flexDriver),
+    // fVectorDriver(flexDriver),
     fEpsilon(eps)
 {
+   if ( !fVectorDriver && flexDriver ) {      
+      SetFlexIntegrationDriver( flexDriver );
+   } else {
+      if ( fVectorDriver )
+         std::cout << "GUFieldPropagator> Not overwriting Vector/Flexible Driver" << std::endl;
+   }
+}
+
+void GUFieldPropagator::SetFlexIntegrationDriver( FlexIntegrationDriver * flexDriver)
+{
+   const std::string methodName = "GUFieldPropagator::SetFlexIntegrationDriver";
+   if ( fVectorDriver && (!flexDriver) ) {
+      std::cout << "Replacing Vector/Flexible Driver" << std::endl;
+      fVectorDriver = flexDriver;
+   }
+   else if ( !flexDriver )
+   {
+      std::cout << methodName // << "GUFieldPropagator::SetFlexIntegrationDriver",
+         << "> Not overwriting with Vector/Flexible Driver" << std::endl;
+   }
 }
 
 // ToDo-s/ideas:
@@ -59,24 +83,31 @@ GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hmi
 #else
    fScalarDriver= nullptr;
 #endif
-   // Create the flexible (vector or scalar) objects
-   using FlexEquationType = MagFieldEquation<FieldType>;
-   auto  gvEquation = new FlexEquationType(magField);
-   using FlexStepperType = CashKarp<FlexEquationType,Nposmom>;
-   auto myFlexStepper = new FlexStepperType(gvEquation);
-   int statsVerbose=1;
-   auto flexDriver =
-      new SimpleIntegrationDriver<FlexStepperType,Nposmom> (hminimum,
-                                                    myFlexStepper,
-                                                    Nposmom,
-                                                    statsVerbose);
-   fVectorDriver= flexDriver;
+
+   if( ! fVectorDriver ) {    // Share it between all instances
+      
+      // Create the flexible (vector or scalar) objects 
+      using FlexEquationType = MagFieldEquation<FieldType>;
+      auto  gvEquation = new FlexEquationType(magField);
+      using FlexStepperType = CashKarp<FlexEquationType,Nposmom>;
+      auto myFlexStepper = new FlexStepperType(gvEquation);
+      int statsVerbose=1;
+      auto flexDriver =
+         new SimpleIntegrationDriver<FlexStepperType,Nposmom> (hminimum,
+                                                               myFlexStepper,
+                                                               Nposmom,
+                                                               statsVerbose);
+      fVectorDriver= flexDriver;
+   }
 }
 
-// GUFieldPropagator* GUFieldPropagator::Clone() const 
-// {
-//    return new GUFieldPropagator( fScalarDriver->Clone(), fEpsilon );
-// }
+// #ifdef FP_CLONE_METHOD
+GUFieldPropagator* GUFieldPropagator::Clone() const 
+{
+    return new GUFieldPropagator( fScalarDriver->Clone(),
+                                  fEpsilon );
+}
+// #endif
 
 // Make a step from current point along the path and compute new point, direction and angle
 // VECCORE_ATT_HOST_DEVICE                 
