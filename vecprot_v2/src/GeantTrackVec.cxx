@@ -1304,7 +1304,11 @@ VECCORE_ATT_HOST_DEVICE
 void GeantTrack_v::GetFieldValue(GeantTaskData *td, int i, double BfieldOut[3], double *bmagOut) const
 {
    vecgeom::Vector3D<double> Position (fXposV[i], fYposV[i], fZposV[i]);
-   FieldLookup::GetFieldValue( Position, BfieldOut, bmagOut, td);
+   vecgeom::Vector3D<double> Bfield;
+   FieldLookup::GetFieldValue( Position, Bfield, *bmagOut, td);
+   BfieldOut[0]= Bfield[0];
+   BfieldOut[1]= Bfield[1];
+   BfieldOut[2]= Bfield[2];   
 }
 
 //______________________________________________________________________________
