@@ -79,11 +79,16 @@ public:
 
 private: 
   //data members   
-  double fDistanceAlongCurve = 0.0;
   double fPosMomArr[NumCompFT];
+  double fDistanceAlongCurve = 0.0;
 
 public:
-  
+  double operator[] (size_t i) const
+  { return (i<NumCompFT) ? fPosMomArr[i] : fDistanceAlongCurve ; } 
+
+  double operator[] (size_t i)
+  { return (i<NumCompFT) ? fPosMomArr[i] : fDistanceAlongCurve ; } 
+   
   friend std::ostream&
           operator<<( std::ostream& os, const FieldTrack& fieldTrack)
           {
