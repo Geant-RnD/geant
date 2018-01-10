@@ -391,10 +391,10 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
                                                 GeantTaskData *td)
 {
 // The Vectorized Implementation for Magnetic Field Propagation
-
   int nTracks = tracks.size();
 #if 1 // VECTOR_FIELD_PROPAGATION
   using vecgeom::SOA3D;
+  using vecgeom::Vector3D;
   const int Npm= 6;
   const double epsTol= 3.0e-5;
   
@@ -450,9 +450,9 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
      for (int itr=0; itr<nTracks; ++itr)
      {
         GeantTrack& track= *tracks[itr];
-        Vector3D<double> positionMove = { track.fXpos,  //  - PositionOut.x(itr), 
-                                          track.fYpos,  //  - PositionOut.y(itr),
-                                          track.fZpos } //  - PositionOut.z(itr) };
+        Vector3D<double> positionMove = { track.fXpos,   //  - PositionOut.x(itr), 
+                                          track.fYpos,   //  - PositionOut.y(itr),
+                                          track.fZpos }; //  - PositionOut.z(itr) };
         positionMove -= PositionOut[itr];
         double posShift = positionMove.Mag();
         track.fXpos= PositionOut.x(itr);
@@ -502,7 +502,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
         for (int itr=0; itr<nTracks; ++itr)
         {
            GeantTrack& track= *tracks[itr];
-           FieldTrack* fldTrackEnd= fldTracksOut[itr];
+           FieldTrack& fldTrackEnd= fldTracksOut[itr];
            Vector3D<double> startPosition = { track.fXpos, track.fYpos, track.fZpos };
            Vector3D<double> endPosition = { fldTrackEnd[0], fldTrackEnd[1], fldTrackEnd[2] };
            double posShift = (startPosition-endPosition).Mag();
@@ -517,7 +517,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
            // Double check magnitude at end point
            double pMag2End = ( pX*pX + pY * pY + pZ * pZ);
            double relDiff = pMag2End * pmag_inv * pmag_inv - 1.0; 
-           if( relDiff > perMillion ) { 
+           if( relDiff > geant::perMillion ) { 
                 std::cerr << "Track " << itr << " has momentum magnitude difference "
                    << relDiff << "  Momentum magnitude @ end = " << std::sqrt( pMag2End )
                    << " vs. start = " << track.fP << std::endl;
@@ -529,7 +529,6 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
            track.fSafety -= posShift; //  Was crtstep;
            if (track.fSafety < 1.E-10)
              track.fSafety = 0;
-           }
         }
      } else {
         // Geant::Error( ... );
