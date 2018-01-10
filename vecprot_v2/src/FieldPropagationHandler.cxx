@@ -433,6 +433,26 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
                                          DirectionOut.x(), DirectionOut.y(), DirectionOut.z(),
                                          nTracks
         );
+     // Store revised positions and location in original tracks
+     for (int itr=0; itr<nTracks; ++itr)
+     {
+        GeantTrack& track= *tracks[itr];
+        Vector3D<double> positionMove = { track.fXpos,  //  - PositionOut.x(itr), 
+                                          track.fYpos,  //  - PositionOut.y(itr),
+                                          track.fZpos } //  - PositionOut.z(itr) };
+        positionMove -= PositionOut[itr];
+        double posShift = positionMove.Mag();
+        track.fXpos= PositionOut.x(itr);
+        track.fYpos= PositionOut.y(itr);
+        track.fZpos= PositionOut.z(itr);
+        track.fXdir= DirectionOut.x(itr);
+        track.fYdir= DirectionOut.y(itr);
+        track.fZdir= DirectionOut.z(itr);
+        // Exact update of the safety - using true move (not distance along curve)
+        track.fSafety -= posShift; //  Was crtstep;
+        if (track.fSafety < 1.E-10)
+           track.fSafety = 0;
+     }
   }
   else
   {
@@ -440,7 +460,6 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
      
      // Choice 3.   Array of FieldTrack 
      FieldTrack fldTracksIn[nTracks], fldTracksOut[nTracks];
-     
      for (int itr=0; itr<nTracks; ++itr)
      {
         GeantTrack* pTrack= tracks[itr];        
@@ -465,6 +484,40 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
         vectorDriver
            ->AccurateAdvance( fldTracksIn, stepSize, fltCharge, epsTol,
                               fldTracksOut, nTracks, succeeded );
+
+        // Store revised positions and location in original tracks
+        for (int itr=0; itr<nTracks; ++itr)
+        {
+           GeantTrack& track= *tracks[itr];
+           FieldTrack* fldTrackEnd= fldTracksOut[itr];
+           Vector3D<double> startPosition = { track.fXpos, track.fYpos, track.fZpos };
+           Vector3D<double> endPosition = { fldTrackEnd[0], fldTrackEnd[1], fldTrackEnd[2] };
+           double posShift = (startPosition-endPosition).Mag();
+           track.fXpos= fldTrackEnd[0];
+           track.fYpos= fldTrackEnd[1];
+           track.fZpos= fldTrackEnd[2];
+           // Vector3D<double> endMomentum = { fldTrackEnd[3], fldTrackEnd[4], fldTrackEnd[5] };
+           double pX= fldTrackEnd[3];
+           double pY= fldTrackEnd[4];
+           double pZ= fldTrackEnd[5];
+           double pmag_inv= 1.0 / track.fP;
+           // Double check magnitude at end point
+           double pMag2End = ( pX*pX + pY * pY + pZ * pZ);
+           double relDiff = pMag2End * pmag_inv * pmag_inv - 1.0; 
+           if( relDiff > perMillion ) { 
+                std::cerr << "Track " << itr << " has momentum magnitude difference "
+                   << relDiff << "  Momentum magnitude @ end = " << std::sqrt( pMag2End )
+                   << " vs. start = " << track.fP << std::endl;
+           }
+           track.fXdir= pmag_inv * pX;
+           track.fYdir= pmag_inv * pY;
+           track.fZdir= pmag_inv * pZ;
+           // Exact update of the safety - using true move (not distance along curve)
+           track.fSafety -= posShift; //  Was crtstep;
+           if (track.fSafety < 1.E-10)
+             track.fSafety = 0;
+           }
+        }
      } else {
         // Geant::Error( ... );
         std::cerr << "FieldPropagationHandler: no Flexible/Vector Integration Driver found."
