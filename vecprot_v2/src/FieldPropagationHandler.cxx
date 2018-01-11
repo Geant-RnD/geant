@@ -36,6 +36,7 @@ FieldPropagationHandler::FieldPropagationHandler(int threshold, GeantPropagator 
                : Handler(threshold, propagator)
 {
 // Default constructor
+   std::cout << " FieldPropagationHandler c-tor called:  threshold= " << threshold << std::endl;
 }
 
 //______________________________________________________________________________
@@ -83,6 +84,8 @@ void FieldPropagationHandler::DoIt(GeantTrack *track, Basket& output, GeantTaskD
   double step, lmax;
   const double eps = 1.E-2; //
 
+  std::cout <<" FieldPropagationHandler::DoIt called " << std::endl;
+  
   // We use the track sagitta to estimate the "bending" error,
   // i.e. what is the propagated length for which the track deviation in
   // magnetic field with respect to straight propagation is less than epsilon.
@@ -257,6 +260,9 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 // - physics step (bdr=0)
 // - safety step (bdr=0)
 // - snext step (bdr=1)
+
+   std::cout << "FieldPropagationHandler::PropagateInVolume called for 1 track" << std::endl;
+   
    using ThreeVector = vecgeom::Vector3D<double>;  
    bool useRungeKutta;
    useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;
@@ -391,6 +397,8 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
                                                 GeantTaskData *td)
 {
 // The Vectorized Implementation for Magnetic Field Propagation
+  std::cout << "FieldPropagationHandler::PropagateInVolume called for Many tracks" << std::endl;
+  
   int nTracks = tracks.size();
 #if 1 // VECTOR_FIELD_PROPAGATION
   using vecgeom::SOA3D;

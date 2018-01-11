@@ -76,8 +76,8 @@ message(STATUS "Created target for testVectorIntegrationDriver")
 # target_link_libraries(BenchmarkIntegrationDriver Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 # message(STATUS "Created target for BenchmarkIntegrationDriver")
 
-#add_executable(TestConstBzStepper TestConstBzStepper.cxx) ## ${sources} ${headers})
-#target_link_libraries(TestConstBzStepper Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+add_executable(TestConstBzStepper TestConstBzStepper.cxx) ## ${sources} ${headers})
+target_link_libraries(TestConstBzStepper Vmagfield Geant_v ${VECGEOM_LIBRARIES} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 add_executable(ReproduceError ReproduceError.cxx)
 target_link_libraries(ReproduceError Vmagfield Geant_v ${VECGEOM_LIBRARIES} ${VECGEOM_LIBRARIES_EXTERNAL} ${USERKERNELLIB} -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
