@@ -87,7 +87,7 @@ void GenVecCart(vecgeom::Vector<ThreeVector> &posVec, const int &n){
 int main()
 {
     CMSmagField m1;
-    m1.ReadVectorData("../VecMagFieldRoutine/cms2015.txt");
+    m1.ReadVectorData("../VecMagFieldRoutine/cmsmagfield2015.txt");
     vecgeom::Vector<ThreeVector> posVec;
     
     int n = 1e+4;
