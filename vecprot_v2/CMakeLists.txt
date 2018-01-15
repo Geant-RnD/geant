@@ -250,7 +250,7 @@ else()
   set(TEST_EXECUTABLES
     CMSApp.cc
     runApp.cc
-    runAppExternalLoop.cc
+    
     testBasketizer.cc
 )
 endif()
@@ -285,8 +285,7 @@ function(add_to_ctest EXECUTABLES)
       get_filename_component(TARGET_NAME ${EXECUTABLE} NAME_WE)
       if(TARGET_NAME STREQUAL "runApp")
           add_test(NAME ${TARGET_NAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND  $<TARGET_FILE:${TARGET_NAME}> -g ${CMAKE_SOURCE_DIR}/data/ExN03.root -x ${CMAKE_SOURCE_DIR}/data/xsec_FTFP_BERT.root -f ${CMAKE_SOURCE_DIR}/data/fstate_FTFP_BERT.root)
-      elseif(TARGET_NAME STREQUAL "runAppExternalLoop")
-          add_test(NAME ${TARGET_NAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND  $<TARGET_FILE:${TARGET_NAME}> -g ${CMAKE_SOURCE_DIR}/data/ExN03.root -x ${CMAKE_SOURCE_DIR}/data/xsec_FTFP_BERT.root -f ${CMAKE_SOURCE_DIR}/data/fstate_FTFP_BERT.root)
+
       elseif(TARGET_NAME STREQUAL "runGPUApp")
           add_test(NAME ${TARGET_NAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND  $<TARGET_FILE:${TARGET_NAME}> -g ${CMAKE_SOURCE_DIR}/data/ExN03.root -x ${CMAKE_SOURCE_DIR}/data/xsec_FTFP_BERT.root -f ${CMAKE_SOURCE_DIR}/data/fstate_FTFP_BERT.root)
       elseif(TARGET_NAME STREQUAL "CMSGPUApp")
@@ -315,7 +314,7 @@ endif()
 if(CUDA)
   install(TARGETS CMSGPUApp runGPUApp DESTINATION bin)
 else()
-  install(TARGETS CMSApp runApp runAppExternalLoop testBasketizer DESTINATION bin)
+  install(TARGETS CMSApp runApp  testBasketizer DESTINATION bin)
 endif()
 
 if(USE_ROOT)
@@ -327,7 +326,7 @@ if(CUDA)
   add_dependencies(CMSGPUApp Geant_v Xsec GeantExamples)
 else()
   add_dependencies(runApp Geant_v Xsec GeantExamples)
-  add_dependencies(runAppExternalLoop Geant_v Xsec GeantExamples)
+
   add_dependencies(CMSApp Geant_v Xsec GeantExamples)
 endif()
 # -------  END == NOT WITH REAL PHYSICS -------------------------------------------------------
@@ -388,6 +387,7 @@ set(TestEm5_GV_OUTPUT bin/examples/TestEm5/GeantV)
 set(TestEm5_GV_SCRIPTS TestEm5_GV_hanson19.mac hanson_19.dat README_TestEm5_GV)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${TestEm5_GV_OUTPUT})
 foreach(_script ${TestEm5_GV_SCRIPTS})
+
   configure_file(
     ${_script}
     ${CMAKE_BINARY_DIR}/${TestEm5_GV_OUTPUT}/${_script}
@@ -418,8 +418,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${caloApp_OUTPUT})
     ${CMAKE_BINARY_DIR}/${caloApp_OUTPUT}/caloApp.mac
     COPYONLY
     )
-install(TARGETS caloAppRP runAppRP runAppTestEM3RP DESTINATION ${caloApp_OUTPUT})
-install(FILES caloApp.mac DESTINATION ${caloApp_OUTPUT})
+endforeach()
+
+install(TARGETS TestEm3_GV DESTINATION ${TestEm3_GV_OUTPUT})
+install(FILES ${TestEm3_GV_SCRIPTS} DESTINATION ${TestEm3_GV_OUTPUT})
 # -------  END == WITH REAL PHYSICS -------------------------------------------------------
 endif()
 
