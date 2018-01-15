@@ -80,8 +80,7 @@ set(headers
 #
 add_library(GeantExamplesRP SHARED ${sources})
 
-target_link_libraries(GeantExamplesRP -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Geant_v RealPhysics Nudy Material
-  ${TBB_LIBRARIES})
+target_link_libraries(GeantExamplesRP -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Geant_v RealPhysics Nudy Material ${HEPMC_LIBRARIES} ${TBB_LIBRARIES})
 
 if (USE_ROOT)
   target_link_libraries(GeantExamplesRP ${ROOT_LIBRARIES})
