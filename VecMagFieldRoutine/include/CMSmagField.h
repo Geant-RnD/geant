@@ -361,7 +361,7 @@ void CMSmagField::GetFieldValueRZ(const Real_v &r,
     Real_v z = Max(Min(Z, Real_v(kZMax)), Real_v(-kZMax)); 
 
     //to make sense of the indices, consider any particular instance e.g. (25,-200)
-    Real_v rFloor = floor(radius * kRDiffInv);
+    Real_v rFloor = Floor(radius * kRDiffInv);
     Real_v rIndLow = rFloor * kNoZValues;
     // Real_v rIndHigh = rIndLow + kNoZValues;
 
@@ -369,7 +369,7 @@ void CMSmagField::GetFieldValueRZ(const Real_v &r,
     //z-z0 = [0,32000]
     //so indices 0 to 160 : total 161 indices for (z-z0)/200
     //i.e. we are saying:
-    Real_v zInd = Floor((z - Real_v(kZ0))) * Real_v(kZDiffInv);
+    Real_v zInd = Floor((z - Real_v(kZ0)) * Real_v(kZDiffInv));
     //need i1,i2,i3,i4 for 4 required indices
     Index_v i1 = Index_v(rIndLow + zInd);
     Index_v i2 = i1 + 1;

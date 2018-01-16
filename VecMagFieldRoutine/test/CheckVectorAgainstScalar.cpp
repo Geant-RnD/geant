@@ -20,43 +20,33 @@
 
 #undef NDEBUG
 
-typedef float dataType;
-//typedef double dataType;
-
 using namespace std;
-typedef vecgeom::Vector3D<dataType> ThreeVector; //normal Vector3D
+
+
 using Double_v = Geant::Double_v;
-using Float_v = Geant::Float_v;
+using ThreeVector = vecgeom::Vector3D<double>;
+using ThreeVector_v = vecgeom::Vector3D<Double_v>;
 
-typedef vecgeom::Vector3D<float>    ThreeVector_f;
-typedef vecgeom::Vector3D<double>   ThreeVector_d;
+template <typename T>
+using vector_t = std::vector<T>;
+//constexpr float tesla     = fieldUnits::tesla; 
+//constexpr float kilogauss = fieldUnits::kilogauss;
+constexpr float millimeter = fieldUnits::millimeter;
 
-typedef vecgeom::Vector3D<Float_v> ThreeVecSimd_v;
-typedef vecgeom::Vector<dataType> VcVectorFloat;
-typedef vecgeom::Vector<ThreeVecSimd_v> VecGeomVector;
+const double kRMax=9000 * millimeter;
+const double kZMax= 16000 * millimeter;
 
-
-
-const dataType kRMax=9000;
-const dataType kZMax= 16000;
-
-dataType RandR(){
-    dataType r = (dataType) rand()/(RAND_MAX) ;
-    r = r*kRMax; //because r is in range (0,9000) mm                                                                          
-    return r;
+double RandR(){
+    double rnd = (double)rand()/(RAND_MAX) ;
+    return rnd * kRMax;
 }
 
-dataType RandZ(){
-    dataType z = (dataType) rand()/(RAND_MAX) ;
-    z = z*kZMax; //range of z is between -16k and 16k                                                                         
-    int sign = rand()%2; //to define the sign, since it can be both positive and negative                                     
-    if (sign==0){
-            z= -z;
-    }
-    return z;
+double RandZ(){
+   double rnd = (double)rand()/(RAND_MAX) ;
+   return -kZMax + 2*rnd*kZMax;
 }
 
-void GenVecCartSubR(dataType &x, dataType &y){
+void GenVecCartSubR(double &x, double &y){
     x = RandR();
     y = RandR();
     if((x*x + y*y)> kRMax*kRMax){
@@ -65,30 +55,29 @@ void GenVecCartSubR(dataType &x, dataType &y){
 }
 
 void GenVecCart(ThreeVector &pos){
-    dataType x=0,y=0;
-    dataType z = RandZ();
-    GenVecCartSubR(x, y);
-    pos.x()=x;
-    pos.y()=y;
-    pos.z()=z;
+    double rnd = (double)rand()/(RAND_MAX) ;
+    double phi = 2. * M_PI * rnd;
+    double r = RandR();
+    double x = r * vecCore::math::Cos(phi);
+    double y = r * vecCore::math::Sin(phi);
+    double z = RandZ();
+    pos.Set(x, y, z);
 }
 
-void GenVecCart(vecgeom::Vector<ThreeVector> &posVec, const int &n){
+void GenVecCart(vector_t<ThreeVector> &posVec, const int &n){
     for (int i = 0; i < n; ++i)
     {       
         ThreeVector pos;
         GenVecCart(pos);
         posVec.push_back(pos);
-
-
     }
 }
 
 int main()
-{
+{   
     CMSmagField m1;
     m1.ReadVectorData("../VecMagFieldRoutine/cmsmagfield2015.txt");
-    vecgeom::Vector<ThreeVector> posVec;
+    vector_t<ThreeVector> posVec;
     
     int n = 1e+4;
 
@@ -98,69 +87,43 @@ int main()
     cout<<"Size of posVec is: "<<posVec.size()<<endl;
 
     ThreeVector sumXYZField(0., 0., 0.), xyzField;
-    vector<ThreeVector> outputScalar;
+    vector_t<ThreeVector> outputScalar;
 
-    vecgeom::Vector<ThreeVector> outputScalar2;
     cout<<"Scalar fields start: "<<endl;
 
     for (int i = 0; i < n; ++i)
     {
-        m1.GetFieldValue<float>(posVec[i], xyzField);
+        m1.GetFieldValue<double>(posVec[i], xyzField);
         // m1.GetFieldValue(posVec[i], xyzField);        
         sumXYZField += xyzField;
         outputScalar.push_back(xyzField);
-        outputScalar2.push_back(xyzField);
     }
     cout<<sumXYZField<<endl;
     for (int i = 0; i < 8; ++i)
     {
-        cout<<outputScalar2[i]<<endl;
+        cout<<outputScalar[i]<<endl;
     }
  
 
     cout<<"\nVector fields start: "<<endl;
-    Float_v vX;
-    Float_v vY;
-    Float_v vZ;
-
-    int inputVcLen = ceil(((dataType)n)/Geant::kVecLenF);
-    ThreeVecSimd_v *inputForVec = new ThreeVecSimd_v[inputVcLen];
-    //std::vector<ThreeVecSimd_v> outputVec;
-    int init = 0;
     
-    for (int i = 0; i < n; i=i+Geant::kVecLenF){
-       for (size_t j = 0; j < Geant::kVecLenF; ++j){
-            vX[j]= posVec[i+j].x();
-            vY[j]= posVec[i+j].y();
-            vZ[j]= posVec[i+j].z();
+    size_t inputVcLen = ceil(((double)n)/Geant::kVecLenD);
+    ThreeVector_v *inputForVec = new ThreeVector_v[inputVcLen];
+    size_t init = 0;
+    for (int i = 0; i < n; i+=Geant::kVecLenD){
+        for (size_t j = 0; j < Geant::kVecLenD; ++j){
+            vecCore::Set(inputForVec[init].x(), j, posVec[i+j].x());
+            vecCore::Set(inputForVec[init].y(), j, posVec[i+j].y());
+            vecCore::Set(inputForVec[init].z(), j, posVec[i+j].z());
         }
-        ThreeVecSimd_v Pos;
-        Pos[0] = vX;
-        Pos[1] = vY;
-        Pos[2] = vZ;
-
-        inputForVec[init] = Pos;
         init++;
     }
 
-    //==================================================
-    //=================Test Block=======================
-    // ThreeVecSimd_v v1, v2, v3;
-    // // outputVec.push_back(v1);
-    // // outputVec.push_back(v2);
-    // // outputVec.push_back(v3);
-    // VecGeomVec VecGeomVec1;
-    // VecGeomVec1.push_back(v1);
-    // VecGeomVec1.push_back(v2);
-    // VecGeomVec1.push_back(v3);
-
-    //==================================================
-
-    VecGeomVector outputVec;
-    ThreeVecSimd_v sumXYZField_v, xyzField_v;
-    for (int i = 0; i < inputVcLen; ++i){
-        m1.GetFieldValue<Float_v>(inputForVec[i], xyzField_v);
-        outputVec.push_back(xyzField_v);
+    //vector_t<ThreeVector_v> outputVec;
+    ThreeVector_v *outputVec = new ThreeVector_v[inputVcLen];
+    ThreeVector_v sumXYZField_v, xyzField_v;
+    for (size_t i = 0; i < inputVcLen; ++i){
+        m1.GetFieldValue<Double_v>(inputForVec[i], outputVec[i]);
         sumXYZField_v += xyzField_v;
     }
     cout<<sumXYZField<<endl;
@@ -169,7 +132,7 @@ int main()
 
     for (int i = 0, k=0; i < 256 ; ++i)
     {
-        for (size_t j = 0; j < Geant::kVecLenF; ++j)
+        for (size_t j = 0; j < Geant::kVecLenD; ++j)
         {
             //ThreeVector testVec2(xyzField_v[0][j], xyzField_v[1][j], xyzField_v[2][j]);
             cout<<k<<endl;
