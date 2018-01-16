@@ -15,6 +15,7 @@ if (USE_REAL_PHYSICS)
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullCMS/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullLHCb/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
+    ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullLHCb/inc
     )
 else()
   include_directories(
@@ -346,6 +347,7 @@ set(NOTEST_EXECUTABLES
   fullCMS.cc
   fullLHCb.cc
   runTARC.cc
+  fullLHCb.cc
   )
 
 macro(build_executables EXECUTABLES)
