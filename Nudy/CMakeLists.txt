@@ -55,6 +55,11 @@ if(USE_ROOT)
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libNudy_rdict.pcm DESTINATION lib)
 endif()
 
+#-----------------------------------------------------------------------------------------------
+# Compile standalone code
+#
+add_subdirectory(standalone)
+
 #----------------------------------------------------------------------------------------------
 # Add this directory to Doxygen
 #
