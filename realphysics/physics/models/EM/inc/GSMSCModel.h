@@ -66,19 +66,20 @@ private:
 //                           double &scra, double &g1);
 // data members
 private:
-  bool   fIsElectron = false;            // is the model for e- (e+ otherwise)
-  bool   fIsUsePWATotalXsecData = false; // use screening that gives back pwa first transport mean free path
-  bool   fIsUseAccurate = true;          // use accurate step limits
-  bool   fIsOptimizationOn = true;       // use optimisation in the step limit: check current range and pre-safety
+  bool   fIsElectron          = false;      // is the model for e- (e+ otherwise)
+  bool   fIsUsePWACorrection  = true;       // use screening that gives back pwa first transport mean free path
+  bool   fIsUseMottCorrection = false;      // use Mott correction
+  bool   fIsUseAccurate       = true;       // use accurate step limits
+  bool   fIsOptimizationOn    = true;       // use optimisation in the step limit: check current range and pre-safety
 
-  double fCharge = 0.0;
+  double fCharge             = 0.0;
 
-  double fTauSmall = 1.e-16;
-  double fTauLim = 1.e-6;
-  double fTLimitMinfix2 = 1.*geant::nm;
-  double fDtrl = 0.05;
+  double fTauSmall           = 1.e-16;
+  double fTauLim             = 1.e-6;
+  double fTLimitMinfix2      = 1.*geant::nm;
+  double fDtrl               = 0.05;
 
-  Particle* fParticle = nullptr;    //e-/e+
+  Particle* fParticle        = nullptr;    //e-/e+
   Geant::TrackToken fMSCdata;   // Handle for MSCData
 
   GSMSCTable*       fGSTable        = nullptr;

@@ -51,7 +51,7 @@ GeantEventServer::GeantEventServer(int nactive_max, GeantRunManager *runmgr)
 
   // Create empty events
   bool generate = fRunMgr->GetConfig()->fRunMode == GeantConfig::kGenerator;
-  int nthreads = runmgr->GetNthreadsTotal();  
+  int nthreads = runmgr->GetNthreadsTotal();
   int ngen = vecCore::math::Max(fNactiveMax, nthreads);
   if (generate) {
     fNevents = fRunMgr->GetConfig()->fNtotal;
@@ -88,7 +88,7 @@ GeantEventServer::~GeantEventServer()
 //______________________________________________________________________________
 GeantEvent *GeantEventServer::GenerateNewEvent(GeantTaskData *td, unsigned int &error)
 {
-// Generates a new event in standalone GeantV mode by filling an empty one and 
+// Generates a new event in standalone GeantV mode by filling an empty one and
 // putting it in the pending events queue.
 //
 // The method may fail due to:
@@ -111,60 +111,25 @@ GeantEvent *GeantEventServer::GenerateNewEvent(GeantTaskData *td, unsigned int &
   }
   error = 0;
   // Now just get next event from the generator
-  GeantEventInfo eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent();
+  GeantEventInfo eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent(td);
   int ntracks = eventinfo.ntracks;
   int nloadtmp = nload;
   while (!ntracks) {
     Error("GenerateNewEvent", "### Problem with generator: event %d has no tracks", nloadtmp++);
-    eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent();
+    eventinfo = fRunMgr->GetPrimaryGenerator()->NextEvent(td);
     ntracks = eventinfo.ntracks;
   }
-  
+
   GeantEvent *event = new GeantEvent();
   event->SetNprimaries(ntracks);
   event->SetVertex(eventinfo.xvert, eventinfo.yvert, eventinfo.zvert);
-
-  // Initialize navigation path for the vertex
-  Volume_t *vol = 0;
-  // Initialize the start path
-  VolumePath_t *startpath = VolumePath_t::MakeInstance(fRunMgr->GetConfig()->fMaxDepth);
-#ifdef USE_VECGEOM_NAVIGATOR
-  vecgeom::SimpleNavigator nav;
-  startpath->Clear();
-  nav.LocatePoint(GeoManager::Instance().GetWorld(),
-                  Vector3D<Precision>(eventinfo.xvert, eventinfo.yvert, eventinfo.zvert), *startpath, true);
-  vol = const_cast<Volume_t *>(startpath->Top()->GetLogicalVolume());
-  VBconnector *link = static_cast<VBconnector *>(vol->GetBasketManagerPtr());
-#else
-  TGeoNavigator *nav = gGeoManager->GetCurrentNavigator();
-  if (!nav)
-    nav = gGeoManager->AddNavigator();
-  TGeoNode *geonode = nav->FindNode(eventinfo.xvert, eventinfo.yvert, eventinfo.zvert);
-  vol = geonode->GetVolume();
-  VBconnector *link = static_cast<VBconnector *>(vol->GetFWExtension());
-  startpath->InitFromNavigator(nav);
-#endif
-  // There are needed for v2 only
-  fBindex = link->index;
-  td->fVolume = vol;
-  
-  // Populate event with primary tracks
+  // Populate event with primary tracks from the generator
   for (int itr=0; itr<ntracks; ++itr) {
     GeantTrack &track = td->GetNewTrack();
-    track.fParticle = event->AddPrimary(&track);
-    track.SetPrimaryParticleIndex(itr); 
-    track.SetPath(startpath);
-    track.SetNextPath(startpath);
-    track.SetEvent(evt);
-    fRunMgr->GetPrimaryGenerator()->GetTrack(itr, track);
-    if (!track.IsNormalized())
-      track.Print("Not normalized");
-    track.fBoundary = false;
-    track.fStatus = kNew;
-    event->fNfilled++;
-    if (fRunMgr->GetMCTruthMgr()) fRunMgr->GetMCTruthMgr()->AddTrack(track);
+    track.SetParticle(event->AddPrimary(&track));
+    fRunMgr->GetPrimaryGenerator()->GetTrack(itr, track, td);
   }
- 
+
   fGenLock.clear(std::memory_order_release);
   if (!AddEvent(event)) {
     error = 4;
@@ -177,53 +142,59 @@ GeantEvent *GeantEventServer::GenerateNewEvent(GeantTaskData *td, unsigned int &
 bool GeantEventServer::AddEvent(GeantEvent *event)
 {
 // Adds one event into the queue of pending events.
+  bool external_loop = fRunMgr->GetConfig()->fRunMode == GeantConfig::kExternalLoop;
   int evt = fNload.fetch_add(1);
+  if (external_loop) evt = event->GetEvent();
   event->SetEvent(evt);
-  if (fRunMgr->GetConfig()->fRunMode == GeantConfig::kExternalLoop) {
-    // The vertex must be defined
-    vecgeom::Vector3D<double> vertex = event->GetVertex();
-    int ntracks = event->GetNprimaries();
-    
-    // Initialize navigation path for the vertex
-    Volume_t *vol = 0;
-    // Initialize the start path
-    VolumePath_t *startpath = VolumePath_t::MakeInstance(fRunMgr->GetConfig()->fMaxDepth);
+  // The vertex must be defined
+  vecgeom::Vector3D<double> vertex = event->GetVertex();
+  int ntracks = event->GetNprimaries();
+
+  // start new event in MCTruthMgr
+  if(fRunMgr->GetMCTruthMgr()) fRunMgr->GetMCTruthMgr()->OpenEvent(evt);
+  
+  // Initialize navigation path for the vertex
+  //Volume_t *vol = 0;
+  // Initialize the start path
+  VolumePath_t *startpath = VolumePath_t::MakeInstance(fRunMgr->GetConfig()->fMaxDepth);
 #ifdef USE_VECGEOM_NAVIGATOR
-    vecgeom::SimpleNavigator nav;
-    startpath->Clear();
-    nav.LocatePoint(GeoManager::Instance().GetWorld(), vertex, *startpath, true);
-    vol = const_cast<Volume_t *>(startpath->Top()->GetLogicalVolume());
-    VBconnector *link = static_cast<VBconnector *>(vol->GetBasketManagerPtr());
+  vecgeom::SimpleNavigator nav;
+  startpath->Clear();
+  nav.LocatePoint(GeoManager::Instance().GetWorld(), vertex, *startpath, true);
+  //vol = const_cast<Volume_t *>(startpath->Top()->GetLogicalVolume());
+  //VBconnector *link = static_cast<VBconnector *>(vol->GetBasketManagerPtr());
 #else
-    TGeoNavigator *nav = gGeoManager->GetCurrentNavigator();
-    if (!nav)
-      nav = gGeoManager->AddNavigator();
-    TGeoNode *geonode = nav->FindNode(vertex.x(), vertex.y(), vertex.z());
-    vol = geonode->GetVolume();
-    VBconnector *link = static_cast<VBconnector *>(vol->GetFWExtension());
-    startpath->InitFromNavigator(nav);
+  TGeoNavigator *nav = gGeoManager->GetCurrentNavigator();
+  if (!nav)
+    nav = gGeoManager->AddNavigator();
+  //TGeoNode *geonode = nav->FindNode(vertex.x(), vertex.y(), vertex.z());
+  //vol = geonode->GetVolume();
+  //VBconnector *link = static_cast<VBconnector *>(vol->GetFWExtension());
+  startpath->InitFromNavigator(nav);
 #endif
-    // There are needed for v2 only
-    fBindex = link->index;
-    //td->fVolume = vol;
-    // Check and fix tracks
-    for (int itr=0; itr<ntracks; ++itr) {
-      GeantTrack &track = *event->GetPrimary(itr);
-      track.SetPrimaryParticleIndex(itr); 
-      track.SetPath(startpath);
-      track.SetNextPath(startpath);
-      track.SetEvent(evt);
-      if (!track.IsNormalized())
-        track.Print("Not normalized");
-      track.fBoundary = false;
-      track.fStatus = kNew;
-      event->fNfilled++;
-      if (fRunMgr->GetMCTruthMgr()) fRunMgr->GetMCTruthMgr()->AddTrack(track);
+
+  // Check and fix tracks
+  for (int itr=0; itr<ntracks; ++itr) {
+    GeantTrack &track = *event->GetPrimary(itr);
+    track.SetPrimaryParticleIndex(itr);
+    track.SetPath(startpath);
+    track.SetNextPath(startpath);
+    track.SetEvent(evt);
+    if (!track.IsNormalized()) {
+      track.Print("Not normalized");
+      track.Normalize();
     }
-    // Release path object
-    VolumePath_t::ReleaseInstance(startpath);
+    if (track.GVcode() < 0) {
+      Error("AddEvent", "GeantV particle codes not initialized. Looks like primary generator was not initialized !!!");
+      return false;
+    }
+    track.SetBoundary(false);
+    track.SetStatus(kNew);
+    event->fNfilled++;
+    if (fRunMgr->GetMCTruthMgr()) fRunMgr->GetMCTruthMgr()->AddTrack(track);
   }
-    
+  VolumePath_t::ReleaseInstance(startpath);
+
   if (!fPendingEvents.enqueue(event)) {
     // Should never happen
     Error("AddEvent", "Event pool is full");
@@ -258,7 +229,6 @@ bool GeantEventServer::AddEvent(GeantEvent *event)
     }
   }
  
-  bool external_loop = fRunMgr->GetConfig()->fRunMode == GeantConfig::kExternalLoop;
   if (external_loop && !fEvent.load()) {
     unsigned int error = 0;
     event = nullptr;
@@ -298,14 +268,14 @@ GeantEvent *GeantEventServer::ActivateEvent(GeantEvent *event, unsigned int &err
     fDoneEvents.enqueue(fEvents[slot]);
     fEvents[slot] = nullptr;
   }
-  
+
   // Get a new generated event from pending queue
   if (!fPendingEvents.dequeue(fEvents[slot])) {
     fFreeSlots.enqueue(slot);
     error = kCEvents;
     return nullptr;
   }
-  
+
   // Pre-activate slot and event number
   fEvents[slot]->SetSlot(slot);
   int nactive = fNactive.fetch_add(1) + 1;
@@ -324,7 +294,7 @@ GeantEvent *GeantEventServer::ActivateEvent(GeantEvent *event, unsigned int &err
     error = kNoerr;
     return event;
   }
-  
+
   // Check if all events were served
   if (fRunMgr->GetConfig()->fRunMode == GeantConfig::kGenerator) {
     if (nactive == fNevents) fEventsServed = true;
@@ -342,7 +312,7 @@ void GeantEventServer::CompletedEvent(GeantEvent *event, GeantTaskData *td)
 // Signals that event 'evt' was fully transported.
   size_t slot = event->GetSlot();
   fNcompleted++;
-  
+
   assert(event->Transported());
   assert(event == fEvents[slot]);
 
@@ -358,7 +328,7 @@ void GeantEventServer::CompletedEvent(GeantEvent *event, GeantTaskData *td)
 }
 
 //______________________________________________________________________________
-GeantTrack *GeantEventServer::GetNextTrack(unsigned int &error)
+GeantTrack *GeantEventServer::GetNextTrack(GeantTaskData *td, unsigned int &error)
 {
 // Fetch next track of the current event. Increments current event if no more
 // tracks. If current event matches last activated one, resets fHasTracks flag.

@@ -106,8 +106,10 @@ void GSMSCModel::StepLimit(Geant::GeantTrack *gtrack, Geant::GeantTaskData *td) 
   double lambtr1;
   double scra;
   double g1;
+  double pMCtoQ1;
+  double pMCtoG2PerG1;
   MSCdata &mscdata = fMSCdata.Data<MSCdata>(gtrack);
-  ComputeParameters(matCut, kineticEnergy, lambel, lambtr1, scra, g1);
+  ComputeParameters(matCut, kineticEnergy, lambel, lambtr1, scra, g1, pMCtoQ1, pMCtoG2PerG1);
   mscdata.fLambda0 = lambel;
   mscdata.fLambda1 = lambtr1;
   mscdata.fScrA    = scra;

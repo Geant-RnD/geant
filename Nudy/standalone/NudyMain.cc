@@ -38,6 +38,44 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
     return stream << static_cast<typename std::underlying_type<T>::type>(e);
 }
 
+void dumpVerb(){
+  // This simply transforms the raw ENDF data file to raw ROOT file
+  // without linearization etc.
+  std::string fInENDF="";
+  std::string fOutROOT="";
+
+  std::cout << "Enter ENDF data file name: ";
+  std::getline (std::cin,fInENDF);
+  std::cout << "Enter ROOT file name to produce: ";
+  std::getline(std::cin, fOutROOT);
+  if (fInENDF.length() < 1) nudyxs.printE2RErr();
+  nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
+}
+
+void DumpProcE2R() {
+    ////////////////////////////////////
+    // This is an example to show dumping of ENDF data file
+    // to ROOT file after computing resonance parameters, linearization etc.
+      // DumpEndf2Root(std::string fIN, std::string fOUT, std::string fSUBName,
+      // int tA, int tZ, double temp, std::string isotopeN)
+    std::string fEndfIN = "";
+    std::string fRootOUT = "";
+    std::string fEndfSubIN = "";
+    double temp = 293.60608;
+    std::cout << " ENDF data file name as INPUT: ";
+    std::getline(std::cin, fEndfIN);
+    std::cout << " ROOT data file name as OUTPUT: ";
+    std::getline(std::cin,fRootOUT);
+    std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ>: ";
+    std::getline(std::cin, fEndfSubIN);
+    //std::cout << " ENDFSUB data file name for fission data as INPUT: ";
+    //std::cin >> fEndfSubIN;
+    std::cout << "Temperature: "; std::cin >> temp;
+    temp = (temp == 0.0) ? 293.60608 : temp;
+    nudyxs.DumpEndf2Root(fEndfIN, fEndfSubIN, fRootOUT, temp);
+    //////////////////////////////////
+}
+
 void CalXS() {
     int projectileCode = 2112;
     std::string eleName =  "Pu";
@@ -72,12 +110,32 @@ void CalXS() {
 }
 
 
-int main(int /*argc*/, char** /*argv*/) { 
-	CalXS();
+int main(int /*argc*/, char** /*argv*/) {
+std::cout << " Select choise:----"                                                   << std::endl
+          << "\t 1. Dump ENDF data file to ROOT verbatim. "                          << std::endl
+		      << "\t 2. Dump ENDF data file to ROOT after processing, linearizing etc. " << std::endl
+		      << "\t 3. Compute cross section example for 94-Pu-241 for 14 Mev neutron." << std::endl
+		      << "\t 4. Quit."                                                           << std::endl
+          << "\t \t ENTER CHOICE:--->";
+int cInput;
+do {
+  std::cin >> cInput ;
+} while (cInput < 1 || cInput > 4);
+
+std::cout << std::endl;
+std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+switch (cInput) {
+  case 1: dumpVerb();
+          exit(0);
+  case 2: DumpProcE2R();
+          exit(0);
+  case 3: CalXS();
+  case 4: exit(0);
+}
 
 
 
-//  The following part was taken from hadronic Test by Witek *******************
 
 /*
   double kinEnergy = 10.* geant::MeV;

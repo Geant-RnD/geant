@@ -93,6 +93,7 @@ public:
   StackLikeBuffer *fStackBuffer = nullptr; /** Stack buffer tor this thread */
   TrackStat *fStat = nullptr;              /** Track statictics */
   NumaTrackBlock_t *fBlock = nullptr;      /** Current track block */
+  BasketCounters *fCounters[kNstages];     /** Counters for stage handlers */
 
 #ifdef VECCORE_CUDA
   char fPool[sizeof(std::deque<GeantBasket *>)]; // Use the same space ...
