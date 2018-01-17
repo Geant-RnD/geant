@@ -140,14 +140,22 @@ void PhysListGVStandard::ConstructProcess()
       ph->RegisterProcess(new G4eBremsstrahlung(), particle);
       //
 //      ph->RegisterProcess(new G4eplusAnnihilation(), particle);
-    } else if (particleName=="proton" || particleName=="pi-"   || particleName=="pi+" ||
-	             particleName=="pi0"    || particleName=="kaon+" || particleName=="kaon-") {
+
+    } else if( particleName == "proton" ||
+               particleName == "pi-" ||
+               particleName == "pi+" ||
+	       particleName == "pi0" ||
+	       particleName == "kaon+" ||
+	       particleName == "kaon-"
+	       ) {
+
       G4HadronElastic* lhep = new G4HadronElastic();
       G4HadronElasticProcess* hel = new G4HadronElasticProcess();
       hel->AddDataSet(new G4CrossSectionElastic(new G4ComponentGGHadronNucleusXsc()));
       hel->RegisterMe(lhep);
 
       ph->RegisterProcess(hel, particle);
+
     }
   }
 

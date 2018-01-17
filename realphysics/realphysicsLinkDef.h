@@ -113,3 +113,16 @@
 #pragma link C++ class geantphysics::Spline+;
 
 #endif
+
+/********************
+ * We try to resolve linking issue for Nudy
+ ********************/
+#ifdef __CINT__
+#pragma link C++ class geantphysics::NudyCrossSection+;
+#pragma link C++ class geantphysics::NudyCrossSectionStore+;
+#pragma link C++ class geantphysics::NudyProcess+;
+#pragma link C++ class geantphysics::NudyFinalStateModel+;
+#pragma link C++ class geantphysics::NudyFinalStateModelStore+;
+#pragma link C++ class NudyPhysics::NudyInterface+;
+
+#endif

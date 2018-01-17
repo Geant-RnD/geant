@@ -1,8 +1,13 @@
 #----------------------------------------------------------------------------------------------
 # Add source files & include directories
 #
-file(GLOB sources ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/src/*.cc)
-file(GLOB headers ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/inc/*.h)
+file(GLOB sources
+ ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/src/*.cc
+)
+
+file(GLOB headers
+ ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/inc/*.h
+)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/inc/
@@ -11,22 +16,32 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/vecprot_v2/inc/
   ${CMAKE_SOURCE_DIR}/base/inc/
   ${CMAKE_SOURCE_DIR}/material/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
   ${CMAKE_SOURCE_DIR}/realphysics/dummies/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/EM/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/utils/inc
+  ${CMAKE_SOURCE_DIR}/realphysics/physics/processes/HAD/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/cross_sections/HAD/inc
+  ${CMAKE_SOURCE_DIR}/realphysics/physics/models/HAD/inc
+  ${CMAKE_SOURCE_DIR}/Nudy/inc
+
   )
 
 #----------------------------------------------------------------------------------------------
 # Executable
 #
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/testRP/xsectionsTest/GeantV)
+
 add_executable(xsectionsTest ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/xsectionsTest.cc ${sources})
-target_link_libraries(xsectionsTest -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Geant_v ${VECGEOM_LIBRARIES})
+target_link_libraries(xsectionsTest -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Nudy Geant_v ${VECGEOM_LIBRARIES})
+
+add_executable(xsTestNudy ${CMAKE_SOURCE_DIR}/testRP/GeantV/xsectionsTest/xsTestNudy.cc ${sources})
+target_link_libraries(xsTestNudy -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Material RealPhysics Geant_v Nudy ${VECGEOM_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS xsectionsTest DESTINATION bin/testRP/xsectionsTest)
+install(TARGETS xsTestNudy DESTINATION bin/testRP/xsTestNudy)

@@ -18,7 +18,16 @@
 #include "TNudyEndfEnergyAng.h"
 #include "TNudyEndfFissionYield.h"
 #include "TNudyCore.h"
+#include "TNudyEndfPhYield.h"
+#include "TNudyEndfPhProd.h"
+#include "TNudyEndfPhAng.h"
+#include "TNudyEndfPhEnergy.h"
 #include "TNudyEndfRecoPoint.h"
+#include "TTree.h"
+#include "TH1D.h"
+
+using namespace Nudy;
+using namespace NudyPhysics;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfRecoPoint)
@@ -42,11 +51,11 @@ void TNudyEndfRecoPoint::ReadFile3(TNudyEndfFile *file)
 {
   TIter secIter(file->GetSections());
   TNudyEndfSec *sec;
+  int mt1multi = -1;
   while ((sec = (TNudyEndfSec *)secIter.Next())) {
-    // std::cout <<"MT  "<<sec->GetMT() <<std::endl;
     int MT = sec->GetMT();
     if (MT != 1 && MT != 3 && MT != 4 && MT != 27 && MT != 19 && MT != 20 && MT != 21 && MT != 38 && MT != 101 &&
-        MT < 250) {
+        (MT < 120 || MT >= 600) ) {
       MtNumbers.push_back(MT);
       TIter recIter(sec->GetRecords());
       TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
@@ -61,13 +70,25 @@ void TNudyEndfRecoPoint::ReadFile3(TNudyEndfFile *file)
         eLinearFile3.push_back(tab1->GetX(crs));
         xLinearFile3.push_back(tab1->GetY(crs));
       }
-      if (MT==1) {
-         energyMts.insert(std::end(energyMts),std::begin(eLinearFile3),std::end(eLinearFile3));
-         sigmaMts.insert(std::end(sigmaMts),std::begin(xLinearFile3),std::end(xLinearFile3));
-      } else {
-         sigmaOfMts.push_back (eLinearFile3);
-         sigmaOfMts.push_back (xLinearFile3);
+      eneTemp.insert(std::end(eneTemp),std::begin(eLinearFile3),std::end(eLinearFile3));
+      eneTemp.insert(std::end(eneTemp),std::begin(xLinearFile3),std::end(xLinearFile3));
+      eLinearFile3.clear();
+      xLinearFile3.clear();
+      sigmaOfMts.push_back (eneTemp);
+      eneTemp.clear();
+    } if (MT==1 && mt1multi==-1){
+      mt1multi = 0;
+      TIter recIter(sec->GetRecords());
+      TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
+      NR = header->GetN1();
+      NP = header->GetN2();
+      TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)(sec->GetRecords()->At(0));
+      for (int crs = 0; crs < NP; crs++) {
+        eLinearFile3.push_back(tab1->GetX(crs));
+        xLinearFile3.push_back(tab1->GetY(crs));
       }
+      energyMts.insert(std::end(energyMts),std::begin(eLinearFile3),std::end(eLinearFile3));
+      sigmaMts.insert(std::end(sigmaMts),std::begin(xLinearFile3),std::end(xLinearFile3));
       eLinearFile3.clear();
       xLinearFile3.clear();
     }
@@ -79,6 +100,11 @@ void TNudyEndfRecoPoint::ReadFile3(TNudyEndfFile *file)
 }
 void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 {
+  //TFile *f = new TFile("testetau235.root", "recreate");
+  //TTree *eta =new TTree("eta","a Tree with fast fission data");
+  //TH1D *h1 = new TH1D("h1", "", 150, -5, 8);
+  //TH1D *h2 = new TH1D("h2", "", 150, -5, 8);
+  //TH1D *h3 = new TH1D("h3", "", 150, -5, 8);
   elemId      = ielemId;
   TFile *rEND = TFile::Open(rENDF);
   //  TFile *rEND = TFile::Open(rENDF,"UPDATE");
@@ -129,47 +155,96 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
         if (flagRead != 1) {
           recoNuPh = new TNudyEndfNuPh(file);
           flagRead = 1;
-          std::cout << "file 1 OK: Should be printed only one time " << std::endl;
+          // std::cout << "file 1 OK: Should be printed only one time " << std::endl;
         }
         break;
       case 2:
         break;
       case 3:
-        { 
+        {
           ReadFile3(file);
           TIter secIter(file->GetSections());
           TNudyEndfSec *sec;
           while ((sec = (TNudyEndfSec *)secIter.Next())) {
-    //    std::cout <<"MT  "<<sec->GetMT() <<std::endl;
-             int MT = sec->GetMT();
-             if (MT != 3 && MT != 4 && MT != 27 && MT != 19 && MT != 20 && MT != 21 && MT != 38 && MT != 101 && MT < 250) {
-                if (MT == 1) {
-                   eneUni.push_back (energyMts);
-                   sigUniT.push_back (sigmaMts);
-                   continue;
-                }
-                fixupTotal(energyMts);
-             }
-          }
-                 energyMts.clear();
-                 sigmaMts.clear();
+	    int MT = sec->GetMT();
+	    if (MT == 1) {
+		eneUni.push_back (energyMts);
+		sigUniT.push_back (sigmaMts);
+	      break;
+	    }
+	  }
+	  fixupTotal(energyMts);
+//	  double sigfis, sigcap;
+//	  std::vector<double> energ, etavalue;
+//	  std::vector<double> energjunk, etajunk;
+//	  eta->Branch("energy",&energ);
+//	  eta->Branch("eta",&etavalue);
+//	  std::cout<<"hello rrebin  "<<energyMts.size()<<std::endl;
+//	    for (unsigned int j1 = 1; j1 < energyMts.size() ; j1++){
+//	       for(unsigned int j2 = 0; j2 < MtValues[0].size(); j2++){
+//	          if(MtValues[0][j2] ==18)sigfis = GetSigmaPartial(0, j2, energyMts[j1]);
+//	          if(MtValues[0][j2] ==102)sigcap = GetSigmaPartial(0, j2, energyMts[j1]);
+//	       }
+// 	       if (recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis)>0){
+// 		h1->Fill(log10(energyMts[j1]),recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis));
+// 		h2->Fill(log10(energyMts[j1]));
+// 	       }
+// 	       energ.push_back(energyMts[j1]);
+// 	       etavalue.push_back(recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis));
+//	      std::cout<< energyMts[j1] <<"  "<< recoNuPh->GetNuTotal(0, energyMts[j1])/(1+sigcap/sigfis) << std::endl;
+	//    }
+// 	    for(int j = 0; j < 150; j++){
+// 	      double num = h1->GetBinContent(j);
+// 	      int    num2 = h2->GetBinContent(j);
+// 	      if ( num >0 && num2 > 0)h3->SetBinContent(j,num/num2);
+// 	      std::cout<<j<<"  "<<num<<"  "<<num2<<"  "<<num/num2 << std::endl;
+// 	    }
+// 	  std::cout<<"hello eta "<<std::endl;
+// 	       eta->Fill();
+// 	       f->Write();
+	  energyMts.clear();
+	  sigmaMts.clear();
         }break;
       case 4:
+        //std::cout << "before file 4 " << std::endl;
         recoAng = new TNudyEndfAng(file);
-        std::cout << "file 4 OK " << std::endl;
+        //std::cout << "file 4 OK " << std::endl;
         break;
       case 5:
+        //std::cout << "before file 5 " << std::endl;
         recoEnergy = new TNudyEndfEnergy(file);
-        std::cout << "file 5 OK " << std::endl;
+        //std::cout << "file 5 OK " << std::endl;
         break;
       case 6:
+        //std::cout << "before file 6 " << std::endl;
         recoEnergyAng = new TNudyEndfEnergyAng(file, QValue);
-        std::cout << "file 6 OK " << std::endl;
+        //std::cout << "file 6 OK " << std::endl;
         break;
       case 8:
+        //std::cout << "before file 8 " << std::endl;
         recoFissY = new TNudyEndfFissionYield(file);
-        std::cout << "file 8 OK " << std::endl;
+        //std::cout << "file 8 OK " << std::endl;
         break;
+// //       case 12:
+// //         std::cout << "before file 12 " << std::endl;
+// // 	recoPhYield = new TNudyEndfPhYield(file);
+// // 	std::cout<<"file 12 OK "<<std::endl;
+// // 	break;
+// //       case 13:
+// //         std::cout << "before file 13 " << std::endl;
+// // 	recoPhProd = new TNudyEndfPhProd(file);
+// // 	std::cout<<"file 13 OK "<<std::endl;
+// // 	break;
+        case 14:
+          //std::cout << "before file 14 " << std::endl;
+  	recoPhAng = new TNudyEndfPhAng(file);
+  	//std::cout<<"file 14 OK "<<std::endl;
+  	break;
+// //       case 15:
+// //         std::cout << "before file 15 " << std::endl;
+// // 	recoPhEnergy = new TNudyEndfPhEnergy(file);
+// // 	std::cout<<"file 15 OK "<<std::endl;
+// // 	break;
       }
     }
   }
@@ -177,9 +252,9 @@ void TNudyEndfRecoPoint::GetData(int ielemId, const char *rENDF)
 //------------------------------------------------------------------------------------------------------
 void TNudyEndfRecoPoint::fixupTotal(std::vector<double> &x1)
 {
-
   for (unsigned long i = 0; i < sigmaOfMts.size(); i++) {
     int size = sigmaOfMts[i].size()/ 2;
+    int flagLoc = -1 ;
     for (unsigned long k = 0; k < x1.size(); k++) {
       int min = 0;
       int max = size - 1;
@@ -187,7 +262,7 @@ void TNudyEndfRecoPoint::fixupTotal(std::vector<double> &x1)
       if (x1[k] <= sigmaOfMts[i][min])
         min = 0;
       else if (x1[k] >= sigmaOfMts[i][max])
-        min = max - 1;
+        min = max;
       else {
         while (max - min > 1) {
           mid = (min + max) / 2;
@@ -197,12 +272,13 @@ void TNudyEndfRecoPoint::fixupTotal(std::vector<double> &x1)
             min = mid;
         }
       }
-      if (x1[k] == sigmaOfMts[i][min] && sigmaOfMts[i][size + min] > 1E-20) {
+      if (x1[k] == sigmaOfMts[i][min] && sigmaOfMts[i][size + min] > 0) {
         eneTemp.push_back(x1[k]);
         sigTemp.push_back(sigmaOfMts[i][size + min]);
       }
-      if (eneTemp.size() == 1) {
+      if (eneTemp.size() == 1 && flagLoc == -1) {
         energyLocationMts.push_back(k);
+	flagLoc = 0;
       }
     }
     sigmaUniOfMts.push_back(sigTemp);
@@ -221,19 +297,20 @@ double TNudyEndfRecoPoint::GetSigmaTotal(int ielemId, double energyK)
   int min = 0;
   int max = eneUni[ielemId].size() - 1;
   int mid = 0;
-  if (energyK <= eneUni[ielemId][min])
+  if (energyK <= eneUni[ielemId][min]){
     min = 0;
-  else if (energyK >= eneUni[ielemId][max])
+  }else if (energyK >= eneUni[ielemId][max]) {
     min = max - 1;
-  else {
+  } else {
     while (max - min > 1) {
       mid = (min + max) / 2;
-      if (energyK < eneUni[ielemId][mid])
+      if (energyK < eneUni[ielemId][mid]){
         max = mid;
-      else
+      }else{
         min = mid;
     }
   }
+}
   return sigUniT[ielemId][min] +
          (sigUniT[ielemId][min + 1] - sigUniT[ielemId][min]) * (energyK - eneUni[ielemId][min]) /
              (eneUni[ielemId][min + 1] - eneUni[ielemId][min]);
@@ -241,6 +318,7 @@ double TNudyEndfRecoPoint::GetSigmaTotal(int ielemId, double energyK)
 //------------------------------------------------------------------------------------------------------
 double TNudyEndfRecoPoint::GetSigmaPartial(int ielemId, int i, double energyK)
 {
+  //std::cout<< eneUni[ielemId].size() <<std::endl;
   int min = 0;
   int max = eneUni[ielemId].size() - 1;
   int mid = 0;
@@ -258,9 +336,9 @@ double TNudyEndfRecoPoint::GetSigmaPartial(int ielemId, int i, double energyK)
     }
   }
   int minp = min - energyLocMtId[ielemId][i];
-  // for (unsigned int j1 = 0; j1 < eneUni[ielemId].size(); j1++)
-  // std::cout << eneUni[ielemId][j1] <<"  "<<  sigUniOfMt[ielemId][i][minp] << std::endl;
-  if (minp < 0) return 0;
+//     for (unsigned int j1 = 0; j1 < eneUni[ielemId].size(); j1++)
+//       std::cout << eneUni[ielemId][j1] <<"  "<< sigUniOfMt[ielemId][i][j1] <<"  "<< sigUniOfMt[ielemId][i].size() << std::endl;
+  if (minp <= 0) return 0;
   if (minp >= (int)sigUniOfMt[ielemId][i].size()) return 0;
   return sigUniOfMt[ielemId][i][minp] +
          (sigUniOfMt[ielemId][i][minp + 1] - sigUniOfMt[ielemId][i][minp]) * (energyK - eneUni[ielemId][min]) /
@@ -340,6 +418,11 @@ double TNudyEndfRecoPoint::GetMt5(int ielemId, int mt)
     }
   }
   return -1;
+}
+//-------------------------------------------------------------------------------------------------------
+int TNudyEndfRecoPoint::GetMt6Neutron(int ielemId, int mt)
+{
+  return recoEnergyAng->GetMt6Neutron(ielemId, mt);
 }
 //-------------------------------------------------------------------------------------------------------
 double TNudyEndfRecoPoint::GetMt6(int ielemId, int mt)

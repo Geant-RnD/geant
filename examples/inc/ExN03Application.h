@@ -38,6 +38,7 @@ class ExN03Application : public Geant::GeantVApplication {
   static const int kNlayers = 15;
   static const int kMaxThreads = 36;
   using GeantRunManager = Geant::GeantRunManager;
+  using PrimaryGenerator = Geant::PrimaryGenerator;
   using GeantEvent = Geant::GeantEvent;
   using EventSet = Geant::EventSet;
   using GeantTrack_v = Geant::GeantTrack_v;
@@ -47,6 +48,7 @@ class ExN03Application : public Geant::GeantVApplication {
 
 private:
   bool fInitialized;                       /** Initialized flag */
+  PrimaryGenerator *fGenerator;            /** Generator used in external loop mode */
   int fIdGap;                              /** ID for the gap volume */
   int fIdAbs;                              /** ID for the absorber volume */
   // These are needed only for v2
@@ -78,6 +80,15 @@ public:
   /** @brief Destructor ExN03Application */
   virtual ~ExN03Application() {}
 
+  /** @brief In external event loop mode, this aplication can use an internal generator */
+  void SetGenerator(PrimaryGenerator *gen);
+
+  /** @brief Generate an event set to be processed by a single task.
+       Not required as application functionality, the event reading or generation
+       can in the external event loop.
+  */
+  EventSet* GenerateEventSet(size_t nevents, GeantTaskData *td);
+
   /**
    * @brief Method called at initialization allowing to attach user data to the
    * task data whiteboard. Called by every worker. in the initialization phase.
@@ -93,7 +104,7 @@ public:
   virtual void SteppingActions(GeantTrack &/*track*/, GeantTaskData */*td*/);
 
   /** @brief  User FinishEvent function.*/
-  virtual void FinishEvent(GeantEvent *event);
+  virtual void FinishEvent(int evt, int slot);
 
   /** @brief User FinishRun function */
   virtual void FinishRun() {}

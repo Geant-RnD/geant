@@ -239,11 +239,16 @@ void UserPhysicsList::Initialize() {
       AddProcessToParticle(particle, photoelectricProc);
 
     }
-    if (particle==geantphysics::Proton::Definition()    || particle==geantphysics::Neutron::Definition()   ||
-	      particle==geantphysics::PionPlus::Definition()  || particle==geantphysics::PionMinus::Definition() ||
-	      particle==geantphysics::PionZero::Definition()  || particle==geantphysics::KaonPlus::Definition()  ||
-	      particle==geantphysics::KaonMinus::Definition() || particle==geantphysics::KaonZero::Definition()  ||
-	      particle==geantphysics::KaonShort::Definition() || particle==geantphysics::KaonLong::Definition()) {
+    if (particle==geantphysics::Proton::Definition() ||
+	particle==geantphysics::Neutron::Definition() ||
+	particle==geantphysics::PionPlus::Definition() ||
+	particle==geantphysics::PionMinus::Definition() ||
+	particle==geantphysics::PionZero::Definition() ||
+	particle==geantphysics::KaonPlus::Definition() ||
+	particle==geantphysics::KaonMinus::Definition() ||
+	particle==geantphysics::KaonZero::Definition() ||
+	particle==geantphysics::KaonShort::Definition() ||
+	particle==geantphysics::KaonLong::Definition()) {
       // create hadronic elastic process for proton:
       //
       geantphysics::HadronicProcess *helProc = new geantphysics::ElasticScatteringProcess();

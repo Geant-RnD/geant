@@ -116,7 +116,7 @@ GeantTrack &GeantTrack::operator=(const GeantTrack &other) {
     fBoundary = other.fBoundary;
     fPending = other.fPending;
     fStage = other.fStage;
-    fIsOnBoundaryPreStp = other.fIsOnBoundaryPreStp;
+    fGeneration = other.fGeneration;
     fVolume = other.fVolume;
 
     // Copy user data

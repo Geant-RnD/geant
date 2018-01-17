@@ -27,7 +27,7 @@ using std::max;
 
 //______________________________________________________________________________
 ExN03Application::ExN03Application(GeantRunManager *runmgr)
-  : GeantVApplication(runmgr), fInitialized(false), fIdGap(0), fIdAbs(0), fFactory(0) {
+  : GeantVApplication(runmgr), fInitialized(false), fGenerator(nullptr), fIdGap(0), fIdAbs(0), fFactory(0) {
   // Ctor..
   GeantFactoryStore *store = GeantFactoryStore::Instance();
   fFactory = store->GetFactory<MyHit>(16, runmgr->GetNthreadsTotal());
@@ -79,8 +79,44 @@ bool ExN03Application::Initialize() {
 #endif
   // Register user data and get a handle for it with the task data manager
   fDigitsHandle = fRunMgr->GetTDManager()->RegisterUserData<ExN03ScoringData>("ExN03digits");
+  if (fGenerator) fGenerator->InitPrimaryGenerator();
   fInitialized = true;
   return true;
+}
+
+//______________________________________________________________________________
+void ExN03Application::SetGenerator(Geant::PrimaryGenerator *gen)
+{ 
+  fGenerator = gen;
+}
+
+//______________________________________________________________________________
+Geant::EventSet *ExN03Application::GenerateEventSet(size_t nevents, Geant::GeantTaskData *td)
+{
+  using EventSet = Geant::EventSet;
+  using GeantEvent = Geant::GeantEvent;
+  using GeantEventInfo = Geant::GeantEventInfo;
+  using GeantTrack = Geant::GeantTrack;
+  
+  EventSet *evset = new EventSet(nevents);
+  for (size_t i=0 ; i< nevents; ++i) {
+    GeantEvent *event = new GeantEvent();
+    GeantEventInfo event_info = fGenerator->NextEvent(td);
+    while (event_info.ntracks == 0) {
+      printf("Discarding empty event\n");
+      event_info = fGenerator->NextEvent(td);
+    }
+    event->SetNprimaries(event_info.ntracks);
+    event->SetVertex(event_info.xvert, event_info.yvert, event_info.zvert);
+    for (int itr = 0; itr < event_info.ntracks; ++itr) {
+      GeantTrack &track = td->GetNewTrack();
+      track.fParticle = event->AddPrimary(&track);
+      track.SetPrimaryParticleIndex(itr);
+      fGenerator->GetTrack(itr, track, td);
+    }
+    evset->AddEvent(event);
+  }
+  return evset;
 }
 
 //______________________________________________________________________________
@@ -120,15 +156,16 @@ void ExN03Application::SteppingActions(GeantTrack &track, GeantTaskData *td)
 }
 
 //______________________________________________________________________________
-void ExN03Application::FinishEvent(GeantEvent *event) {
+void ExN03Application::FinishEvent(int evt, int slot) {
   // User method to digitize a full event, which is at this stage fully transported
+  GeantEvent *event = fRunMgr->GetEvent(slot);
   //   printf("======= Statistics for event %d:\n", event);
   // Merge the digits for the event
   ExN03ScoringData *digits = fRunMgr->GetTDManager()->MergeUserData(event->GetSlot(), *fDigitsHandle);
   if (digits) {
     printf("=== Merged digits for event %d\n", event->GetEvent());
     //digits->PrintDigits(event);
-    digits->Clear(event->GetSlot());
+    digits->Clear(slot);
   }
   return;
   printf("Energy deposit [MeV/primary] and cumulated track length [cm/primary] per layer");
