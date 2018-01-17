@@ -11,6 +11,7 @@
 
 // from application
 #include "TARCGeometryConstruction.h"
+#include "TARC.h"
 
 // from GeantV
 #include "PrimaryGenerator.h"
@@ -67,6 +68,7 @@ namespace userapplication{
     int         fGVPartIndex;         // Internal GV particle index of the primary
     double      fPrimaryKE;           // KE of the primary in internal [energy] unit
 
+    vecgeom::Vector3D<double> fGunPos;
     double      fXPos;                // (x, y, z) position of the primary particles in internal [length] unit
     double      fYPos;
     double      fZPos;

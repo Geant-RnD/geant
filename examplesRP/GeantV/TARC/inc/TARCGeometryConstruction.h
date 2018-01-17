@@ -51,40 +51,44 @@ namespace geantphysics {
 }
 
 namespace userapplication {
-class TARCGeometryConstruction : public Geant::GeantVDetectorConstruction {
-public:
-  // Constructor
-  TARCGeometryConstruction(Geant::GeantRunManager *runmgr);
-  // Destructor
-  ~TARCGeometryConstruction();
+  class TARCGeometryConstruction : public Geant::GeantVDetectorConstruction {
+  public:
+    // Constructor
+    TARCGeometryConstruction(Geant::GeantRunManager *runmgr);
+    // Destructor
+    ~TARCGeometryConstruction();
 
-  // create materials for the setup
-  //virtual void CreateMaterials();
+    // create materials for the setup
+    //virtual void CreateMaterials();   // Material is already defined in the GDML file
 
-  // interface method to define the geometry for the application
-  virtual void CreateGeometry();
+    // interface method to define the geometry for the application
+    virtual void CreateGeometry();
 
-private:
-  //const char *
-  std::string GeomFileName = "tarc_geometry.root";
-  std::string             fTargetMatName;
-  int                     fTargetLogicalVolumeID;
-  int                     fTargetRegionIndx;
-  double                  fTargetYZ;
-  double                  fTargetX;
-  double                  fWorldYZ;
-  double                  fWorldX;
+    void SetLVList(vecgeom::LogicalVolume *inpLV){ fLVolumeList.push_back(inpLV); }
+    void SetPVList(vecgeom::VPlacedVolume *inpPV){ fPVolumeList.push_back(inpPV); }
 
-  geantphysics::Material *fTargetMaterial;
-  geantphysics::Material *fWorldMaterial;
+  private:
+    //const char *
+    std::string GeomFileName = "tarc_geometry.root";
+    std::string             fTargetMatName;
+    //int                     fTargetLogicalVolumeID;
+    //int                     fTargetRegionIndx;
+    double                  fTargetXY;
+    double                  fTargetZ;
+    double                  fWorldXY;
+    double                  fWorldZ;
 
-  geantphysics::Material *fPb;
-  geantphysics::Material *fSteel;
-  geantphysics::Material *fAir;
-  geantphysics::Material *fGapMaterial;
-  geantphysics::Material *fAbsorberMaterial;
-};  // CLASS closes here
+    double                  fGammaCut;
+    double                  fElectronCut;
+    double                  fPositronCut;
 
-} // namepsac eends here
+    std::vector<vecgeom::LogicalVolume*> fLVolumeList;
+    std::vector<vecgeom::VPlacedVolume*> fPVolumeList;
+
+    geantphysics::Material *fTargetMaterial;
+    geantphysics::Material *fWorldMaterial;
+  };  // CLASS closes here
+
+} // namespace eends here
 
 #endif   // DETECTORCONSTRUCTION_

@@ -10,7 +10,18 @@
 #include <iostream>
 #include <unistd.h>
 
+#ifdef USE_ROOT
+#include "Rtypes.h"
+#include "TGeoManager.h"
+#endif
+
+#ifdef USE_ROOT
+class TGeoManager;
+class TGeoMaterial;
+#endif
+
 // GeantV include
+#include "GeantVDetectorConstruction.h"
 #include "GeantRunManager.h"
 
 // real-physics includes
@@ -22,6 +33,7 @@
 #include "TARC.h"
 #include "TARCGeometryConstruction.h"
 #include "TARCPrimaryGenerator.h"
+#include "TARCPhysicsList.h"
 
 //#include "UserPhysicsList.h"
 
@@ -30,12 +42,13 @@ int parConfigNumPropagators    = 1;    // Number of propagators per working thre
 int parConfigNumThreads        = 4;    // Number of working threads;
 
 void SetupUserDetector             (userapplication::TARCGeometryConstruction*     tarcGeom);
-void SetupUserPrimaryGenerator     (userapplication::TARCPrimaryGenerator*         tarcGUN);
+void SetupUserPrimaryGenerator     (userapplication::TARCPrimaryGenerator*          tarcGUN);
+void SetupUserPhysicsList          (userapplication::TARCPhysicsList*              tarcPhys);
 void SetupUserApplication          (userapplication::TARC*                              app);
+
 Geant::GeantRunManager* RunManager();
 
-int main(int argc, char* argv[]) {
-
+int main(int argc, char** argv) {
   Geant::GeantRunManager *runManager = RunManager();
 
   // Here setup the TARC Geometry
@@ -47,6 +60,11 @@ int main(int argc, char* argv[]) {
   userapplication::TARCPrimaryGenerator *primGenerator = new userapplication::TARCPrimaryGenerator(tarcGeom);
   SetupUserPrimaryGenerator(primGenerator);
   runManager->SetPrimaryGenerator(primGenerator);
+
+  // Here setup physics List
+  userapplication::TARCPhysicsList *tarcPhysList       = new userapplication::TARCPhysicsList("test");
+  SetupUserPhysicsList(tarcPhysList);
+  geantphysics::PhysicsListManager::Instance().RegisterPhysicsList(tarcPhysList);
 
   // Here setup TARC application
   userapplication::TARC *tarcApplication = new userapplication::TARC(runManager, tarcGeom, primGenerator);
@@ -75,12 +93,30 @@ Geant::GeantRunManager* RunManager() {
 
 // Setup detector
 void SetupUserDetector(userapplication::TARCGeometryConstruction* tarcGeom) {
+  std::string GeomFileName = "tarc_geometry.root";
+  std::string rootGeomFilePath = std::getenv("TARCGDMLPATH");
+  rootGeomFilePath += "/" + GeomFileName;
+  const char* rootGeomFile = rootGeomFilePath.c_str();
+  // bool wasLoaded = GeantVDetectorConstruction::LoadGeometry(GeomFileName);
+  bool wasLoaded = Geant::GeantVDetectorConstruction::LoadGeometry(rootGeomFile);
+  if (!wasLoaded){
+    std::cout << "Error in loading the GDML file." << std::endl;
+    return;
+  } else {
+    std::cout << GeomFileName << " loaded." <<std::endl;
+  }
+
   std::cout << " Visited SetupUserDetector function." << std::endl;
 }
 
 //Setup primary generator
 void SetupUserPrimaryGenerator(userapplication::TARCPrimaryGenerator* tarcGUN) {
   std::cout << " Inside primary Generator setting." << std::endl;
+}
+
+// Setup Physics List
+void SetupUserPhysicsList(userapplication::TARCPhysicsList* tarcPhys) {
+  std::cout << " Visited Phys List." << std::endl;
 }
 
 // Setup application

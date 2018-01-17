@@ -5,7 +5,7 @@ using namespace geantphysics;
 using namespace geant;
 
 namespace userapplication {
-  TARCPrimaryGenerator::TARCPrimaryGenerator( const TARCGeometryConstruction *geomTARC) : fGeometry(geomTARC) {
+  TARCPrimaryGenerator::TARCPrimaryGenerator( const TARCGeometryConstruction *geomTARC) : fGeomSetup(geomTARC) {
     fPrimaryParticleName          = "proton";
     fPrimaryPerEvent              = 1;
     fParticle                     = nullptr;
@@ -15,9 +15,9 @@ namespace userapplication {
     fXPos                         = 0.0;
     fYPos                         = 0.0;
     fZPos                         = 0.0;
-    fXDir                         = 1.0;
+    fXDir                         = 0.0;
     fYDir                         = 0.0;
-    fZDir                         = 0.0;
+    fZDir                         = 1.0;
     fMass                         = 0.0;
     fCharge                       = 0.0;
     fEnergyTotal                  = 0.0;
@@ -40,7 +40,15 @@ namespace userapplication {
     fCharge              = fParticle->GetPDGCharge();
     fEnergyTotal         = fPrimaryKE + fMass;
     fMomentumTotal       = std::sqrt((fEnergyTotal - fMass) * ( fEnergyTotal + fMass));
-    //fXPos
+
+    
+    fXPos                = 0;
+    fYPos                = 0;
+    fZPos                = 0;
+
+    fXDir                = 0.0;
+    fYDir                = 0.0;
+    fZDir                = 1.0;
   }
 
   Geant::GeantEventInfo TARCPrimaryGenerator::NextEvent() {

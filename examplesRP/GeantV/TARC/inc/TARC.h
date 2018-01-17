@@ -26,7 +26,6 @@
 #include "volumes/LogicalVolume.h"
 #include "volumes/PlacedVolume.h"
 
-
 #include "Region.h"
 
 #include "GeantEvent.h"
@@ -83,15 +82,18 @@ namespace userapplication {
 
   public:
     void RetrieveLogicalVolumesFromGDML(){
-      vecgeom::GeoManager::Instance().GetAllLogicalVolumes(fLogiVolumeList);
+      vecgeom::GeoManager::Instance().GetAllLogicalVolumes(fLVolumeList);
     }
 
+    void RetrievePlacedVolumesFromGDML() {
+      vecgeom::GeoManager::Instance().getAllPlacedVolumes(fPVolumeList);
+    }
 
-
-  public:
     virtual bool Initialize(); // @brief Interface to Initialize application
 
-
+    virtual vecgeom::Vector3D<double> GetGun() { return fGunPos; }
+    virtual void SetGun(double x, double y, double z) { fGunPos[0] = x; fGunPos[1] = y; fGunPos[2] = z; }
+    virtual void fixGun();
 
   private:
     TARC(const TARC &) = delete;
@@ -99,12 +101,14 @@ namespace userapplication {
 
   private:
     bool fInitialized;
-    std::vector<vecgeom::LogicalVolume*> fLogiVolumeList;
+    std::vector<vecgeom::LogicalVolume*> fLVolumeList;
+    std::vector<vecgeom::VPlacedVolume*> fPVolumeList;
     int fNumPrimaryPerEvent;
     int fNumBufferedEvents;
     TARCGeometryConstruction *fGeomSetup;
     TARCPrimaryGenerator *fPrimaryGun;
     std::mutex fMutex;
+    vecgeom::Vector3D<double> fGunPos;
 
   };  // class ends
 

@@ -13,41 +13,73 @@ using namespace Geant;
 
 namespace userapplication {
 
-TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun)
-: Geant::GeantVApplication(runmgr), fGeomSetup(geom), fPrimaryGun(gun){
-  fInitialized           = false;
-  fNumPrimaryPerEvent    = -1;
-  fNumBufferedEvents     = -1;
-}
-
-TARC::~TARC(){}
-
-bool TARC::Initialize() {
-  if (fInitialized) return true;
-  std::cout << " Initializing......" << std::endl;
-  if (!fGeomSetup) {
-    Geant::Error("TARC::Initialize", "Geometry is not available!");
-    return false;
+  TARC::TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun)
+  : Geant::GeantVApplication(runmgr), fGeomSetup(geom), fPrimaryGun(gun){
+    fInitialized           = false;
+    fNumPrimaryPerEvent    = -1;
+    fNumBufferedEvents     = -1;
   }
 
- RetrieveLogicalVolumesFromGDML(); // Retrieve asscoiated Logical volumes and place in array
+  TARC::~TARC(){}
 
-std::cout << " There are in total " << fLogiVolumeList.size() << " logical volumes \n";
+  bool TARC::Initialize() {
+    if (fInitialized) return true;
+    std::cout << " Initializing......" << std::endl;
+    if (!fGeomSetup) {
+      Geant::Error("TARC::Initialize", "Geometry is not available!");
+      return false;
+    }
 
- for (size_t i=0; i<fLogiVolumeList.size(); ++i) {
-    Material *mat = (Material*)fLogiVolumeList[i]->GetMaterialPtr();
-    vecgeom::Region *reg = fLogiVolumeList[i]->GetRegion();
+    RetrieveLogicalVolumesFromGDML();
+    RetrievePlacedVolumesFromGDML();
+    fixGun();
 
-    std::cout << " LogicalVolume with name = " << fLogiVolumeList[i]->GetLabel()
-              << " id-> " << fLogiVolumeList[i]->id()
-              << " has material -> " << mat->GetName()
-              << " in Region = " << reg->GetName() << " index " << reg->GetIndex()
-              << std::endl;
+    fInitialized = true;
+
+    std::cout <<"Fixing the Gun position at :--> " << fGunPos <<  " OK " << std::endl;
+    for (auto iLV : fLVolumeList) {
+      std::cout << iLV->GetLabel() << "   " << iLV->id() << std::endl;
+      // fGeomSetup->SetLVList(iLV);
+    }
+
+    if (!fPrimaryGun) {
+      Geant::Error("TARC::Initialize","PrimaryGenerator not available!");
+      return false;
+    }
+
+
+    exit(0);
+    return true;
   }
 
-  fInitialized = true;
-  return true;
-}
+  void TARC::fixGun() {
+    Vector3D<double> minVal(0.0, 0.0, 0.0);
+    Vector3D<double> maxVal(0.0, 0.0, 0.0);
+    Vector3D<double> myGunPoint(0., 0., 0.);
+    double maxX = -999999.99, minX = -maxX, maxY = maxX, minY = minX, maxZ = maxX, minZ = minZ;
+    VPlacedVolume *beamLine;
+    Transformation3D const *transUsed;
+    for (auto iPV : fPVolumeList) {
+      std::string placedName = iPV->GetLabel();
+      if (placedName.find("beam")!=std::string::npos){
+        iPV->GetUnplacedVolume()->Extent(minVal, maxVal);
+        myGunPoint.x() = 0.5 * (maxVal.x() + minVal.x());
+        myGunPoint.y() = 0.5 * (maxVal.y() + minVal.y());
+        myGunPoint.z() = 0.5 * (maxVal.z() + minVal.z());
+        beamLine = vecgeom::GeoManager::Instance().FindPlacedVolume(placedName.c_str());
+        transUsed = beamLine->GetTransformation();
+        SetGun(
+         transUsed->InverseTransform(myGunPoint).x(),
+         transUsed->InverseTransform(myGunPoint).y(),
+         transUsed->InverseTransform(myGunPoint).z()
+       );
 
+       maxZ = std::max(maxZ, fGunPos.z());
+       minZ = std::min(minZ, fGunPos.z());
+     }
+     fGunPos.z() = minZ;
+     fGunPos.z() -= 1000.0*geant::mm;
+   }
+ }
 
 } // namespace ends Here

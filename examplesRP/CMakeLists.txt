@@ -45,6 +45,7 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARC.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCGeometryConstruction.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPrimaryGenerator.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPhysicsList.cxx
   )
 
 set(headers
@@ -66,6 +67,7 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/Hist.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCGeometryConstruction.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCPrimaryGenerator.h
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCPhysicsList.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARC.h
   )
 

@@ -7,4 +7,5 @@
 #pragma link C++ class TARC+;
 #pragma link C++ class TARCGeometryConstruction+;
 #pragma link C++ class TARCPrimaryGenerator+;
+#pragma link C++ class TARCPhysicsList+;
 #endif
