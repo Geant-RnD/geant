@@ -38,18 +38,13 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
     return stream << static_cast<typename std::underlying_type<T>::type>(e);
 }
 
-void CalXS() {
+void CalcXS() {
     int projectileCode = 2112;
     std::string eleName =  "Pu";
     int AtomicNumber  =  94; // 4; //
     int MassNumber = 241; // 7;   //
     double temperature = 293.60608;
     double EnergyValue = 14.0 * geant::MeV; // 1.0e+5; // 2.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
-
-    //pType = geantphysics::HadronicProcessType::kElastic;  // kFission;
-    //pType = geantphysics::HadronicProcessType::kFission;  // kElastic;
-    //pType = geantphysics::HadronicProcessType::kCapture;
-    //pType = geantphysics::HadronicProcessType::kRadioactiveDecay;
 
   // @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
   // @brief Then we provide temperature which is required for fission etc.
@@ -61,10 +56,13 @@ void CalXS() {
 
   pType = geantphysics::NudyProcessType::kElastic;
   double xse = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
+  
   pType = geantphysics::NudyProcessType::kFission;
   double xsf = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
+  
   pType = geantphysics::NudyProcessType::kCapture;
   double xsc = nudyxs.GetXS(projectileCode, Eval, temperature, eleName, AtomicNumber, MassNumber, pType);
+  
   std::cout << "Neutron Energy = " << EnergyValue/geant::MeV << " MeV " << " Isotope "
             << AtomicNumber << "-" << eleName << "-" << MassNumber
             << " Elastic :: XS = " << xse << " Fission :: XS = " << xsf << " Capture :: XS = " << xsc
@@ -73,13 +71,19 @@ void CalXS() {
 
 
 int main(int /*argc*/, char** /*argv*/) { 
-	CalXS();
+	CalcXS();
 
 
 
 //  The following part was taken from hadronic Test by Witek *******************
 
 /*
+
+    //pType = geantphysics::HadronicProcessType::kElastic;  // kFission;
+    //pType = geantphysics::HadronicProcessType::kFission;  // kElastic;
+    //pType = geantphysics::HadronicProcessType::kCapture;
+    //pType = geantphysics::HadronicProcessType::kRadioactiveDecay;
+
   double kinEnergy = 10.* geant::MeV;
   double maxEnergy = 1000 * geant::GeV;
   int particlePDG = -321;
