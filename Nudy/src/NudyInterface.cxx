@@ -121,7 +121,9 @@ double NudyPhysics::NudyInterface::GetXS( int projCode, double projKE, double te
 
   // Create and process with NUDY with keywords
   Nudy::TNudyENDF *procX = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
+
   procX->SetPreProcess (0) ;  // make comment if wrong
+
   procX->SetLogLev(0);
   procX->Process();
 

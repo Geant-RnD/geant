@@ -73,8 +73,6 @@ void CalcXS() {
 int main(int /*argc*/, char** /*argv*/) { 
 	CalcXS();
 
-
-
 //  The following part was taken from hadronic Test by Witek *******************
 
 /*
