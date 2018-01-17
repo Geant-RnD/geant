@@ -43,9 +43,10 @@
 
 #include "base/Vector3D.h"
 #include "base/Global.h"
+#include <SystemOfUnits.h>
 #include <Geant/VectorTypes.h>
 
-#include "Units.h"
+//#include "Units.h"
 
 #define FORCE_INLINE   1
 
@@ -117,9 +118,9 @@ public:
     //  Invariants -- parameters of the field 
     // static constexpr float millimeter = 0.1;             // Equal to Native GeantV unit
     // static constexpr float tesla = 10.0;                 // Navite unit = KiloGauss
-    static constexpr float tesla     = fieldUnits::tesla; 
-    static constexpr float kilogauss = fieldUnits::kilogauss;
-    static constexpr float millimeter = fieldUnits::millimeter;
+    static constexpr float tesla     = geant::tesla; 
+    static constexpr float kilogauss = geant::kilogauss;
+    static constexpr float millimeter = geant::millimeter;
    
     const float kRMax   = 9000.  * millimeter;   //  Maximum value of R =  9.00 meters
     const float kZMax   = 16000. * millimeter;   //  Max value of Z = 16.00 meters
@@ -322,7 +323,7 @@ void CMSmagField::Gather2(const vecCore::Index<Real_v> index,
   Index_v ind1z = ind1 + kNumZ;
   Index_v ind2z = ind2 + kNumZ;
   B1[2] = vecCore::Gather<Real_v>( addr, ind1z );
-  B1[3] = vecCore::Gather<Real_v>( addr, ind2z );
+  B2[2] = vecCore::Gather<Real_v>( addr, ind2z );
 }
 
 // Scalar specialization
