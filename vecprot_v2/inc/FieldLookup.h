@@ -43,8 +43,9 @@ class FieldLookup
    VECCORE_ATT_HOST_DEVICE   
    void GetFieldValue( const vecgeom::Vector3D<double>& Position,
                              vecgeom::Vector3D<double>& MagFieldValue, // Out
-                             double                   & bmag,
-                       const GeantTaskData            * td );
+                             double                   & bmag // ,
+                       // const GeantTaskData            * td
+      );
 
 #if 0   
    /**
@@ -57,13 +58,14 @@ class FieldLookup
    VECCORE_ATT_HOST_DEVICE
    void GetFieldValue( const vecgeom::Vector3D<double> & Position,
                              double                      BfieldOut[3],
-                             double                    & bmag,
-                       const Geant::GeantTaskData      * td                          
+                             double                    & bmag // ,
+                       // const Geant::GeantTaskData      * td                          
          );
 #endif
 
    static void SetFieldConfig( FieldConfig* fldCfg ) { fFieldConfig = fldCfg; }
-   static const FieldConfig* GetFieldConfig const ( return fFieldConfig; }
+
+   static FieldConfig* /*const*/ GetFieldConfig() { return fFieldConfig; }
    
 private:
    // static VVectorField               *fFieldObj;         // To get value of the field!
