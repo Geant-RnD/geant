@@ -14,7 +14,9 @@
 #define FIELD_LOOKUP_H
 
 #include "Geant/Typedefs.h"
-#include "VScalarField.h"
+#include "VVectorField.h"
+
+#include "FieldConfig.h"
 
 namespace Geant {
 inline namespace GEANT_IMPL_NAMESPACE {
@@ -60,9 +62,14 @@ class FieldLookup
          );
 #endif
 
-   /* @brief Ensure that either a uniform field is set or a field class is registered. */
-   static   
-      bool CheckConfig( const Geant::GeantTaskData * td );
+   static void SetFieldConfig( FieldConfig* fldCfg ) { fFieldConfig = fldCfg; }
+   static const FieldConfig* GetFieldConfig const ( return fFieldConfig; }
+   
+private:
+   // static VVectorField               *fFieldObj;         // To get value of the field!
+   // static vecgeom::Vector3D<double>  fConstFieldValue;   // Value - if field is constant.
+   // static bool                       fBfieldIsConst;      /** Flag - is the B field constant ?  */
+   static FieldConfig* fFieldConfig;
 };
 
 }

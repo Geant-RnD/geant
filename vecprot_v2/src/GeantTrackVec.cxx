@@ -36,7 +36,7 @@
 #include "ConstFieldHelixStepper.h"
 #include "GeantScheduler.h"
 
-#include "VScalarField.h"
+// #include "VVectorField.h"
 #include "Units.h"     //  Field Units - to be 'unified'
 #include "GUFieldPropagatorPool.h"
 #include "GUFieldPropagator.h"
