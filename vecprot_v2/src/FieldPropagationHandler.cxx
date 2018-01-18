@@ -433,7 +433,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   
   if( fieldConfig->IsFieldUniform() )
   {
-     vecgeom::Vector3D<double> BfieldUniform= td->fConstFieldValue;
+     vecgeom::Vector3D<double> BfieldUniform= fieldConfig->GetUniformFieldValue();
      ConstFieldHelixStepper stepper( BfieldUniform );
      // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), stepSize,
      //                                        PositionNew, DirectionNew);

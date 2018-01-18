@@ -12,12 +12,12 @@
 namespace Geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
-FieldLookup::fFieldConfig= nullptr;
+FieldConfig* FieldLookup::fFieldConfig= nullptr;
 
 VECCORE_ATT_HOST_DEVICE
 void FieldLookup::GetFieldValue( const vecgeom::Vector3D<double>& Position,
                                        vecgeom::Vector3D<double>& MagFieldOut,
-                                       double                   & bmag
+                                       double                   & bmagOut
                                  // , const Geant::GeantTaskData     * td  => Not needed !!
    )
 {
@@ -30,7 +30,7 @@ void FieldLookup::GetFieldValue( const vecgeom::Vector3D<double>& Position,
    
    if( fFieldConfig->IsFieldUniform() ) {
       MagFieldOut= fFieldConfig->GetUniformFieldValue();
-      bmag=        fFieldConfig->GetUniformFieldmag();
+      bmag=        fFieldConfig->GetUniformFieldMag();
    }
    else // if( pField )
    {
@@ -41,6 +41,7 @@ void FieldLookup::GetFieldValue( const vecgeom::Vector3D<double>& Position,
       // printf(" GeantTrack_v::GetFieldValue> Field at ( %f %f %f ) is (%f %f %f) kGauss - mag = %f \n",
          //       Position.x(), Position.y(), Position.z(), MagFldD.x(), MagFldD.y(), MagFldD.z(), *bmag );
    }
+   bmagOut= bmag;
 }
 
 #if 0
