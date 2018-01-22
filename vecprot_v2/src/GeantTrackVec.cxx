@@ -37,7 +37,7 @@
 #include "GeantScheduler.h"
 
 // #include "VVectorField.h"
-#include "Units.h"     //  Field Units - to be 'unified'
+#include "SystemOfUnits.h"
 #include "GUFieldPropagatorPool.h"
 #include "GUFieldPropagator.h"
 #include "FieldLookup.h"
@@ -1777,8 +1777,8 @@ int GeantTrack_v::PropagateTracks(GeantTaskData *td) {
        numCharged++;
        GetFieldValue( itr, Bfield, &bmag);
        // td->StoreFieldValue(itr, Bfield, bmag);   // Store it in Task-Data array !?
-       straightTraj = bmag < 1.E-10 * fieldUnits::kilogauss;
-       // printf("bmag = %9.3g kiloGauss\n", bmag / fieldUnits::kilogauss );
+       straightTraj = bmag < 1.E-10 * geant::kilogauss;
+       // printf("bmag = %9.3g kiloGauss\n", bmag / geant::kilogauss );
     } else {
        // td->ClearFieldValue(itr);
        numNeutral++;

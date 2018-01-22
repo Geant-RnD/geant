@@ -105,6 +105,7 @@ FieldPropagatorFactory::CreatePropagator( // Field_t&              gvField,
    )
 {
   // using Equation_t =  TMagFieldEquation<Field_t,Nvar>;
+  const char *methodName= "FieldPropagatorFactory::CreatePropagator";
   GUFieldPropagator* fieldPropagator = nullptr;
 
   // constexpr double epsTol = 3.0e-4;               // Relative error tolerance of integration
@@ -113,7 +114,8 @@ FieldPropagatorFactory::CreatePropagator( // Field_t&              gvField,
   fieldPropagator =
      new GUFieldPropagator(&integrDriver, relEpsilonTolerance, flexDriver );
 
-  std::cout << " - Integration constraint:  eps_tol= " << relEpsilonTolerance << std::endl;
+  std::cout << methodName << " ( scalar, double, flex-driver ) called "
+            << " - Integration constraint:  eps_tol= " << relEpsilonTolerance << std::endl;
   // Geant::Printf("FieldPropagatorFactory::CreatePropagator",  
   //             "Parameters for RK integration in magnetic field: \n - Integration constraint:  eps_tol=  %8.3g\n",
   //              relEpsilonTolerance); 
@@ -131,6 +133,10 @@ FieldPropagatorFactory::CreatePropagator(Field_t&  gvField,
                                          double    relativeTolerance,
                                          double    minStep )
 {
+   const char *methodName= "FieldPropagatorFactory::CreatePropagator";
+   const char *methodSig=  "( templated<Field_t> field, double, double )";
+   std::cout << methodName << " " << methodSig << " called " << std::endl;
+   
    auto  // ScalarIntegrationDriver
       scalarDriver = CreateScalarDriver( gvField, relativeTolerance, minStep );
    FlexIntegrationDriver*  // auto

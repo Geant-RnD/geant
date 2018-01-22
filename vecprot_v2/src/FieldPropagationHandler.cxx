@@ -47,7 +47,26 @@ FieldPropagationHandler::~FieldPropagationHandler()
 // Destructor
 }
 
-        
+//______________________________________________________________________________
+GUFieldPropagator *
+FieldPropagationHandler::Initialize(GeantTaskData * td)
+{          
+#ifndef VECCORE_CUDA_DEVICE_COMPILATION
+  bool useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;   
+  GUFieldPropagator *fieldPropagator = nullptr;
+  if( useRungeKutta ){
+     // Initialize for the current thread -- move to GeantPropagator::Initialize() or per thread Init method
+     static GUFieldPropagatorPool* fieldPropPool= GUFieldPropagatorPool::Instance();
+     assert( fieldPropPool );
+     
+     fieldPropagator = fieldPropPool->GetPropagator(td->fTid);
+     assert( fieldPropagator );
+     td->fFieldPropagator= fieldPropagator;
+  }
+  return fieldPropagator;
+#endif          
+}
+
 //______________________________________________________________________________
 // Curvature for general field   
 VECCORE_ATT_HOST_DEVICE
@@ -55,12 +74,14 @@ double FieldPropagationHandler::Curvature(const GeantTrack  & track) const
 {
   using ThreeVector_d = vecgeom::Vector3D<double>;
   constexpr double tiny = 1.E-30;
+  constexpr double inv_kilogauss = 1.0 / geant::kilogauss;  
   ThreeVector_d MagFld;
   double bmag= 0.0;
 
   ThreeVector_d Position(track.X(), track.Y(), track.Z());
   FieldLookup::GetFieldValue(Position, MagFld, bmag); // , td);
-
+  bmag *= inv_kilogauss;
+  
   //  Calculate transverse momentum 'Pt' for field 'B'
   // 
   ThreeVector_d Momentum( track.Dx(), track.Dy(), track.Dz() );
@@ -83,8 +104,8 @@ void FieldPropagationHandler::DoIt(GeantTrack *track, Basket& output, GeantTaskD
   double step, lmax;
   const double eps = 1.E-2; //
 
-  std::cout <<" FieldPropagationHandler::DoIt called " << std::endl;
-  
+  // std::cout <<" FieldPropagationHandler::DoIt(*track) called for 1 ptrTrack." << std::endl;
+     
   // We use the track sagitta to estimate the "bending" error,
   // i.e. what is the propagated length for which the track deviation in
   // magnetic field with respect to straight propagation is less than epsilon.
@@ -138,8 +159,11 @@ void FieldPropagationHandler::DoIt(Basket &input, Basket& output, GeantTaskData 
   TrackVec_t &tracks = input.Tracks();
   double lmax;
   const double eps = 1.E-2; //
-
+  
   int ntracks = tracks.size();
+  std::cout <<" FieldPropagationHandler::DoIt(baskets) called for " << ntracks
+            << " tracks." << std::endl;
+  
   double *steps = td->GetDblArray(ntracks);
   for (int itr = 0; itr < ntracks; itr++) {
     // Can this loop be vectorized?
@@ -255,18 +279,20 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 // - safety step (bdr=0)
 // - snext step (bdr=1)
 
-   std::cout << "FieldPropagationHandler::PropagateInVolume called for 1 track" << std::endl;
+   // std::cout << "FieldPropagationHandler::PropagateInVolume called for 1 track" << std::endl;
    
    using ThreeVector = vecgeom::Vector3D<double>;  
    bool useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;
-   // double bmag = td->fPropagator->fConfig->fBmag;
-   double bmag;
-   ThreeVector BfieldInitial;      // double BfieldInitial[3]
+   double bmag= -1.0;
+   ThreeVector BfieldInitial;
    ThreeVector Position(track.X(), track.Y(), track.Z());
-   FieldLookup::GetFieldValue(Position, BfieldInitial, bmag); // , td);
+   FieldLookup::GetFieldValue(Position, BfieldInitial, bmag);
 
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
-   auto fieldPropagator = GetFieldPropagator(td);   
+   auto fieldPropagator = GetFieldPropagator(td);
+   if( !fieldPropagator ) {
+      fieldPropagator= Initialize(td);
+   }
 #endif
 
   // Reset relevant variables
@@ -288,7 +314,8 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 #ifdef USE_VECGEOM_NAVIGATOR
 //  CheckLocationPathConsistency(i);
 #endif
-  double curvaturePlus= fabs(GeantTrack::kB2C * track.Charge() * bmag) / (track.P() + 1.0e-30);  // norm for step
+  constexpr double inv_kilogauss = 1.0 / geant::kilogauss;
+  double curvaturePlus= fabs(GeantTrack::kB2C * track.Charge() * (bmag* inv_kilogauss)) / (track.P() + 1.0e-30);  // norm for step
   
   constexpr double numRadiansMax= 10.0; // Too large an angle - many RK steps.  Potential change -> 2.0*PI;
   constexpr double numRadiansMin= 0.05; // Very small an angle - helix is adequate.  TBC: Use average B-field value?
@@ -297,26 +324,27 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
   bool mediumAngle = ( numRadiansMin < angle ) && ( angle < numRadiansMax );
   useRungeKutta = useRungeKutta && (mediumAngle);
 
+  // if( angle > 0.000001 ) std::cout << " ang= " << angle << std::endl;
   bool dominantBz =  std::fabs( std::fabs(BfieldInitial[2]) )
      > 1.e3 * std::max( std::fabs( BfieldInitial[0]), std::fabs(BfieldInitial[1]) );
 
-#ifdef DEBUG_FIELD
+// #ifdef DEBUG_FIELD
   printf("--PropagateInVolume(Single): \n");
-  printf("Curvature= %8.4g   CurvPlus= %8.4g  step= %f   Bmag=%8.4g   momentum mag=%f  angle= %g\n"
-         Curvature(td, i), curvaturePlus, crtstep, bmag, track.P(), angle );
-#endif
+  printf("Curvature= %8.4g   CurvPlus= %8.4g  step= %f   Bmag=%8.4g   momentum mag=%f  angle= %g\n",
+         Curvature(track), curvaturePlus, crtstep, bmag*inv_kilogauss, track.P(), angle );
+// #endif
 
   ThreeVector Direction(track.Dx(), track.Dy(), track.Dz());
   ThreeVector PositionNew(0.,0.,0.);
   ThreeVector DirectionNew(0.,0.,0.);
 
-#ifndef VECCORE_CUDA
+// #ifndef VECCORE_CUDA
   if( useRungeKutta ) {
      fieldPropagator->DoStep(Position,    Direction,    track.Charge(), track.P(), crtstep,
                              PositionNew, DirectionNew);
   }
   else
-#endif
+// #endif
   {
      constexpr double toKiloGauss= 1.0e+14; // Converts to kilogauss -- i.e. 1 / Unit::kilogauss
                                             // Must agree with values in magneticfield/inc/Units.h
