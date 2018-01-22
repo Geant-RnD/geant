@@ -314,6 +314,8 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 #ifdef USE_VECGEOM_NAVIGATOR
 //  CheckLocationPathConsistency(i);
 #endif
+
+#if 0  
   constexpr double inv_kilogauss = 1.0 / geant::kilogauss;
   double curvaturePlus= fabs(GeantTrack::kB2C * track.Charge() * (bmag* inv_kilogauss)) / (track.P() + 1.0e-30);  // norm for step
   
@@ -323,16 +325,17 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
   const double angle= crtstep * curvaturePlus;
   bool mediumAngle = ( numRadiansMin < angle ) && ( angle < numRadiansMax );
   useRungeKutta = useRungeKutta && (mediumAngle);
+#endif
 
   // if( angle > 0.000001 ) std::cout << " ang= " << angle << std::endl;
   bool dominantBz =  std::fabs( std::fabs(BfieldInitial[2]) )
      > 1.e3 * std::max( std::fabs( BfieldInitial[0]), std::fabs(BfieldInitial[1]) );
 
-// #ifdef DEBUG_FIELD
+#ifdef DEBUG_FIELD
   printf("--PropagateInVolume(Single): \n");
   printf("Curvature= %8.4g   CurvPlus= %8.4g  step= %f   Bmag=%8.4g   momentum mag=%f  angle= %g\n",
          Curvature(track), curvaturePlus, crtstep, bmag*inv_kilogauss, track.P(), angle );
-// #endif
+#endif
 
   ThreeVector Direction(track.Dx(), track.Dy(), track.Dz());
   ThreeVector PositionNew(0.,0.,0.);
