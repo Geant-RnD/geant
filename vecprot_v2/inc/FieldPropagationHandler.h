@@ -70,6 +70,10 @@ private:
   VECCORE_ATT_HOST_DEVICE
   void PropagateInVolume(TrackVec_t &tracks, const double *crtstep, GeantTaskData *td);
 
+  /** @brief Ensure that connection is made with thread's FieldPropagator */
+  VECCORE_ATT_HOST_DEVICE
+  GUFieldPropagator * Initialize(GeantTaskData * td);
+   
   /** @brief Curvature for general field    */
   VECCORE_ATT_HOST_DEVICE
   double Curvature(const GeantTrack &track ) const;
@@ -106,14 +110,19 @@ SafeLength(const GeantTrack &track, double eps)
 //______________________________________________________________________________
 // VECCORE_ATT_HOST_DEVICE -- not yet
 GUFieldPropagator *
-FieldPropagationHandler::GetFieldPropagator( GeantTaskData *td)
+FieldPropagationHandler::GetFieldPropagator( GeantTaskData *td )
 {
    GUFieldPropagator *fieldPropagator = nullptr;
    bool useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;
-   
+
+   // static GUFieldPropagatorPool* fieldPropPool= GUFieldPropagatorPool::Instance();
+   // if( useRungeKutta && fieldPropPool ){
+   //    fieldPropagator = fieldPropPool->GetPropagator(td->fTid);
+   //    assert( fieldPropagator );  // To assert, it must be initialised !!
+   // }
    if( useRungeKutta ){
       fieldPropagator = td->fFieldPropagator;
-      assert( fieldPropagator );
+      // assert( fieldPropagator );  // To assert, it must be initialised !!
    }
    // GUFieldPropagator *fieldPropagator = useRungeKutta ? td->fFieldPropagator : nullptr;
    return fieldPropagator;
