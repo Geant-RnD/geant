@@ -162,8 +162,8 @@ protected:
 
 public:
   // Methods for Multi-treading
-  CMSmagField* CloneOrSafeSelf( bool* pSafe );
-   // VVectorField*    Clone() const override;
+  // CMSmagField* CloneOrSafeSelf( bool* pSafe );
+  // VVectorField*    Clone() const override;
 
   enum  kIndexRPhiZ { kNumR = 0, kNumPhi= 1, kNumZ = 2 } ;
 private: 
@@ -434,6 +434,7 @@ void CMSmagField::GetFieldValue(const Vector3D<Real_v>      &pos,
 
 // This class is thread safe.  So other threads can use the same instance
 //
+/*
 CMSmagField* CMSmagField::CloneOrSafeSelf( bool* pSafe )
 {
    if( pSafe ) *pSafe= true;
@@ -444,4 +445,5 @@ VVectorField* CMSmagField::Clone() const
 {
    return new CMSmagField( *this );
 }
+*/
 #endif
