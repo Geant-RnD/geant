@@ -164,8 +164,8 @@ protected:
 
 public:
   // Methods for Multi-treading
-  CMSmagField* CloneOrSafeSelf( bool* pSafe );
-   // VVectorField*    Clone() const override;
+  // CMSmagField* CloneOrSafeSelf( bool* pSafe );
+  // VVectorField*    Clone() const override;
 
   enum  kIndexRPhiZ { kNumR = 0, kNumPhi= 1, kNumZ = 2 } ;
 private: 

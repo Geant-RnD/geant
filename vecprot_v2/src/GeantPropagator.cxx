@@ -468,7 +468,7 @@ int GeantPropagator::CreateSimulationStages()
   //        V
   GetStage(kPropagationStage)->SetFollowUpStage(kPostPropagationStage, false);
   // Follow-up not unique: stuck tracks are killed -> SteppingActions
-  GetStage(kPropagationStage)->SetBasketizing(false);
+  GetStage(kPropagationStage)->SetBasketizing(true);
   //        V
   //        V
   //        V
