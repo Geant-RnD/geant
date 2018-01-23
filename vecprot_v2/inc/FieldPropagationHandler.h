@@ -70,10 +70,6 @@ private:
   VECCORE_ATT_HOST_DEVICE
   void PropagateInVolume(TrackVec_t &tracks, const double *crtstep, GeantTaskData *td);
 
-  /** @brief Ensure that connection is made with thread's FieldPropagator */
-  VECCORE_ATT_HOST_DEVICE
-  GUFieldPropagator * Initialize(GeantTaskData * td);
-   
   /** @brief Curvature for general field    */
   VECCORE_ATT_HOST_DEVICE
   double Curvature(const GeantTrack &track ) const;
@@ -86,6 +82,20 @@ private:
   /** @brief Function that return Field Propagator, i.e. the holder of (RK) Integration Driver */
   GEANT_FORCE_INLINE   
   GUFieldPropagator * GetFieldPropagator(GeantTaskData *td);
+
+  // - Book keeping methods for task data
+   
+  /** @brief Connect with thread's FieldPropagator & create working buffers */
+  VECCORE_ATT_HOST_DEVICE
+  GUFieldPropagator * Initialize(GeantTaskData * td);
+
+  /** @brief Cleanup the thread working buffers */
+  VECCORE_ATT_HOST_DEVICE   
+  void Cleanup(GeantTaskData * td);
+
+  /** @brief Clear the old buffers and create new working buffers */
+  VECCORE_ATT_HOST_DEVICE
+  void ClearAndResizeBuffers( size_t nTracks, GeantTaskData *td );
 };
 
 // ---------------------------------------------------------------------------------          

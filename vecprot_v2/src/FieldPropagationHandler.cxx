@@ -15,6 +15,7 @@
 // #include "SOA6D.h"
 #include "Geant/VectorTypes.h"   // Defines Geant::Double_v etc
 
+#include "WorkspaceForFieldPropagation.h"
 #include "FlexIntegrationDriver.h"
 
 #ifdef USE_VECGEOM_NAVIGATOR
@@ -50,10 +51,11 @@ FieldPropagationHandler::~FieldPropagationHandler()
 //______________________________________________________________________________
 GUFieldPropagator *
 FieldPropagationHandler::Initialize(GeantTaskData * td)
-{          
+{
+  GUFieldPropagator *fieldPropagator = nullptr;   
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
   bool useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;   
-  GUFieldPropagator *fieldPropagator = nullptr;
+
   if( useRungeKutta ){
      // Initialize for the current thread -- move to GeantPropagator::Initialize() or per thread Init method
      static GUFieldPropagatorPool* fieldPropPool= GUFieldPropagatorPool::Instance();
@@ -63,8 +65,20 @@ FieldPropagationHandler::Initialize(GeantTaskData * td)
      assert( fieldPropagator );
      td->fFieldPropagator= fieldPropagator;
   }
+
+  size_t basketSize = td->fPropagator->fConfig->fNperBasket;
+  td->fSpace4FieldProp = new WorkspaceForFieldPropagation(basketSize);
+#endif
+  // For the moment return the field Propagator.
+  // Once this method is called by the framework, this can be obtained from td->fFieldPropagator
   return fieldPropagator;
-#endif          
+}
+
+//______________________________________________________________________________
+void FieldPropagationHandler::Cleanup(GeantTaskData * td)
+{
+   delete td->fSpace4FieldProp;
+   td->fSpace4FieldProp = nullptr;
 }
 
 //______________________________________________________________________________
@@ -428,16 +442,17 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   int        intCharge[nTracks];
   double     fltCharge[nTracks];
   
-  // Choice 1.   SOA3D
-  SOA3D<double> position3D(nTracks);   // To-Do: Move into TaskData: 
-  SOA3D<double> direction3D(nTracks); // Alternative to momentum
+  // Choice 1.  SOA3D
+  auto  wsp = td->fSpace4FieldProp; // WorkspaceForFieldPropagation *
+  if( (size_t) nTracks > wsp->capacity() ){
+     ClearAndResizeBuffers(nTracks, td);
+  }
+  SOA3D<double>& position3D  = * (wsp->fPositionInp);
+  SOA3D<double>& direction3D = * (wsp->fDirectionInp);
   double        momentumMag[nTracks];
 
-  // SOA3D<double> momentum3D(nTracks);   
-
-  //    ==> CheckSize(position3D, nTracks);
-  SOA3D<double> PositionOut(nTracks);   // To-Do: Move into TaskData: 
-  SOA3D<double> DirectionOut(nTracks);
+  SOA3D<double>& PositionOut  = * (wsp->fPositionOutp);
+  SOA3D<double>& DirectionOut = * (wsp->fDirectionOutp);
   
   // Choice 2.   SOA6D
   // SOA6D<double> PositMom6D( nTracks );
@@ -597,6 +612,14 @@ bool FieldPropagationHandler::IsSameLocation(GeantTrack &track, GeantTaskData *t
     track.SetStatus(kExitingSetup);
   if (track.GetStep() < 1.E-8) td->fNsmall++;
   return false;
+}
+
+//______________________________________________________________________________________
+VECCORE_ATT_HOST_DEVICE
+void FieldPropagationHandler::ClearAndResizeBuffers( size_t nTracks, GeantTaskData *td )
+{
+   auto   wsp = td->fSpace4FieldProp;
+   wsp->ClearAndResize( nTracks );
 }
 
 } // GEANT_IMPL_NAMESPACE
