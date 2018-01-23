@@ -118,6 +118,11 @@ inline namespace GEANT_IMPL_NAMESPACE {
 
     protected:
       void CalculateDerived();
+      
+      template<typename Real_v>
+         GEANT_FORCE_INLINE
+         bool
+         CheckModulus( Real_v& newdirX_v, Real_v& newdirY_v, Real_v & newdirZ_v ) const;
 
     private:
       double fBx, fBy, fBz;
@@ -181,7 +186,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                BaseDType & dx, BaseDType & dy, BaseDType & dz
              ) const
   {
-     Vector3D_t startPosition = { x0, y0, z0 };
+     Vector3D_t startPosition( x0, y0, z0 );
      Vector3D_t startDirection( dirX0, dirY0, dirZ0 );
      Vector3D_t   endPosition,   endDirection;
 
@@ -293,10 +298,12 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                         int np
                      ) const
    {
-       const int vectorSize= vecgeom::kVectorSize;
+       const size_t vectorSize= vecCore::VectorSize<Real_v>();
        using vecCore::Load;
        using vecCore::Store;
        using vecCore::Set;
+
+       std::cout << " --- ConstFieldHelixStepper::DoStepArr called." << std::endl;
 
        int i;
        for ( i=0; i < np ; i+= vectorSize )
@@ -322,7 +329,9 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
             Load( oldDirz_v,  &dirz[i] );
             Load( momentum_v, &momentum[i] );
             Load( stepSz_v,   &step[i] );
-            
+
+            CheckModulus<Real_v>( oldDirx_v, oldDiry_v, oldDirz_v );
+
             DoStep<vecgeom::Vector3D<Real_v>, Real_v, vecCore::Index<Real_v>>
                ( oldPosx_v, oldPosy_v, oldPosz_v,
                     // Real_v(posx[i]), Real_v(posy[i]), Real_v(posz[i]),
@@ -334,6 +343,9 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                  newposx_v, newposy_v, newposz_v,
                  newdirx_v, newdiry_v, newdirz_v
                );
+
+            CheckModulus /*<Real_v>*/( newdirx_v, newdiry_v, newdirz_v );
+
             // write results
             Store(newposx_v, &newposx[i]);
             Store(newposy_v, &newposy[i]);
@@ -359,6 +371,27 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                   newdirz[i]
              );
    }
+  
+//________________________________________________________________________________
+  template<typename Real_v>
+     GEANT_FORCE_INLINE
+     bool
+     ConstFieldHelixStepper::
+     CheckModulus( Real_v& newdirX_v, Real_v& newdirY_v, Real_v & newdirZ_v ) const
+  {
+     constexpr double perMillion = 1.0e-6;
+
+     Real_v modulusDir = newdirX_v * newdirX_v + newdirY_v * newdirY_v 
+           + newdirZ_v * newdirZ_v;
+     typename vecCore::Mask<Real_v> goodDir;
+     goodDir= vecCore::math::Abs( modulusDir - Real_v(1.0) ) < perMillion;
+
+     bool  allGood= vecCore::MaskFull( goodDir );
+     assert( allGood && "Not all Directions are nearly 1");
+
+     return allGood;
+  }
+
 
  /********  Attempt to create method directly for SOA3D 
   template <typename Real_v>
@@ -377,7 +410,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
      // template <typename Real_vecTp> using Vector3D = vecgeom::Vector3D<Real_vecTp>;
      
      // Use the values in the SOA3D directly - without minimum of copying
-     const int vectorSize= vecgeom::VectorSize;
+     const int vectorSize= vecCore::VectorSize<Real_v>();
      int i;
      for ( i=0; i < numTracks ; i+= vectorSize )
      {

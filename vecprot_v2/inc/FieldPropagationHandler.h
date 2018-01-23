@@ -17,6 +17,8 @@
 #include "Handler.h"
 #include "GeantTaskData.h"
 
+#include "WorkspaceForFieldPropagation.h"          
+
 namespace Geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
@@ -70,10 +72,6 @@ private:
   VECCORE_ATT_HOST_DEVICE
   void PropagateInVolume(TrackVec_t &tracks, const double *crtstep, GeantTaskData *td);
 
-  /** @brief Ensure that connection is made with thread's FieldPropagator */
-  VECCORE_ATT_HOST_DEVICE
-  GUFieldPropagator * Initialize(GeantTaskData * td);
-   
   /** @brief Curvature for general field    */
   VECCORE_ATT_HOST_DEVICE
   double Curvature(const GeantTrack &track ) const;
@@ -86,6 +84,20 @@ private:
   /** @brief Function that return Field Propagator, i.e. the holder of (RK) Integration Driver */
   GEANT_FORCE_INLINE   
   GUFieldPropagator * GetFieldPropagator(GeantTaskData *td);
+
+  // - Book keeping methods for task data
+   
+  /** @brief Connect with thread's FieldPropagator & create working buffers */
+  VECCORE_ATT_HOST_DEVICE
+  GUFieldPropagator * Initialize(GeantTaskData * td);
+
+  /** @brief Cleanup the thread working buffers */
+  VECCORE_ATT_HOST_DEVICE   
+  void Cleanup(GeantTaskData * td);
+
+  /** @brief Clear the old buffers and create new working buffers */
+  VECCORE_ATT_HOST_DEVICE
+  void PrepareBuffers( size_t nTracks, GeantTaskData *td );
 };
 
 // ---------------------------------------------------------------------------------          
@@ -128,6 +140,22 @@ FieldPropagationHandler::GetFieldPropagator( GeantTaskData *td )
    return fieldPropagator;
 }
 
+//______________________________________________________________________________________
+VECCORE_ATT_HOST_DEVICE
+inline
+void FieldPropagationHandler::PrepareBuffers( size_t nTracks, GeantTaskData *td )
+{
+   auto wsp = td->fSpace4FieldProp;
+   if( nTracks > wsp->capacity() ){
+      std::cout << "Calling ClearAndResizeBuffers on task/thread " << td->fTid
+                << " with tracks = " << nTracks
+                << " . Note: capacity = " << wsp->capacity() << std::endl;
+      wsp->ClearAndResize( nTracks );
+   } else {
+      wsp->Resize(0); // Erase the entries, ready for new content!!
+   }      
+}
+          
 } // GEANT_IMPL_NAMESPACE
 } // Geant
 

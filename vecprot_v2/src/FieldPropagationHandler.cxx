@@ -15,6 +15,7 @@
 // #include "SOA6D.h"
 #include "Geant/VectorTypes.h"   // Defines Geant::Double_v etc
 
+#include "WorkspaceForFieldPropagation.h"
 #include "FlexIntegrationDriver.h"
 
 #ifdef USE_VECGEOM_NAVIGATOR
@@ -50,10 +51,11 @@ FieldPropagationHandler::~FieldPropagationHandler()
 //______________________________________________________________________________
 GUFieldPropagator *
 FieldPropagationHandler::Initialize(GeantTaskData * td)
-{          
+{
+  GUFieldPropagator *fieldPropagator = nullptr;   
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
   bool useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;   
-  GUFieldPropagator *fieldPropagator = nullptr;
+
   if( useRungeKutta ){
      // Initialize for the current thread -- move to GeantPropagator::Initialize() or per thread Init method
      static GUFieldPropagatorPool* fieldPropPool= GUFieldPropagatorPool::Instance();
@@ -63,8 +65,20 @@ FieldPropagationHandler::Initialize(GeantTaskData * td)
      assert( fieldPropagator );
      td->fFieldPropagator= fieldPropagator;
   }
+
+  size_t basketSize = td->fPropagator->fConfig->fNperBasket;
+  td->fSpace4FieldProp = new WorkspaceForFieldPropagation(basketSize);
+#endif
+  // For the moment return the field Propagator.
+  // Once this method is called by the framework, this can be obtained from td->fFieldPropagator
   return fieldPropagator;
-#endif          
+}
+
+//______________________________________________________________________________
+void FieldPropagationHandler::Cleanup(GeantTaskData * td)
+{
+   delete td->fSpace4FieldProp;
+   td->fSpace4FieldProp = nullptr;
 }
 
 //______________________________________________________________________________
@@ -425,16 +439,16 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   int        intCharge[nTracks];
   double     fltCharge[nTracks];
   
-  // Choice 1.   SOA3D
-  SOA3D<double> position3D(nTracks);   // To-Do: Move into TaskData: 
-  SOA3D<double> direction3D(nTracks); // Alternative to momentum
+  // Choice 1.  SOA3D
+  PrepareBuffers(nTracks, td);
+  
+  auto  wsp = td->fSpace4FieldProp; // WorkspaceForFieldPropagation *
+  SOA3D<double>& position3D  = * (wsp->fPositionInp);
+  SOA3D<double>& direction3D = * (wsp->fDirectionInp);
   double        momentumMag[nTracks];
 
-  // SOA3D<double> momentum3D(nTracks);   
-
-  //    ==> CheckSize(position3D, nTracks);
-  SOA3D<double> PositionOut(nTracks);   // To-Do: Move into TaskData: 
-  SOA3D<double> DirectionOut(nTracks);
+  SOA3D<double>& PositionOut  = * (wsp->fPositionOutp);
+  SOA3D<double>& DirectionOut = * (wsp->fDirectionOutp);
   
   // Choice 2.   SOA6D
   // SOA6D<double> PositMom6D( nTracks );
@@ -457,12 +471,15 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   auto fieldConfig = FieldLookup::GetFieldConfig();
   assert ( fieldConfig != nullptr);
   
-  if( fieldConfig->IsFieldUniform() )
+  if( 0 ) // fieldConfig->IsFieldUniform() )
   {
      vecgeom::Vector3D<double> BfieldUniform= fieldConfig->GetUniformFieldValue();
      ConstFieldHelixStepper stepper( BfieldUniform );
      // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), stepSize,
      //                                        PositionNew, DirectionNew);
+
+     std::cout << "Before Helix stepper - Position addresses: x= " << PositionOut.x() << " y= " << PositionOut.y()
+               << " z=" << PositionOut.z() << std::endl;
      
      stepper.DoStepArr</*Geant::*/Double_v>( position3D.x(),  position3D.y(),  position3D.z(),
                                          direction3D.x(), direction3D.y(), direction3D.z(),
@@ -484,6 +501,11 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
         double posShift = positionMove.Mag();
         track.SetPosition(PositionOut.x(itr), PositionOut.y(itr), PositionOut.z(itr));
         track.SetDirection(DirectionOut.x(itr), DirectionOut.y(itr), DirectionOut.z(itr));
+
+        // Check new direction
+        Vector3D<double> dirOut( DirectionOut.x(itr), DirectionOut.y(itr), DirectionOut.z(itr) );
+        std::cout << "["<< itr << "] new direction = " << dirOut.x() << " " << dirOut.y() << " " << dirOut.z() << std::endl;
+        assert( fabs( dirOut.Mag() - 1.0 ) < 1.0e-6 && "Out Direction is not normalised." );
         // Exact update of the safety - using true move (not distance along curve)
         track.DecreaseSafety(posShift); //  Was crtstep;
         if (track.GetSafety() < 1.E-10)
@@ -543,6 +565,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
                    << relDiff << "  Momentum magnitude @ end = " << std::sqrt( pMag2End )
                    << " vs. start = " << track.P() << std::endl;
            }
+           assert( pMag2End > 0.0 && fabs(relDiff) < 0.01 && "ERROR in direction normal.");
            track.SetDirection(pmag_inv * pX, pmag_inv * pY, pmag_inv * pZ);
            // Exact update of the safety - using true move (not distance along curve)
            track.DecreaseSafety(posShift); //  Was crtstep;
