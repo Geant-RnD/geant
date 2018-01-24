@@ -623,9 +623,13 @@ add_subdirectory (magneticfield)
 if(USE_ROOT AND NOT (USE_REAL_PHYSICS))
   add_subdirectory (fastsim)
 endif()
+
+#--------------------------- in physics/Neutrons/ -------------------------
 if (ROOT_mathmore_FOUND)
-  add_subdirectory (Nudy)
+  add_subdirectory (physics/Neutrons/Nudy)
+# add_subdirectory (Nudy)
 endif()
+#-------------------------------------------------------------------------
 
 if(USE_VECPHYS)
   add_subdirectory(vecphys)
@@ -645,8 +649,6 @@ endif()
 if (USE_VECGEOM_NAVIGATOR)
   add_subdirectory(material)
 endif()
-
-
 
 
 #----------------------------------------------------------------------------------------------
