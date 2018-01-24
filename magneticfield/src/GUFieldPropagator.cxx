@@ -124,8 +124,8 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
                         0.0); // s_0  xo
   ScalarFieldTrack yTrackOut( yTrackIn );
   
-  // Call the driver HERE
-  //fScalarDriver->InitializeCharge( charge );
+  // std::cout << " GUFieldPropagator::DoStep > fScalarDriver " << fScalarDriver << std::endl;
+  
   bool goodAdvance=
      fScalarDriver->AccurateAdvance( yTrackIn, step, fEpsilon, yTrackOut ); // , hInitial );
 

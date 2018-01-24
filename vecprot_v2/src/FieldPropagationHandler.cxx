@@ -443,10 +443,9 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   double     fltCharge[nTracks];
   
   // Choice 1.  SOA3D
+  PrepareBuffers(nTracks, td);
+  
   auto  wsp = td->fSpace4FieldProp; // WorkspaceForFieldPropagation *
-  if( (size_t) nTracks > wsp->capacity() ){
-     ClearAndResizeBuffers(nTracks, td);
-  }
   SOA3D<double>& position3D  = * (wsp->fPositionInp);
   SOA3D<double>& direction3D = * (wsp->fDirectionInp);
   double        momentumMag[nTracks];
@@ -481,6 +480,9 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
      ConstFieldHelixStepper stepper( BfieldUniform );
      // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), stepSize,
      //                                        PositionNew, DirectionNew);
+
+     std::cout << "Before Helix stepper - Position addresses: x= " << PositionOut.x() << " y= " << PositionOut.y()
+               << " z=" << PositionOut.z() << std::endl;
      
      stepper.DoStepArr</*Geant::*/Double_v>( position3D.x(),  position3D.y(),  position3D.z(),
                                          direction3D.x(), direction3D.y(), direction3D.z(),
@@ -502,6 +504,11 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
         double posShift = positionMove.Mag();
         track.SetPosition(PositionOut.x(itr), PositionOut.y(itr), PositionOut.z(itr));
         track.SetDirection(DirectionOut.x(itr), DirectionOut.y(itr), DirectionOut.z(itr));
+
+        // Check new direction
+        Vector3D<double> dirOut( DirectionOut.x(itr), DirectionOut.y(itr), DirectionOut.z(itr) );
+        std::cout << "["<< itr << "] new direction = " << dirOut.x() << " " << dirOut.y() << " " << dirOut.z() << std::endl;
+        assert( fabs( dirOut.Mag() - 1.0 ) < 1.0e-6 && "Out Direction is not normalised." );
         // Exact update of the safety - using true move (not distance along curve)
         track.DecreaseSafety(posShift); //  Was crtstep;
         if (track.GetSafety() < 1.E-10)
@@ -561,6 +568,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
                    << relDiff << "  Momentum magnitude @ end = " << std::sqrt( pMag2End )
                    << " vs. start = " << track.P() << std::endl;
            }
+           assert( pMag2End > 0.0 && fabs(relDiff) < 0.01 && "ERROR in direction normal.");
            track.SetDirection(pmag_inv * pX, pmag_inv * pY, pmag_inv * pZ);
            // Exact update of the safety - using true move (not distance along curve)
            track.DecreaseSafety(posShift); //  Was crtstep;
@@ -612,14 +620,6 @@ bool FieldPropagationHandler::IsSameLocation(GeantTrack &track, GeantTaskData *t
     track.SetStatus(kExitingSetup);
   if (track.GetStep() < 1.E-8) td->fNsmall++;
   return false;
-}
-
-//______________________________________________________________________________________
-VECCORE_ATT_HOST_DEVICE
-void FieldPropagationHandler::ClearAndResizeBuffers( size_t nTracks, GeantTaskData *td )
-{
-   auto   wsp = td->fSpace4FieldProp;
-   wsp->ClearAndResize( nTracks );
 }
 
 } // GEANT_IMPL_NAMESPACE

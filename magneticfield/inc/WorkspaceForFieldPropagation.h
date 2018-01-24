@@ -13,13 +13,17 @@ struct WorkspaceForFieldPropagation
     ~WorkspaceForFieldPropagation();
 
     size_t capacity(){ return fPositionInp->capacity(); } 
-      
+
+    /** @brief  Resize - likely to ignore old content */
+    void Resize( size_t size );
+   
     /** @brief  Throw away old content */
     void Clear();
     
     /** @brief  Enlarge the buffers, throwing away old content */
     void ClearAndResize( size_t numEntries );
 
+    bool CheckSize( size_t numNeeded );
     // Invariant: 
     //    All SOA3D containers must have the same size.
     //
@@ -73,6 +77,34 @@ void WorkspaceForFieldPropagation::ClearAndResize( size_t numEntries )
    fPositionOutp->reserve(nextCap);
    fDirectionInp->reserve(nextCap);
    fDirectionOutp->reserve(nextCap);
+}
+
+inline
+void WorkspaceForFieldPropagation::Resize( size_t size )
+{
+   assert( size < fPositionInp->capacity() );
+   fPositionInp->reserve(size);
+   fPositionOutp->reserve(size);
+   fDirectionInp->reserve(size);
+   fDirectionOutp->reserve(size);   
+}
+
+inline
+bool WorkspaceForFieldPropagation::CheckSize( size_t numNeeded )
+{
+   bool goodInp  = fPositionInp  && (fPositionInp->capacity() >= numNeeded);
+   assert ( goodInp  && "Bad capacity of PositionInp in Workspace for Field Propagation." );
+
+   bool goodOutp = fPositionOutp && (fPositionOutp->capacity() >= numNeeded);
+   assert(  goodOutp &&  "Bad capacity of PositionOutp in Workspace for Field Propagation." ); 
+           
+   bool goodInpDir = fDirectionInp  && (fDirectionInp->capacity()  >= numNeeded);
+   assert( goodInpDir &&  "Bad capacity of DirectionInp in Workspace for Field Propagation." );
+   
+   bool goodOutpDir = fDirectionOutp && (fDirectionOutp->capacity() >= numNeeded);
+   assert( goodOutpDir && "Bad capacity of DirectionOutp in Workspace for Field Propagation." );
+
+   return goodInp && goodOutp && goodInpDir && goodOutpDir;
 }
 
 } // GEANT_IMPL_NAMESPACE
