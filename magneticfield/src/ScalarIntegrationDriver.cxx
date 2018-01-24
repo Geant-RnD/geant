@@ -184,7 +184,8 @@ ScalarIntegrationDriver::AccurateAdvance(const ScalarFieldTrack& yInput,
 
   int nstp, i, no_warnings=0;
   double x, hnext, hdid, h;
-  double charge= yInput.GetCharge(); 
+  double charge= yInput.GetCharge();
+  std::cout << " ScalarIntegrationDriver::AccurateAdvance > Charge= " << charge << std::endl;
 
 #ifdef GUDEBUG_FIELD
   static int dbg=1;

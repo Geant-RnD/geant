@@ -474,7 +474,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
   auto fieldConfig = FieldLookup::GetFieldConfig();
   assert ( fieldConfig != nullptr);
   
-  if( fieldConfig->IsFieldUniform() )
+  if( 0 ) // fieldConfig->IsFieldUniform() )
   {
      vecgeom::Vector3D<double> BfieldUniform= fieldConfig->GetUniformFieldValue();
      ConstFieldHelixStepper stepper( BfieldUniform );

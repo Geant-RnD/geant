@@ -24,7 +24,6 @@ using ThreeVector = vecgeom::Vector3D<double>;
 
 FlexIntegrationDriver*  GUFieldPropagator::fVectorDriver= nullptr;
 
-//____________________________________________________________________________________
 //------------------------------------------------------------------------------------
 GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver,
                                      double eps,
@@ -39,8 +38,19 @@ GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver,
       if ( fVectorDriver )
          std::cout << "GUFieldPropagator> Not overwriting Vector/Flexible Driver" << std::endl;
    }
+
+   std::cout << "GUFieldPropagator constructor> ptr= " << this << std::endl
+             << " scalar driver = " << fScalarDriver
+             << " flex/vector driver = " << flexDriver << std::endl;
 }
 
+//------------------------------------------------------------------------------------
+GUFieldPropagator::~GUFieldPropagator()
+{
+   std::cout << "GUFieldPropagator destructor called for ptr= " << this << std::endl;
+}
+
+//------------------------------------------------------------------------------------
 void GUFieldPropagator::SetFlexIntegrationDriver( FlexIntegrationDriver * flexDriver)
 {
    const std::string methodName = "GUFieldPropagator::SetFlexIntegrationDriver";
@@ -58,6 +68,7 @@ void GUFieldPropagator::SetFlexIntegrationDriver( FlexIntegrationDriver * flexDr
 // ToDo-s/ideas:
 //  - Factory to create the Driver, Stepper and Equation
 
+//____________________________________________________________________________________
 template<typename FieldType>  // , typename StepperType>
 GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hminimum)
    : fEpsilon(eps)
@@ -117,19 +128,23 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
                            ThreeVector       & endDirection
          )
 {
+  double notUsed = 1, notUsed2= 2;
+
   // Do the work HERE
   ScalarFieldTrack yTrackIn( startPosition, 
                         startDirection * startMomentumMag,
                         charge, 
                         0.0); // s_0  xo
   ScalarFieldTrack yTrackOut( yTrackIn );
+
   
-  // std::cout << " GUFieldPropagator::DoStep > fScalarDriver " << fScalarDriver << std::endl;
+   
+  std::cout << "GUFieldPropagator constructor> ptr= " << this << std::endl;
+  std::cout << " GUFieldPropagator::DoStep > fScalarDriver " << fScalarDriver << std::endl;
   
   bool goodAdvance=
      fScalarDriver->AccurateAdvance( yTrackIn, step, fEpsilon, yTrackOut ); // , hInitial );
 
-  // fInitialCurvature; 
   endPosition=  yTrackOut.GetPosition();
   endDirection= yTrackOut.GetMomentumDirection();
   return goodAdvance;
