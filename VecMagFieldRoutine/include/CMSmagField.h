@@ -372,7 +372,7 @@ void CMSmagField::GetFieldValueRZ(const Real_v &r,
 
     //to make sense of the indices, consider any particular instance e.g. (25,-200)
     Real_v rFloor = Floor(radius * kRDiffInv);
-    Real_v rIndLow = rFloor * kNoZValues;
+    Real_v rIndLow = rFloor * Real_v(kNoZValues);
     // Real_v rIndHigh = rIndLow + kNoZValues;
 
     //if we use z-z0 in place of two loops for Z<0 and Z>0

@@ -319,7 +319,7 @@ private:
 
 // Related to AccurateAdvance
      //Variables required for track insertion algorithm
-     static constexpr unsigned int kVectorSize = vecgeom::kVectorSize; // TODO: template it on the backend
+     static constexpr size_t kVectorSize = kVectorSize; // TODO: template it on the backend
      // int    fNTracks = 0;        //  number under current integration -> ~ current array size
      // ScalarIntegrationStepper *fpScalarStepper= nullptr;  // --> call Stepper with scalar values (args)
      // ScalarIntegrationDriver  *fpScalarDriver = nullptr;  // --> (later) use this driver with scalar args
@@ -406,7 +406,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>::
    
    const int chName = 10, chValue = 10;
    std::cout << setw( chName ) << "h" << " : ";
-   for (int i = 0; i < vecgeom::kVectorSize; ++i) {
+   for (size_t i = 0; i < kVectorSize; ++i) {
       cout << " " << setw( chValue ) << Get( hFinal, i )  << " | ";
    }
    cout << endl;
@@ -414,7 +414,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>::
    ReportRowOfDoubles( "hFinal", hFinal );
    //
    cout << setw( chName ) << "errMaxSq/M" << " : ";
-   for (int i = 0; i < vecgeom::kVectorSize; ++i) {
+   for (size_t i = 0; i < kVectorSize; ++i) {
       cout << " " << setw( chValue ) << Get( errmaxSqFinal, i ) << " | ";      
    }
    cout << endl;
@@ -458,7 +458,7 @@ PowerIf( const Real_v            value,
    else
    {
       // Do expensive 'pow' only for continuing ('condition') lanes
-      for (unsigned int i = 0; i < kVectorSize; ++i)
+      for (size_t i = 0; i < kVectorSize; ++i)
       {
          if ( vecCore::Get(condition, i) )
          {
@@ -1122,7 +1122,7 @@ void
    using std::cerr;
    using std::endl;   
    
-   for (int i = 0; i < vecgeom::kVectorSize; ++i)
+   for (size_t i = 0; i < kVectorSize; ++i)
    {
       if( problemLane[i] ) {
          double xnewCheck = x[i] + h[i];
@@ -1184,7 +1184,7 @@ SimpleIntegrationDriver< /*Real_v,*/ T_Stepper, Nvar>
   
   numBadSize = 0; // Ensure it starts at Zero !?
   int     j=0;
-  int slot= 0;
+  size_t slot= 0;
   do
   {
      double hVal= hstep[j];
@@ -1222,7 +1222,7 @@ SimpleIntegrationDriver< /*Real_v,*/ T_Stepper, Nvar>
         ++slot;
      }
      ++j;
-  } while (      slot < vecgeom::kVectorSize
+  } while (      slot < kVectorSize
             &&      j < nTracks
      );
 
@@ -1338,7 +1338,7 @@ SimpleIntegrationDriver< /*Real_v,*/ T_Stepper, Nvar>
                       int          indOut,
                 const double       hstep[],
                       bool         succeeded[],
-                      int          nTracks
+                      int          /*nTracks*/
      ) const
 // Called whenever a lane is finished, to store output of integration
 // Input arguments
@@ -1423,7 +1423,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
   using std::cout;
   using std::endl;  
 
-  int   indexArr[vecgeom::kVectorSize];
+  int   indexArr[kVectorSize];
   
   // Working variables for integration  
   Real_v x, hnext, hdid, h, chargeLane, x1, x2, xStartLane, hStepLane;

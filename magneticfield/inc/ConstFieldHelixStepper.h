@@ -298,7 +298,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                         int np
                      ) const
    {
-       const int vectorSize= vecgeom::kVectorSize;
+       const size_t vectorSize= vecCore::VectorSize<Real_v>();
        using vecCore::Load;
        using vecCore::Store;
        using vecCore::Set;
@@ -410,7 +410,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
      // template <typename Real_vecTp> using Vector3D = vecgeom::Vector3D<Real_vecTp>;
      
      // Use the values in the SOA3D directly - without minimum of copying
-     const int vectorSize= vecgeom::VectorSize;
+     const int vectorSize= vecCore::VectorSize<Real_v>();
      int i;
      for ( i=0; i < numTracks ; i+= vectorSize )
      {
