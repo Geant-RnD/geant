@@ -1376,6 +1376,7 @@ SimpleIntegrationDriver< /*Real_v,*/ T_Stepper, Nvar>
       std::cout<<"----Storage position (out-arr): "<< indOut << std::endl;
 
    // int     indOut = indexArr[currIndex]; // might be sent directly to StoreOutput as well
+   (void)nTracks;
    assert( 0 <= indOut && indOut < nTracks );
    
    double hOriginal = hstep [indOut];

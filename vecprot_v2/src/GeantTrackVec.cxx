@@ -1374,12 +1374,12 @@ void GeantTrack_v::PropagateInVolumeSingle(int i, double crtstep, GeantTaskData 
   ThreeVector PositionNew(0.,0.,0.);
   ThreeVector DirectionNew(0.,0.,0.);
 
-  int propagationType= 0;
+  // int propagationType= 0;
 
   if( useRungeKutta )
   {
      // crtstep = 1.0e-4;   printf( "Setting crtstep = %f -- for DEBUGing ONLY.", crtstep );
-     propagationType= 1;
+     // propagationType= 1;
      // PrintTrack(i);
 #ifndef VECCORE_CUDA
      fieldPropagator->DoStep(Position,    Direction,    fChargeV[i], fPV[i], crtstep,
@@ -1401,7 +1401,7 @@ void GeantTrack_v::PropagateInVolumeSingle(int i, double crtstep, GeantTaskData 
      double Bz = BfieldInitial[2] * toKiloGauss;
      if ( dominantBz ) { // Oldest - constant field along z        
         // printf("h"); std::cout << "h";
-        propagationType= 2;
+        // propagationType= 2;
         // Printf("Called Helix-Bz.  Bz= %g , ( Bx = %g, By= %g ) Kilo Gauss\n", Bz, Bx, By );
 
         // Constant field in Z-direction
@@ -1409,7 +1409,7 @@ void GeantTrack_v::PropagateInVolumeSingle(int i, double crtstep, GeantTaskData 
         stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  fChargeV[i], fPV[i], crtstep,
                                                PositionNew, DirectionNew);
      } else {
-        propagationType= 3;
+        // propagationType= 3;
         // double Bx = BfieldInitial[0] * toKiloGauss;
         // double By = BfieldInitial[1] * toKiloGauss;
         // printf("H"); std::cout << "H";
