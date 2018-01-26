@@ -1356,7 +1356,7 @@ SimpleIntegrationDriver< /*Real_v,*/ T_Stepper, Nvar>
                       int          indOut,
                 const double       hstep[],
                       bool         succeeded[],
-                      int          /*nTracks*/
+                      int          nTracks
      ) const
 // Called whenever a lane is finished, to store output of integration
 // Input arguments
