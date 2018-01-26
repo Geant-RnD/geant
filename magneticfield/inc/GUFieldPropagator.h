@@ -93,8 +93,9 @@ class GUFieldPropagator
    *****/
 
 private:
-    ScalarIntegrationDriver*       fScalarDriver= nullptr;
     static FlexIntegrationDriver*  fVectorDriver;
+    
+    ScalarIntegrationDriver*       fScalarDriver= nullptr;
     double                         fEpsilon;
 };
 

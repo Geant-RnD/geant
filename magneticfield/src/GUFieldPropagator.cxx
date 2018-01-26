@@ -164,8 +164,7 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   std::cout << methodName << " Dump of suspect arguments: " << std::endl;
   std::cout << "   Step       = " << step << std::endl;
   std::cout << "   yTrackInFT = " << yTrackInFT << std::endl;
-  std::cout << "   Epsion     = " << fEpsilon   << std::endl;
-  std::cout << "   Epsion     = " << fEpsilon   << std::endl;  
+
 #if 0
 // #ifdef EXTEND_SINGLE
   // Using the vector/flexible driver to integrate a single track -- EXPERIMENTAL   
@@ -177,6 +176,8 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   std::cout << " Results:  good = " << okFlex << " track out= " << yTrackOutFT << std::endl;
 // #endif
 
+  std::cout << "   Epsilon    = " << fEpsilon   << std::endl;
+  
     // Do the work HERE
   ScalarFieldTrack yTrackIn( startPosition, 
                         startDirection * startMomentumMag,

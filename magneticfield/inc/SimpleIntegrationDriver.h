@@ -158,7 +158,7 @@ protected:
                        const Real_v  charge,                          
                              Real_v& x,        // InOut                    
                              Real_v  htry,
-                       const Real_v  epsilon,  // required relative accuracy
+                             double  epsilon, // Was const Real_v  epsilon,  // required relative accuracy
                              Real_v  yEnd[],   // [N]
                              Real_v& hdid,
                              Real_v& hnext ) const ;
@@ -692,7 +692,8 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
                 const Real_v  charge,                
                       Real_v& x,         // InOut
                       Real_v  htry,
-                const Real_v  eps_rel_max,
+                      double  eps_rel_max,
+                // const Real_v  eps_rel_max,                
                       Real_v  yFinal[],  // Out-values
                       Real_v& hdid,      // Out - achieved length
                       Real_v& hnext   )  // Out - proposed next integration length
@@ -751,7 +752,8 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
   Real_v h = htry ; // Set stepsize to the initial trial value
   // Renamed it to hStep
 
-  Real_v invEpsilonRelSq = 1.0 / (eps_rel_max*eps_rel_max);
+  // Real_v  //  Epsilon was variable per track (ToCheck)
+  double invEpsilonRelSq = 1.0 / (eps_rel_max*eps_rel_max);
 
   static int tot_no_trials=0;  // Should be thread_local - or suppressed. Just statistics
   const int max_trials=100; 
@@ -1441,7 +1443,8 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
   using std::cout;
   using std::endl;  
 
-  int   indexArr[vecCore::VectorSize<Real_v>()];
+  constexpr unsigned int VecSize = vecCore::VectorSize<Real_v>();
+  int   indexArr[VecSize]; // vecCore::VectorSize<Real_v>()];
   
   // Working variables for integration  
   Real_v x, hnext, hdid, h, chargeLane, x1, x2, xStartLane, hStepLane;
@@ -1461,6 +1464,9 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
   int  numFilled= 0;
   int  numBadSize= 0;  // How many tracks have invalid step size
   // ThreadLocal int  noGoodSteps =0 ;  // Bad = chord > curve-len 
+
+  for ( unsigned int i = 0; i < VecSize; ++i )
+     indexArr[i] = -1;
   
   int  idNext =
      InitializeLanes( yInput, hstep,     charge, /* xStart, */ nTracks, /* badStepSize,*/ indexArr,
@@ -1471,7 +1477,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
   // const maxSize = std::max( (int) vecCore::VectorSize<Real_v>(), (int) numTracks );
   if( idNext > (int) vecCore::VectorSize<Real_v>() ) // Some lanes had hstep <= 0.0 
   {
-    for (unsigned int i = 0; i < vecCore::VectorSize<Real_v>(); ++i)
+    for (unsigned int i = 0; i < VecSize; ++i ) // vecCore::VectorSize<Real_v>(); ++i)
     {
       if ( hstep[i] <= 0.0 )
       {
@@ -1643,7 +1649,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
            if ( vecCore::Get( finishedLane, i ) &&  indexArr[i] != -1)
            {
               // 1. Store the Results (Output)
-              stillOK[indexArr[i]] = vecCore::Get(succeededLane, i); // succeededLane[i];   // First
+              stillOK[indexArr[i]] = vecCore::Get(succeededLane, i); // succeededLane[i];
               if( partDebug) 
                  std::cout<<"----Storing Output at position: "<< i << std::endl;              
               StoreOutput( y, x, i, yOutput, indexArr[i], hstep, stillOK, nTracks ); // Second - can change 'succeeded'
