@@ -626,7 +626,7 @@ endif()
 
 #--------------------------- in physics/Neutrons/ -------------------------
 if (ROOT_mathmore_FOUND)
-  add_subdirectory (physics/Neutrons/Nudy)
+  add_subdirectory (physics/neutron/Nudy)
 # add_subdirectory (Nudy)
 endif()
 #-------------------------------------------------------------------------
