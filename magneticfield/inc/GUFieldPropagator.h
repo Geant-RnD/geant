@@ -94,9 +94,9 @@ class GUFieldPropagator
 
 private:
     static FlexIntegrationDriver*  fVectorDriver;
+    static double                  fEpsilon;
     
     ScalarIntegrationDriver*       fScalarDriver= nullptr;
-    double                         fEpsilon;
 };
 
 // } // GEANT_IMPL_NAMESPACE

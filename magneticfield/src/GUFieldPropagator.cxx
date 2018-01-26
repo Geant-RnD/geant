@@ -23,15 +23,18 @@
 using ThreeVector = vecgeom::Vector3D<double>;
 
 FlexIntegrationDriver*  GUFieldPropagator::fVectorDriver= nullptr;
-
+double                  GUFieldPropagator::fEpsilon = 1.0e-4;
 //------------------------------------------------------------------------------------
 GUFieldPropagator::GUFieldPropagator(ScalarIntegrationDriver* driver,
                                      double eps,
                                      FlexIntegrationDriver* flexDriver )
-  : fScalarDriver(driver),
-    fEpsilon(eps)
+  : fScalarDriver(driver)
+    // fEpsilon(eps)
 {
    const char* methodName="GUFieldPropagator constructor (scalarDriver, eps, *flex - with default = null)";
+
+   fEpsilon= eps;
+   
    std::cout << "------------------------------------------------------------------------------------" << std::endl;
    std::cout << methodName << std::endl
              << "  Arguments:  scalarDrv= " << driver << " eps = " << eps << " flexDriver = " << flexDriver
@@ -85,10 +88,13 @@ void GUFieldPropagator::SetFlexIntegrationDriver( FlexIntegrationDriver * flexDr
 //____________________________________________________________________________________
 template<typename FieldType>  // , typename StepperType>
 GUFieldPropagator::GUFieldPropagator(FieldType* magField, double eps, double hminimum)
-   : fEpsilon(eps)
+  // : fEpsilon(eps)
 {
    constexpr unsigned int Nposmom = 6; // Number of Integration variables - 3 position, 3 momentum
-  
+
+   if( 0.0 < eps && eps < 1.0 ) 
+      fEpsilon= eps;
+   
 // #if 0
    using  ScalarEquationType=  ScalarMagFieldEquation<FieldType, Nposmom>;
    int statVerbose= 1;
@@ -165,8 +171,8 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   std::cout << "   Step       = " << step << std::endl;
   std::cout << "   yTrackInFT = " << yTrackInFT << std::endl;
 
-#if 0
-// #ifdef EXTEND_SINGLE
+// #if 0
+#ifdef EXTEND_SINGLE
   // Using the vector/flexible driver to integrate a single track -- EXPERIMENTAL   
   fVectorDriver->AccurateAdvance( yTrackInFT, step, chargeFlt, fEpsilon, yTrackOutFT, okFlex );
 #else
