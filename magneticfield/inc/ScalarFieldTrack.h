@@ -26,11 +26,11 @@ class  ScalarFieldTrack
    public:  // with description
 
      ScalarFieldTrack( const ThreeVector& pPosition, 
-                   const ThreeVector& pMomentum,
+                       const ThreeVector& pMomentum,
                          // double       restMass_c2,
-                         double       charge,
+                       double       charge,
                          // double       laboratoryTimeOfFlight= 0.0,
-                         double       curve_length= 0.0); 
+                       double       curve_length= 0.0); 
 
      ScalarFieldTrack( const ScalarFieldTrack&   pFieldTrack ); 
      ScalarFieldTrack( char );   //  Almost default constructor

@@ -33,13 +33,14 @@ struct WorkspaceForFieldPropagation
     vecgeom::SOA3D<double> * fPositionInp= nullptr;
     vecgeom::SOA3D<double> * fDirectionInp= nullptr;
     vecgeom::SOA3D<double> * fPositionOutp= nullptr;
-    vecgeom::SOA3D<double> * fDirectionOutp= nullptr;   
+    vecgeom::SOA3D<double> * fDirectionOutp= nullptr;
 };
 
 inline
 WorkspaceForFieldPropagation::WorkspaceForFieldPropagation(size_t bufferSize)
 {
    // using SoADd = vecgeom::SOA3D<type>;
+   assert(bufferSize > 0 );
    
    fPositionInp=   new vecgeom::SOA3D<double>(bufferSize);
    fDirectionInp=  new vecgeom::SOA3D<double>(bufferSize);
@@ -83,10 +84,10 @@ inline
 void WorkspaceForFieldPropagation::Resize( size_t size )
 {
    assert( size < fPositionInp->capacity() );
-   fPositionInp->reserve(size);
-   fPositionOutp->reserve(size);
-   fDirectionInp->reserve(size);
-   fDirectionOutp->reserve(size);   
+   fPositionInp->resize(size);
+   fPositionOutp->resize(size);
+   fDirectionInp->resize(size);
+   fDirectionOutp->resize(size);   
 }
 
 inline

@@ -215,27 +215,29 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
                                        Vector3D_t        & endDirection
      ) const
   {
-      const double kB2C_local = -0.299792458e-3;
-      const double kSmall = 1.E-30;
+      const BaseDType kB2C_local(-0.299792458e-3);
+      const BaseDType kSmall(1.E-30);
       using vecCore::math::Max;
       using vecCore::math::Sin;
       using vecCore::math::Cos;
-      using vecCore::math::Abs;      
+      using vecCore::math::Abs;
+      using vecCore::math::Sqrt;
+      using vecCore::Convert;
       // could do a fast square root here
 
-      // BaseDType dt = sqrt((dx0*dx0) + (dy0*dy0)) + kSmall;
+      // BaseDType dt = Sqrt((dx0*dx0) + (dy0*dy0)) + kSmall;
 
       // assert( std::abs( startDirection.Mag2() - 1.0 ) < 1.0e-6 );
 
       Vector3D_t  dir1Field( fUnitX, fUnitY, fUnitZ );
       BaseDType UVdotUB = startDirection.Dot(dir1Field);   //  Limit cases 0.0 and 1.0
       BaseDType dt2   = Max( startDirection.Mag2() - UVdotUB * UVdotUB, BaseDType(0.0) );
-      BaseDType sinVB = sqrt( dt2 ) + kSmall;
+      BaseDType sinVB = Sqrt( dt2 ) + kSmall;
  
       // BaseDType invnorm = 1. / sinVB;
 
       // radius has sign and determines the sense of rotation
-      BaseDType R = momentum*sinVB/((kB2C_local*BaseDType(charge))*(fBmag));
+      BaseDType R = momentum*sinVB/((kB2C_local*Convert<BaseDType>(charge))*(fBmag));
 
       Vector3D_t  restVelX = startDirection - UVdotUB * dir1Field;
 
@@ -261,7 +263,7 @@ template<typename Vector3D_t, typename BaseDType, typename BaseIType>
       assert ( vecCore::MaskFull( Abs( dirVelX.Dot(    dirCrossVB) ) < 1.e-6 ) );
       assert ( vecCore::MaskFull( Abs( dirCrossVB.Dot( dir1Field ) ) < 1.e-6 ) );
       
-      BaseDType phi = - step * BaseDType(charge) * fBmag * kB2C_local / momentum;
+      BaseDType phi = - step * Convert<BaseDType>(charge) * fBmag * kB2C_local / momentum;
 
       BaseDType cosphi = Cos(phi);
       BaseDType sinphi = Sin(phi);

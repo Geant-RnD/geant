@@ -411,8 +411,8 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
   const double drift= 0.01*crtstep;
   if ( diffpos2>drift*drift ){
       double diffpos= vecCore::math::Sqrt(diffpos2);
-      // Geant::Print("PropagateInVolumeSingle","relative difference in pos = %g", diffpos/crtstep);
-      Geant::Print("PropagateInVolumeSingle","difference in pos = %g (abs) %g (relative) , step= %g",
+      // Geant::Print("PropagateInVolume/Single","relative difference in pos = %g", diffpos/crtstep);
+      Geant::Print("PropagateInVolume/Single","difference in pos = %g (abs) %g (relative) , step= %g",
                    diffpos, diffpos/crtstep, crtstep);
   }
 #endif
