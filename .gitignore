@@ -17,6 +17,10 @@ G__*.c
 G__*.cxx
 G__*.h
 
+# cmsToyMT files
+BusyWaitCalibrate
+DispatchDemo
+
 # ROOT data files
 *.root
 
