@@ -288,7 +288,7 @@ private:
 
      // ---------------------------------------------------------------     
      // Compilation constants 
-     const bool partDebug= true;  // false;  // Enforce debugging output
+     const bool partDebug= false; // Enforce debugging output
      const  int ncompSVEC= FieldTrack::NumCompFT; // expect 6, later 8, eventually up to 12
      const bool useOneStep  = true; //  Algorithm selection - false for KeepStepping
 
@@ -323,7 +323,7 @@ private:
      static constexpr double fMaxSteppingDecrease = 0.1;
      // Maximum stepsize increase/decrease factors.
 
-     int            fStatisticsVerboseLevel;
+     int            fStatisticsVerboseLevel= 0;
      mutable unsigned long  fStepperCalls= 0UL;
      // ---------------------------------------------------------------
      //  STATE
@@ -587,7 +587,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
   /* fDyerr_max(0.0), fDyerr_mx2(0.0), 
      fDyerrPos_smTot(0.0), fDyerrPos_lgTot(0.0), fDyerrVel_lgTot(0.0),  
      fSumH_sm(0.0), fSumH_lg(0.0), */ 
-     fVerboseLevel(3)
+     fVerboseLevel(0)
 {
   // In order to accomodate "Laboratory Time", which is [7], fMinNoVars=8
   // is required. For proper time of flight and spin,  fMinNoVars must be 12

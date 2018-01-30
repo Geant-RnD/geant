@@ -38,7 +38,7 @@ FieldPropagationHandler::FieldPropagationHandler(int threshold, GeantPropagator 
                : Handler(threshold, propagator)
 {
 // Default constructor
-   std::cout << " FieldPropagationHandler c-tor called:  threshold= " << threshold << std::endl;
+   // std::cout << " FieldPropagationHandler c-tor called:  threshold= " << threshold << std::endl;
 }
 
 //______________________________________________________________________________
@@ -175,8 +175,9 @@ void FieldPropagationHandler::DoIt(Basket &input, Basket& output, GeantTaskData 
   const double eps = 1.E-2; //
   
   int ntracks = tracks.size();
-  std::cout <<" FieldPropagationHandler::DoIt(baskets) called for " << ntracks
-            << " tracks." << std::endl;
+
+  // std::cout <<" FieldPropagationHandler::DoIt(baskets) called for " << ntracks
+  //          << " tracks." << std::endl;
   
   double *steps = td->GetDblArray(ntracks);
   for (int itr = 0; itr < ntracks; itr++) {
@@ -428,7 +429,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
                                                 GeantTaskData *td)
 {
 // The Vectorized Implementation for Magnetic Field Propagation
-  std::cout << "FieldPropagationHandler::PropagateInVolume called for Many tracks" << std::endl;
+   // std::cout << "FieldPropagationHandler::PropagateInVolume called for Many tracks" << std::endl;
   
   int nTracks = tracks.size();
 #if 1 // VECTOR_FIELD_PROPAGATION
@@ -481,8 +482,8 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
      // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), stepSize,
      //                                        PositionNew, DirectionNew);
 
-     std::cout << "Before Helix stepper - Position addresses: x= " << PositionOut.x() << " y= " << PositionOut.y()
-               << " z=" << PositionOut.z() << std::endl;
+     // std::cout << "Before Helix stepper - Position addresses: x= " << PositionOut.x() << " y= " << PositionOut.y()
+     //           << " z=" << PositionOut.z() << std::endl;
      
      stepper.DoStepArr</*Geant::*/Double_v>( position3D.x(),  position3D.y(),  position3D.z(),
                                          direction3D.x(), direction3D.y(), direction3D.z(),
@@ -507,7 +508,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
 
         // Check new direction
         Vector3D<double> dirOut( DirectionOut.x(itr), DirectionOut.y(itr), DirectionOut.z(itr) );
-        std::cout << "["<< itr << "] new direction = " << dirOut.x() << " " << dirOut.y() << " " << dirOut.z() << std::endl;
+        // std::cout << "["<< itr << "] new direction = " << dirOut.x() << " " << dirOut.y() << " " << dirOut.z() << std::endl;
         assert( fabs( dirOut.Mag() - 1.0 ) < 1.0e-6 && "Out Direction is not normalised." );
         // Exact update of the safety - using true move (not distance along curve)
         track.DecreaseSafety(posShift); //  Was crtstep;

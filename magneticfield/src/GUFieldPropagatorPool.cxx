@@ -115,7 +115,7 @@ GUFieldPropagatorPool::Extend(size_t noNeeded)
 
       num++;
 
-      std::cout << methodName << ": Created propagator" << prop << "for slot " << num << std::endl;
+      std::cout << methodName << ": Created propagator " << prop << " for slot " << num << std::endl;
       // printf("            Created propagator %p for slot %ld\n", prop, num );
 
       // fFieldVec.push_back( fFieldPrototype->CloneOrSafeSelf() );
