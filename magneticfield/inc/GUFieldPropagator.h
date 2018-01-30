@@ -97,6 +97,8 @@ private:
     static double                  fEpsilon;
     
     ScalarIntegrationDriver*       fScalarDriver= nullptr;
+
+    bool                           fVerboseConstruct;
 };
 
 // } // GEANT_IMPL_NAMESPACE
