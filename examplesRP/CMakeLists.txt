@@ -7,6 +7,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullLHCb/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
+  #  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyMT/
   ${CMAKE_SOURCE_DIR}/realphysics/dummies/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/models/EM/inc
@@ -41,6 +42,7 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/src/TestEm3PrimaryGenerator.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/src/TestEm3PhysicsList.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/src/HepMCTruth.cxx
+
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/TestEm5.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/TestEm5Data.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/src/UserDetectorConstruction.cxx
@@ -53,6 +55,8 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPrimaryGenerator.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCapp.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCData.cxx
+
+  #  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyMT/TBBProcessingDemo/main.cpp
   )
 
 set(headers
@@ -73,6 +77,7 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc/TestEm3PrimaryGenerator.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc/TestEm3PhysicsList.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc/HepMCTruth.h
+
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/TestEm5.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/TestEm5Data.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/UserDetectorConstruction.h
