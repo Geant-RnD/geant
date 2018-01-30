@@ -305,7 +305,7 @@ void FieldPropagationHandler::PropagateInVolume(GeantTrack &track, double crtste
 
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
    auto fieldPropagator = GetFieldPropagator(td);
-   if( !fieldPropagator ) {
+   if( !fieldPropagator || !td->fSpace4FieldProp) {
       fieldPropagator= Initialize(td);
    }
 #endif
@@ -551,7 +551,7 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
            FieldTrack& fldTrackEnd= fldTracksOut[itr];
            Vector3D<double> startPosition = { track.X(), track.Y(), track.Z() };
            Vector3D<double> endPosition = { fldTrackEnd[0], fldTrackEnd[1], fldTrackEnd[2] };
-           double posShift = (startPosition-endPosition).Mag();
+           // double posShift = (startPosition-endPosition).Mag();
            track.SetPosition(fldTrackEnd[0], fldTrackEnd[1], fldTrackEnd[2]);
            // Vector3D<double> endMomentum = { fldTrackEnd[3], fldTrackEnd[4], fldTrackEnd[5] };
            double pX= fldTrackEnd[3];
@@ -569,7 +569,8 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks,
            assert( pMag2End > 0.0 && fabs(relDiff) < 0.01 && "ERROR in direction normal.");
            track.SetDirection(pmag_inv * pX, pmag_inv * pY, pmag_inv * pZ);
            // Exact update of the safety - using true move (not distance along curve)
-           track.DecreaseSafety(posShift); //  Was crtstep;
+           // track.DecreaseSafety(posShift); //  Was crtstep;
+           track.DecreaseSafety(stepSize[itr]);  // Trial fix/change - in case this is sensitive
            if (track.GetSafety() < 1.E-10)
              track.SetSafety(0);
         }

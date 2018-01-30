@@ -146,6 +146,7 @@ inline
 void FieldPropagationHandler::PrepareBuffers( size_t nTracks, GeantTaskData *td )
 {
    auto wsp = td->fSpace4FieldProp;
+   assert(wsp);
    if( nTracks > wsp->capacity() ){
       std::cout << "Calling ClearAndResizeBuffers on task/thread " << td->fTid
                 << " with tracks = " << nTracks
