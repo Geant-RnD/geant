@@ -163,6 +163,9 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
   bool goodAdvance=false;
   bool verbose= false;
 
+  verbose= true;
+  static bool infoPrinted= false;
+  
 // #define USE_FLEXIBLE_FOR_SCALAR 1
   
 #ifdef USE_FLEXIBLE_FOR_SCALAR
@@ -183,11 +186,22 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
      std::cout << "   Step       = " << step << std::endl;
      std::cout << "   yTrackInFT = " << yTrackInFT << std::endl;
   }
-  
+
+
 #ifdef EXTEND_SINGLE
+  if( verbose && !infoPrinted ) {
+     std::cout << methodName << " > Using Flexible/Vector Driver - for 1 track " << fScalarDriver << std::endl;
+     infoPrinted = true;
+  }
+  
   // Using the capabiity of the flexible driver to integrate a single track -- New 25.01.2018
   fVectorDriver->AccurateAdvance( yTrackInFT, step, chargeFlt, fEpsilon, yTrackOutFT, okFlex );
 #else
+  if( verbose && !infoPrinted ) {
+     std::cout << methodName << " > Using VectorDriver ( Real_v ) with 1 track" << fScalarDriver << std::endl;
+     infoPrinted = true;
+  }
+
   // Harnessing the vector driver to integrate just a single track -- MIS-USE
   fVectorDriver->AccurateAdvance( &yTrackInFT, &step, &chargeFlt, fEpsilon, &yTrackOutFT, 1, &okFlex );
 #endif
@@ -206,10 +220,11 @@ GUFieldPropagator::DoStep( ThreeVector const & startPosition, ThreeVector const 
 #else
   //-------------------------------------------------------------------------------------
    // Do the single-track work using the Scalar Driver
-  verbose= true;
+
   assert( fScalarDriver );
-  if( verbose ) {
+  if( verbose && !infoPrinted ) {
      std::cout << methodName << " > Using ScalarDriver " << fScalarDriver << std::endl;
+     infoPrinted = true;
   }
   
   ScalarFieldTrack yTrackIn( startPosition, 
