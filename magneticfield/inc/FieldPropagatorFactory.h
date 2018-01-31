@@ -228,14 +228,16 @@ FieldPropagatorFactory::CreateFlexibleDriver(Field_t&    gvField,
                                       statsVerbose);
 
   assert( vectorDriver );
-  
-  std::cout << methodName << ": Parameters for RK integration in magnetic field: "
-            << " - Driver minimum step (h_min) = " << minStepSize << std::endl;
-  std::cout << methodName << ": created vector driver = " << vectorDriver << std::endl;
-  // Geant::Print(methodName,
-               // "Parameters for RK integration in magnetic field: "
-  //            " - Driver minimum step (h_min) = %8.3g\n", minStepSize);
-               
+
+  if( fVerboseConstruct )
+  {
+    std::cout << methodName << ": Parameters for RK integration in magnetic field: "
+              << " - Driver minimum step (h_min) = " << minStepSize << std::endl;
+    std::cout << methodName << ": created vector driver = " << vectorDriver << std::endl;
+    // Geant::Print(methodName,
+    //              "Parameters for RK integration in magnetic field: "
+    //             " - Driver minimum step (h_min) = %8.3g\n", minStepSize);
+  }
   
   return vectorDriver;
 }
