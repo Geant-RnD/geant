@@ -1376,15 +1376,16 @@ SimpleIntegrationDriver< /*Real_v,*/ T_Stepper, Nvar>
       std::cout<<"----Storage position (out-arr): "<< indOut << std::endl;
 
    // int     indOut = indexArr[currIndex]; // might be sent directly to StoreOutput as well
-   (void)nTracks;
-   assert( 0 <= indOut && indOut < nTracks );
-   
+   // (void)nTracks;
+   assert( 0 <= indOut && indOut < nTracks && "Track Index is Out of Range"  );
+   assert( 0 <= currIndex && ((unsigned long)currIndex < vecCore::VectorSize<Real_v>() ) && "Lane Index is Out of Range" ) ;
+
    double hOriginal = hstep [indOut];
    
    if (hOriginal >= 0.0)     
    {
       // need to get a yEnd : scalar array
-      double yOutOneArr[ncompSVEC];
+      double yOutOneArr[std::max(int(ncompSVEC),int(Nvar))];
       for (unsigned int i = 0; i < Nvar; ++i ) // Was: i < fNoIntegrationVariables; ++i)
       {
          // yOutOneArr[i] =    yEnd[i] [currIndex]; // Constant col no., varying row no. for required traversal
@@ -1653,7 +1654,7 @@ SimpleIntegrationDriver<T_Stepper, Nvar>
               stillOK[indexArr[i]] = vecCore::Get(succeededLane, i); // succeededLane[i];
               if( partDebug) 
                  std::cout<<"----Storing Output at position: "<< i << std::endl;              
-              StoreOutput( y, x, i, yOutput, indexArr[i], hstep, stillOK, nTracks ); // Second - can change 'succeeded'
+              StoreOutput( yNext, x, i, yOutput, indexArr[i], hstep, stillOK, nTracks ); // Second - can change 'succeeded'
               //*********----------------------------------------------
               // Ananya: Do not pass succeededLane to StoreOutput (preference?), so 
               //         'stillOK' should *not* be absorbed in StoreOutput.
