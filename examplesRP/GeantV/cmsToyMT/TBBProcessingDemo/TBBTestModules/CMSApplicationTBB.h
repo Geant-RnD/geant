@@ -137,8 +137,9 @@ public:
    * @param npart Number of tracks
    * @param tracks GeantV track container
    */
-  virtual void SteppingActions(GeantTrack &tracks, GeantTaskData *td);
-  virtual void SteppingActions(TrackVec_t &tracks, GeantTaskData *td);
+  using GeantVApplication::SteppingActions;
+  void SteppingActions(GeantTrack &tracks, GeantTaskData *td);
+  void SteppingActions(TrackVec_t &tracks, GeantTaskData *td);
 
   /**
    * @brief Function of digitization
@@ -151,7 +152,8 @@ public:
    * @brief  Finish an event. 
    * @details The slot released is evt%ninflight, for easier user data management.
    */
-  virtual void FinishEvent(int /*evt*/, int /*islot*/);
+  using GeantVApplication::FinishEvent;
+  void FinishEvent(int /*evt*/, int /*islot*/);
 
   /** @brief User FinishRun function */
   virtual void FinishRun();

@@ -85,10 +85,10 @@ namespace demo {
 
   GeantVProducer::GeantVProducer(const boost::property_tree::ptree& iConfig)
     : ConfiguredProducer(iConfig,kThreadSafeBetweenInstances)
+    , fNevents(iConfig.get<int>("Nevents"))
     , fConfig(0)
     , fRunMgr(0)
     , fPrimaryGenerator(0)
-    , fNevents(iConfig.get<int>("Nevents"))
   {
     fEventGeneratorLock.clear();
     registerProduct(demo::DataKey());
@@ -103,7 +103,7 @@ namespace demo {
     int n_track_max = 500;
     int n_learn_steps = 0;
     int n_reuse = 100000;
-    bool monitor = false, score = false, debug = false, coprocessor = false, usev3 = true, usenuma = false;
+    bool monitor = false, score = false, debug = false, usev3 = true, usenuma = false;
     bool performance = true;
 
     //e.g. cms2015.root, cms2018.gdml, ExN03.root
@@ -218,10 +218,10 @@ namespace demo {
     printf("hepmc_event_filename=%s\n", hepmc_event_filename.c_str());
     if (hepmc_event_filename.empty()) {
       std::cerr<<"*** GeantRunManager: setting up a GunGenerator...\n";
-      double x = rand();
-      double y = rand();
-      double z = rand();
-      double r = sqrt(x*x+y*y+z*z);
+      //double x = rand();
+      //double y = rand();
+      //double z = rand();
+      //double r = sqrt(x*x+y*y+z*z);
       //fPrimaryGenerator = new GunGenerator(fConfig->fNaverage, 11, fConfig->fEmax, 0, 0, 0, x/r, y/r, z/r);
       //fPrimaryGenerator = new GunGenerator(fConfig->fNaverage, 11, fConfig->fEmax, -8, 0, 0, 1, 0, 0);
 

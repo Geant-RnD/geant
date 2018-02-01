@@ -156,8 +156,10 @@ bool CMSApplicationTBB::Initialize() {
 }
 
 //______________________________________________________________________________
-void CMSApplicationTBB::SteppingActions(GeantTrack &track, GeantTaskData *td)
+  void CMSApplicationTBB::SteppingActions(GeantTrack &track, GeantTaskData *td)
 {
+  (void)track;
+  (void)td;
   /*
   // counting steps for debugging printouts
   static atomic<int> count{ 0 };
@@ -364,14 +366,16 @@ void CMSApplicationTBB::Digitize(GeantEvent *event) {
   //event->Print();
   //Geant::Printf("Energy deposit in ECAL [MeV/primary] ");
   //Geant::Printf("================================================================================");
+#ifdef USE_VECGEOM_NAVIGATOR
   double nprim = (double)(event->GetNtracks());
+#endif
   for (int i = 0; i < kNECALModules; ++i) {
     for (int tid = 1; tid < kMaxThreads; ++tid) {
       fEdepECAL[i][0] += fEdepECAL[i][tid];
     }
 #ifdef USE_VECGEOM_NAVIGATOR
-    //Geant::Printf("   volume %s: edep=%f", GeoManager::Instance().FindLogicalVolume(fECALid[i])->GetName(),
-    //     fEdepECAL[i][0] * 1000. / nprim);
+    Geant::Printf("   volume %s: edep=%f", GeoManager::Instance().FindLogicalVolume(fECALid[i])->GetName(),
+         fEdepECAL[i][0] * 1000. / nprim);
 #else
     Geant::Printf("   volume %s: edep=%f", gGeoManager->GetVolume(fECALid[i])->GetName(), fEdepECAL[i][0] * 1000. / nprim);
 #endif
@@ -383,8 +387,8 @@ void CMSApplicationTBB::Digitize(GeantEvent *event) {
       fEdepHCAL[i][0] += fEdepHCAL[i][tid];
     }
 #ifdef USE_VECGEOM_NAVIGATOR
-    //    Geant::Printf("   volume %s: edep=%f", GeoManager::Instance().FindLogicalVolume(fHCALid[i])->GetName(),
-    //     fEdepHCAL[i][0] * 1000. / nprim);
+    Geant::Printf("   volume %s: edep=%f", GeoManager::Instance().FindLogicalVolume(fHCALid[i])->GetName(),
+		  fEdepHCAL[i][0] * 1000. / nprim);
 #else
     Geant::Printf("   volume %s: edep=%f", gGeoManager->GetVolume(fHCALid[i])->GetName(), fEdepHCAL[i][0] * 1000. / nprim);
 #endif
