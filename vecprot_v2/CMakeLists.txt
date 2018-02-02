@@ -13,6 +13,7 @@ if (USE_REAL_PHYSICS)
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullCMS/inc
+    ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
     )
 else()
   include_directories(
@@ -339,6 +340,7 @@ set(TEST_EXECUTABLES
   )
 set(NOTEST_EXECUTABLES
   fullCMS.cc
+  runTARC.cc
   )
 
 macro(build_executables EXECUTABLES)
@@ -420,6 +422,24 @@ foreach(_script ${TestEm3_GV_SCRIPTS})
 endforeach()
 install(TARGETS TestEm3_GV DESTINATION ${TestEm3_GV_OUTPUT})
 install(FILES ${TestEm3_GV_SCRIPTS} DESTINATION ${TestEm3_GV_OUTPUT})
+
+### TARC ###
+
+set(TARC_OUTPUT bin/examples/TARC/GeantV)
+set(TARC_SCRIPTS TARCrun.mac ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/data/tarc_geometry.gdml)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${TARC_OUTPUT})
+foreach(_script ${TARC_SCRIPTS})
+	configure_file(
+		${_script}
+		${CMAKE_BINARY_DIR}/${TARC_OUTPUT}/${_script}
+		COPYONLY
+	)
+endforeach()
+install(TARGETS runTARC DESTINATION ${TARC_OUTPUT})
+install(FILES ${TARC_SCRIPTS} DESTINATION ${TARC_OUTPUT})
+
+### TARC ###
+
 # -------  END == WITH REAL PHYSICS -------------------------------------------------------
 endif()
 
