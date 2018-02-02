@@ -7,8 +7,9 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullLHCb/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
-  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyMT/TBBProcessingDemo/TBBFrameworkCore
-  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyMT/TBBProcessingDemo/TBBTestModules
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBTestModules
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
 
   ${CMAKE_SOURCE_DIR}/realphysics/dummies/inc
   ${CMAKE_SOURCE_DIR}/realphysics/physics/management/inc
@@ -87,6 +88,15 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/UserPhysicsList.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/StepMaxProcess.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc/Hist.h
+
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Event.cpp
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Filter.cpp
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Module.cpp
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Producer.cpp
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Schedule.cpp
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Path.cpp
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/EventProcessor.cpp
+
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCapp.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCData.h
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc/TARCGeometrycConstruction.h
