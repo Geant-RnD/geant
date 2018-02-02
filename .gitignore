@@ -30,6 +30,6 @@ DispatchDemo
 lib
 bin
 build
-/include
+include
 doxygen.conf
 setmeup.sh
