@@ -51,8 +51,8 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCGeometryConstruction.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPhysicsList.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCPrimaryGenerator.cxx
-  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCData.cxx
   ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCapp.cxx
+  ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/src/TARCData.cxx
   )
 
 set(headers
