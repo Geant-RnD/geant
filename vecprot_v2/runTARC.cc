@@ -1,4 +1,4 @@
-/****************************************************************
+tarcapp/****************************************************************
  *  @file: runTARC.cc
  *  @author: Abhijit Bhattacharyya
  *  @brief: This file is created to run simulation for TARC.
