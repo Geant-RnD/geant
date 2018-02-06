@@ -8,11 +8,8 @@ namespace tarcapp {
   class TARCDataPerPrimary {
   public:
     TARCDataPerPrimary();
-<<<<<<< HEAD
     ~TARCDataPerPrimary(){};
-=======
-    ~TARCDataPerPrimary();
->>>>>>> Further change in code
+
 
     void   AddChargedStep()                  {fNumChargedSteps += 1.0; }
     double GetChargedSteps() const           {return fNumChargedSteps;}
@@ -66,11 +63,8 @@ namespace tarcapp {
   class TARCDataPerPrimaryType{
   public:
     TARCDataPerPrimaryType();
-<<<<<<< HEAD
     ~TARCDataPerPrimaryType(){};
-=======
-    ~TARCDataPerPrimaryType();
->>>>>>> Further change in code
+
 
     void AddOnePrimary()                    { fNumPrimaries += 1.0;}
     double GetNumPrimaries() const          { return fNumPrimaries;}
@@ -210,11 +204,7 @@ private:
   std::vector<TARCDataPerEvent>   fPerEventData;
 };
 
-<<<<<<< HEAD
 } // namespace
-=======
-}
->>>>>>> Further change in code
 
 
 #endif

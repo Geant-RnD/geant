@@ -71,7 +71,7 @@ namespace tarcapp {
 
   private:
     //const char *
-    std::string fGeomFileName = "tarc_geometry.root";
+    std::string fGeomFileName = "/home/vega/decrypt/GV_APPLI_TARC/examplesRP/GeantV/TARC/data/tarc_geometry.root";
     std::string fGDMLFileName;
     std::string             fTargetMatName;
     //int                     fTargetLogicalVolumeID;
@@ -94,4 +94,4 @@ namespace tarcapp {
 
 } // namespace eends here
 
-#endif   // DETECTORCONSTRUCTION_
+#endif   // DETECTORCONSTRUCTION_H
