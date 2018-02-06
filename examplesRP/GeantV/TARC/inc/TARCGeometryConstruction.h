@@ -3,6 +3,7 @@
  * @author Abhijit Bhattacharyya
  * @brief This file is to construct detector geometry loading from ROOT file
  *        supplied by Alexander Howard
+ * This trial version is written following CMSFull simulation example.
  * @date Oct 2017
  *********************************************************/
 
@@ -70,7 +71,7 @@ namespace tarcapp {
 
   private:
     //const char *
-    std::string fGeomFileName = "tarc_geometry.root";
+    std::string fGeomFileName = "/home/vega/decrypt/GV_APPLI_TARC/examplesRP/GeantV/TARC/data/tarc_geometry.root";
     std::string fGDMLFileName;
     std::string             fTargetMatName;
     //int                     fTargetLogicalVolumeID;

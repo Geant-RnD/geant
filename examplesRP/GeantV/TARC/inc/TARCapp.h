@@ -5,8 +5,8 @@
  * @date Oct 2017
  *********************************************************/
 
-#ifndef TARC_H
-#define TARC_H
+#ifndef TARCAPP_H
+#define TARCAPP_H
 
 #include <iostream>
 #include <iomanip>
@@ -70,7 +70,7 @@ namespace tarcapp {
   class TARCapp : public Geant::GeantVApplication {
   public:
     //TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun);
-    TARCapp(Geant::GeantRunManager *, TARCGeometryConstruction *, TARCPrimaryGenerator *);
+    TARCapp(Geant::GeantRunManager *, TARCPrimaryGenerator *);
     virtual ~TARCapp();
 
     void RetrieveLogicalVolumesFromGDML(){

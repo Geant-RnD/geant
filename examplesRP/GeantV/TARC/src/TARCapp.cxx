@@ -12,8 +12,9 @@ using namespace geantphysics;
 using namespace Geant;
 using namespace tarcapp;
 
-TARCapp::TARCapp(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun)
-  : Geant::GeantVApplication(runmgr), fGeomSetup(geom), fPrimaryGun(gun){
+// TARCapp::TARCapp(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun)
+TARCapp::TARCapp(Geant::GeantRunManager *runmgr, TARCPrimaryGenerator *gun)
+  : Geant::GeantVApplication(runmgr), fPrimaryGun(gun){
     fInitialized           = false;
     //fTargetLogicalVolumeID = -1;
     fNumPrimaryPerEvent    = TARCPrimaryGenerator::GetMaxNumberOfPrimariesPerEvent();

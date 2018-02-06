@@ -57,9 +57,10 @@ namespace tarcapp{
     void SetPrimaryEnergy( const double );
     void SetNumberOfPrimaryPerEvent( int );
     void SetPrimaryDirection(const double pdir[3]);
+    void SetGunPosition(const double rpos[3]);
 
     // interfacing
-    virtual void InitPrimaryGenerator();
+    virtual void InitPrimaryGenerator(){};
     virtual Geant::GeantEventInfo NextEvent(Geant::GeantTaskData* );
     virtual void GetTrack( int, Geant::GeantTrack &, Geant::GeantTaskData* );
 

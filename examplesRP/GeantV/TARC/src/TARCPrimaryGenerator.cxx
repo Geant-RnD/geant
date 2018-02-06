@@ -175,6 +175,12 @@ void TARCPrimaryGenerator::SetPrimaryName(const std::string& pname) {
   fIsUserPrimaryType    = true;
 }
 
+void TARCPrimaryGenerator::SetGunPosition(const double rPos[3]) {
+  fXPos = rPos[0];
+  fYPos = rPos[1];
+  fZPos = rPos[2];
+}
+
 void TARCPrimaryGenerator::SetPrimaryDirection(const double pdir[3]) {
   double norm = 1.0 /std::sqrt(pdir[0] * pdir[0] + pdir[1] * pdir[1] + pdir[2] * pdir[2]);
   fXDir              = pdir[0] * norm;

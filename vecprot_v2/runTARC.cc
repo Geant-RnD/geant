@@ -1,4 +1,4 @@
-tarcapp/****************************************************************
+/****************************************************************
  *  @file: runTARC.cc
  *  @author: Abhijit Bhattacharyya
  *  @brief: This file is created to run simulation for TARC.
@@ -32,6 +32,7 @@ class TGeoMaterial;
 
 // application includes
 #include "TARCapp.h"
+#include "TARCData.h"
 #include "TARCGeometryConstruction.h"
 #include "TARCPrimaryGenerator.h"
 #include "TARCPhysicsList.h"
@@ -42,9 +43,10 @@ class TGeoMaterial;
 std::string  parGeomFileName             = "";    // "tarc_geometry.root";
 // primary generator/particle based
 std::string  parGunPrimaryParticleName   = "";
-int          ParGunPrimaryPerEvent       = 0;
-double       ParGunPrimaryKE             = 0.0;
-double       ParGunPrimaryDir[3]         = {0.0, 0.0, 0.0};
+int          parGunPrimaryPerEvent       = 0;
+double       parGunPrimaryKE             = 0.0;
+double       parGunPrimaryDir[3]         = {0.0, 0.0, 0.0};
+double       parGunPosition[3]           = {0.0, 0.0, 0.0};
 // run config based
 int          parConfigNumBufferedEvt     = 4;    // Num of events to be transported on the same time (buffered)
 int          parConfigNumRunEvt          = 10;   // Num of events to be transported during the run
@@ -56,7 +58,42 @@ int          parConfigVectorizedGeom     = 0;    // activate geometry basketizin
 int          parConfigExternalLoop       = 0;    // activate external loop mode
 
 
-void GetArguments          (int argc, char **argv);
+static struct option options[] = {
+         {"gun-set-primary-energy"             , required_argument, 0, 'a'},
+         {"gun-set-primary-type"               , required_argument, 0, 'b'},
+         {"gun-set-primary-per-event"          , required_argument, 0, 'c'},
+         {"gun-set-primary-direction"          , required_argument, 0, 'd'},
+         {"det-set-gdml"                       , required_argument, 0, 'e'},
+         {"config-number-of-buffered-events"   , required_argument, 0, 'm'},
+         {"config-total-number-of-events"      , required_argument, 0, 'n'},
+         {"config-number-of-threads"           , required_argument, 0, 'p'},
+         {"config-number-of-propagators"       , required_argument, 0, 'q'},
+         {"config-tracks-per-basket"           , required_argument, 0, 'r'},
+         {"config-run-performance"             , required_argument, 0, 's'},
+         {"config-vectorized-geom"             , required_argument, 0, 't'},
+         {"config-external-loop"               , required_argument, 0, 'u'},
+         {"gun-set-position"                   , required_argument, 0, 'x'},
+         {"help", no_argument, 0, 'h'},
+         {0, 0, 0, 0}
+};
+
+enum PRIMARYDIR_OPTIONS { PRIMARYDIR_X_OPT = 0, PRIMARYDIR_Y_OPT, PRIMARYDIR_Z_OPT};
+enum POSITION_OPTIONS { POSITION_X_OPT = 0, POSITION_Y_OPT, POSITION_Z_OPT};
+char *const primarydir_token[] = {
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_X_OPT]   = (char* const)"x",
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Y_OPT]   = (char* const)"y",
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Z_OPT]   = (char* const)"z",
+   NULL
+};
+char *const position_token[] = {
+   [POSITION_OPTIONS::POSITION_X_OPT]   = (char* const)"x",
+   [POSITION_OPTIONS::POSITION_Y_OPT]   = (char* const)"y",
+   [POSITION_OPTIONS::POSITION_Z_OPT]   = (char* const)"z",
+   NULL
+};
+
+
+void GetArguments          (int argc, char** argv);
 void SetupDetectorConst    (tarcapp::TARCGeometryConstruction*  tarcGeom);
 void SetupPrimaryGenerator (tarcapp::TARCPrimaryGenerator*      tarcGUN);
 void SetupApplication      (tarcapp::TARCapp*                      app);
@@ -66,7 +103,7 @@ Geant::GeantRunManager* RunManager();
 int main(int argc, char** argv) {
   GetArguments(argc, argv);   // read user arguments here
 
-  Geant::GeantRunManager *runMgr = RunManager();
+  Geant::GeantRunManager* runMgr = RunManager();
 
   // Here setup the TARC Geometry
   tarcapp::TARCGeometryConstruction *tarcGeom = new tarcapp::TARCGeometryConstruction(runMgr);
@@ -90,6 +127,7 @@ int main(int argc, char** argv) {
   tarcapp::TARCPrimaryGenerator::Print();
 
   // run the simulation
+  /*
   if (parConfigExternalLoop) {
     userfw::Framework fw(parConfigNumPropagators*parConfigNumThreads, parConfigNumRunEvt, runMgr, runMgr->GetPrimaryGenerator());
     fw.Run();
@@ -97,34 +135,11 @@ int main(int argc, char** argv) {
     runMgr->RunSimulation();   // delete the run manager at the end of the simulation
     delete runMgr;
   }
+  */
+  runMgr->RunSimulation();
+  delete runMgr;
   return 0;
 }
-
-static struct option options[] = {
-         {"gun-set-primary-energy"             , required_argument, 0, 'a'},
-         {"gun-set-primary-type"               , required_argument, 0, 'b'},
-         {"gun-set-primary-per-event"          , required_argument, 0, 'c'},
-         {"gun-set-primary-direction"          , required_argument, 0, 'd'},
-         {"det-set-gdml"                       , required_argument, 0, 'e'},
-         {"config-number-of-buffered-events"   , required_argument, 0, 'm'},
-         {"config-total-number-of-events"      , required_argument, 0, 'n'},
-         {"config-number-of-threads"           , required_argument, 0, 'p'},
-         {"config-number-of-propagators"       , required_argument, 0, 'q'},
-         {"config-tracks-per-basket"           , required_argument, 0, 'r'},
-         {"config-run-performance"             , required_argument, 0, 's'},
-         {"config-vectorized-geom"             , required_argument, 0, 't'},
-         {"config-external-loop"               , required_argument, 0, 'u'},
-         {"help", no_argument, 0, 'h'},
-         {0, 0, 0, 0}
-};
-
-enum PRIMARYDIR_OPTIONS { PRIMARYDIR_X_OPT = 0, PRIMARYDIR_Y_OPT, PRIMARYDIR_Z_OPT};
-char *const primarydir_token[] = {
-   [PRIMARYDIR_OPTIONS::PRIMARYDIR_X_OPT]   = (char* const)"x",
-   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Y_OPT]   = (char* const)"y",
-   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Z_OPT]   = (char* const)"z",
-   NULL
-};
 
 // Here define the functions used in this application
 
@@ -137,41 +152,41 @@ void help() {
 }
 
 
-void GetArguments(int argc, char**argv) {
+void GetArguments(int argc, char** argv) {
   char *subopts, *value;
   int errfind = 0;
   while(true) {
-    int option_index = 0;
+    int optionindex = 0;
     int c;
-    c = getopt_long (argc, argv, "", options, &option_index);
+    c = getopt_long (argc, argv, "", options, &optionindex);
 
-    if (c == -1) break;     // exit if no option.
+    if (c == -1) exit(1);   // break;     // exit if no option.
     switch(c) {
       case   0:
-              c = options[option_index].val;
+              c = options[optionindex].val;
       case 'a':
-              ParGunPrimaryKE = strtod(optarg, NULL);
-              if (ParGunPrimaryKE <= 0.0)
+              parGunPrimaryKE = strtod(optarg, NULL);
+              if (parGunPrimaryKE <= 0.0)
                   errx(1, "Primary particle energy must be positive non zero.");
               break;
       case 'b':
               parGunPrimaryParticleName = optarg;
               break;
       case 'c':
-              ParGunPrimaryPerEvent     = (int)strtol(optarg, NULL, 10);
+              parGunPrimaryPerEvent     = (int)strtol(optarg, NULL, 10);
               break;
       case 'd':
               subopts = optarg;
               while (*subopts != '\0' && !errfind) {
                 switch(getsubopt(&subopts, primarydir_token, &value)){
                   case PRIMARYDIR_OPTIONS::PRIMARYDIR_X_OPT:
-                                                            ParGunPrimaryDir[0] = strtod(value, NULL);
+                                                            parGunPrimaryDir[0] = strtod(value, NULL);
                                                             break;
                   case PRIMARYDIR_OPTIONS::PRIMARYDIR_Y_OPT:
-                                                            ParGunPrimaryDir[1] = strtod(value, NULL);
+                                                            parGunPrimaryDir[1] = strtod(value, NULL);
                                                             break;
                   case PRIMARYDIR_OPTIONS::PRIMARYDIR_Z_OPT:
-                                                            ParGunPrimaryDir[2] = strtod(value, NULL);
+                                                            parGunPrimaryDir[2] = strtod(value, NULL);
                                                             break;
                   default                                  :
                                                             fprintf(stderr, "No match found for token: [%s] in options.\n", value);
@@ -207,6 +222,27 @@ void GetArguments(int argc, char**argv) {
               break;
       case 'u':
               parConfigExternalLoop = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'x':
+              subopts = optarg;
+              while (*subopts != '\0' && !errfind) {
+                switch(getsubopt(&subopts, position_token, &value)){
+                  case POSITION_OPTIONS::POSITION_X_OPT:
+                                                    parGunPosition[0] = strtod(value, NULL);
+                                                    break;
+                  case POSITION_OPTIONS::POSITION_Y_OPT:
+                                                    parGunPosition[1] = strtod(value, NULL);
+                                                    break;
+                  case POSITION_OPTIONS::POSITION_Z_OPT:
+                                                    parGunPosition[2] = strtod(value, NULL);
+                                                    break;
+                  default                              :
+                                                    fprintf(stderr, "No match found for token: [%s] in options.\n", value);
+                                                    errfind = 1;
+                                                    exit(0);
+                                                    break;
+                }
+              }
               break;
       case 'h':
               help();
@@ -269,14 +305,16 @@ void SetupDetectorConst(tarcapp::TARCGeometryConstruction* tarcGeom) {
 
 //Setup primary generator
 void SetupPrimaryGenerator(tarcapp::TARCPrimaryGenerator* tarcGUN) {
-  if (ParGunPrimaryPerEvent > 0)
-    tarcGUN->SetNumberOfPrimaryPerEvent(ParGunPrimaryPerEvent);
+  if (parGunPrimaryPerEvent > 0)
+    tarcGUN->SetNumberOfPrimaryPerEvent(parGunPrimaryPerEvent);
   if (parGunPrimaryParticleName != "")
     tarcGUN->SetPrimaryName(parGunPrimaryParticleName);
-  if (ParGunPrimaryKE > 0.0)
-    tarcGUN->SetPrimaryEnergy(ParGunPrimaryKE);
-  if ( (ParGunPrimaryDir[0] || ParGunPrimaryDir[1] || ParGunPrimaryDir[2]))
-    tarcGUN->SetPrimaryDirection(ParGunPrimaryDir);
+  if (parGunPrimaryKE > 0.0)
+    tarcGUN->SetPrimaryEnergy(parGunPrimaryKE);
+  if ( (parGunPosition[0] || parGunPosition[1] || parGunPosition[2]))
+    tarcGUN->SetGunPosition(parGunPosition);
+  if ( (parGunPrimaryDir[0] || parGunPrimaryDir[1] || parGunPrimaryDir[2]))
+    tarcGUN->SetPrimaryDirection(parGunPrimaryDir);
 }
 
 // Setup application

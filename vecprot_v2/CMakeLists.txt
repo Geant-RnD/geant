@@ -13,7 +13,6 @@ if (USE_REAL_PHYSICS)
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm5/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TestEm3/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullCMS/inc
-    ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/FullLHCb/inc
     ${CMAKE_SOURCE_DIR}/examplesRP/GeantV/TARC/inc
     )
@@ -342,7 +341,6 @@ set(TEST_EXECUTABLES
   )
 set(NOTEST_EXECUTABLES
   fullCMS.cc
-  runTARC.cc
   fullLHCb.cc
   runTARC.cc
   )
