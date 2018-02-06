@@ -10,7 +10,6 @@ namespace tarcapp {
     TARCDataPerPrimary();
     ~TARCDataPerPrimary(){};
 
-
     void   AddChargedStep()                  {fNumChargedSteps += 1.0; }
     double GetChargedSteps() const           {return fNumChargedSteps;}
 

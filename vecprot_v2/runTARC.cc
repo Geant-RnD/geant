@@ -127,7 +127,6 @@ int main(int argc, char** argv) {
   tarcapp::TARCPrimaryGenerator::Print();
 
   // run the simulation
-
   if (parConfigExternalLoop) {
     userfw::Framework fw(parConfigNumPropagators*parConfigNumThreads, parConfigNumRunEvt, runMgr, runMgr->GetPrimaryGenerator());
     fw.Run();
@@ -141,6 +140,32 @@ int main(int argc, char** argv) {
   delete runMgr;
   return 0;
 }
+
+static struct option options[] = {
+         {"gun-set-primary-energy"             , required_argument, 0, 'a'},
+         {"gun-set-primary-type"               , required_argument, 0, 'b'},
+         {"gun-set-primary-per-event"          , required_argument, 0, 'c'},
+         {"gun-set-primary-direction"          , required_argument, 0, 'd'},
+         {"det-set-gdml"                       , required_argument, 0, 'e'},
+         {"config-number-of-buffered-events"   , required_argument, 0, 'm'},
+         {"config-total-number-of-events"      , required_argument, 0, 'n'},
+         {"config-number-of-threads"           , required_argument, 0, 'p'},
+         {"config-number-of-propagators"       , required_argument, 0, 'q'},
+         {"config-tracks-per-basket"           , required_argument, 0, 'r'},
+         {"config-run-performance"             , required_argument, 0, 's'},
+         {"config-vectorized-geom"             , required_argument, 0, 't'},
+         {"config-external-loop"               , required_argument, 0, 'u'},
+         {"help", no_argument, 0, 'h'},
+         {0, 0, 0, 0}
+};
+
+enum PRIMARYDIR_OPTIONS { PRIMARYDIR_X_OPT = 0, PRIMARYDIR_Y_OPT, PRIMARYDIR_Z_OPT};
+char *const primarydir_token[] = {
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_X_OPT]   = (char* const)"x",
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Y_OPT]   = (char* const)"y",
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Z_OPT]   = (char* const)"z",
+   NULL
+};
 
 // Here define the functions used in this application
 

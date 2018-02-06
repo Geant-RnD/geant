@@ -7,7 +7,6 @@
  #include "TARCPhysicsList.h"
 using namespace tarcapp;
 
-
   TARCPhysicsList::TARCPhysicsList(const std::string &name) : geantphysics::PhysicsList(name) {
 
   }
