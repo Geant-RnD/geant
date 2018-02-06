@@ -31,7 +31,7 @@ class TGeoMaterial;
 #include "MSCModel.h"
 
 // application includes
-#include "TARC.h"
+#include "TARCapp.h"
 #include "TARCGeometryConstruction.h"
 #include "TARCPrimaryGenerator.h"
 #include "TARCPhysicsList.h"
@@ -39,7 +39,7 @@ class TGeoMaterial;
 
 // Parameters
 // Detector based
-std::string  GeomFileName                = "tarc_geometry.root";
+std::string  parGeomFileName             = "";    // "tarc_geometry.root";
 // primary generator/particle based
 std::string  parGunPrimaryParticleName   = "";
 int          ParGunPrimaryPerEvent       = 0;
@@ -56,59 +56,193 @@ int          parConfigVectorizedGeom     = 0;    // activate geometry basketizin
 int          parConfigExternalLoop       = 0;    // activate external loop mode
 
 
-void GetArguments(int argc, char **argv);
-void SetupUserDetector         (tarc::TARCGeometryConstruction*  tarcGeom);
-void SetupUserPrimaryGenerator (tarc::TARCPrimaryGenerator*      tarcGUN);
-void SetupUserPhysicsList      (tarc::TARCPhysicsList*           tarcPhys);
-void Setuptarc                 (tarc::TARC*                      app);
+void GetArguments          (int argc, char **argv);
+void SetupDetectorConst    (tarcapp::TARCGeometryConstruction*  tarcGeom);
+void SetupPrimaryGenerator (tarcapp::TARCPrimaryGenerator*      tarcGUN);
+void SetupApplication      (tarcapp::TARCapp*                      app);
 
 Geant::GeantRunManager* RunManager();
 
 int main(int argc, char** argv) {
-  Geant::GeantRunManager *runManager = RunManager();
+  GetArguments(argc, argv);   // read user arguments here
+
+  Geant::GeantRunManager *runMgr = RunManager();
 
   // Here setup the TARC Geometry
-  tarc::TARCGeometryConstruction *tarcGeom = new tarc::TARCGeometryConstruction(runManager);
-  SetupUserDetector(tarcGeom);
-  runManager->SetDetectorConstruction(tarcGeom);
+  tarcapp::TARCGeometryConstruction *tarcGeom = new tarcapp::TARCGeometryConstruction(runMgr);
+  SetupDetectorConst(tarcGeom);
+  runMgr->SetDetectorConstruction(tarcGeom);
 
   // Here setup primary generator
-  tarc::TARCPrimaryGenerator *primaryGenerator = new tarc::TARCPrimaryGenerator();
-  SetupUserPrimaryGenerator(primaryGenerator);
-  runManager->SetPrimaryGenerator(primaryGenerator);
+  tarcapp::TARCPrimaryGenerator *primaryGenerator = new tarcapp::TARCPrimaryGenerator();
+  SetupPrimaryGenerator(primaryGenerator);
+  runMgr->SetPrimaryGenerator(primaryGenerator);
 
   // Here setup physics List
-  tarc::TARCPhysicsList *tarcPhysList       = new tarc::TARCPhysicsList("test");
-  SetupUserPhysicsList(tarcPhysList);
-  geantphysics::PhysicsListManager::Instance().RegisterPhysicsList(tarcPhysList);
+  geantphysics::PhysicsListManager::Instance().RegisterPhysicsList(new tarcapp::TARCPhysicsList());
 
   // Here setup TARC application
-  tarc::TARC *tarcApplication = new tarc::TARC(runManager, tarcGeom, primaryGenerator);
-  Setuptarc(tarcApplication);
-  runManager->Settarc(tarcApplication);
+  //               tarcapp::TARCapp *app = new tarcapp::TARCapp(runManager, tarcGeom, primaryGenerator);
+  tarcapp::TARCapp *app = new tarcapp::TARCapp(runMgr, primaryGenerator);
+  SetupApplication(app);
+  //Setuptarc(app);
+  runMgr->SetUserApplication(app);
+  tarcapp::TARCPrimaryGenerator::Print();
 
   // run the simulation
-  runManager->RunSimulation();
-
-  // delete the run manager at the end of the simulation
-  delete runManager;
+  if (parConfigExternalLoop) {
+    userfw::Framework fw(parConfigNumPropagators*parConfigNumThreads, parConfigNumRunEvt, runMgr, runMgr->GetPrimaryGenerator());
+    fw.Run();
+  } else {
+    runMgr->RunSimulation();   // delete the run manager at the end of the simulation
+    delete runMgr;
+  }
   return 0;
 }
 
+static struct option options[] = {
+         {"gun-set-primary-energy"             , required_argument, 0, 'a'},
+         {"gun-set-primary-type"               , required_argument, 0, 'b'},
+         {"gun-set-primary-per-event"          , required_argument, 0, 'c'},
+         {"gun-set-primary-direction"          , required_argument, 0, 'd'},
+         {"det-set-gdml"                       , required_argument, 0, 'e'},
+         {"config-number-of-buffered-events"   , required_argument, 0, 'm'},
+         {"config-total-number-of-events"      , required_argument, 0, 'n'},
+         {"config-number-of-threads"           , required_argument, 0, 'p'},
+         {"config-number-of-propagators"       , required_argument, 0, 'q'},
+         {"config-tracks-per-basket"           , required_argument, 0, 'r'},
+         {"config-run-performance"             , required_argument, 0, 's'},
+         {"config-vectorized-geom"             , required_argument, 0, 't'},
+         {"config-external-loop"               , required_argument, 0, 'u'},
+         {"help", no_argument, 0, 'h'},
+         {0, 0, 0, 0}
+};
+
+enum PRIMARYDIR_OPTIONS { PRIMARYDIR_X_OPT = 0, PRIMARYDIR_Y_OPT, PRIMARYDIR_Z_OPT};
+char *const primarydir_token[] = {
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_X_OPT]   = (char* const)"x",
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Y_OPT]   = (char* const)"y",
+   [PRIMARYDIR_OPTIONS::PRIMARYDIR_Z_OPT]   = (char* const)"z",
+   NULL
+};
+
 // Here define the functions used in this application
+
+void help() {
+  printf("\nUsage: runTARC [OPTIONS] INPUT_FILE\n\n");
+  for (int i = 0; options[i].name != NULL; i++) {
+    printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
+  }
+  printf("\n\n");
+}
+
+
+void GetArguments(int argc, char**argv) {
+  char *subopts, *value;
+  int errfind = 0;
+  while(true) {
+    int option_index = 0;
+    int c;
+    c = getopt_long (argc, argv, "", options, &option_index);
+
+    if (c == -1) break;     // exit if no option.
+    switch(c) {
+      case   0:
+              c = options[option_index].val;
+      case 'a':
+              ParGunPrimaryKE = strtod(optarg, NULL);
+              if (ParGunPrimaryKE <= 0.0)
+                  errx(1, "Primary particle energy must be positive non zero.");
+              break;
+      case 'b':
+              parGunPrimaryParticleName = optarg;
+              break;
+      case 'c':
+              ParGunPrimaryPerEvent     = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'd':
+              subopts = optarg;
+              while (*subopts != '\0' && !errfind) {
+                switch(getsubopt(&subopts, primarydir_token, &value)){
+                  case PRIMARYDIR_OPTIONS::PRIMARYDIR_X_OPT:
+                                                            ParGunPrimaryDir[0] = strtod(value, NULL);
+                                                            break;
+                  case PRIMARYDIR_OPTIONS::PRIMARYDIR_Y_OPT:
+                                                            ParGunPrimaryDir[1] = strtod(value, NULL);
+                                                            break;
+                  case PRIMARYDIR_OPTIONS::PRIMARYDIR_Z_OPT:
+                                                            ParGunPrimaryDir[2] = strtod(value, NULL);
+                                                            break;
+                  default                                  :
+                                                            fprintf(stderr, "No match found for token: [%s] in options.\n", value);
+                                                            errfind = 1;
+                                                            exit(0);
+                                                            break;
+                }
+              }
+              break;
+      case 'e':
+              parGeomFileName = optarg;
+              break;
+      case 'm':
+              parConfigNumBufferedEvt = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'n':
+              parConfigNumRunEvt = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'p':
+              parConfigNumThreads = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'q':
+              parConfigNumPropagators = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'r':
+              parConfigNumTracksPerBasket = (int)strtol(optarg, NULL, 10);
+              break;
+      case 's':
+              parConfigIsPerformance = (int)strtol(optarg, NULL, 10);
+              break;
+      case 't':
+              parConfigVectorizedGeom = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'u':
+              parConfigExternalLoop = (int)strtol(optarg, NULL, 10);
+              break;
+      case 'h':
+              help();
+              exit(0);
+      default:
+              help();
+              errx(1, "Unknown option %c", c);
+    }
+  }
+}
+
 
 //  RunManager
 Geant::GeantRunManager* RunManager() {
   Geant::GeantConfig*       runConfig   = new Geant::GeantConfig();
-  Geant::GeantRunManager*   runManager  = new Geant::GeantRunManager(
-    parConfigNumPropagators, parConfigNumThreads, runConfig
-  );
-  runManager->SetPhysicsInterface(new geantphysics::PhysicsProcessHandler());
+  Geant::GeantRunManager*   runManager  = new Geant::GeantRunManager(parConfigNumPropagators, parConfigNumThreads, runConfig);
+
+  runManager->SetPhysicsInterface(new geantphysics::PhysicsProcessHandler());  // real physics interface object
+
+  // Setting parameters for GeantConfig object
+  runConfig->fNtotal            = parConfigNumRunEvt;
+  runConfig->fNbuff             = parConfigNumBufferedEvt;
+  runConfig->fUseV3             = true;                     //  THIS IS TRUE as Present GV uses V3
+  runConfig->fNminThreshold     = 5 * parConfigNumThreads;  // Sets threshold for tracks to be used in same volume.
+  runConfig->fNminReuse         = 100000;
+  runConfig->fNperBasket        = parConfigNumTracksPerBasket;
+  runConfig->fUseVectorizedGeom = parConfigVectorizedGeom; // Activate Vectorized Geometry.
+
   return runManager;
 }
 
 // Setup detector
-void SetupUserDetector(tarc::TARCGeometryConstruction* tarcGeom) {
+void SetupDetectorConst(tarcapp::TARCGeometryConstruction* tarcGeom) {
+  if (parGeomFileName != "")
+    tarcGeom->SetGDMLFile(parGeomFileName);
+  /*
   Geant::GeantVDetectorConstruction *gvDetNew;
   std::string rootGeomFilePath = "";
   if (std::getenv("TARCGDMLPATH") == "" ) {
@@ -130,19 +264,23 @@ void SetupUserDetector(tarc::TARCGeometryConstruction* tarcGeom) {
   }
 
   std::cout << " Visited SetupUserDetector function." << std::endl;
+  */
 }
 
 //Setup primary generator
-void SetupUserPrimaryGenerator(tarc::TARCPrimaryGenerator* tarcGUN) {
-  std::cout << " Inside primary Generator setting." << std::endl;
-}
-
-// Setup Physics List
-void SetupUserPhysicsList(tarc::TARCPhysicsList* tarcPhys) {
-  std::cout << " Visited Phys List." << std::endl;
+void SetupPrimaryGenerator(tarcapp::TARCPrimaryGenerator* tarcGUN) {
+  if (ParGunPrimaryPerEvent > 0)
+    tarcGUN->SetNumberOfPrimaryPerEvent(ParGunPrimaryPerEvent);
+  if (parGunPrimaryParticleName != "")
+    tarcGUN->SetPrimaryName(parGunPrimaryParticleName);
+  if (ParGunPrimaryKE > 0.0)
+    tarcGUN->SetPrimaryEnergy(ParGunPrimaryKE);
+  if ( (ParGunPrimaryDir[0] || ParGunPrimaryDir[1] || ParGunPrimaryDir[2]))
+    tarcGUN->SetPrimaryDirection(ParGunPrimaryDir);
 }
 
 // Setup application
-void Setuptarc(tarc::TARC* app) {
-  std::cout << " Visited Setuptarc function." << std::endl;
+void SetupApplication(tarcapp::TARCapp *app) {
+  if (parConfigIsPerformance)
+    app->SetPerformanceMode(true);
 }

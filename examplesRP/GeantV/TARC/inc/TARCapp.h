@@ -40,10 +40,13 @@
 
 #include "TARCGeometryConstruction.h"
 #include "TARCPrimaryGenerator.h"
+#include "TARCData.h"
 
 #include "Geant/Typedefs.h"
 #include "GeantFwd.h"
 #include "GeantTaskData.h"
+
+#define SQR(x) x * x
 
 namespace geantphysics {
   inline namespace GEANT_IMPL_NAMESPACE {
@@ -60,15 +63,15 @@ namespace GEANT_IMPL_NAMESPACE {
   }
 }
 
-namespace tarc {
+namespace tarcapp {
   class TARCGeometryConstruction;
   class TARCPrimaryGenerator;
 
-  class TARC : public Geant::GeantVApplication {
+  class TARCapp : public Geant::GeantVApplication {
   public:
     //TARC(Geant::GeantRunManager *runmgr, TARCGeometryConstruction *geom, TARCPrimaryGenerator *gun);
-    TARC(Geant::GeantRunManager *, TARCGeometryConstruction *, TARCPrimaryGenerator *);
-    virtual ~TARC();
+    TARCapp(Geant::GeantRunManager *, TARCGeometryConstruction *, TARCPrimaryGenerator *);
+    virtual ~TARCapp();
 
     void RetrieveLogicalVolumesFromGDML(){
       vecgeom::GeoManager::Instance().GetAllLogicalVolumes(fLVolumeList);
@@ -80,28 +83,30 @@ namespace tarc {
 
     virtual bool Initialize(); // @brief Interface to Initialize application
 
-    // virtual void AttachUserData(Geant::GeantTaskData *td);
+    virtual void AttachUserData(Geant::GeantTaskData *td);
 
-    // virtual void SteppingActions(Geant::geantTrack &, geant::GeantTaskData *);
+    virtual void SteppingActions(Geant::GeantTrack &, Geant::GeantTaskData *);
 
-    // virtual void FinishEvent(Geant::GeantEvent * );
+    virtual void FinishEvent(Geant::GeantEvent * );
 
-    // virtual void FinishRun();
+    void SetPerformanceMode(bool val) { fIsPerformance = val;}
 
+    virtual void FinishRun();
     virtual vecgeom::Vector3D<double> GetGun() { return fGunPos; }
     virtual void SetGun(double x, double y, double z) { fGunPos[0] = x; fGunPos[1] = y; fGunPos[2] = z; }
-    virtual void fixGun();
+    virtual void fixGun();private:
 
   private:
-    TARC(const TARC &) = delete;
-    TARC &operator=(const TARC &) = delete;
+    TARCapp(const TARCapp &) = delete;
+    TARCapp &operator=(const TARCapp &) = delete;
 
   private:
+    bool                                               fIsPerformance;
     bool                                               fInitialized;
 
     std::vector<vecgeom::LogicalVolume*>               fLVolumeList;
     std::vector<vecgeom::VPlacedVolume*>               fPVolumeList;
-    int                                                fTargetLogicalVolumeID;
+
     int                                                fNumPrimaryPerEvent;
     int                                                fNumBufferedEvents;
     TARCGeometryConstruction                          *fGeomSetup;
@@ -109,9 +114,9 @@ namespace tarc {
     std::mutex                                         fMutex;
     vecgeom::Vector3D<double>                          fGunPos;
     double                                             fPrimaryParticleCharge;
-    // Geant::TaskDataHandle<TARCThreadDataEvents>    *fDataHandlerEvents;
+    Geant::TaskDataHandle<TARCThreadDataEvents>       *fDataHandlerEvents;
     // Geant::TaskDataHandle<TARCThreadDataRun>       *fDataHandlerRun;
-    // TARCData                                       *fData;
+    TARCData                                          *fData;
 
   };  // class ends
 

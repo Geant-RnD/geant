@@ -50,26 +50,28 @@ namespace geantphysics {
   }
 }
 
-namespace tarc {
+namespace tarcapp {
   class TARCGeometryConstruction : public Geant::GeantVDetectorConstruction {
   public:
     // Constructor
     TARCGeometryConstruction(Geant::GeantRunManager *runmgr);
     // Destructor
-    ~TARCGeometryConstruction();
+    virtual ~TARCGeometryConstruction();
 
     // create materials for the setup
     //virtual void CreateMaterials();   // Material is already defined in the GDML file
 
     // interface method to define the geometry for the application
     virtual void CreateGeometry();
+    void SetGDMLFile(const std::string& gdmlFile) { fGDMLFileName = gdmlFile;}
 
     void SetLVList(vecgeom::LogicalVolume *inpLV){ fLVolumeList.push_back(inpLV); }
     void SetPVList(vecgeom::VPlacedVolume *inpPV){ fPVolumeList.push_back(inpPV); }
 
   private:
     //const char *
-    std::string GeomFileName = "tarc_geometry.root";
+    std::string fGeomFileName = "tarc_geometry.root";
+    std::string fGDMLFileName;
     std::string             fTargetMatName;
     //int                     fTargetLogicalVolumeID;
     //int                     fTargetRegionIndx;

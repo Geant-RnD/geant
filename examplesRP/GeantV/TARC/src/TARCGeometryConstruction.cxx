@@ -3,18 +3,21 @@
 using namespace vecgeom;
 using namespace geantphysics;
 using namespace geant;
+using namespace tarcapp;
 
 
-namespace tarc{
 TARCGeometryConstruction::TARCGeometryConstruction(Geant::GeantRunManager *runmgr)
- : Geant::GeantVDetectorConstruction(runmgr) {
+ : Geant::GeantVDetectorConstruction(runmgr), fGDMLFileName(fGeomFileName) {
   // fTargetLogicalVolumeID = -1;
 }
 
 
-TARCGeometryConstruction::~TARCGeometryConstruction() {/* nothing to do */}
+TARCGeometryConstruction::~TARCGeometryConstruction() {
+
+}
 
 void TARCGeometryConstruction::CreateGeometry() {
+  LoadGeometry(fGDMLFileName.c_str());
   /*
   std::string rootGeomFilePath = std::getenv("TARCGDMLPATH");
   rootGeomFilePath += "/" + GeomFileName;
@@ -29,5 +32,3 @@ void TARCGeometryConstruction::CreateGeometry() {
   }
   */
 }
-
-} //namespace ends Here

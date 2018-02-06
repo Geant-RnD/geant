@@ -43,18 +43,34 @@
 #include "MSCModel.h"
 #include "GSMSCModel.h"
 #include "StepMaxProcess.h"
+
+#include "ElectronBremsstrahlungProcess.h"
+#include "SeltzerBergerBremsModel.h"
+#include "RelativisticBremsModel.h"
+
+#include "PositronAnnihilationProcess.h"
+
+#include "ComptonScatteringProcess.h"
+#include "KleinNishinaComptonModel.h"
+
+#include "GammaConversionProcess.h"
+#include "BetheHeitlerPairModel.h"
+#include "RelativisticPairModel.h"
+
+#include "GammaPhotoElectricProcess.h"
+#include "SauterGavrilaPhotoElectricModel.h"
+
 //#include "ElasticScatteringProcess.h"
 //#include "DiffuseElasticModel.h"
 //#include "GlauberGribovElasticXsc.h"
 
 
-namespace tarc {
+namespace tarcapp {
   class TARCPhysicsList : public geantphysics::PhysicsList {
   public:
-    TARCPhysicsList(const std::string &name);
-    ~TARCPhysicsList();
-
-    void SetStepMaxValue(double aVal);
+    TARCPhysicsList(const std::string &name = "TARC-PhysicsList");
+    virtual~TARCPhysicsList();
+    void SetStepMaxValue(double);
     virtual void Initialize();
 
   private:
