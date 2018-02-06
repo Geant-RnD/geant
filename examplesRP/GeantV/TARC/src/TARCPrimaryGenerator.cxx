@@ -175,7 +175,6 @@ void TARCPrimaryGenerator::SetPrimaryName(const std::string& pname) {
   fIsUserPrimaryType    = true;
 }
 
-
 void TARCPrimaryGenerator::SetGunPosition(const double rPos[3]) {
   fXPos = rPos[0];
   fYPos = rPos[1];

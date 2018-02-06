@@ -64,7 +64,6 @@ namespace tarcapp {
     TARCDataPerPrimaryType();
     ~TARCDataPerPrimaryType(){};
 
-
     void AddOnePrimary()                    { fNumPrimaries += 1.0;}
     double GetNumPrimaries() const          { return fNumPrimaries;}
 
