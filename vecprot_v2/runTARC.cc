@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
   tarcapp::TARCPrimaryGenerator::Print();
 
   // run the simulation
-  /*
+  
   if (parConfigExternalLoop) {
     userfw::Framework fw(parConfigNumPropagators*parConfigNumThreads, parConfigNumRunEvt, runMgr, runMgr->GetPrimaryGenerator());
     fw.Run();
@@ -135,10 +135,10 @@ int main(int argc, char** argv) {
     runMgr->RunSimulation();   // delete the run manager at the end of the simulation
     delete runMgr;
   }
+
   */
   runMgr->RunSimulation();
   delete runMgr;
-
   return 0;
 }
 

@@ -348,8 +348,6 @@ set(NOTEST_EXECUTABLES
   fullCMS.cc
   fullLHCb.cc
   runTARC.cc
-  fullLHCb.cc
-  runTARC.cc
   )
 
 macro(build_executables EXECUTABLES)
