@@ -8,7 +8,6 @@
 using namespace tarcapp;
 
 
-
   TARCPhysicsList::TARCPhysicsList(const std::string &name) : geantphysics::PhysicsList(name) {
 
   }
@@ -202,13 +201,34 @@ using namespace tarcapp;
         // add the process to the gamma particle
         AddProcessToParticle(particle, photoelectricProc);
       }
-      if (particle == geantphysics::Proton::Definition()) {
+      if (  particle == geantphysics::Proton::Definition()
+         || particle == geantphysics::Neutron::Definition()
+         || particle == geantphysics::PionPlus::Definition()
+         || particle == geantphysics::PionMinus::Definition()
+         || particle == geantphysics::PionZero::Definition()
+         || particle == geantphysics::KaonPlus::Definition()
+         || particle == geantphysics::KaonMinus::Definition()
+         || particle == geantphysics::KaonZero::Definition()
+         || particle == geantphysics::KaonShort::Definition()
+         || particle == geantphysics::KaonLong::Definition()
+       ){
+          geantphysics::HadronicProcess *hadElasticProc = new geantphysics::ElasticScatteringProcess();  // hadronic elastic process for proton
+          geantphysics::HadronicFinalStateModel *diffuseElasticModel = new geantphysics::DiffuseElasticModel(); // diffuse elastic model.
+          geantphysics::HadronicCrossSection *ggElasticXS = new geantphysics::GlauberGribovElasticXsc(); // create cross section. ?? compare with NUDY ?
 
-      }
-      if (particle == geantphysics::Neutron::Definition()){
+          diffuseElasticModel->SetLowEnergyUsageLimit(0.001*geant::eV); // minimum energy of the model
+          diffuseElasticModel->SetHighEnergyUsageLimit(100.0 * geant::TeV); // maximum energy of model
 
+          hadElasticProc->AddModel(diffuseElasticModel);    // add model to the process
+          hadElasticProc->AddCrossSection(ggElasticXS);
+
+          AddProcessToParticle(particle, hadElasticProc); // Add process to particle
       }
     }
+  }
+
+  void TARCPhysicsList::SetMSCStepLimit(geantphysics::MSCSteppingAlgorithm stepping) {
+    fMSCSteppingAlgorithm = stepping;
   }
 
   void TARCPhysicsList::SetStepMaxValue(double aVal){

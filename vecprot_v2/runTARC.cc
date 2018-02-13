@@ -40,7 +40,7 @@ class TGeoMaterial;
 
 // Parameters
 // Detector based
-std::string  parGeomFileName             = "";    // "tarc_geometry.root";
+std::string  parGeomFileName             = "./tarc_geometry.gdml";    // "tarc_geometry.root";
 // primary generator/particle based
 std::string  parGunPrimaryParticleName   = "";
 int          parGunPrimaryPerEvent       = 0;
@@ -102,7 +102,7 @@ Geant::GeantRunManager* RunManager();
 
 int main(int argc, char** argv) {
   GetArguments(argc, argv);   // read user arguments here
-  
+
   Geant::GeantRunManager* runMgr = RunManager();
 
   // Here setup the TARC Geometry
@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
   tarcapp::TARCPrimaryGenerator::Print();
 
   // run the simulation
-  
+
   if (parConfigExternalLoop) {
     userfw::Framework fw(parConfigNumPropagators*parConfigNumThreads, parConfigNumRunEvt, runMgr, runMgr->GetPrimaryGenerator());
     fw.Run();
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
     delete runMgr;
   }
 
-  */
+
   runMgr->RunSimulation();
   delete runMgr;
   return 0;
@@ -277,6 +277,7 @@ Geant::GeantRunManager* RunManager() {
 
 // Setup detector
 void SetupDetectorConst(tarcapp::TARCGeometryConstruction* tarcGeom) {
+  std::cout << parGeomFileName << std::endl;
   if (parGeomFileName != "")
     tarcGeom->SetGDMLFile(parGeomFileName);
   /*

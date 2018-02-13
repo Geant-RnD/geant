@@ -9,9 +9,12 @@
 
 #include "PhysicsList.h"
 #include "MSCModel.h"
+#include "MSCProcess.h"
 #include "PhysicsProcess.h"
 #include "PhysicalConstants.h"
 #include "SystemOfUnits.h"
+#include "GSMSCModel.h"
+#include "StepMaxProcess.h"
 
 
 #include "Particle.h"
@@ -29,7 +32,6 @@
 #include "KaonShort.h"
 #include "KaonLong.h"
 
-
 #include "ElectronIonizationProcess.h"
 #include "MollerBhabhaIonizationModel.h"
 #include "ElectronBremsstrahlungProcess.h"
@@ -37,32 +39,17 @@
 #include "RelativisticBremsModel.h"
 #include "ComptonScatteringProcess.h"
 #include "KleinNishinaComptonModel.h"
-#include "GammaConversionProcess.h"
 #include "BetheHeitlerPairModel.h"
-#include "MSCProcess.h"
-#include "MSCModel.h"
-#include "GSMSCModel.h"
-#include "StepMaxProcess.h"
-
-#include "ElectronBremsstrahlungProcess.h"
-#include "SeltzerBergerBremsModel.h"
-#include "RelativisticBremsModel.h"
-
 #include "PositronAnnihilationProcess.h"
-
-#include "ComptonScatteringProcess.h"
-#include "KleinNishinaComptonModel.h"
-
-#include "GammaConversionProcess.h"
-#include "BetheHeitlerPairModel.h"
 #include "RelativisticPairModel.h"
-
+#include "GammaConversionProcess.h"
 #include "GammaPhotoElectricProcess.h"
 #include "SauterGavrilaPhotoElectricModel.h"
+#include "StepMaxProcess.h"
+// #include "ElasticScatteringProcess.h"
+#include "DiffuseElasticModel.h"
+#include "GlauberGribovElasticXsc.h"
 
-//#include "ElasticScatteringProcess.h"
-//#include "DiffuseElasticModel.h"
-//#include "GlauberGribovElasticXsc.h"
 
 
 namespace tarcapp {
@@ -70,11 +57,14 @@ namespace tarcapp {
   public:
     TARCPhysicsList(const std::string &name = "TARC-PhysicsList");
     virtual~TARCPhysicsList();
+    void SetMSCSteppingAlgorithm(geantphysics::MSCSteppingAlgorithm);
     void SetStepMaxValue(double);
+    void SetMSCStepLimit(geantphysics::MSCSteppingAlgorithm);
     virtual void Initialize();
 
   private:
-  double fStepMaxValue;
+    geantphysics::MSCSteppingAlgorithm fMSCSteppingAlgorithm;
+    double fStepMaxValue;
 
 };
 

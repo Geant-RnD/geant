@@ -38,10 +38,13 @@ TARCapp::~TARCapp(){
     fDataHandlerEvents->AttachUserData(eventData, td);
   }
 
-  bool TARCapp::Initialize() {
 
+  bool TARCapp::Initialize() {
     if (fInitialized || fIsPerformance) return true;
 
+    RetrieveLogicalVolumesFromGDML();
+    RetrievePlacedVolumesFromGDML();
+    fixGun();
     /*
     std::cout << " Initializing......" << std::endl;
     if (!fGeomSetup) {
@@ -233,4 +236,6 @@ void TARCapp::FinishRun(){
      fGunPos.z() = minZ;
      fGunPos.z() -= 1000.0*geant::mm;
    }
+
+   std::cout << fGunPos.x() <<  ", " << fGunPos.y() <<", " << fGunPos.z() << std::endl;
  }
