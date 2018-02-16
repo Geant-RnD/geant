@@ -22,9 +22,9 @@ void dumpVerb(){
   std::string fInENDF="";
   std::string fOutROOT="";
 
-  std::cout << "Enter ENDF data file name: ";
+  std::cout << "Enter ENDF data file name ( e.g. 094_Pu_246) : ";
   std::getline (std::cin,fInENDF);
-  std::cout << "Enter ROOT file name to produce: ";
+  std::cout << "Enter ROOT file name to produce <press ENTER for automatic name>: ";
   std::getline(std::cin, fOutROOT);
   if (fInENDF.length() < 1) nudyxs.printE2RErr();
   nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
@@ -40,16 +40,16 @@ void DumpProcE2R() {
     std::string fRootOUT = "";
     std::string fEndfSubIN = "";
     double temp = 293.60608;
-    std::cout << " ENDF data file name as INPUT: ";
+    std::cout << " ENDF data file name as INPUT (e.g. 094_Pu_246): ";
     std::getline(std::cin, fEndfIN);
-    std::cout << " ROOT data file name as OUTPUT: ";
+    std::cout << " ROOT data file name as OUTPUT <press ENTER for automatic name>: ";
     std::getline(std::cin,fRootOUT);
-    std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ>: ";
+    std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ> (e.g.094_Pu_241) : ";
     std::getline(std::cin, fEndfSubIN);
     //std::cout << " ENDFSUB data file name for fission data as INPUT: ";
     //std::cin >> fEndfSubIN;
-    std::cout << "Temperature: "; std::cin >> temp;
-    temp = (temp == 0.0) ? 293.60608 : temp;
+    std::cout << "Temperature (0 means 293.60608 default ) : "; std::cin >> temp;
+    temp = (temp <= 0.0) ? 293.60608 : temp;
     nudyxs.DumpEndf2Root(fEndfIN, fEndfSubIN, fRootOUT, temp);
     //////////////////////////////////
 }

@@ -49,12 +49,22 @@ void NudyPhysics::TNudyInterface::setFileNames(std::string fIN, std::string fOUT
 void NudyPhysics::TNudyInterface::DumpEndf2Root(std::string fIN, std::string fEndfSub, std::string fOUT, double temp) {
   SetTemp(temp);
   SetIsFissKey(false);
+ 
+  std::string fENDFD1;
+  std::string fENDFD2;
+  fENDFD1 = "n-" + fIN;
 
-  fEndfFileN = fIN.c_str();
-  fEndfSubDataFileName = fEndfSub.c_str();
+  fENDFD1 = GetDataFileName("neutrons", fENDFD1);
+  fENDFD1+=".endf";
+  fEndfFileN = fENDFD1.c_str();
+
+  fENDFD2 = "nfy-"+fEndfSub;
+  fENDFD2 = GetDataFileName("nfy", fENDFD2);
+  fENDFD2 +=".endf";
+  fEndfSubDataFileName = fENDFD2.c_str();
+  
   if (!fOUT.length()) fOUT = fIN + ".root";
   fRootFileName = fOUT.c_str();
-
 
   Nudy::TNudyENDF *proc = new Nudy::TNudyENDF (fEndfFileN, fRootFileName, "recreate");
   proc->SetPreProcess(0);
@@ -133,9 +143,15 @@ double NudyPhysics::TNudyInterface::GetXS( int projCode, double projKE, double t
 
 void NudyPhysics::TNudyInterface::ConvertENDF2ROOT(std::string fENDFD, std::string rENDFD){
   // setFileNames(fENDFD, rENDFD, "");
+
+  std::string fIN = fENDFD;
+  fENDFD = "n-"+fENDFD+".endf";
+
+  fENDFD = GetDataFileName("neutrons", fENDFD);
   fEndfFileN = fENDFD.c_str();
-  if (!rENDFD.length()) rENDFD = fENDFD + ".root";
+  if (!rENDFD.length()) rENDFD = fIN + ".root";
   fRootFileName = rENDFD.c_str();
+
   Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fEndfFileN, fRootFileName, "recreate");
   tn->SetLogLev(0);
   tn->Process();
@@ -212,7 +228,7 @@ std::string NudyPhysics::TNudyInterface::GetDataFileName(std::string str1, std::
   std::string EndfDataPath="";
   if (std::getenv("ENDFDATADIR")!=NULL){
     EndfDataPath = std::getenv("ENDFDATADIR");
-    std::string ENDFDataString = EndfDataPath + "/" + str1 + "/" + str2 + ".endf";
+    std::string ENDFDataString = EndfDataPath + "/" + str1 + "/" + str2;// + ".endf";
     return ENDFDataString;
   } else {
     std::cout << " Please set environment ENDFDATADIR pointing to root of ENDF-B-VII data directory ." << std::endl;
