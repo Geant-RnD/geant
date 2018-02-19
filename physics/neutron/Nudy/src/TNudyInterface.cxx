@@ -87,8 +87,8 @@ void NudyPhysics::TNudyInterface::DumpEndf2Root(std::string fIN, std::string fEn
   NudyPhysics::TNudyEndfSigma *xsec = new NudyPhysics::TNudyEndfSigma(fRootFileName, iSigDiff);
   xsec->SetsigPrecision(iSigDiff);
   xsec->SetPreProcess(0);
-  xsec->SetOutTempDop(0.0);
-  xsec->SetInitTempDop(temp);
+  xsec->SetInitTempDop(0.0);
+  xsec->SetOutTempDop(temp);
   xsec->GetData(fRootFileName, iSigDiff);
   NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
 }
@@ -140,63 +140,6 @@ double NudyPhysics::TNudyInterface::GetXS( int projCode, double projKE, double t
   //SetProjIDFn(projCode, projKE,"");
   double XSvalue = ComputeCrossSection();  // call routines from Nudy
   return XSvalue;
-}
-
-void NudyPhysics::TNudyInterface::ConvertENDF2ROOT(std::string fIN, std::string fEndfSub,std::string fOUT, double temp){
-  SetTemp(temp);
-  SetIsFissKey(false);
-  
-  std::string fENDFD1;
-  std::string fENDFD2;
-  fENDFD1 = "n-" + fIN;
-   
-  fENDFD1 = GetDataFileName("neutrons", fENDFD1);
-  fENDFD1+=".endf";
-  fEndfFileN = fENDFD1.c_str();
-   
-  fENDFD2 = "nfy-"+fEndfSub;
-  fENDFD2 = GetDataFileName("nfy", fENDFD2);
-  fENDFD2 +=".endf";
-  fEndfSubDataFileName = fENDFD2.c_str();
-   
-  if (!fOUT.length()) fOUT = fIN + ".root";
-  fRootFileName = fOUT.c_str();
-  
-  // setFileNames(fENDFD, rENDFD, "");
-  /*
-  std::string fIN = fENDFD;
-  fENDFD = "n-"+fENDFD+".endf";
-
-  fENDFD = GetDataFileName("neutrons", fENDFD);
-  fEndfFileN = fENDFD.c_str();
-  if (!rENDFD.length()) rENDFD = fIN + ".root";
-  fRootFileName = rENDFD.c_str();
-  */
-  Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fEndfFileN, fRootFileName, "recreate");
-  tn->SetPreProcess(0);
-  tn->SetLogLev(0);
-  tn->Process();
-
-  if (fEndfSub.find("ZZ") == std::string::npos){
-    bool LFIval = tn->GetLFI();
-    SetIsFissKey(LFIval);
-    tn->SetEndfSub(fEndfSubDataFileName);
-    tn->Process();
-  } else {
-    // Nudy::TNudyENDF *tn = new Nudy::TNudyENDF(fEndfFileN, fRootFileName, "recreate");
-    // tn->SetLogLev(2);
-    // tn->Process();
-    return;
-  }
-   
-  double iSigDiff = 0.001;  // documentation required
-  NudyPhysics::TNudyEndfSigma *xsec = new NudyPhysics::TNudyEndfSigma(fRootFileName, iSigDiff);
-  xsec->SetsigPrecision(iSigDiff);
-  xsec->SetPreProcess(0);
-  xsec->SetOutTempDop(0.0);
-  xsec->SetInitTempDop(temp);
-  xsec->GetData(fRootFileName, iSigDiff);
-  NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
 }
 
 void NudyPhysics::TNudyInterface::printE2RErr() {

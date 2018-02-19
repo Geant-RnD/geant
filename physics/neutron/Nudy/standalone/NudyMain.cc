@@ -16,26 +16,6 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
     return stream << static_cast<typename std::underlying_type<T>::type>(e);
 }
 
-void dumpVerb(){
-  // This simply transforms the raw ENDF data file to raw ROOT file
-  std::string fEndfIN = "";
-  std::string fRootOUT = "";
-  std::string fEndfSubIN = "";
-  double temp = 293.60608;
-  std::cout << " ENDF data file name as INPUT (e.g. 094_Pu_246): ";
-  std::getline(std::cin, fEndfIN);
-  std::cout << " ROOT data file name as OUTPUT <press ENTER for automatic name>: ";
-  std::getline(std::cin,fRootOUT);
-  std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ> (e.g.094_Pu_241) : ";
-  std::cout << " We are selecting " << fEndfIN << std::endl;
-  fEndfSubIN = fEndfIN;
-  //std::getline(std::cin, fEndfSubIN);
-  //std::cout << " ENDFSUB data file name for fission data as INPUT: ";
-  //std::cin >> fEndfSubIN;
-  std::cout << "Temperature (0 means 293.60608 default ) : "; std::cin >> temp;
-  temp = (temp <= 0.0) ? 293.60608 : temp;
-  nudyxs.ConvertENDF2ROOT(fEndfIN, fEndfSubIN, fRootOUT, temp);
-}
 
 void DumpProcE2R() {
     ////////////////////////////////////
@@ -96,27 +76,24 @@ void CalXS() {
 
 int main(int /*argc*/, char** /*argv*/) {
 std::cout << " Select choice:----"                                                   << std::endl
-          << "\t 1. Dump ENDF data file to ROOT verbatim. "                          << std::endl
-		      << "\t 2. Dump ENDF data file to ROOT after processing, linearizing etc. " << std::endl
-		      << "\t 3. Compute cross section example for 94-Pu-240 for 1 Mev neutron." << std::endl
-		      << "\t 4. Quit."                                                           << std::endl
+		      << "\t 1. Dump ENDF data file to ROOT after processing, linearizing etc. " << std::endl
+		      << "\t 2. Compute cross section example for 94-Pu-240 for 1 Mev neutron." << std::endl
+		      << "\t 3. Quit."                                                           << std::endl
           << "\t \t ENTER CHOICE:--->";
 int cInput;
 do {
   std::cin >> cInput ;
-} while (cInput < 1 || cInput > 4);
+} while (cInput < 1 || cInput > 3);
 
 std::cout << std::endl;
 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 switch (cInput) {
-  case 1: dumpVerb();
+  case 1: DumpProcE2R();
           exit(0);
-  case 2: DumpProcE2R();
+  case 2: CalXS();
           exit(0);
-  case 3: CalXS();
-          exit(0);
-  case 4: exit(0);
+  case 3: exit(0);
 }
 
   return 0;
