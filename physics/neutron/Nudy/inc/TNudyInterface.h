@@ -144,7 +144,7 @@ namespace NudyPhysics{
     void SetMTValues(geantphysics::NudyProcessType pType);
     void setFileNames(std::string fIN, std::string fOUT, std::string fSubName);
     void DumpEndf2Root(std::string fIN, std::string fEndfSub, std::string fOUT, double temp);
-	  void ConvertENDF2ROOT(std::string fENDF, std::string rENDF);
+	void ConvertENDF2ROOT(std::string fENDF, std::string fEndfSub, std::string rENDF, double temp);
 	  void printE2RErr();
   public:
     inline std::string GetIsotopeName ();

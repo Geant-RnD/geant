@@ -18,16 +18,23 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
 
 void dumpVerb(){
   // This simply transforms the raw ENDF data file to raw ROOT file
-  // without linearization etc.
-  std::string fInENDF="";
-  std::string fOutROOT="";
-
-  std::cout << "Enter ENDF data file name ( e.g. 094_Pu_246) : ";
-  std::getline (std::cin,fInENDF);
-  std::cout << "Enter ROOT file name to produce <press ENTER for automatic name>: ";
-  std::getline(std::cin, fOutROOT);
-  if (fInENDF.length() < 1) nudyxs.printE2RErr();
-  nudyxs.ConvertENDF2ROOT(fInENDF, fOutROOT);
+  std::string fEndfIN = "";
+  std::string fRootOUT = "";
+  std::string fEndfSubIN = "";
+  double temp = 293.60608;
+  std::cout << " ENDF data file name as INPUT (e.g. 094_Pu_246): ";
+  std::getline(std::cin, fEndfIN);
+  std::cout << " ROOT data file name as OUTPUT <press ENTER for automatic name>: ";
+  std::getline(std::cin,fRootOUT);
+  std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ> (e.g.094_Pu_241) : ";
+  std::cout << " We are selecting " << fEndfIN << std::endl;
+  fEndfSubIN = fEndfIN;
+  //std::getline(std::cin, fEndfSubIN);
+  //std::cout << " ENDFSUB data file name for fission data as INPUT: ";
+  //std::cin >> fEndfSubIN;
+  std::cout << "Temperature (0 means 293.60608 default ) : "; std::cin >> temp;
+  temp = (temp <= 0.0) ? 293.60608 : temp;
+  nudyxs.ConvertENDF2ROOT(fEndfIN, fEndfSubIN, fRootOUT, temp);
 }
 
 void DumpProcE2R() {
@@ -45,7 +52,9 @@ void DumpProcE2R() {
     std::cout << " ROOT data file name as OUTPUT <press ENTER for automatic name>: ";
     std::getline(std::cin,fRootOUT);
     std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ> (e.g.094_Pu_241) : ";
-    std::getline(std::cin, fEndfSubIN);
+	std::cout << " We are selecting " << fEndfIN << std::endl;
+	fEndfSubIN = fEndfIN;
+    //std::getline(std::cin, fEndfSubIN);
     //std::cout << " ENDFSUB data file name for fission data as INPUT: ";
     //std::cin >> fEndfSubIN;
     std::cout << "Temperature (0 means 293.60608 default ) : "; std::cin >> temp;
