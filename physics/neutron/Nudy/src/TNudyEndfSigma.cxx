@@ -43,7 +43,7 @@ TNudyEndfSigma::TNudyEndfSigma() : rENDF(), sigDiff(0){ }
 
 TNudyEndfSigma::TNudyEndfSigma(const char *irENDF, double isigDiff) : rENDF(irENDF), sigDiff(isigDiff)
 {
-  GetData(irENDF, isigDiff);
+  // GetData(irENDF, isigDiff);
 }
 
 //____________________________________________________________________________________________________________________

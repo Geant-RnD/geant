@@ -60,6 +60,7 @@ void CalXS() {
     int AtomicNumber  =  94; // 4; //
     int MassNumber = 240;  //
     double temperature = 293.60608;
+	double fTempInit, fTempOut;
     double EnergyValue = 1.0e+6; // 14.0 * geant::MeV;  // 2.0e+6;  // in terms of eV    // 1.0 * geant::MeV;
 
   // @brief Here we provide code for projectile say 2112 for neutron, energy of projectile say 1.0 MeV
