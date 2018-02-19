@@ -111,12 +111,12 @@ double NudyPhysics::TNudyInterface::GetXS( int projCode, double projKE, double t
   //  Fix the name of the ENDF, ROOT and ENDFSUB filenames here
   std::string fileENDF1 = SetDataFileNameENDF(projCode, isoName);
   SetEndfDataFileName(fileENDF1);
+  fileENDF1 += ".endf";
   std::string fileENDF2 = SetDataFileNameROOT(isoName);
   SetRootFileName (fileENDF2);
   std::string fileENDF3 = SetDataFileNameENDFSUB( isoName);
   SetEndfSubDataFileName (fileENDF3);
-
-  std::cout << "ENDFSUB:- " << fileENDF3 << std::endl;
+  fileENDF3 += ".endf";
 
   fEndfFileN = fileENDF1.c_str();
   fRootFileName = fileENDF2.c_str();
