@@ -20,7 +20,7 @@
 
 namespace geant {
   enum class EMsgLevel {
-    kUnset    =  -1,
+       kUnset    =  -1,
     kPrint    =   0,
     kInfo     =   1000,
     kWarning  =   2000,
