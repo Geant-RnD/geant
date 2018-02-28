@@ -27,10 +27,10 @@ export BUILDTYPE
 export COMPILER
 
 # Set up the externals against devgeantv in CVMFS
-if [ -a /cvmfs/sft.cern.ch/lcg/views/devgeantv/latest/$PLATFORM ]; then
-  source /cvmfs/sft.cern.ch/lcg/views/devgeantv/latest/$PLATFORM/setup.sh
-elif [ -a /cvmfs/sft.cern.ch/lcg/views/devgeantv/latest/$COMPATIBLE ]; then
-  source /cvmfs/sft.cern.ch/lcg/views/devgeantv/latest/$COMPATIBLE/setup.sh
+if [ -a /cvmfs/sft.cern.ch/lcg/views/devgeantv/Fri/$PLATFORM ]; then
+  source /cvmfs/sft.cern.ch/lcg/views/devgeantv/Fri/$PLATFORM/setup.sh
+elif [ -a /cvmfs/sft.cern.ch/lcg/views/devgeantv/Fri/$COMPATIBLE ]; then
+  source /cvmfs/sft.cern.ch/lcg/views/devgeantv/Fri/$COMPATIBLE/setup.sh
 else
   echo "No externals for $PLATFORM in $EXTERNALDIR/$EXTERNALS"
 fi
