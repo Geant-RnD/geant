@@ -17,6 +17,7 @@
 
 // from geantV
 #include "Geant/TaskData.h"
+#include "GV/VecCore/VecCore"
 
 namespace geantphysics {
 

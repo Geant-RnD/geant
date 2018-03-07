@@ -4,7 +4,7 @@
 #include "Geant/Config.h"
 
 // include VecCore's math ...
-#include "VecCore/VecCore"
+#include "GV/VecCore/VecCore"
 
 namespace Math {
 template <typename T>
