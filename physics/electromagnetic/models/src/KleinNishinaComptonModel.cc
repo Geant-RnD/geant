@@ -333,7 +333,7 @@ double KleinNishinaComptonModel::SampleReducedPhotonEnergy(const double egamma, 
                                                 &(als->fAliasIndx[0]), fSTNumDiscreteEnergyTransferVals, r2, r3);
   // transform it back to eps = E_1/E_0
   // \epsion(\xi) = \exp[ \alpha(1-\xi) ] = \exp [\ln(1+2\kappa)(\xi-1)]
-  const double kappa = egamma / geant::units::kElectronMassC2;
+  const double kappa = egamma * geant::units::kInvElectronMassC2;
   return std::exp(std::log(1. + 2. * kappa) * (xi - 1.)); // eps = E_1/E_0
 }
 
