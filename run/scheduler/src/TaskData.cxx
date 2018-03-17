@@ -191,6 +191,20 @@ void TaskData::InspectStages(int istage)
   }
 }
 
+//______________________________________________________________________________
+bool TDManager::IsStarving(TaskData *td, int &nbalance) const
+{
+  int ntracks = 0;
+  nbalance = td->fStackBuffer->GetNstart();
+  for (auto tdata : fTaskData)
+    ntracks += tdata->fStackBuffer->GetNstart();
+  if (fMaxThreads * nbalance < (ntracks >> 1)) {
+    nbalance = ntracks/fMaxThreads - nbalance;
+    return true;
+  }
+  nbalance = 0;
+  return false;
+}
 
 #endif
 

@@ -347,6 +347,8 @@ public:
   GEANT_FORCE_INLINE
   TaskData *GetTaskData(int index) { return fTaskData[index]; }
 
+  bool IsStarving(TaskData *tdata, int &nbalance) const;
+
   void ReleaseTaskData(TaskData *td) {
     while (!fQueue.enqueue(td)) {}
   }

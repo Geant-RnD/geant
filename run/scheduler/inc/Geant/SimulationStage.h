@@ -57,6 +57,7 @@ protected:
   size_t fThrBasketCheck = 0;               ///< Threshold for starting checking efficiency of basketizing
   float fFireFlushRatio = 0;                ///< Ratio fired/flushed baskets to trigger basketizing
   size_t fNstaged = 0;                      ///< Total number of staged tracks
+  size_t fFlushIndex = 0;                   ///< Current flushing index
   bool fUniqueFollowUp = false;             ///< All tracks go to single follow-up after this stage
   bool fEndStage = false;                   ///< Marker for stage at end of stepping
   bool fBasketized = false;                 ///< Stage is basketized
@@ -142,7 +143,7 @@ public:
    *  @return Number of tracks flushed
    */
   VECCORE_ATT_HOST_DEVICE
-  int FlushAndProcess(TaskData *td);
+  int FlushAndProcess(TaskData *td, int &nflush, bool force);
 
    /** @brief Flush a handler and return the number of flushed tracks */
   VECCORE_ATT_HOST_DEVICE

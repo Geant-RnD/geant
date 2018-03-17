@@ -19,6 +19,7 @@
 #ifndef GEANT_STACK_LIKE_BUFFER
 #define GEANT_STACK_LIKE_BUFFER
 
+#include <atomic>
 #include <VecCore/VecCore>
 #include "Geant/Typedefs.h"
 #include "Geant/Track.h"
@@ -41,6 +42,8 @@ protected:
   bool fPriorityMode = false;      ///< Priority mode
   int fLastLane = 0;               ///< Last lane containing tracks
   int fNlanes = 10;                ///< Number of lanes stored
+  std::atomic<size_t> fNstart {0}; ///< Number of particles in the buffer at the
+                                   ///<  beginning of the current generation
   
 private:
   StackLikeBuffer(const StackLikeBuffer &) = delete;
@@ -91,7 +94,22 @@ public:
     }
   }
   
-  /** @brief Flush a given lane into the stage buffer */
+  /** @brief Count tracks in the buffer. To be invoked at the beginning of each stage generation */
+  GEANT_FORCE_INLINE
+  VECCORE_ATT_HOST_DEVICE
+  size_t CountNstart() {
+    size_t nstart = fPriorityLane->size();
+    for (int lane = 0; lane <= fLastLane; ++lane)
+      nstart += fLanes[lane]->size();
+    fNstart.store(nstart);
+    return nstart;
+  }
+
+  GEANT_FORCE_INLINE
+  VECCORE_ATT_HOST_DEVICE
+  size_t GetNstart() const { return fNstart.load(); }
+
+ /** @brief Flush a given lane into the stage buffer */
   GEANT_FORCE_INLINE
   VECCORE_ATT_HOST_DEVICE
   int FlushLane(size_t lane)

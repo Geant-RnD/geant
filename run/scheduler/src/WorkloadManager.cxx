@@ -212,6 +212,9 @@ void WorkloadManager::TransportTracksV3(Propagator *prop) {
       }
     }
     flush = (feedres == FeederResult::kNone) | (feedres == FeederResult::kError);
+    if (flush) {
+      printf("=== Task %d is now flushing...\n", td->fTid);
+    }
     SteppingLoop(td, flush);
   }
   prop->fWMgr->DoneQueue()->push_force(nullptr);
@@ -271,6 +274,9 @@ int WorkloadManager::FlushOneLane(TaskData *td)
 // Flush a single track lane from the stack-like buffer into the first stage.
   // Check the stack buffer and flush priority events first
   int ninjected = 0;
+  // Store the number of tracks in the buffer
+  size_t nstart = td->fStackBuffer->CountNstart();
+  Printf("Task %d: nstart = %ld", td->fTid, nstart);
   int maxspill = td->fPropagator->fConfig->fNmaxBuffSpill;
   if ( td->fStackBuffer->IsPrioritized())
     ninjected = td->fStackBuffer->FlushPriorityLane();
@@ -300,6 +306,11 @@ int WorkloadManager::SteppingLoop(TaskData *td, bool flush)
   int ninput = 0;
   int istage = 0;
   int ninjected = FlushOneLane(td);
+  int nbalance = 0;
+  bool must_balance = (flush) ? false : td->fPropagator->fRunMgr->GetTDManager()->IsStarving(td, nbalance);
+  if (must_balance) {
+    printf("must balance thread %d with %d tracks\n", td->fTid, nbalance);
+  }
   // Flush the input buffer lane by lane, starting with higher generations.
   // Exit loop when buffer is empty or when the stages are cosidered flushed
   while ( ninjected || flush ) {
@@ -313,8 +324,8 @@ int WorkloadManager::SteppingLoop(TaskData *td, bool flush)
         nproc += stage->Process(td);
       } else {
         // If flush mode requested and the stage is basketized, process in flush mode
-        if (flush && stage->IsBasketized())
-          nproc += stage->FlushAndProcess(td);
+        if ((flush || must_balance) && stage->IsBasketized())
+          nproc += stage->FlushAndProcess(td, nbalance, flush);
       }
       nprocessed += nproc;
       // Go to next stage

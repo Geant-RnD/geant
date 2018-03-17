@@ -107,7 +107,7 @@ int SimulationStage::FlushHandler(int i, TaskData *td, Basket &output)
 
 //______________________________________________________________________________
 VECCORE_ATT_HOST_DEVICE
-int SimulationStage::FlushAndProcess(TaskData *td)
+int SimulationStage::FlushAndProcess(TaskData *td, int &nflush, bool force)
 {
 // Flush all active handlers in the stage, executing their scalar DoIt methods.
 // Flushing the handlers is opportunistic, as a handler is flushed by the first
@@ -139,7 +139,11 @@ int SimulationStage::FlushAndProcess(TaskData *td)
   input.Clear();
   
   // Loop active handlers and flush them into btodo basket
-  for (int i=0; i < GetNhandlers(); ++i) {
+  const int istart = (force) ? 0 : fFlushIndex + 1;
+  const size_t iforce = size_t(!force);
+  const size_t nhandlers = GetNhandlers();
+  for (size_t icrt = 0; icrt < nhandlers; ++icrt) {
+    size_t i = (istart + icrt) % nhandlers;
     if (fHandlers[i]->IsActive() && fHandlers[i]->Flush(bvector)) {
       // btodo has some content, invoke DoIt
       if (bvector.size() >= (size_t)fPropagator->fConfig->fNvecThreshold) {
@@ -150,7 +154,10 @@ int SimulationStage::FlushAndProcess(TaskData *td)
         for (auto track : bvector.Tracks())
           fHandlers[i]->DoIt(track, output, td);
       }
+      nflush -= iforce * bvector.size();
       bvector.Clear();
+      fFlushIndex = i;
+      if (nflush < 0) break;
     }
   }
     
