@@ -83,5 +83,6 @@ endmacro(GeantExampleDef)
 # Add subdirectories
 #
 
+add_subdirectory (emVecPhys)
 add_subdirectory (physics)
 add_subdirectory (magneticfield/simplifiedCMS)
