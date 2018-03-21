@@ -43,6 +43,8 @@ class LightTrack;
 
 class EMModel {
 public:
+    using Real_v =  vecCore::backend::VcVector::Real_v;
+    using Real = double;
   /**
    * @brief CTR
    */
@@ -149,6 +151,11 @@ public:
   virtual void SampleSecondariesVector(LightTrack_v &tracks, geant::TaskData *td);
 
   /**
+  * @brief Method to SampleShells in p.e. Added only for testing purposes */
+  virtual void SampleShell(Real /*kinE_v*/, size_t &/*zed*/, Real &/*rand_v*/, size_t  &/*sampledShells_v*/){std::cout<<"EMMODEL::SampleShell\n"; exit(-1);}
+  virtual void SampleShellAlias(Real /*kinE_v*/, size_t &/*zed*/, Real &/*r1*/, Real &/*r2*/,size_t  &/*sampledShells_v*/){std::cout<<"EMMODEL::SampleShellAlias\n"; exit(-1);}
+  virtual void SampleShellAliasVec(const double* /*ekin_v*/, const double * /*zed*/, const double */*r1*/, const double */*r2*/, int */*sampledShells*/, int /*nTracks*/){std::cout<<"EMMODEL::SampleShellAliasVec\n";exit(-1);}
+  /**
    * @brief Method to obtain minim primary particle kinetic energy at which the discrete part (if any) of the
    * interaction
    *        can happen i.e. kinematic minimum for the discrete part of the interaction.
@@ -196,6 +203,29 @@ public:
 
   // protected
   void RotateToLabFrame(double &u, double &v, double &w, double x, double y, double z);
+    
+  template <typename Real_v>
+  void RotateToLabFrame_v(Real_v &u, Real_v &v, Real_v &w, Real_v u1, Real_v u2, Real_v u3) {
+      using Mask_v = vecCore::Mask<Real_v>;
+      Real_v up = u1*u1 + u2*u2;
+      Mask_v upPos = up > 0;
+      if (!vecCore::MaskEmpty(upPos)) {
+            up = vecCore::math::Sqrt(up);
+            Real_v px = u;
+            Real_v py = v;
+            Real_v pz = w;
+            vecCore::MaskedAssign(u, upPos, (u1 * u3 * px - u2 * py) / up + u1 * pz);
+            vecCore::MaskedAssign(v, upPos, (u2 * u3 * px + u1 * py) / up + u2 * pz);
+            vecCore::MaskedAssign(w, upPos, -up * px + u3 * pz);
+        }
+      Mask_v u3Neg = u3 < 0;
+      Mask_v upZu3Neg = (!upPos) & u3Neg;
+      if(!vecCore::MaskEmpty(upZu3Neg)){
+          vecCore::MaskedAssign(u, upZu3Neg, -u);
+          vecCore::MaskedAssign(w, upZu3Neg, -w);
+          
+      }
+    }
 
   void RotateToLabFrame(PhysDV &u, PhysDV &v, PhysDV &w, PhysDV u1, PhysDV u2, PhysDV u3)
   {
