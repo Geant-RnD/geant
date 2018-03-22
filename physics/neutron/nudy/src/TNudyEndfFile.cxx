@@ -11,7 +11,9 @@
 
 */
 
-#include "Geant/TNudyEndfFile.h"
+#include <TNudyEndfFile.h>
+
+using namespace Nudy;
 
 //_______________________________________________________________________________
 TNudyEndfFile::TNudyEndfFile() : fMAT(0), fMF(0)

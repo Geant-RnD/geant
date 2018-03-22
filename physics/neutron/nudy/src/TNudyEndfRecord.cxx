@@ -1,5 +1,7 @@
 #include "Rtypes.h"
-#include "Geant/TNudyEndfRecord.h"
+#include "TNudyEndfRecord.h"
+
+using namespace Nudy;
 
 TNudyEndfRecord::TNudyEndfRecord() : TObject()
 {

@@ -1,0 +1,3 @@
+Compilation with GeantV makes the following:
+ (a) The library libNudy.so inside lib sub-directory in build.
+ (b) The standalone code NudyMain is created at nudy/bin sub-directory inside build

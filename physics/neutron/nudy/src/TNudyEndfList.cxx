@@ -11,7 +11,9 @@
 
 */
 
-#include "Geant/TNudyEndfList.h"
+#include <TNudyEndfList.h>
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfList)

@@ -1,10 +1,12 @@
-#include "Geant/TNudyManager.h"
-#include "Geant/TNudyEndfTape.h"
-#include "Geant/TNudySubLibrary.h"
-#include "Geant/TVNudyModel.h"
-#include "Geant/TNudyENDF.h"
+#include "TNudyManager.h"
+#include "TNudyEndfTape.h"
+#include "TNudySubLibrary.h"
+#include "TVNudyModel.h"
+#include "TNudyENDF.h"
 #include "TFile.h"
 #include <TROOT.h>
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyManager)
@@ -183,7 +185,7 @@ TNudyLibrary *TNudyManager::LoadLibrary(const char *memLibName, const char *disk
       }
       //      printf("Changing dir to %d",newSubLib);
       gDirectory->cd(newSubLib->GetName());
-      printf("Listof keys\n");
+      //printf("Listof keys\n");
       TList *models = gDirectory->GetListOfKeys();
       TIter iter(models);
       models->Print();

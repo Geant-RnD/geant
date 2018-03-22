@@ -6,7 +6,9 @@
 // @(#)root/meta:$Id: TNuEndf.h 29000 2009-06-15 13:53:52Z rdm $
 // Author: F.Carminati 02/05/09
 
-#include "Geant/TNudyEndfTab1.h"
+#include <TNudyEndfTab1.h>
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfTab1)

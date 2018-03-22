@@ -1,12 +1,16 @@
 #----------------------------------------------------------------------------------------------
 # Add source files & include directories
 #
-file(GLOB sources src/*.cxx)
-file(GLOB headers inc/Geant/T*.h)
+set(NUDYSRC "${CMAKE_SOURCE_DIR}/physics/neutron/nudy")
 
-include_directories(inc)
+file(GLOB sources ${NUDYSRC}/src/*.cxx)
+file(GLOB headers ${NUDYSRC}/inc/*.h)
 
-ROOT_GENERATE_DICTIONARY(NudyDict ${headers} MODULE Nudy LINKDEF inc/Geant/LinkDef.h)
+include_directories(
+ ${NUDYSRC}/inc
+)
+
+ROOT_GENERATE_DICTIONARY(NudyDict ${headers} MODULE Nudy LINKDEF ${NUDYSRC}/LinkDef.h)
 
 #----------------------------------------------------------------------------------------------
 # Add the executable
@@ -28,6 +32,11 @@ if(USE_ROOT)
   install(FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libNudy.rootmap 
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libNudy_rdict.pcm DESTINATION lib)
 endif()
+
+#---------------------------------------------------------------------------------------------
+# compile standalone
+#
+add_subdirectory(standalone)
 
 #----------------------------------------------------------------------------------------------
 # Add this directory to Doxygen

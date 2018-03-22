@@ -4,11 +4,14 @@
 // 	date of creation: March 24, 2016
 
 #include "TList.h"
-#include "Geant/TNudyEndfFile.h"
-#include "Geant/TNudyEndfList.h"
-#include "Geant/TNudyEndfTab1.h"
-#include "Geant/TNudyCore.h"
-#include "Geant/TNudyEndfNuPh.h"
+#include "TNudyEndfFile.h"
+#include "TNudyEndfList.h"
+#include "TNudyEndfTab1.h"
+#include "TNudyCore.h"
+#include "TNudyEndfNuPh.h"
+
+using namespace Nudy;
+using namespace NudyPhysics;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfNuPh)

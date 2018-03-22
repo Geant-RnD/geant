@@ -1,4 +1,4 @@
-#include "Geant/TVNudyModel.h"
+#include "TVNudyModel.h"
 
 #include <TFrame.h>
 #include <TStyle.h>
@@ -9,13 +9,15 @@
 #include "TMath.h"
 #include "Math/SpecFuncMathMore.h"
 #include "base/Global.h"
-#include "Geant/TNudyCore.h"
-#include "Geant/TNudyEndfMat.h"
-#include "Geant/TNudyAliasCont.h"
-#include "Geant/TNudyEndfCont.h"
-#include "Geant/TNudyEndfTab1.h"
-#include "Geant/TNudyEndfTab2.h"
-#include "Geant/TNudyEndfList.h"
+#include "TNudyCore.h"
+#include "TNudyEndfMat.h"
+#include "TNudyAliasCont.h"
+#include "TNudyEndfCont.h"
+#include "TNudyEndfTab1.h"
+#include "TNudyEndfTab2.h"
+#include "TNudyEndfList.h"
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TVNudyModel)
@@ -234,7 +236,7 @@ void TVNudyModel::ReadFile4(TNudyEndfFile *file)
       TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
       int LTT               = sec->GetL2();
       int LI                = header->GetL1();
-      printf("LTT = %d LI = %d\n", LTT, LI);
+      //printf("LTT = %d LI = %d\n", LTT, LI);
       if (LTT == 1 && LI == 0) {
         TNudyEndfTab2 *subheader = (TNudyEndfTab2 *)recIter.Next();
         TArrayD ein(subheader->GetN2());

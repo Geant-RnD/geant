@@ -1,11 +1,13 @@
-#include "Geant/TNudySubLibrary.h"
+#include "TNudySubLibrary.h"
 #include "TParticlePDG.h"
 #include "TBtree.h"
-#include "Geant/TVNudyModel.h"
-#include "Geant/TNudyCore.h"
-#include "Geant/TNudyEndfMat.h"
+#include "TVNudyModel.h"
+#include "TNudyCore.h"
+#include "TNudyEndfMat.h"
 #include "TROOT.h"
 #include "TFile.h"
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudySubLibrary)

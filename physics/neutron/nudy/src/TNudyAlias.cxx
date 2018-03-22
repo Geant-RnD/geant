@@ -3,7 +3,7 @@
  * @brief Implementation file for Alias Sampling
 */
 
-#include "Geant/TNudyAlias.h"
+#include "TNudyAlias.h"
 
 #ifdef USE_ROOT
 #include "TRandom.h"
@@ -14,8 +14,10 @@
 #endif
 
 #ifdef USE_ROOT
-ClassImp(TNudyAlias)
+ClassImp(Nudy::TNudyAlias)
 #endif
+
+namespace Nudy {
 
     /**
      * Dummy constructor
@@ -192,3 +194,5 @@ double *TNudyAlias::Randoms(int n)
 }
 
 #endif
+} //namespace 
+

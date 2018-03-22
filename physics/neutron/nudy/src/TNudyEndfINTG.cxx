@@ -1,4 +1,6 @@
-#include "Geant/TNudyEndfINTG.h"
+#include <TNudyEndfINTG.h>
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfINTG)

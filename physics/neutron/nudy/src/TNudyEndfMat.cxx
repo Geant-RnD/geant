@@ -18,8 +18,10 @@
 */
 
 #include <TError.h>
-#include "Geant/TNudyEndfCont.h"
-#include "Geant/TNudyEndfMat.h"
+#include <TNudyEndfCont.h>
+#include <TNudyEndfMat.h>
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfMat)

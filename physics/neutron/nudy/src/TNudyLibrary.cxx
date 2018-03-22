@@ -1,13 +1,15 @@
 #include "TMath.h"
 
-#include "Geant/TNudyLibrary.h"
-#include "Geant/TNudySubLibrary.h"
-#include "Geant/TNudyEndfTape.h"
-#include "Geant/TNudyCore.h"
-#include "Geant/TNudyEndfMat.h"
+#include "TNudyLibrary.h"
+#include "TNudySubLibrary.h"
+#include "TNudyEndfTape.h"
+#include "TNudyCore.h"
+#include "TNudyEndfMat.h"
 #include "THashList.h"
 #include "TPDGCode.h"
 #include "TROOT.h"
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyLibrary)

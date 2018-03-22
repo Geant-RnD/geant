@@ -7,8 +7,10 @@
 
 #include <iostream>
 #include "TList.h"
-#include "Geant/TNudyEndfTape.h"
-#include "Geant/TNudyEndfMat.h"
+#include <TNudyEndfTape.h>
+#include "TNudyEndfMat.h"
+
+using namespace Nudy;
 
 #ifdef USE_ROOT
 ClassImp(TNudyEndfTape)
@@ -34,7 +36,7 @@ TNudyEndfTape::TNudyEndfTape(const char *name, unsigned char loglev) : TNamed(""
   sname.ReplaceAll(" ", "_");
   sname.ReplaceAll("/", "_");
   SetName(sname.Data());
-  std::cout << "Creating ENDF Tape:" << std::endl << name << std::endl;
+  // std::cout << "Creating ENDF Tape:" << std::endl << name << std::endl;
   fMats = new TList();
 };
 
