@@ -295,7 +295,6 @@ void NudyPhysics::TNudyInterface::SetMTValues (geantphysics::NudyProcessType pTy
 
 bool NudyPhysics::TNudyInterface::GetFisCha(int inKey) {
   bool isIn = false;
-  isIn = std::find(
-  fChannelFiss.begin(), TNudyInterface::fChannelFiss.end(), inKey ) != fChannelFiss.end();
+//  isIn = std::find( fChannelFiss.begin(), TNudyInterface::fChannelFiss.end(), inKey ) != fChannelFiss.end();
   return isIn;
 }

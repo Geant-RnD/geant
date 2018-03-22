@@ -27,11 +27,11 @@ void DumpProcE2R() {
     std::string fRootOUT = "";
     std::string fEndfSubIN = "";
     double temp = 293.60608;
-    std::cout << " ENDF data file name as INPUT (e.g. 094_Pu_246): ";
+    std::cout << " ENDF data file name as INPUT (e.g. 094_Pu_240): ";
     std::getline(std::cin, fEndfIN);
     std::cout << " ROOT data file name as OUTPUT <press ENTER for automatic name>: ";
     std::getline(std::cin,fRootOUT);
-    std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ> (e.g.094_Pu_241) : ";
+    std::cout << " ENDFSUB file name < If does not exist, please ENTER <ZZ> (e.g.094_Pu_240) : ";
 	std::cout << " We are selecting " << fEndfIN << std::endl;
 	fEndfSubIN = fEndfIN;
     //std::getline(std::cin, fEndfSubIN);
