@@ -18,6 +18,8 @@
 // from geantV
 #include "Geant/TaskData.h"
 #include "GV/VecCore/VecCore"
+#include "Geant/G4Exp.hh"
+#include "Geant/G4Log.hh"
 
 namespace geantphysics {
 
@@ -314,7 +316,7 @@ double KleinNishinaComptonModel::SampleReducedPhotonEnergy(const double egamma, 
                                                            const double r3)
 {
   // determine electron energy lower grid point
-  const double legamma = std::log(egamma);
+  const double legamma = G4Log(egamma);
   //
   int indxEgamma = fSTNumPhotonEnergies - 1;
   if (egamma < GetHighEnergyUsageLimit()) {
@@ -334,7 +336,7 @@ double KleinNishinaComptonModel::SampleReducedPhotonEnergy(const double egamma, 
   // transform it back to eps = E_1/E_0
   // \epsion(\xi) = \exp[ \alpha(1-\xi) ] = \exp [\ln(1+2\kappa)(\xi-1)]
   const double kappa = egamma * geant::units::kInvElectronMassC2;
-  return std::exp(std::log(1. + 2. * kappa) * (xi - 1.)); // eps = E_1/E_0
+  return G4Exp(G4Log(1. + 2. * kappa) * (xi - 1.)); // eps = E_1/E_0
 }
 
 double KleinNishinaComptonModel::SampleReducedPhotonEnergy(const double egamma, double &onemcost, double &sint2,
@@ -343,7 +345,7 @@ double KleinNishinaComptonModel::SampleReducedPhotonEnergy(const double egamma, 
   const double kappa = egamma / geant::units::kElectronMassC2;
   const double eps0  = 1. / (1. + 2. * kappa);
   const double eps02 = eps0 * eps0;
-  const double al1   = -std::log(eps0);
+  const double al1   = -G4Log(eps0);
   const double cond  = al1 / (al1 + 0.5 * (1. - eps02));
   //
   double eps, eps2, gf;
@@ -351,7 +353,7 @@ double KleinNishinaComptonModel::SampleReducedPhotonEnergy(const double egamma, 
   do {
     td->fRndm->uniform_array(3, rndArray);
     if (cond > rndArray[0]) {
-      eps  = std::exp(-al1 * rndArray[1]);
+      eps  = G4Exp(-al1 * rndArray[1]);
       eps2 = eps * eps;
     } else {
       eps2 = eps02 + (1. - eps02) * rndArray[1];
