@@ -2655,6 +2655,7 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
     TNudyEndfFile *file, *file2 = nullptr;
     std::vector<int>().swap(MtNumAng4Photon);
     while ((file = (TNudyEndfFile *)iter.Next())) {
+	  file2 = file;  // added to stop cdash warning.
       if (file->GetMF() > 13 && (file->GetMF() <= 15 || file->GetMF() <= 33)){
 	       //std::cout<< "add file 2 called "<< file->GetMF() << std::endl;
 	       tMat->Add(file2);
