@@ -13,6 +13,7 @@
 #include <cmath>
 #include <vector>
 #include <iterator>
+#include <algorithm>
 
 //#include "Material.h"
 //#include "Element.h"
