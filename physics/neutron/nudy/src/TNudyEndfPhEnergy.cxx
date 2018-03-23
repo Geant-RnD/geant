@@ -34,7 +34,7 @@ TNudyEndfPhEnergy::TNudyEndfPhEnergy(TNudyEndfFile *file)
     for (int k = 0; k < sec->GetN1(); k++) {
       TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)recIter.Next();
       int MT              = sec->GetMT();
-      int NC              = sec->GetN1();
+      //int NC              = sec->GetN1();
       MtNumbers.push_back(MT);
       int LF = tab1->GetL2();
       //std::cout << " LF = " << LF << " MT " << MT << "  NC " << NC << std::endl;

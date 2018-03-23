@@ -2652,7 +2652,7 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
   for (int iMat = 0; iMat < nmats; iMat++) {
     tMat = (TNudyEndfMat *)mats->At(iMat);
     TIter iter(tMat->GetFiles());
-    TNudyEndfFile *file, *file2;
+    TNudyEndfFile *file, *file2 = nullptr;
     std::vector<int>().swap(MtNumAng4Photon);
     while ((file = (TNudyEndfFile *)iter.Next())) {
       if (file->GetMF() > 13 && (file->GetMF() <= 15 || file->GetMF() <= 33)){
@@ -2660,70 +2660,71 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 	       tMat->Add(file2);
       }
       switch (file->GetMF()) {
-      case 1:
+        case 1:
         if (flagRead != 1) {
-	  for (int nxc = 0; nxc < tMat->GetNXC(); nxc++){
-	    int mfn 	= tMat->GetMFn(nxc) ;
-	    int mtn	= tMat->GetMTn(nxc) ;
-	    if(mfn == 3 ){
-	      if(mtn == 103){
-		        MTChargeFlag[0] = -1;
-	      } else if (mtn == 104){
-		        MTChargeFlag[1] = -1;
-	      } else if (mtn == 105){
-		        MTChargeFlag[2] = -1;
-	      } else if (mtn == 106){
-		        MTChargeFlag[3] = -1;
-	      } else if (mtn == 107){
-		        MTChargeFlag[4] = -1;
-	      } else if (mtn >= 600 && mtn < 650) {
-		        MTChargeFlag[5] = -1;
-	      } else if (mtn >= 650 && mtn < 700) {
-		        MTChargeFlag[6] = -1;
-	      } else if (mtn >= 700 && mtn < 750) {
-		        MTChargeFlag[7] = -1;
-	      } else if (mtn >= 750 && mtn < 800) {
-		        MTChargeFlag[8] = -1;
-	      } else if (mtn >= 800 && mtn < 850) {
-		        MTChargeFlag[9] = -1;
-	      }
-	    } else if (mfn == 12 || mfn == 13) {
-	       MtNumSig4Photon.push_back (mtn) ;
-	      // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
-	    } else if (mfn == 14) {
-	       MtNumAng4Photon.push_back (mtn) ;
-	      // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
-	    } else if (mfn == 15) {
-	      MtNumEng4Photon.push_back (mtn) ;
-	      // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
-	    }
-	  }
-	  if (MtNumAng4Photon.size() == 0 ) {
-	    file2 = new TNudyEndfFile(tMat->GetMAT(), 14);
-	  } else {
-	    file2 = file;
-	  }
+	        for (int nxc = 0; nxc < tMat->GetNXC(); nxc++){
+	          int mfn 	= tMat->GetMFn(nxc) ;
+	          int mtn	= tMat->GetMTn(nxc) ;
+	          if(mfn == 3 ){
+	            if(mtn == 103){
+		            MTChargeFlag[0] = -1;
+	            } else if (mtn == 104){
+		            MTChargeFlag[1] = -1;
+	            } else if (mtn == 105){
+		            MTChargeFlag[2] = -1;
+	            } else if (mtn == 106){
+		            MTChargeFlag[3] = -1;
+	            } else if (mtn == 107){
+		            MTChargeFlag[4] = -1;
+	            } else if (mtn >= 600 && mtn < 650) {
+		            MTChargeFlag[5] = -1;
+	            } else if (mtn >= 650 && mtn < 700) {
+		            MTChargeFlag[6] = -1;
+	            } else if (mtn >= 700 && mtn < 750) {
+		            MTChargeFlag[7] = -1;
+	            } else if (mtn >= 750 && mtn < 800) {
+		            MTChargeFlag[8] = -1;
+	            } else if (mtn >= 800 && mtn < 850) {
+		            MTChargeFlag[9] = -1;
+	            }
+	          } else if (mfn == 12 || mfn == 13) {
+	            MtNumSig4Photon.push_back (mtn) ;
+	            // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
+	          } else if (mfn == 14) {
+	            MtNumAng4Photon.push_back (mtn) ;
+	            // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
+	          } else if (mfn == 15) {
+	            MtNumEng4Photon.push_back (mtn) ;
+	            // std::cout <<" MF = \t"<< mfn <<" MT = \t"<< mtn << std::endl;
+	          }
+	        }
+	        if (MtNumAng4Photon.size() == 0 ) {
+	          file2 = new TNudyEndfFile(tMat->GetMAT(), 14);
+	        } else {
+	          file2 = file;
+	        }
           ReadFile1(file);
           flagRead = 1;
 //          std::cout << "file 1 OK: Should be printed only one time " << std::endl;
           // ReWriteFile1(file);
         }
         break;
-      case 2:
-	if(prepro == 0){
-	  ReadFile2(file);
-	  if (LRU != 0) {
-	    TNudyCore::Instance()->Sort(eLinElastic, xLinElastic);
-	    TNudyCore::Instance()->Sort(eLinCapture, xLinCapture);
-	    TNudyCore::Instance()->Sort(eLinFission, xLinFission);
-	    TNudyCore::Instance()->ThinningDuplicate(eLinElastic, xLinElastic);
-	    TNudyCore::Instance()->ThinningDuplicate(eLinCapture, xLinCapture);
-	    TNudyCore::Instance()->ThinningDuplicate(eLinFission, xLinFission);
-	    Thinning(eLinElastic, xLinElastic);
-	    Thinning(eLinCapture, xLinCapture);
-	    Thinning(eLinFission, xLinFission);
-	  }
-	}
+        
+        case 2:
+	      if(prepro == 0){
+	        ReadFile2(file);
+	        if (LRU != 0) {
+	          TNudyCore::Instance()->Sort(eLinElastic, xLinElastic);
+	          TNudyCore::Instance()->Sort(eLinCapture, xLinCapture);
+	          TNudyCore::Instance()->Sort(eLinFission, xLinFission);
+	          TNudyCore::Instance()->ThinningDuplicate(eLinElastic, xLinElastic);
+	          TNudyCore::Instance()->ThinningDuplicate(eLinCapture, xLinCapture);
+	          TNudyCore::Instance()->ThinningDuplicate(eLinFission, xLinFission);
+	          Thinning(eLinElastic, xLinElastic);
+	          Thinning(eLinCapture, xLinCapture);
+	          Thinning(eLinFission, xLinFission);
+	        }
+	      }
 //         double siga, sigb, sigc;
 //	for (unsigned int i = 0; i < eLinCapture.size() ; i++) {
 // 	    GetSigma(3, eLinCapture[i], siga, sigb, sigc);
@@ -2737,39 +2738,39 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 //              std::cout << std::setprecision(12) << eLinCapture [ j ] << "  " << xLinCapture [ j ] << std::endl;
         	// std::cout<<"file 2 OK "<< std::endl;
         break;
-      case 3: {
+        case 3:
 //           for (unsigned long j = 0 ; j < eLinCapture.size() ; j++)
 //             std::cout << std::setprecision(12) << eLinCapture [ j ] << "  \t" << xLinCapture [ j ] << std::endl;
         ReadFile3(file);
         sigma.clear();
 
             // std::cout << "file 3 OK \t" << sigmaOfMts.size() << std::endl;
-	    TNudyCore::Instance()->ThinningDuplicate(eLinElastic, xLinElastic);
-	    TNudyCore::Instance()->ThinningDuplicate(eLinCapture, xLinCapture);
-	    TNudyCore::Instance()->ThinningDuplicate(eLinFission, xLinFission);
+	      TNudyCore::Instance()->ThinningDuplicate(eLinElastic, xLinElastic);
+	      TNudyCore::Instance()->ThinningDuplicate(eLinCapture, xLinCapture);
+	      TNudyCore::Instance()->ThinningDuplicate(eLinFission, xLinFission);
 
 //           std::cout << "before elstic Doppler begins " << eLinElastic.size() <<"  \t"<< xLinElastic.size() << std::endl;
 //           for (unsigned long j = 0 ; j < eLinElastic.size() ; j++)
 //             std::cout << std::setprecision(12) << eLinElastic [ j ] << "  \t" << xLinElastic [ j ] << std::endl;
         broadSigma(eLinElastic, xLinElastic, xBroadElastic);
-	TNudyCore::Instance()->Sort(eLinElastic, xBroadElastic);
+	      TNudyCore::Instance()->Sort(eLinElastic, xBroadElastic);
 //           std::cout << "after elstic Doppler " << eLinElastic.size() <<"  \t"<< xBroadElastic.size() << std::endl;
 //           for (unsigned long j = 0 ; j < eLinFission.size() ; j++)
 //             std::cout << std::setprecision(12) << eLinFission [ j ] << "  " << xLinFission [ j ] << std::endl;
-	if(prepro==0)Thinning(eLinElastic, xBroadElastic);
+	      if(prepro==0)Thinning(eLinElastic, xBroadElastic);
          // std::cout << eLinElastic.size() << std::endl;
 //          std::cout << "before capture Doppler begins " << eLinCapture.size() <<"  "<< xLinCapture.size() << std::endl;
 //            for (unsigned long j = 0 ; j < eLinCapture.size() ; j++)
 //              std::cout << std::setprecision(12) << eLinCapture [ j ] << "  " << xLinCapture [ j ] << std::endl;
         broadSigma(eLinCapture, xLinCapture, xBroadCapture);
-	TNudyCore::Instance()->Sort(eLinCapture, xBroadCapture);
+	      TNudyCore::Instance()->Sort(eLinCapture, xBroadCapture);
 //           std::cout << "after capture Doppler begins " << eLinCapture.size() <<"  "<< xBroadCapture.size() << std::endl;
-	if(prepro==0)Thinning(eLinCapture, xBroadCapture);
+	      if(prepro==0)Thinning(eLinCapture, xBroadCapture);
          // std::cout << eLinCapture.size() << std::endl;
 //          std::cout << "before fission Doppler begins "<< eLinFission.size() <<"  "<< xLinFission.size() << std::endl;
         broadSigma(eLinFission, xLinFission, xBroadFission);
-	TNudyCore::Instance()->Sort(eLinFission, xBroadFission);
-	if(prepro==0)Thinning(eLinFission, xBroadFission);
+	      TNudyCore::Instance()->Sort(eLinFission, xBroadFission);
+	      if(prepro==0)Thinning(eLinFission, xBroadFission);
 //            std::cout << "after Fission Doppler begins " << eLinFission.size() <<"  "<< xBroadFission.size() << std::endl;
         // std::cout << eLinFission.size() << std::endl;
         // std::cout<<"Doppler done "<<outstring << std::endl;
@@ -2802,7 +2803,7 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 
         ReWriteFile3(file);
         MtNumbers.clear();
-      } break;
+        break;
 
 // //       case 4:
 // // //        ReadFile4(file);
@@ -2814,135 +2815,138 @@ void TNudyEndfSigma::GetData(const char *rENDF, double isigDiff)
 // // //	recoEnergy = new TNudyEndfEnergy(file);
 // // 	std::cout<<"file 5 OK "<<std::endl;
 // // 	break;
-	case 6:
-	{
-	  TIter iter1(tMat->GetFiles());
-	  TNudyEndfFile *file1;
-	  while ((file1 = (TNudyEndfFile *)iter1.Next())) {
-	    if (file1->GetMF() == 6) {
-	      // std::cout << "file 6 found " << std::endl ;
-	    TIter secIter1(file1->GetSections());
-	    TNudyEndfSec *sec1;
-	    while ((sec1 = (TNudyEndfSec *)secIter1.Next())) {
-	      int NK = sec1->GetN1();
-	      TIter recIter1(sec1->GetRecords());
-	      for (int k = 0; k < NK; k++) {
-		// std::cout<<k<<" NK "<<NK<< std::endl;
-		TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)recIter1.Next();
-		div_t divr;
-		AWRI   = sec1->GetC2();
-		int MT = sec1->GetMT();
-		//      int LCT = sec->GetL2();
-		divr       = div(sec1->GetC1(), 1000);
-		double ZA  = divr.quot;
-		double AA  = divr.rem;
-//		double NA1 = AA - ZA;
-		int ZAP    = tab1->GetC1();
-//		double AWP = tab1->GetC2();
-		// std::cout<<" ZAP = \t"<< ZAP <<" MT "<< MT <<  std::endl;
-		// int LIP =tab1->GetL1();
-		int LAW = tab1->GetL2();
-		if (LAW == 3 || LAW == 4 || LAW == 0) continue;
-		divr          = div(ZAP, 1000);
-		int particleA = divr.rem;
-		int particleZ = divr.quot;
-		// std::cout<<"LAW = "<< LAW <<" MT "<<MT <<" ZAP = "<< ZAP <<" AWP "<<AWP <<" parZ "<< particleZ
-		// <<" parA "<< particleA << std::endl;
-		if (LAW == 2 && particleZ == 0 && particleA == 0) {
-		  int LANG, NL;
-		  TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter1.Next();
-		  int ne2               = tab2->GetN2();
-		  TNudyEndfList *header = (TNudyEndfList *)recIter1.Next();
-		  LANG = header->GetL1();
-		  TNudyEndfSec *sec3;
-		  if (LANG == 0) {
-		    sec3 = new TNudyEndfSec(sec1->GetMAT(), 14, MT, sec1->GetC1(), AWRI,0,1,1,0);
-		  } else {
-		    sec3 = new TNudyEndfSec(sec1->GetMAT(), 14, MT, sec1->GetC1(), AWRI,0,2,1,0);
-		  }
-		  TNudyEndfTab2 *sec3Tab2 = new TNudyEndfTab2();
-		  sec3Tab2->SetCont(tab2->GetC1(),tab2->GetC2(),0,0,tab2->GetN1(),ne2);
-		  sec3Tab2->SetNBT(ne2, 0);
-		  sec3Tab2->SetINT(tab2->GetINT(0), 0);
-		  sec3->Add(sec3Tab2);
-		  // std::cout<<"tab2->GetINT(0) "<< sec3Tab2->GetINT(0) <<" NR "<< sec3Tab2->GetN1() <<" NE "<< sec3Tab2->GetN2() << std::endl;
+	      case 6: {
+	      TIter iter1(tMat->GetFiles());
+	      TNudyEndfFile *file1;
+	      while ((file1 = (TNudyEndfFile *)iter1.Next())) {
+	        if (file1->GetMF() == 6) {
+	          // std::cout << "file 6 found " << std::endl ;
+	          TIter secIter1(file1->GetSections());
+	          TNudyEndfSec *sec1;
+	          while ((sec1 = (TNudyEndfSec *)secIter1.Next())) {
+	            int NK = sec1->GetN1();
+	            TIter recIter1(sec1->GetRecords());
+	            for (int k = 0; k < NK; k++) {
+		          // std::cout<<k<<" NK "<<NK<< std::endl;
+		            TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)recIter1.Next();
+		            div_t divr;
+		            AWRI   = sec1->GetC2();
+		            int MT = sec1->GetMT();
+		    //      int LCT = sec->GetL2();
+		            divr       = div(sec1->GetC1(), 1000);
+		            //double ZA  = divr.quot;
+		            //double AA  = divr.rem;
+        //		  double NA1 = AA - ZA;
+		            int ZAP    = tab1->GetC1();
+        //      double AWP = tab1->GetC2();
+		    //      std::cout<<" ZAP = \t"<< ZAP <<" MT "<< MT <<  std::endl;
+		    //      int LIP =tab1->GetL1();
+		            int LAW = tab1->GetL2();
+		            if (LAW == 3 || LAW == 4 || LAW == 0) continue;
+		            divr          = div(ZAP, 1000);
+		            int particleA = divr.rem;
+		            int particleZ = divr.quot;
+		     //     std::cout<<"LAW = "<< LAW <<" MT "<<MT <<" ZAP = "<< ZAP <<" AWP "<<AWP <<" parZ "<< particleZ
+		            // <<" parA "<< particleA << std::endl;
+		            if (LAW == 2 && particleZ == 0 && particleA == 0) {
+		              int LANG, NL;
+		              TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter1.Next();
+		              int ne2               = tab2->GetN2();
+		              TNudyEndfList *header = (TNudyEndfList *)recIter1.Next();
+		              LANG = header->GetL1();
+		              TNudyEndfSec *sec3;
+		              if (LANG == 0) {
+		                sec3 = new TNudyEndfSec(sec1->GetMAT(), 14, MT, sec1->GetC1(), AWRI,0,1,1,0);
+		              } else {
+		                sec3 = new TNudyEndfSec(sec1->GetMAT(), 14, MT, sec1->GetC1(), AWRI,0,2,1,0);
+		              }
+		              TNudyEndfTab2 *sec3Tab2 = new TNudyEndfTab2();
+		              sec3Tab2->SetCont(tab2->GetC1(),tab2->GetC2(),0,0,tab2->GetN1(),ne2);
+		              sec3Tab2->SetNBT(ne2, 0);
+		              sec3Tab2->SetINT(tab2->GetINT(0), 0);
+		              sec3->Add(sec3Tab2);
+		              // std::cout<<"tab2->GetINT(0) "<< sec3Tab2->GetINT(0) <<" NR "<< sec3Tab2->GetN1() <<" NE "<< sec3Tab2->GetN2() << std::endl;
 
-		  TNudyEndfList *sec3List = new TNudyEndfList();
-		  sec3List->SetCont(header->GetC1(),header->GetC2(),0,0,header->GetN2(),0);
-		  // std::cout<<"C1 "<< header->GetC1() <<" C2 "<< header->GetC2() <<" N2 "<< header->GetN2() << std::endl;
-		  for (int j = 0; j < header->GetN2(); ++j) {
-		    sec3List->SetLIST(header->GetLIST(j), j);
-		  }
-		  sec3->Add(sec3List);
-		  // std::cout<<"sec3List C1 "<< sec3List->GetC1()<<" sec3List C2 "<< sec3List->GetC2() <<" nl "<< sec3List->GetN1() << std::endl;
-		  //for (int j = 0; j < sec3List->GetN1(); ++j) {
-		    //std::cout <<"list "<< sec3List->GetLIST(j) << std::endl;
-		  //}
-		  for (int lis = 1; lis < ne2; lis++) {
-		    TNudyEndfList *header = (TNudyEndfList *)recIter1.Next();
-		    TNudyEndfList *sec3List = new TNudyEndfList();
-		    sec3List->SetCont(header->GetC1(),header->GetC2(),0,0,header->GetN2(),0);
-		    NL = header->GetN2();
-		    if (LANG == 0) {
-		      for (int j = 0; j < NL; j++) {
-			sec3List->SetLIST(header->GetLIST(j),j);
-		      }
-		    //  std::cout<<"sec3List C1 "<< sec3List->GetC1()<<" sec3List C2 "<< sec3List->GetC2() <<" nl "<< sec3List->GetN1() << std::endl;
-		     // for (int j = 0; j < sec3List->GetN1(); ++j) {
-			// std::cout <<"list "<< sec3List->GetLIST(j) << std::endl;
-		     // }
-		    } else if (LANG > 0) {
-		      for (int i = 0; i < NL; i++) {
-			sec3List->SetLIST(header->GetLIST(2 * i + 0),2 * i + 0);
-			sec3List->SetLIST(header->GetLIST(2 * i + 1),2 * i + 1);
-		      }
-		    }
-		    sec3->Add(sec3List);
-		  }
-		  file2->Add(sec3);
-		} else if (LAW == 1 || LAW == 5) {
-		    TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter1.Next();
-		    for (unsigned int lis = 0; lis < tab2->GetN2(); lis++) {
-		      TNudyEndfList *header = (TNudyEndfList *)recIter1.Next();
-		    }
-		  } else if (LAW == 6){
-		    TNudyEndfCont *header = (TNudyEndfCont *)recIter1.Next();
-		  } else if (LAW == 7){
-		    TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter1.Next();
-		    for (unsigned int cr1 = 0; cr1 < tab2->GetN2(); cr1++) {
-		      TNudyEndfTab2 *tab3 = (TNudyEndfTab2 *)recIter1.Next();
-		      for (unsigned int cr2 = 0; cr2 < tab3->GetN2(); cr2++) {
-			TNudyEndfTab1 *tab12 = (TNudyEndfTab1 *)recIter1.Next();
-		      }
-		    }
-		  }
-		}
+                  TNudyEndfList *sec3List = new TNudyEndfList();
+		              sec3List->SetCont(header->GetC1(),header->GetC2(),0,0,header->GetN2(),0);
+		              // std::cout<<"C1 "<< header->GetC1() <<" C2 "<< header->GetC2() <<" N2 "<< header->GetN2() << std::endl;
+		              for (int j = 0; j < header->GetN2(); ++j) {
+		                sec3List->SetLIST(header->GetLIST(j), j);
+		              }
+		              sec3->Add(sec3List);
+		              // std::cout<<"sec3List C1 "<< sec3List->GetC1()<<" sec3List C2 "<< sec3List->GetC2() <<" nl "<< sec3List->GetN1() << std::endl;
+		              //for (int j = 0; j < sec3List->GetN1(); ++j) {
+		              //std::cout <<"list "<< sec3List->GetLIST(j) << std::endl;
+		              //}
+		              for (int lis = 1; lis < ne2; lis++) {
+		                TNudyEndfList *header = (TNudyEndfList *)recIter1.Next();
+		                TNudyEndfList *sec3List = new TNudyEndfList();
+		                sec3List->SetCont(header->GetC1(),header->GetC2(),0,0,header->GetN2(),0);
+		                NL = header->GetN2();
+		                if (LANG == 0) {
+		                  for (int j = 0; j < NL; j++) {
+			                  sec3List->SetLIST(header->GetLIST(j),j);
+		                  }
+		                  //  std::cout<<"sec3List C1 "<< sec3List->GetC1()<<" sec3List C2 "<< sec3List->GetC2() <<" nl "<< sec3List->GetN1() << std::endl;
+		                  // for (int j = 0; j < sec3List->GetN1(); ++j) {
+			                // std::cout <<"list "<< sec3List->GetLIST(j) << std::endl;
+		                  // }
+		                } else if (LANG > 0) {
+		                  for (int i = 0; i < NL; i++) {
+			                  sec3List->SetLIST(header->GetLIST(2 * i + 0),2 * i + 0);
+			                  sec3List->SetLIST(header->GetLIST(2 * i + 1),2 * i + 1);
+		                  }
+		                }
+		                sec3->Add(sec3List);
+		              }
+		              file2->Add(sec3);
+		            } else if (LAW == 1 || LAW == 5) {
+		              TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter1.Next();
+		              for (int lis = 0; lis < tab2->GetN2(); lis++) {
+		                recIter1.Next();
+		              }
+		            } else if (LAW == 6){
+		              recIter1.Next();
+		            } else if (LAW == 7){
+		              TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter1.Next();
+  		            for (int cr1 = 0; cr1 < tab2->GetN2(); cr1++) {
+		                TNudyEndfTab2 *tab3 = (TNudyEndfTab2 *)recIter1.Next();
+		                for (int cr2 = 0; cr2 < tab3->GetN2(); cr2++) {
+                      recIter1.Next();
+		                }
+		              }
+		            }
+	            }
+            }
+          }
+        }
+        // recoEnergyAng = new TNudyEndfEnergyAng(file,QValue);
+        // std::cout<<"file 6 OK "<<std::endl;
 	      }
-	    }
-	  }
-//	recoEnergyAng = new TNudyEndfEnergyAng(file,QValue);
-// 	std::cout<<"file 6 OK "<<std::endl;
-	}break;
+        break;
 // // 	case 8:
 // // //	recoFissY = new TNudyEndfFissionYield(file);
 // // 	std::cout<<"file 8 OK "<<std::endl;
 // // 	break;
-	case 12:
-	recoPhYield = new TNudyEndfPhYield(file);
-// 	std::cout<<"file 12 OK "<<std::endl;
-	break;
-	case 13:
-	recoPhProd = new TNudyEndfPhProd(file);
-// 	std::cout<<"file 13 OK "<<std::endl;
-	break;
-	case 14:
-	recoPhAng = new TNudyEndfPhAng(file);
- 	// std::cout<<"file 14 OK "<<std::endl;
-	break;
-	case 15:
-	recoPhEnergy = new TNudyEndfPhEnergy(file);
-// 	std::cout<<"file 15 OK "<<std::endl;
-	break;
+	      case 12:
+	      recoPhYield = new TNudyEndfPhYield(file);
+        // std::cout<<"file 12 OK "<<std::endl;
+	      break;
+	      
+        case 13:
+	      recoPhProd = new TNudyEndfPhProd(file);
+        // std::cout<<"file 13 OK "<<std::endl;
+	      break;
+	      
+        case 14:
+	      recoPhAng = new TNudyEndfPhAng(file);
+ 	      // std::cout<<"file 14 OK "<<std::endl;
+	      break;
+	      
+        case 15:
+	      recoPhEnergy = new TNudyEndfPhEnergy(file);
+        // std::cout<<"file 15 OK "<<std::endl;
+	      break;
       }
     }
   }

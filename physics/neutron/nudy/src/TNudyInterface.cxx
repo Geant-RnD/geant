@@ -90,7 +90,7 @@ void NudyPhysics::TNudyInterface::DumpEndf2Root(std::string fIN, std::string fEn
   xsec->SetInitTempDop(0.0);
   xsec->SetOutTempDop(temp);
   xsec->GetData(fRootFileName, iSigDiff);
-  NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
+  //NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
 }
 
 
@@ -294,7 +294,6 @@ void NudyPhysics::TNudyInterface::SetMTValues (geantphysics::NudyProcessType pTy
 }
 
 bool NudyPhysics::TNudyInterface::GetFisCha(int inKey) {
-  bool isIn = false;
-//  isIn = std::find( fChannelFiss.begin(), TNudyInterface::fChannelFiss.end(), inKey ) != fChannelFiss.end();
-  return isIn;
+  auto p = std::find( fChannelFiss.begin(), fChannelFiss.end(), inKey ) ;
+  return (p != fChannelFiss.end());
 }

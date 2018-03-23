@@ -40,7 +40,7 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
     MtNumbers.push_back(MT);
     int LTT 		 = sec->GetL2();
     int LI  		 = sec->GetL1();
-    int NK  		 = sec->GetN1();
+    //int NK  		 = sec->GetN1();
    //printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {
