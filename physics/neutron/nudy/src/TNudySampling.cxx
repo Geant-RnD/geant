@@ -1223,14 +1223,14 @@ double TNudySampling::kinematicNonRel(TParticle */*particle*/, TNudyEndfRecoPoin
   double fqval  = recoPoint->GetQValue(elemId, MT);
   double cosCM 	= recoPoint->GetCos64(elemId, MT, kineticE);
   double beta 	= sqrt((a1* ( a1 + 1- a2 )/a2) * (1 + (1+a1)*fqval/(a1 * kineticE))) ;
-  double gama 	= (a2 * beta)/ (a1 + 1- a2);
-  double e3bye1 = a2 * beta * beta / ( a1 * a1 ) ; 
-  double e1 	= (a1/(1+a1)) * (a1/(1+a1)) * kineticE ;
-  double mu3 	= cosCM ;
-  double e4bye1 = (a2 * e3bye1)/ (a1 + 1- a2) ; 
-  double mu4 	= -cosCM ;
+  // double gama 	= (a2 * beta)/ (a1 + 1- a2);
+  // double e3bye1 = a2 * beta * beta / ( a1 * a1 ) ; 
+  // double e1 	= (a1/(1+a1)) * (a1/(1+a1)) * kineticE ;
+  // double mu3 	= cosCM ;
+  // double e4bye1 = (a2 * e3bye1)/ (a1 + 1- a2) ; 
+  // double mu4 	= -cosCM ;
   cosLab	= (1 + beta *cosCM )/sqrt(beta * beta + 1 + 2 * beta * cosCM ) ;
-  double w4 	= (1 - gama * cosCM) / sqrt(1 + gama * gama  - 2 * gama * cosCM ) ;
+  // double w4 	= (1 - gama * cosCM) / sqrt(1 + gama * gama  - 2 * gama * cosCM ) ;
   secEnergyLab 	= kineticE *(a2/((1 + a1)*(1 + a1)) * ( beta * beta + 1 + 2 * beta * cosCM )) ;
   double EnergyR= kineticE * ( a1 + 1- a2 ) * (1 + gama * gama  - 2 * gama * cosCM )/((1 + a1)*(1 + a1)) ;
 */
@@ -1247,7 +1247,7 @@ double TNudySampling::kinematicRel(TParticle */*particle*/, TNudyEndfRecoPoint *
   double di	=  a1 - a2 ;
   double sf	=  a3 + a4 ;
   double df	=  a3 - a4 ;
-  double fqval  = recoPoint->GetQValue(elemId, MT);
+  // double fqval  = recoPoint->GetQValue(elemId, MT);
   double cosCM 	= recoPoint->GetCos64(elemId, MT, kineticE);
   double s	= si * si + 2 * a2 * kineticE ;
 //   std::cout<<"q value \t" << fqval <<" cosCM \t"<< cosCM <<" s \t"<< s << std::endl;
@@ -1255,14 +1255,14 @@ double TNudySampling::kinematicRel(TParticle */*particle*/, TNudyEndfRecoPoint *
   double kf2 	= (s - sf * sf) * (s - df * df)/(4 * s) ;
   double z2 	= sqrt (ki2 + a2 * a2) ;
   double z3 	= sqrt (kf2 + a3 * a3) ;
-  double z4 	= sqrt (kf2 + a4 * a4) ;
+  //double z4 	= sqrt (kf2 + a4 * a4) ;
 //   std::cout<<"ki2 \t" << ki2 <<" kf2 \t"<< kf2 <<" z2 \t"<< z2 <<" z3 \t"<< z3 <<" z4 \t"<< z4 << std::endl;
   secEnergyLab	= (z2 * z3 - sqrt(ki2 * kf2 * cosCM))/(a2) - a3;
-  double EnergyR= (z2 * z4 - sqrt(ki2 * kf2 * cosCM))/(a2) - a4;
+  // double EnergyR= (z2 * z4 - sqrt(ki2 * kf2 * cosCM))/(a2) - a4;
 //   std::cout<<"secEnergyLab \t" << secEnergyLab <<" z2 * z3 \t"<< z2 * z3 <<" sqrt(ki2 * kf2 * cosCM) \t"<< sqrt(ki2 * kf2 * cosCM) <<" a3 \t"<< a3 <<" z4 \t"<< z4 << std::endl;
   double p12	= kineticE * kineticE + 2 * a1 * kineticE ;
   double p32	= secEnergyLab * secEnergyLab + 2 * a3 * secEnergyLab ;
-  double p42	= EnergyR * EnergyR + 2 * a4 * EnergyR ;
+  // double p42	= EnergyR * EnergyR + 2 * a4 * EnergyR ;
   cosLab	= (kineticE + si) * (secEnergyLab + a3) -z3 * sqrt (s) / (p12 * p32);
   double w4 	= (kineticE + si) * (EnergyR + a4) -z4 * sqrt (s) / (p12 * p42);
 */
@@ -1274,7 +1274,7 @@ double TNudySampling::kinematicGama(TParticle */*particle*/, TNudyEndfRecoPoint 
   double a1 	=  1E6 ;
   double a2 	=  particle[elemId].mass*1E6 ;
   double a3 	=  residueA*1E6 ;
-  double a4 	=  recoPoint->GetQValue(elemId, MT);
+  // double a4 	=  recoPoint->GetQValue(elemId, MT);
   double fqval  =  recoPoint->GetQValue(elemId, MT);
   double cosCM 	=  recoPoint->GetCos64(elemId, MT, kineticE);
   double beta	=  sqrt(kineticE *(kineticE + 2*a1))/(a1 + a2 + kineticE);

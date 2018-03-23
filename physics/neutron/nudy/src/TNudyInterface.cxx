@@ -90,7 +90,7 @@ void NudyPhysics::TNudyInterface::DumpEndf2Root(std::string fIN, std::string fEn
   xsec->SetInitTempDop(0.0);
   xsec->SetOutTempDop(temp);
   xsec->GetData(fRootFileName, iSigDiff);
-  //NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
+  // NudyPhysics::TNudyEndfRecoPoint *recoPoint = new NudyPhysics::TNudyEndfRecoPoint(0, fRootFileName);
 }
 
 
