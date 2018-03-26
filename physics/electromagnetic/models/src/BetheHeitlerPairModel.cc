@@ -1,4 +1,6 @@
 
+#include <Geant/G4Log.hh>
+#include <Geant/G4Exp.hh>
 #include "Geant/BetheHeitlerPairModel.h"
 
 #include "Geant/PhysicalConstants.h"
@@ -387,7 +389,7 @@ double BetheHeitlerPairModel::SampleTotalEnergyTransfer(const double egamma, con
                                                         const double r2, const double r3)
 {
   // determine electron energy lower grid point
-  const double legamma = std::log(egamma);
+  const double legamma = G4Log(egamma);
   //
   int indxEgamma = fSTNumPhotonEnergies - 1;
   if (egamma < GetHighEnergyUsageLimit()) {
@@ -413,7 +415,7 @@ double BetheHeitlerPairModel::SampleTotalEnergyTransfer(const double egamma, con
   const double eps0   = geant::units::kElectronMassC2 / egamma;
   const double epsp   = 0.5 - 0.5 * std::sqrt(1. - 4. * eps0 * gElementData[izet]->fDeltaFactor / deltaMax);
   const double epsMin = std::max(eps0, epsp);
-  return epsMin * std::exp(xi * std::log(0.5 / epsMin));
+  return epsMin * G4Exp(xi * G4Log(0.5 / epsMin));
 }
 
 /**
