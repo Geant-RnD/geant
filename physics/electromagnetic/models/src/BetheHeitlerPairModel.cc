@@ -554,13 +554,13 @@ void BetheHeitlerPairModel::ScreenFunction12(double &val1, double &val2, const d
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
     const double dum1 =
-        33.726 - 4. * std::log(1.0 + 0.311877 * gamma2) + 4.8 * std::exp(-0.9 * gamma) + 3.2 * std::exp(-1.5 * gamma);
+        33.726 - 4. * G4Log(1.0 + 0.311877 * gamma2) + 4.8 * G4Exp(-0.9 * gamma) + 3.2 * G4Exp(-1.5 * gamma);
     const double dum2 = 2. / (3. + 19.5 * gamma + 18. * gamma2);
     val1              = dum1 + dum2;
     val2              = dum1 - 0.5 * dum2;
   } else {
     if (delta > 1.) {
-      val1 = 42.24 - 8.368 * std::log(delta + 0.952);
+      val1 = 42.24 - 8.368 * G4Log(delta + 0.952);
       val2 = val1;
     } else {
       val1 = 42.392 - delta * (7.796 - 1.961 * delta);
@@ -576,11 +576,11 @@ double BetheHeitlerPairModel::ScreenFunction1(const double delta, const bool ist
   if (istsai) {
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
-    val                 = 33.726 - 4. * std::log(1.0 + 0.311877 * gamma2) + 4.8 * std::exp(-0.9 * gamma) +
-          3.2 * std::exp(-1.5 * gamma) + 2. / (3. + 19.5 * gamma + 18. * gamma2);
+    val = 33.726 - 4. * G4Log(1.0 + 0.311877 * gamma2) + 4.8 * G4Exp(-0.9 * gamma) + 3.2 * G4Exp(-1.5 * gamma) +
+          2. / (3. + 19.5 * gamma + 18. * gamma2);
   } else {
     if (delta > 1.) {
-      val = 42.24 - 8.368 * std::log(delta + 0.952);
+      val = 42.24 - 8.368 * G4Log(delta + 0.952);
     } else {
       val = 42.392 - delta * (7.796 - 1.961 * delta);
     }
@@ -595,11 +595,11 @@ double BetheHeitlerPairModel::ScreenFunction2(const double delta, const bool ist
   if (istsai) {
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
-    val                 = 33.726 - 4. * std::log(1.0 + 0.311877 * gamma2) + 4.8 * std::exp(-0.9 * gamma) +
-          3.2 * std::exp(-1.5 * gamma) - 1. / (3. + 19.5 * gamma + 18. * gamma2);
+    val = 33.726 - 4. * G4Log(1.0 + 0.311877 * gamma2) + 4.8 * G4Exp(-0.9 * gamma) + 3.2 * G4Exp(-1.5 * gamma) -
+          1. / (3. + 19.5 * gamma + 18. * gamma2);
   } else {
     if (delta > 1.) {
-      val = 42.24 - 8.368 * std::log(delta + 0.952);
+      val = 42.24 - 8.368 * G4Log(delta + 0.952);
     } else {
       val = 41.405 - delta * (5.828 - 0.8945 * delta);
     }
