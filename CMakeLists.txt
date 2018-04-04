@@ -343,6 +343,9 @@ endif()
 #----------------------------------------------------------------------------------------------
 # Handle compiler flags
 #
+if (NOT DEFINED ${CMAKE_CXX_STANDARD})
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   # using Clang
