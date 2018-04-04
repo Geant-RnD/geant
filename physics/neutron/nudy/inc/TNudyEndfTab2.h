@@ -26,7 +26,7 @@
 #include "TNudyEndfCont.h"
 
 namespace Nudy {
-	class TNudyEndfCont;
+class TNudyEndfCont;
 }
 
 namespace Nudy {

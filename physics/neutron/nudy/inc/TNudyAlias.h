@@ -98,5 +98,5 @@ public:
 #endif
 };
 
-} //namespace 
+} // namespace
 #endif

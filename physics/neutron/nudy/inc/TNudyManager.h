@@ -4,10 +4,10 @@
 #include "TNamed.h"
 #include "TBtree.h"
 namespace Nudy {
-	class TVNudyModel;
-	class TNudyLibrary;
-	class TNudyCore;
-	class TNudyDB;
+class TVNudyModel;
+class TNudyLibrary;
+class TNudyCore;
+class TNudyDB;
 }
 #include "THashTable.h"
 #include "TNudyDB.h"
@@ -16,7 +16,6 @@ namespace Nudy {
 class TGeoElementRN;
 class TParticlePDG;
 #include "TNudyTypes.h"
-
 
 namespace Nudy {
 class TNudyManager : public TNamed {
@@ -42,7 +41,7 @@ public:
   ~TNudyManager();                 // Public Destructor
   static TNudyManager *Instance(); // Returns Instance of TNudyManager
   Nudy::TNudyLibrary *LoadLibrary(const char *memLibName, const char *diskLibName, const char *sublib = NULL,
-                            TGeoElementRN *mat = NULL, Reaction_t reac = kNoReaction, unsigned long temp = 0);
+                                  TGeoElementRN *mat = NULL, Reaction_t reac = kNoReaction, unsigned long temp = 0);
   THashTable *GetDatabases() { return fNudyDB; }
   THashTable *GetLibraries() { return fLibrary; }
   Nudy::TNudyDB *OpenDatabase(const char *name, const char *file);
@@ -50,7 +49,10 @@ public:
   Nudy::TNudyDB *SetDatabase(const Nudy::TNudyDB *db);
   Nudy::TNudyDB *GetDatabase() { return fCurNudyDB; }
   Nudy::TNudyLibrary *GetLibrary(const char *name) { return (Nudy::TNudyLibrary *)fLibrary->FindObject(name); }
-  Nudy::TNudyLibrary *SetLibrary(TNudyLibrary *lib) { return (fCurLibrary = (Nudy::TNudyLibrary *)fLibrary->FindObject(lib)); }
+  Nudy::TNudyLibrary *SetLibrary(TNudyLibrary *lib)
+  {
+    return (fCurLibrary = (Nudy::TNudyLibrary *)fLibrary->FindObject(lib));
+  }
   Nudy::TNudyLibrary *SetLibrary(const char *name) { return (fCurLibrary = GetLibrary(name)); }
   void DumpTape(const char *rendf, int debug);
   void SetSubLib(TParticlePDG *proj) { fCurLibrary->SetSubLib(proj); }
@@ -68,7 +70,7 @@ public:
   }
   void ListModels();
   Nudy::TVNudyModel *GetModel(const int a, const int z, const int iso, const int reaction, const unsigned long temp,
-                        const char *particleName = NULL);
+                              const char *particleName = NULL);
   TBtree *GetAllModels(const int a = 0, const int z = 0, const int iso = 0, const int reaction = kNoReaction,
                        const unsigned long temp = 0, const char *particleName = NULL);
 
@@ -77,5 +79,5 @@ public:
 #endif
 };
 
-} //namespace 
+} // namespace
 #endif

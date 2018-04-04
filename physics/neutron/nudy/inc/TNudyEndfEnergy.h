@@ -4,11 +4,11 @@
 #include "TNudyEndfRecoPoint.h"
 
 namespace NudyPhysics {
-	class TNudyEndfRecoPoint;
+class TNudyEndfRecoPoint;
 }
 
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 #define PI acos(-1.0)

@@ -27,7 +27,7 @@
 #include <TList.h>
 
 namespace Nudy {
-	class TNudyEndfSec;
+class TNudyEndfSec;
 }
 
 namespace Nudy {
@@ -59,5 +59,5 @@ private:
   ClassDef(TNudyEndfFile, 1)
 };
 
-} //namespace 
+} // namespace
 #endif

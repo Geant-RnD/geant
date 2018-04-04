@@ -13,7 +13,7 @@ using VECGEOM_NAMESPACE::RNG;
 #include "TNudyAlias.h"
 
 namespace Nudy {
-	class TNudyAlias;
+class TNudyAlias;
 }
 
 //--------------------------------------------------
@@ -26,7 +26,7 @@ namespace Nudy {
 
 class TNudyAliasCont {
 private:
-  int fLen;               // Length of data
+  int fLen;                     // Length of data
   Nudy::TNudyAlias *fChooseBin; // Use alias method to choose bin
   // Probability distribution
   double *fP;         //[fLen] Probability distribution
@@ -96,5 +96,5 @@ public:
 #endif
 };
 
-} //namespace  
+} // namespace
 #endif

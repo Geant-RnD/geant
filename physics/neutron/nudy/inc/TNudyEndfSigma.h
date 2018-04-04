@@ -5,22 +5,22 @@
 #include <fstream>
 
 namespace NudyPhysics {
-	class TNudyEndfDoppler;
-	class TNudyEndfAng;
-	class TNudyEndfEnergy;
-	class TNudyEndfEnergyAng;
-	class TNudyEndfNuPh;
-	class TNudyEndfFissionYield;
-	class TNudyEndfPhYield;
-	class TNudyEndfPhProd;
-	class TNudyEndfPhAng;
-	class TNudyEndfPhEnergy;
+class TNudyEndfDoppler;
+class TNudyEndfAng;
+class TNudyEndfEnergy;
+class TNudyEndfEnergyAng;
+class TNudyEndfNuPh;
+class TNudyEndfFissionYield;
+class TNudyEndfPhYield;
+class TNudyEndfPhProd;
+class TNudyEndfPhAng;
+class TNudyEndfPhEnergy;
 }
 
 namespace Nudy {
-	class TNudyENDF;
-	class TNudyEndfFile;
-	class TNudyEndfList;
+class TNudyENDF;
+class TNudyEndfFile;
+class TNudyEndfList;
 }
 
 class TList;
@@ -63,19 +63,19 @@ public:
   void SetsigPrecision(double x1) { sigDiff = x1; }
   void SetInitTempDop(double t1) { doppTemp1 = t1; }
   void SetOutTempDop(double t2) { doppTemp2 = t2; }
-  double GetsigPrecision() const {return sigDiff;}
-  double GetOutTempDop() const {return doppTemp2;}
+  double GetsigPrecision() const { return sigDiff; }
+  double GetOutTempDop() const { return doppTemp2; }
   void SetPreProcess(int x1) { prepro = x1; }
   std::fstream out, outtotal;
   std::string outstring, outstringTotal;
-	bool GetIsFiss() { return IsFission; }
+  bool GetIsFiss() { return IsFission; }
 
 protected:
 private:
   void ReadFile1(Nudy::TNudyEndfFile *file);
   void ReWriteFile1(Nudy::TNudyEndfFile *file);
-// //   void SetMtMfMap(int mt, int mf, int i);
-// //   int GetMtMfMap(int mt, int i);
+  // //   void SetMtMfMap(int mt, int mf, int i);
+  // //   int GetMtMfMap(int mt, int i);
   void ReadFile2(Nudy::TNudyEndfFile *file);
   void ReadFile3(Nudy::TNudyEndfFile *file);
   void ReWriteFile3(Nudy::TNudyEndfFile *file);
@@ -122,10 +122,10 @@ private:
   void fillPdf2d();
   void AddSecFile12(Nudy::TNudyEndfFile *file);
 
-	void SetIsFission(bool FissKey) {IsFission = FissKey;}
+  void SetIsFission(bool FissKey) { IsFission = FissKey; }
 
   const char *rENDF;             // Name of the endf cross-section data file
-  double doppTemp1, doppTemp2 ;                // temperature t1 t2
+  double doppTemp1, doppTemp2;   // temperature t1 t2
   double sigDiff;                // precision for cross-section reconstruction
   matrixd4 cos4OfMts;            // cosine and pdf from file 4 for each reaction
   matrixd4 cosPdf4OfMts;         // cosine and pdf from file 4 for each reaction
@@ -157,7 +157,7 @@ private:
   double AWRI;
   int Z, ZA, ZAI, LFW, NER, LRU, LRF, NRO, NAPS, NLS, LSSF, NLS2, NJS, INT, NIS,
       intLinLru1 = 0;  // standard ENDF parameters
-	bool IsFission;  // Abhijit:: to simply know whether fit for fission
+  bool IsFission;      // Abhijit:: to simply know whether fit for fission
   int LRX, cueMat = 0; // flag for inelastic reaction, number of J
   int flagRead = -1;
   double QValue[999];
@@ -173,18 +173,18 @@ private:
   double R[3][3], S[3][3];        // matrix for RM formalism
   double RI[3][3], SI[3][3];      // matrix for RM formalism
   double MissingJ[5][50], MisGj[5];
-  int NJValue[5]; // J values in sorted form
+  int NJValue[5];              // J values in sorted form
   int NR, NP, NE, MAT, MT, MF; // standard ENDF parameters for range and interpolation
   matrixint Mt4, Mt5,
       Mt6; // MT values for which angular, energy/ angular-energy distributions are given in file 4, 5, 6
-  rowd energyUni, sigmaUniTotal;            // unionization of energy and total cross-section
-  matrixd2 sigmaOfMts;                      // sigma for each reaction
-  matrixd2 sigmaOfMtsDop;                   // sigma for each reaction after doppler
-  matrixd2 sigmaUniOfMts;                   // sigma for each reaction afte unionization of energy
-  rowint energyLocationMts;                 // MT wise starting energy for cross-section
-  rowint MtNumbers, MtNum4, MtNum5, MtNum6; // MT numbers
+  rowd energyUni, sigmaUniTotal;                            // unionization of energy and total cross-section
+  matrixd2 sigmaOfMts;                                      // sigma for each reaction
+  matrixd2 sigmaOfMtsDop;                                   // sigma for each reaction after doppler
+  matrixd2 sigmaUniOfMts;                                   // sigma for each reaction afte unionization of energy
+  rowint energyLocationMts;                                 // MT wise starting energy for cross-section
+  rowint MtNumbers, MtNum4, MtNum5, MtNum6;                 // MT numbers
   rowint MtNumSig4Photon, MtNumAng4Photon, MtNumEng4Photon; // MT numbers for photon cross-section, angle, energy
-  rowd sigmaMts, qvaluetemp;                // MT numbers for sigma in file3
+  rowd sigmaMts, qvaluetemp;                                // MT numbers for sigma in file3
   rowd eLinElastic, eLinCapture, eLinFission;
   rowd xLinElastic, xLinCapture, xLinFission;
   rowd eBroadElastic, eBroadCapture, eBroadFission;
@@ -199,61 +199,61 @@ private:
   rowd cosFile4;
   rowd cosPdfFile4;
   rowd cosCdfFile4;
-  rowint MtLct;                	// LCT numbers
-  rowint l;                    	// l values
-  rowint NRS;                  	// no. of resolved resonances
-  rowint NRJ;                  	// no. of URR J
-  rowint JSM;                  	// URR J
-  rowd Er;                     	// resolved resonance energy
-  rowd J;                      	// associated J
-  rowd GJ;                     	// spin multiplication factor
-  rowd Gamma_r;                	// total width = Gamma_n + Gamma_g + Gamma_f
-  rowd Gamma_n;                	// neutron scattering width
-  rowd Gamma_g;                	// Capture width
-  rowd Gamma_f;                	// fission width
-  rowd Gamma_x;                	// Inelastic width
-  rowd Gamma_fa, Gamma_fasq;   	// fission width 1
-  rowd Gamma_fb, Gamma_fbsq;   	// fission width 2
-  rowd at1;                    	// 1 background constant (Reich-Moore)
-  rowd at2;                    	// 2 background constant (Reich-Moore)
-  rowd at3;                    	// 3 background constant (Reich-Moore)
-  rowd at4;                    	// 4 background constant (Reich-Moore)
-  rowd bt1;                    	// 5 background constant (Reich-Moore)
-  rowd bt2;                    	// 6 background constant (Reich-Moore)
-  rowd det1;                   	// 1 resonance energy (Reich-Moore)
-  rowd dwt1;                   	// 2 half width (Reich-Moore)
-  rowd grt1;                   	// 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd git1;                   	// 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd def1;                   	// 5 background constant (Reich-Moore)
-  rowd dwf1;                   	// 6 background constant (Reich-Moore)
-  rowd grf1;                   	// 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd gif1;                   	// 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd dec1;                   	// 5 background constant (Reich-Moore)
-  rowd dwc1;                   	// 6 background constant (Reich-Moore)
-  rowd grc1;                   	// 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd gic1;                   	// 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd amux, amun, amug, amuf; 	// standard ENDF parameters
-  rowd Es;                     	// energy URR
-  rowd D, GX, GNO, GG, GF;     	// URR parameters
-  rowd PhiEr, ShiftEr;         	// penetration and shift factors
-  rowd eneTemp, sigTemp;       	// temporary vectors to store energy and sigma
-  rowd eneUniP, sigUniP;       	// unionization of energy and total cross-section for n,p
-  rowd eneUniD, sigUniD;       	// unionization of energy and total cross-section for n,d
-  rowd eneUniT, sigUniT;      	// unionization of energy and total cross-section for n,t
-  rowd eneUniHe3, sigUniHe3;  	// unionization of energy and total cross-section for n,He3
-  rowd eneUniHe4, sigUniHe4;   	// unionization of energy and total cross-section for n,He4
-  rowint eneLocP, eneLocD, eneLocT, eneLocHe3, eneLocHe4;   	// location of the first energy grid point
+  rowint MtLct;                // LCT numbers
+  rowint l;                    // l values
+  rowint NRS;                  // no. of resolved resonances
+  rowint NRJ;                  // no. of URR J
+  rowint JSM;                  // URR J
+  rowd Er;                     // resolved resonance energy
+  rowd J;                      // associated J
+  rowd GJ;                     // spin multiplication factor
+  rowd Gamma_r;                // total width = Gamma_n + Gamma_g + Gamma_f
+  rowd Gamma_n;                // neutron scattering width
+  rowd Gamma_g;                // Capture width
+  rowd Gamma_f;                // fission width
+  rowd Gamma_x;                // Inelastic width
+  rowd Gamma_fa, Gamma_fasq;   // fission width 1
+  rowd Gamma_fb, Gamma_fbsq;   // fission width 2
+  rowd at1;                    // 1 background constant (Reich-Moore)
+  rowd at2;                    // 2 background constant (Reich-Moore)
+  rowd at3;                    // 3 background constant (Reich-Moore)
+  rowd at4;                    // 4 background constant (Reich-Moore)
+  rowd bt1;                    // 5 background constant (Reich-Moore)
+  rowd bt2;                    // 6 background constant (Reich-Moore)
+  rowd det1;                   // 1 resonance energy (Reich-Moore)
+  rowd dwt1;                   // 2 half width (Reich-Moore)
+  rowd grt1;                   // 3 symmetrical cross-section parameter G (Reich-Moore)
+  rowd git1;                   // 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
+  rowd def1;                   // 5 background constant (Reich-Moore)
+  rowd dwf1;                   // 6 background constant (Reich-Moore)
+  rowd grf1;                   // 3 symmetrical cross-section parameter G (Reich-Moore)
+  rowd gif1;                   // 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
+  rowd dec1;                   // 5 background constant (Reich-Moore)
+  rowd dwc1;                   // 6 background constant (Reich-Moore)
+  rowd grc1;                   // 3 symmetrical cross-section parameter G (Reich-Moore)
+  rowd gic1;                   // 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
+  rowd amux, amun, amug, amuf; // standard ENDF parameters
+  rowd Es;                     // energy URR
+  rowd D, GX, GNO, GG, GF;     // URR parameters
+  rowd PhiEr, ShiftEr;         // penetration and shift factors
+  rowd eneTemp, sigTemp;       // temporary vectors to store energy and sigma
+  rowd eneUniP, sigUniP;       // unionization of energy and total cross-section for n,p
+  rowd eneUniD, sigUniD;       // unionization of energy and total cross-section for n,d
+  rowd eneUniT, sigUniT;       // unionization of energy and total cross-section for n,t
+  rowd eneUniHe3, sigUniHe3;   // unionization of energy and total cross-section for n,He3
+  rowd eneUniHe4, sigUniHe4;   // unionization of energy and total cross-section for n,He4
+  rowint eneLocP, eneLocD, eneLocT, eneLocHe3, eneLocHe4; // location of the first energy grid point
   matrixd2 sigUniOfP, sigUniOfD, sigUniOfT, sigUniOfHe3, sigUniOfHe4;
-  rowd eneUniPAll, sigUniPAll;       	// unionization of energy and total cross-section for n,p + n,pX
-  rowd eneUniDAll, sigUniDAll;       	// unionization of energy and total cross-section for n,d + n,dX
-  rowd eneUniTAll, sigUniTAll;      	// unionization of energy and total cross-section for n,t + n,tX
-  rowd eneUniHe3All, sigUniHe3All;  	// unionization of energy and total cross-section for n,He3 + n,He3X
-  rowd eneUniHe4All, sigUniHe4All;   	// unionization of energy and total cross-section for n,He4 + n,He4X
-  rowint eneLocPAll, eneLocDAll, eneLocTAll, eneLocHe3All, eneLocHe4All;   	// location of the first energy grid point
+  rowd eneUniPAll, sigUniPAll;     // unionization of energy and total cross-section for n,p + n,pX
+  rowd eneUniDAll, sigUniDAll;     // unionization of energy and total cross-section for n,d + n,dX
+  rowd eneUniTAll, sigUniTAll;     // unionization of energy and total cross-section for n,t + n,tX
+  rowd eneUniHe3All, sigUniHe3All; // unionization of energy and total cross-section for n,He3 + n,He3X
+  rowd eneUniHe4All, sigUniHe4All; // unionization of energy and total cross-section for n,He4 + n,He4X
+  rowint eneLocPAll, eneLocDAll, eneLocTAll, eneLocHe3All, eneLocHe4All; // location of the first energy grid point
   matrixd2 sigUniOfPAll, sigUniOfDAll, sigUniOfTAll, sigUniOfHe3All, sigUniOfHe4All;
-  int MTChargeFlag[10] ; 	// flag if charge particle production is added in MT = 103-107
-  int prepro = 0 ;
-  rowint nSecNeutron, nSecPhoton;   // counter for neutron, photon producing reactions
+  int MTChargeFlag[10]; // flag if charge particle production is added in MT = 103-107
+  int prepro = 0;
+  rowint nSecNeutron, nSecPhoton;    // counter for neutron, photon producing reactions
   rowint nReacNeutron, nDelayFamily; // number of neutron reactions, delayed neutron families
   NudyPhysics::TNudyEndfDoppler *doppler;
   NudyPhysics::TNudyEndfAng *recoAng;
@@ -275,5 +275,5 @@ private:
 #endif
 };
 
-} //namespace
+} // namespace
 #endif

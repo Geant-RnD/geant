@@ -3,12 +3,12 @@
 
 #include "TNudyEndfRecoPoint.h"
 
-namespace NudyPhysics {	
-	class TNudyEndfRecoPoint;
+namespace NudyPhysics {
+class TNudyEndfRecoPoint;
 }
 
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 #define PI acos(-1.0)
@@ -21,7 +21,6 @@ typedef std::vector<std::vector<std::vector<rowd>>> matrixd4;
 #include "Rtypes.h"
 class TRandom3;
 #endif
-
 
 namespace NudyPhysics {
 class TNudyEndfEnergyAng : public NudyPhysics::TNudyEndfRecoPoint {
@@ -55,10 +54,10 @@ private:
   rowd edes6, f06, r6, a6;
   rowd fE1, fP1, fE2, fP2, fE3, fP3, INorm;
   rowint zd, ad;
-  rowint law;                               // law6 numbers
-  rowint MtNumbers, MtNumbers6, MtNumbers4; // MT numbers
+  rowint law;                                    // law6 numbers
+  rowint MtNumbers, MtNumbers6, MtNumbers4;      // MT numbers
   rowint MtNumNeutron, MtNumPhoton, MtNumCharge; // MT numbers
-  rowint MtLct;                             // LCT numbers
+  rowint MtLct;                                  // LCT numbers
   rowint nbt1, int1;
   int nr1, np1; // standard ENDF parameters
   rowint nbt2, int2;
@@ -67,7 +66,7 @@ private:
   int nr3, np3; // standard ENDF parameters
   rowd ein, cosc, cdfc, pdfc, lCoef1, cosin, cosinpdf, cosincdf;
   rowd eoute, cdfe, pdfe;
-  matrixint Mt6Values; // MT values
+  matrixint Mt6Values;                        // MT values
   matrixint Mt6Neutron, Mt6Photon, Mt6Charge; // MT values
   matrixd2 cos2d, cosinpdf2d, cosincdf2d, cos2dc, pdf2dc, cdf2dc, lCoef, ein2d, ein2dc;
   matrixd3 cos3d, cosinpdf3d, cosincdf3d, cos3dc, pdf3dc, cdf3dc;
@@ -82,5 +81,5 @@ private:
 #endif
 };
 
-} //namespace 
+} // namespace
 #endif

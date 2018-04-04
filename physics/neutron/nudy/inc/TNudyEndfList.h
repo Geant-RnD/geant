@@ -26,7 +26,7 @@
 #include "TNudyEndfCont.h"
 
 namespace Nudy {
-	class TNudyEndfCont;
+class TNudyEndfCont;
 }
 
 #ifdef USE_ROOT
@@ -54,5 +54,5 @@ private:
 #endif
 };
 
-} //namespace 
+} // namespace
 #endif

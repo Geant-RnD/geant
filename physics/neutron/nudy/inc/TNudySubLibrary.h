@@ -3,15 +3,14 @@
 
 #include "TNamed.h"
 namespace Nudy {
-	class TVNudyModel;
-	class TNudyEndfMat;
+class TVNudyModel;
+class TNudyEndfMat;
 }
 
 #include "TNudyTypes.h"
 class TBtree;
 class TParticlePDG;
 class TGeoElementRN;
-
 
 namespace Nudy {
 
@@ -38,5 +37,5 @@ private:
 #endif
 };
 
-} //namespace
+} // namespace
 #endif

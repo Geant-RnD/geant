@@ -3,13 +3,12 @@
 
 #include "TNudyEndfRecoPoint.h"
 
-
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 namespace NudyPhysics {
-	class TNudyEndfRecoPoint;
+class TNudyEndfRecoPoint;
 }
 
 typedef std::vector<double> rowd;
@@ -60,5 +59,5 @@ private:
 #endif
 };
 
-} //namespace 
+} // namespace
 #endif

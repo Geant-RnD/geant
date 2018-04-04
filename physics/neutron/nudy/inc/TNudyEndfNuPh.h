@@ -11,7 +11,7 @@ typedef std::vector<int> rowint;
 #endif
 
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 namespace NudyPhysics {

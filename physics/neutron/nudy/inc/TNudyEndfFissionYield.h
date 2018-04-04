@@ -4,7 +4,7 @@
 #include "TNudyEndfRecoPoint.h"
 
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 typedef std::vector<double> rowd;
@@ -34,5 +34,5 @@ private:
   ClassDef(TNudyEndfFissionYield, 1) // class for an ENDF fission yield reconstruction
 };
 
-} //namespace
+} // namespace
 #endif

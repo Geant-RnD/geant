@@ -4,29 +4,28 @@
 #include <vector>
 #include <fstream>
 namespace Nudy {
-	class TNudyEndfFile;
-	class TNudyEndfList;
+class TNudyEndfFile;
+class TNudyEndfList;
 }
 
 class TList;
 
 namespace NudyPhysics {
-	class TNudyEndfNuPh;
-	class TNudyEndfFissionYield;
-	class TNudyEndfEnergy;
-	class TNudyEndfEnergyAng;
-	class TNudyEndfAng;
-	class TNudyEndfPhYield;
-	class TNudyEndfPhProd;
-	class TNudyEndfPhAng;
-	class TNudyEndfPhEnergy;
+class TNudyEndfNuPh;
+class TNudyEndfFissionYield;
+class TNudyEndfEnergy;
+class TNudyEndfEnergyAng;
+class TNudyEndfAng;
+class TNudyEndfPhYield;
+class TNudyEndfPhProd;
+class TNudyEndfPhAng;
+class TNudyEndfPhEnergy;
 }
 
 #ifdef USE_ROOT
 #include "Rtypes.h"
 class TRandom3;
 #endif
-
 
 namespace NudyPhysics {
 
@@ -38,8 +37,6 @@ typedef std::vector<rowd> matrixd2;
 typedef std::vector<std::vector<rowd>> matrixd3;
 typedef std::vector<std::vector<std::vector<rowd>>> matrixd4;
 typedef std::vector<std::vector<std::vector<std::vector<rowd>>>> matrixd5;
-
-
 
 class TNudyEndfRecoPoint {
 
@@ -74,7 +71,6 @@ public:
   std::fstream out, outtotal;
   std::string outstring, outstringTotal;
   matrixint MtValues; // MT values for which cross-section/ heating values are given  all elements
-
 
 protected:
   int elemId;
@@ -116,18 +112,18 @@ private:
 
   int flagRead = -1;
   double QValue[999];
-  double A, AWR, ABN, QX;         // standard ENDF parameters
-  int NR, NP, NE; // standard ENDF parameters for range and interpolation
+  double A, AWR, ABN, QX; // standard ENDF parameters
+  int NR, NP, NE;         // standard ENDF parameters for range and interpolation
   matrixint Mt4, Mt5,
-      Mt6; // MT values for which angular, energy/ angular-energy distributions are given in file 4, 5, 6
-  matrixd2 sigmaOfMts;                      // sigma for each reaction
-  matrixd2 sigmaUniOfMts;                   // sigma for each reaction afte unionization of energy
+      Mt6;                // MT values for which angular, energy/ angular-energy distributions are given in file 4, 5, 6
+  matrixd2 sigmaOfMts;    // sigma for each reaction
+  matrixd2 sigmaUniOfMts; // sigma for each reaction afte unionization of energy
   rowint energyLocationMts;                 // MT wise starting energy for cross-section
   rowint MtNumbers, MtNum4, MtNum5, MtNum6; // MT numbers
-  rowd energyMts, sigmaMts, qvaluetemp;                // MT numbers for sigma in file3
+  rowd energyMts, sigmaMts, qvaluetemp;     // MT numbers for sigma in file3
   rowd eLinearFile3;
   rowd xLinearFile3;
-  rowd eneTemp, sigTemp;       // temporary vectors to store energy and sigma
+  rowd eneTemp, sigTemp; // temporary vectors to store energy and sigma
   NudyPhysics::TNudyEndfAng *recoAng;
   NudyPhysics::TNudyEndfEnergy *recoEnergy;
   NudyPhysics::TNudyEndfEnergyAng *recoEnergyAng;
@@ -145,6 +141,5 @@ private:
   ClassDef(TNudyEndfRecoPoint, 1) // class for an ENDF reconstruction
 #endif
 };
-
 }
 #endif

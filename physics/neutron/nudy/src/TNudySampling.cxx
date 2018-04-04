@@ -20,7 +20,6 @@
 using namespace Nudy;
 using namespace NudyPhysics;
 
-
 #ifdef USE_ROOT
 ClassImp(TNudySampling)
 #endif
@@ -32,11 +31,11 @@ ClassImp(TNudySampling)
 TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
 {
   kineticE = particle[elemId].energy;
-  std::cout << "sampling start \t" << elemId <<"\t"<< kineticE << std::endl;
-  events   = 1000000;
-  fRnd     = new TRandom3(0);
+  std::cout << "sampling start \t" << elemId << "\t" << kineticE << std::endl;
+  events = 1000000;
+  fRnd   = new TRandom3(0);
   div_t divr;
-  int jkl=0;
+  int jkl  = 0;
   TFile *f = new TFile("test.root", "recreate");
   f->cd();
   h     = new TH2D("h", "", 100, -1, 1, 100, 0, 20E6);
@@ -47,7 +46,7 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
     fissA1[i] = new TH1D(Form("fissA1[%d]", i), "", 100, 0, 20E6);
     hist[i]   = new TH2D(Form("hist[%d]", i), "", 1000, 0, 20, 10, 0, 10);
   }
-   std::cout <<"sampling sigmaTotal "<< recoPoint->GetSigmaTotal(elemId,kineticE) << std::endl;
+  std::cout << "sampling sigmaTotal " << recoPoint->GetSigmaTotal(elemId, kineticE) << std::endl;
   // std::cout <<"sampling sigmaPartial total "<< recoPoint->GetSigmaPartial(0,0,20) << std::endl;
   // std::cout <<"sampling sigmaPartial elstic "<< recoPoint->GetSigmaPartial(0,1,20) << std::endl;
   // determining reaction type from element;
@@ -56,19 +55,22 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
   // double avg = 6.022E23;
   // double ro = avg * density / mass;
   // int enemax = recoPoint->eneUni[elemId].size();
-   std::cout <<" target mass "<< particle[elemId].mass <<"  "<< particle[elemId].charge <<"  "<< kineticE <<  std::endl;
+  std::cout << " target mass " << particle[elemId].mass << "  " << particle[elemId].charge << "  " << kineticE
+            << std::endl;
   // kineticE = fRnd->Uniform(1) * recoPoint->eneUni[elemId][enemax-1];
   for (unsigned int crsp = 0; crsp < recoPoint->MtValues[elemId].size(); crsp++) {
-    std::cout << recoPoint->MtValues[elemId][crsp] <<"  \t"<< recoPoint->GetSigmaTotal(elemId, kineticE) <<"  \t"<< recoPoint->GetSigmaPartial(elemId, crsp, kineticE) << std::endl;
+    std::cout << recoPoint->MtValues[elemId][crsp] << "  \t" << recoPoint->GetSigmaTotal(elemId, kineticE) << "  \t"
+              << recoPoint->GetSigmaPartial(elemId, crsp, kineticE) << std::endl;
     crs.push_back(recoPoint->GetSigmaPartial(elemId, crsp, kineticE) / recoPoint->GetSigmaTotal(elemId, kineticE));
-//     std::cout<<recoPoint->MtValues[elemId][crsp]<<"  "<< crs[crsp] <<"  "<<
-//     recoPoint->GetSigmaPartial(elemId,crsp,kineticE) <<"  "<< recoPoint->GetSigmaTotal(elemId,kineticE) << std::endl;
+    //     std::cout<<recoPoint->MtValues[elemId][crsp]<<"  "<< crs[crsp] <<"  "<<
+    //     recoPoint->GetSigmaPartial(elemId,crsp,kineticE) <<"  "<< recoPoint->GetSigmaTotal(elemId,kineticE) <<
+    //     std::endl;
   }
-//  exit(1);
+  //  exit(1);
   do {
-    kineticE = particle[elemId].energy;
+    kineticE    = particle[elemId].energy;
     double sum1 = 0;
-    //std::cout << counter << " bef " << recoPoint->MtValues[elemId].size() << std::endl;
+    // std::cout << counter << " bef " << recoPoint->MtValues[elemId].size() << std::endl;
     double rnd1 = fRnd->Uniform(1);
     // std::cout << counter <<" aft "<<rnd1<< std::endl;
     for (unsigned int crsp = 0; crsp < recoPoint->MtValues[elemId].size(); crsp++) {
@@ -84,19 +86,20 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
     MF4 = recoPoint->GetMt4(elemId, MT);
     MF5 = recoPoint->GetMt5(elemId, MT);
     MF6 = recoPoint->GetMt6(elemId, MT);
-    //int MT6N = recoPoint->GetMt6Neutron(elemId, MT);
-    //std::cout << " bef "<< counter << " MT " << MT<<"   "<< MF4 <<"  "<< MF5 <<"  "<< MF6 <<"  "<< kineticE << std::endl;
+    // int MT6N = recoPoint->GetMt6Neutron(elemId, MT);
+    // std::cout << " bef "<< counter << " MT " << MT<<"   "<< MF4 <<"  "<< MF5 <<"  "<< MF6 <<"  "<< kineticE <<
+    // std::endl;
     // selection of the data from file 4 5 and 6 for angle and energy calculations
     LCT = recoPoint->GetCos4Lct(elemId, MT);
     switch (MT) {
     case 2: { // elastic
-      residueA     = particle[elemId].mass;
-      residueZ     = particle[elemId].charge;
-      cosCM        = recoPoint->GetCos4(elemId, MT, kineticE);
-//      std::cout << cosCM <<"\t"<< LCT << std::endl;
+      residueA = particle[elemId].mass;
+      residueZ = particle[elemId].charge;
+      cosCM    = recoPoint->GetCos4(elemId, MT, kineticE);
+      //      std::cout << cosCM <<"\t"<< LCT << std::endl;
       cosLab       = TNudyCore::Instance()->cmToLabElasticCosT(cosCM, particle[elemId].mass);
       secEnergyLab = TNudyCore::Instance()->cmToLabElasticE(kineticE, cosCM, particle[elemId].mass);
-//      FillHisto(acos(cosCM)*180/3.14159, secEnergyLab);
+      //      FillHisto(acos(cosCM)*180/3.14159, secEnergyLab);
     } break;
     case 11: // 2nd
       residueA = particle[elemId].mass - 3;
@@ -109,14 +112,14 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
       residueZ = particle[elemId].charge;
       GetSecParameter(particle, recoPoint);
       fissA->Fill(residueA);
-      //FillHisto(cosLab, secEnergyLab);
-      jkl = (int)((1 - cosLab)*10);
+      // FillHisto(cosLab, secEnergyLab);
+      jkl = (int)((1 - cosLab) * 10);
       fissA1[jkl]->Fill(secEnergyLab);
       fissA1[20]->Fill(secEnergyLab);
       // std::cout << jkl <<"  "<< cosLab <<"  "<<secEnergyLab << std::endl;
-//       kineticE = kineticE - secEnergyLab ;
-//       GetSecParameter(particle, recoPoint);
-//       FillHisto(cosLab, secEnergyLab);
+      //       kineticE = kineticE - secEnergyLab ;
+      //       GetSecParameter(particle, recoPoint);
+      //       FillHisto(cosLab, secEnergyLab);
       break;
     case 17: // 3n
       residueA = particle[elemId].mass - 2;
@@ -128,17 +131,17 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
     case 18: // fission
     {
       // double kineticRand = kineticE * fRnd->Uniform(1);
-      double zaf   = recoPoint->GetFisYield(elemId, kineticE);
+      double zaf = recoPoint->GetFisYield(elemId, kineticE);
       // std::cout<<" sample z "<< std::endl;
-      divr         = div(zaf, 10000);
-      residueZ     = divr.quot;
-      divr         = div(divr.rem, 10);
-      residueA     = divr.quot ;
-      //std::cout <<"mass "<< residueA <<"  "<< residueZ <<"  "<< zaf << std::endl;
-       fissA->Fill(residueA);
-       fissA->Fill(particle[elemId].mass - residueA);
+      divr     = div(zaf, 10000);
+      residueZ = divr.quot;
+      divr     = div(divr.rem, 10);
+      residueA = divr.quot;
+      // std::cout <<"mass "<< residueA <<"  "<< residueZ <<"  "<< zaf << std::endl;
+      fissA->Fill(residueA);
+      fissA->Fill(particle[elemId].mass - residueA);
       // double fissHeat = recoPoint->GetFissHeat(elemId, kineticRand);
-      double nut   = recoPoint->GetNuTotal(elemId, kineticE);
+      double nut = recoPoint->GetNuTotal(elemId, kineticE);
       // double nup = recoPoint->GetNuPrompt(elemId, kineticRand);
       // double nud = recoPoint->GetNuDelayed(elemId, kineticRand);
       int nu                              = (int)nut;
@@ -183,7 +186,7 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
       for (int nui = 0; nui < nu; nui++) {
         secEnergyLab = recoPoint->GetEnergy5(elemId, MT, kineticE);
         cosLab       = 2 * fRnd->Uniform(1) - 1;
-        //fissA1[6]->Fill(secEnergyLab / 1E6);
+        // fissA1[6]->Fill(secEnergyLab / 1E6);
         // FillHisto(cosLab, secEnergyLab);
       }
     } break;
@@ -358,17 +361,17 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
       // secEnergyLab = TNudyCore::Instance()->cmToLabInelasticE(secEnergyCM, kineticE, cosCM, particle[elemId].mass);
       // cosLab = TNudyCore::Instance()->cmToLabInelasticCosT(secEnergyLab, secEnergyCM, kineticE, cosCM,
       // particle[elemId].mass);
-      if (MT==91) FillHisto(cosLab, secEnergyLab);
+      if (MT == 91) FillHisto(cosLab, secEnergyLab);
       break;
     case 102: // capture
       residueA = particle[elemId].mass + 1;
       residueZ = particle[elemId].charge;
       fissA->Fill(residueA);
       GetSecParameter(particle, recoPoint);
-       std::cout<< cosLab <<"\t"<< secEnergyLab <<"\t"<< std::endl;
-//      FillHisto(cosLab, secEnergyLab);
-//      FillHisto(acos(cosCM)*180/3.14159, secEnergyLab);
-      //FillHisto(cosLab, secEnergyLab);
+      std::cout << cosLab << "\t" << secEnergyLab << "\t" << std::endl;
+      //      FillHisto(cosLab, secEnergyLab);
+      //      FillHisto(acos(cosCM)*180/3.14159, secEnergyLab);
+      // FillHisto(cosLab, secEnergyLab);
       break;
     case 103: // p
     case 600:
@@ -421,11 +424,11 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
     case 647:
     case 648:
     case 649:
-     residueA = particle[elemId].mass;
+      residueA = particle[elemId].mass;
       residueZ = particle[elemId].charge - 1;
       GetSecParameter(particle, recoPoint);
       fissA->Fill(residueA);
-       //FillHisto(cosLab, secEnergyLab);
+      // FillHisto(cosLab, secEnergyLab);
       break;
     case 104: // d
     case 650:
@@ -538,7 +541,7 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
       residueA = particle[elemId].mass - 2;
       residueZ = particle[elemId].charge - 1;
       GetSecParameter(particle, recoPoint);
-      //FillHisto(cosLab, secEnergyLab);
+      // FillHisto(cosLab, secEnergyLab);
       fissA->Fill(residueA);
       // FillHisto(cosLab, secEnergyLab);
       break;
@@ -592,7 +595,8 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
     case 796:
     case 797:
     case 798:
-    case 799:      residueA = particle[elemId].mass - 2;
+    case 799:
+      residueA = particle[elemId].mass - 2;
       residueZ = particle[elemId].charge - 2;
       GetSecParameter(particle, recoPoint);
       fissA->Fill(residueA);
@@ -1093,7 +1097,7 @@ TNudySampling::TNudySampling(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
 //------------------------------------------------------------------------------------------------------
 void TNudySampling::GetSecParameter(TParticle *particle, TNudyEndfRecoPoint *recoPoint)
 {
-   std::cout<<"MF "<< MF4 << " MF5 "<< MF5  << " MF6 "<< MF6 << " MT "<< MT << " LCT "<< LCT << std::endl;
+  std::cout << "MF " << MF4 << " MF5 " << MF5 << " MF6 " << MF6 << " MT " << MT << " LCT " << LCT << std::endl;
   if (MF4 == 4 && MF5 == 5) {
     cosCM        = recoPoint->GetCos4(elemId, MT, kineticE);
     secEnergyCM  = recoPoint->GetEnergy5(elemId, MT, kineticE);
@@ -1105,13 +1109,13 @@ void TNudySampling::GetSecParameter(TParticle *particle, TNudyEndfRecoPoint *rec
       cosLab       = cosCM;
       secEnergyLab = secEnergyCM;
     }
-   std::cout<<"cosLab "<< cosLab << " secEnergyLab "<< secEnergyLab << std::endl;
+    std::cout << "cosLab " << cosLab << " secEnergyLab " << secEnergyLab << std::endl;
   } else if (MF4 == 4 && MF5 == -1) {
     cosCM      = recoPoint->GetCos4(elemId, MT, kineticE);
     double fm1 = 1E6;
-    double fm2 = particle[elemId].mass*1E6;
-    double fm4 = residueA*1E6;
-    double fm3 = particle[elemId].mass*1E6 - residueA*1E6;
+    double fm2 = particle[elemId].mass * 1E6;
+    double fm4 = residueA * 1E6;
+    double fm3 = particle[elemId].mass * 1E6 - residueA * 1E6;
     // double fqval =  recoPoint->GetQValue(elemId, MT) ;
     double fsi  = fm1 + fm2;
     double fdi  = fm1 - fm2;
@@ -1131,9 +1135,9 @@ void TNudySampling::GetSecParameter(TParticle *particle, TNudyEndfRecoPoint *rec
     // double fcos3 = ((kineticE + fsi)*(fe3 + fm3)- fz3 * sqrt(fs))/sqrt(fp12*fp32);
     // double fcos4 = ((kineticE + fsi)*(fe4 + fm4)- fz4 * sqrt(fs))/sqrt(fp12*fp42);
 
-      //kinematicNonRel (particle, recoPoint) ;
-      secEnergyLab = fe3;
-      //std::cout<<"MT \t"<< MT <<"  \t" << cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
+    // kinematicNonRel (particle, recoPoint) ;
+    secEnergyLab = fe3;
+    // std::cout<<"MT \t"<< MT <<"  \t" << cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
     // std::cout<<"cos CM = "<< cosCM << std::endl;
     // secEnergyCM = recoPoint->GetEnergy5(elemId, MT, kineticE);
     if (LCT == 2) {
@@ -1168,31 +1172,31 @@ void TNudySampling::GetSecParameter(TParticle *particle, TNudyEndfRecoPoint *rec
     // double fcos4 = ((kineticE + fsi)*(fe4 + fm4)- fz4 * sqrt(fs))/sqrt(fp12*fp42);
     secEnergyLab = fe3;
   } else if (MF4 == 99 && MF5 == -1 && MF6 == 6) {
-    int law 	= recoPoint->GetLaw6(elemId, MT);
-    //int zi 	= recoPoint->GetZd6(elemId, MT);
-    //int ai 	= recoPoint->GetAd6(elemId, MT);
-     //std::cout<<"law "<< law <<" Zi \t" << zi <<" Ai \t" << ai << std::endl;
+    int law = recoPoint->GetLaw6(elemId, MT);
+    // int zi 	= recoPoint->GetZd6(elemId, MT);
+    // int ai 	= recoPoint->GetAd6(elemId, MT);
+    // std::cout<<"law "<< law <<" Zi \t" << zi <<" Ai \t" << ai << std::endl;
     switch (law) {
     case 2: {
-      cosCM         = recoPoint->GetCos64(elemId, MT, kineticE);
-      double fm1    = 1;
-      //double fm2    = particle[elemId].mass;
-      double fm3    = particle[elemId].mass - residueA;
-      double fm4    = residueA;
-      double fqval  = recoPoint->GetQValue(elemId, MT);
-      double fg     = sqrt ((fm1 * fm4 * kineticE)/(fm3 * (fm3 + fm4) * fqval + fm3 * (fm3 + fm4 - fm1) * kineticE));
-      cosLab        = (fg + cosCM)/sqrt(1 + fg * fg + 2 * fg * cosCM);
-      double fr	    = sqrt (fm1*fm4*kineticE) *cosLab / (fm3 + fm4);
-      double fs     = (kineticE * (fm3-fm1) + fm3 * fqval)/(fm3 + fm4);
-      double feb    = fr + sqrt(fr * fr + fs );
-      secEnergyLab  = feb * feb;
-      
-//       std::cout<< cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
-//       kinematicNonRel (particle, recoPoint) ;
-//       std::cout<< cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
-//      kinematicRel (particle, recoPoint, cosLab, secEnergyLab) ;
-      if (fm4 == 0) kinematicGama (particle, recoPoint) ;
-//       std::cout<< cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
+      cosCM      = recoPoint->GetCos64(elemId, MT, kineticE);
+      double fm1 = 1;
+      // double fm2    = particle[elemId].mass;
+      double fm3   = particle[elemId].mass - residueA;
+      double fm4   = residueA;
+      double fqval = recoPoint->GetQValue(elemId, MT);
+      double fg    = sqrt((fm1 * fm4 * kineticE) / (fm3 * (fm3 + fm4) * fqval + fm3 * (fm3 + fm4 - fm1) * kineticE));
+      cosLab       = (fg + cosCM) / sqrt(1 + fg * fg + 2 * fg * cosCM);
+      double fr    = sqrt(fm1 * fm4 * kineticE) * cosLab / (fm3 + fm4);
+      double fs    = (kineticE * (fm3 - fm1) + fm3 * fqval) / (fm3 + fm4);
+      double feb   = fr + sqrt(fr * fr + fs);
+      secEnergyLab = feb * feb;
+
+      //       std::cout<< cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
+      //       kinematicNonRel (particle, recoPoint) ;
+      //       std::cout<< cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
+      //      kinematicRel (particle, recoPoint, cosLab, secEnergyLab) ;
+      if (fm4 == 0) kinematicGama(particle, recoPoint);
+      //       std::cout<< cosLab  <<"   \t"<< cosCM  <<"   \t"<<  secEnergyLab << std::endl;
     } break;
     case 3:
       break;
@@ -1216,78 +1220,83 @@ void TNudySampling::GetSecParameter(TParticle *particle, TNudyEndfRecoPoint *rec
   }
 }
 //------------------------------------------------------------------------------------------------------
-double TNudySampling::kinematicNonRel(TParticle */*particle*/, TNudyEndfRecoPoint */*recoPoint*/){
-/*
-  double a1 	=  particle[elemId].mass ;
-  double a2 	=  particle[elemId].mass - residueA ;
-  double fqval  = recoPoint->GetQValue(elemId, MT);
-  double cosCM 	= recoPoint->GetCos64(elemId, MT, kineticE);
-  double beta 	= sqrt((a1* ( a1 + 1- a2 )/a2) * (1 + (1+a1)*fqval/(a1 * kineticE))) ;
-  // double gama 	= (a2 * beta)/ (a1 + 1- a2);
-  // double e3bye1 = a2 * beta * beta / ( a1 * a1 ) ; 
-  // double e1 	= (a1/(1+a1)) * (a1/(1+a1)) * kineticE ;
-  // double mu3 	= cosCM ;
-  // double e4bye1 = (a2 * e3bye1)/ (a1 + 1- a2) ; 
-  // double mu4 	= -cosCM ;
-  cosLab	= (1 + beta *cosCM )/sqrt(beta * beta + 1 + 2 * beta * cosCM ) ;
-  // double w4 	= (1 - gama * cosCM) / sqrt(1 + gama * gama  - 2 * gama * cosCM ) ;
-  secEnergyLab 	= kineticE *(a2/((1 + a1)*(1 + a1)) * ( beta * beta + 1 + 2 * beta * cosCM )) ;
-  double EnergyR= kineticE * ( a1 + 1- a2 ) * (1 + gama * gama  - 2 * gama * cosCM )/((1 + a1)*(1 + a1)) ;
-*/
+double TNudySampling::kinematicNonRel(TParticle * /*particle*/, TNudyEndfRecoPoint * /*recoPoint*/)
+{
+  /*
+    double a1 	=  particle[elemId].mass ;
+    double a2 	=  particle[elemId].mass - residueA ;
+    double fqval  = recoPoint->GetQValue(elemId, MT);
+    double cosCM 	= recoPoint->GetCos64(elemId, MT, kineticE);
+    double beta 	= sqrt((a1* ( a1 + 1- a2 )/a2) * (1 + (1+a1)*fqval/(a1 * kineticE))) ;
+    // double gama 	= (a2 * beta)/ (a1 + 1- a2);
+    // double e3bye1 = a2 * beta * beta / ( a1 * a1 ) ;
+    // double e1 	= (a1/(1+a1)) * (a1/(1+a1)) * kineticE ;
+    // double mu3 	= cosCM ;
+    // double e4bye1 = (a2 * e3bye1)/ (a1 + 1- a2) ;
+    // double mu4 	= -cosCM ;
+    cosLab	= (1 + beta *cosCM )/sqrt(beta * beta + 1 + 2 * beta * cosCM ) ;
+    // double w4 	= (1 - gama * cosCM) / sqrt(1 + gama * gama  - 2 * gama * cosCM ) ;
+    secEnergyLab 	= kineticE *(a2/((1 + a1)*(1 + a1)) * ( beta * beta + 1 + 2 * beta * cosCM )) ;
+    double EnergyR= kineticE * ( a1 + 1- a2 ) * (1 + gama * gama  - 2 * gama * cosCM )/((1 + a1)*(1 + a1)) ;
+  */
   return 0;
 }
 //------------------------------------------------------------------------------------------------------
-double TNudySampling::kinematicRel(TParticle */*particle*/, TNudyEndfRecoPoint */*recoPoint*/){
-/*
-  double a1 	=  1E6 ;
-  double a2 	=  particle[elemId].mass*1E6 ;
-  double a3 	=  residueA*1E6 ;
-  double a4 	=  recoPoint->GetQValue(elemId, MT);
-  double si	=  a1 + a2 ;
-  double di	=  a1 - a2 ;
-  double sf	=  a3 + a4 ;
-  double df	=  a3 - a4 ;
-  // double fqval  = recoPoint->GetQValue(elemId, MT);
-  double cosCM 	= recoPoint->GetCos64(elemId, MT, kineticE);
-  double s	= si * si + 2 * a2 * kineticE ;
-//   std::cout<<"q value \t" << fqval <<" cosCM \t"<< cosCM <<" s \t"<< s << std::endl;
-  double ki2 	= (s - si * si) * (s - di * di)/(4 * s) ;
-  double kf2 	= (s - sf * sf) * (s - df * df)/(4 * s) ;
-  double z2 	= sqrt (ki2 + a2 * a2) ;
-  double z3 	= sqrt (kf2 + a3 * a3) ;
-  //double z4 	= sqrt (kf2 + a4 * a4) ;
-//   std::cout<<"ki2 \t" << ki2 <<" kf2 \t"<< kf2 <<" z2 \t"<< z2 <<" z3 \t"<< z3 <<" z4 \t"<< z4 << std::endl;
-  secEnergyLab	= (z2 * z3 - sqrt(ki2 * kf2 * cosCM))/(a2) - a3;
-  // double EnergyR= (z2 * z4 - sqrt(ki2 * kf2 * cosCM))/(a2) - a4;
-//   std::cout<<"secEnergyLab \t" << secEnergyLab <<" z2 * z3 \t"<< z2 * z3 <<" sqrt(ki2 * kf2 * cosCM) \t"<< sqrt(ki2 * kf2 * cosCM) <<" a3 \t"<< a3 <<" z4 \t"<< z4 << std::endl;
-  double p12	= kineticE * kineticE + 2 * a1 * kineticE ;
-  double p32	= secEnergyLab * secEnergyLab + 2 * a3 * secEnergyLab ;
-  // double p42	= EnergyR * EnergyR + 2 * a4 * EnergyR ;
-  cosLab	= (kineticE + si) * (secEnergyLab + a3) -z3 * sqrt (s) / (p12 * p32);
-  double w4 	= (kineticE + si) * (EnergyR + a4) -z4 * sqrt (s) / (p12 * p42);
-*/
+double TNudySampling::kinematicRel(TParticle * /*particle*/, TNudyEndfRecoPoint * /*recoPoint*/)
+{
+  /*
+    double a1 	=  1E6 ;
+    double a2 	=  particle[elemId].mass*1E6 ;
+    double a3 	=  residueA*1E6 ;
+    double a4 	=  recoPoint->GetQValue(elemId, MT);
+    double si	=  a1 + a2 ;
+    double di	=  a1 - a2 ;
+    double sf	=  a3 + a4 ;
+    double df	=  a3 - a4 ;
+    // double fqval  = recoPoint->GetQValue(elemId, MT);
+    double cosCM 	= recoPoint->GetCos64(elemId, MT, kineticE);
+    double s	= si * si + 2 * a2 * kineticE ;
+  //   std::cout<<"q value \t" << fqval <<" cosCM \t"<< cosCM <<" s \t"<< s << std::endl;
+    double ki2 	= (s - si * si) * (s - di * di)/(4 * s) ;
+    double kf2 	= (s - sf * sf) * (s - df * df)/(4 * s) ;
+    double z2 	= sqrt (ki2 + a2 * a2) ;
+    double z3 	= sqrt (kf2 + a3 * a3) ;
+    //double z4 	= sqrt (kf2 + a4 * a4) ;
+  //   std::cout<<"ki2 \t" << ki2 <<" kf2 \t"<< kf2 <<" z2 \t"<< z2 <<" z3 \t"<< z3 <<" z4 \t"<< z4 << std::endl;
+    secEnergyLab	= (z2 * z3 - sqrt(ki2 * kf2 * cosCM))/(a2) - a3;
+    // double EnergyR= (z2 * z4 - sqrt(ki2 * kf2 * cosCM))/(a2) - a4;
+  //   std::cout<<"secEnergyLab \t" << secEnergyLab <<" z2 * z3 \t"<< z2 * z3 <<" sqrt(ki2 * kf2 * cosCM) \t"<< sqrt(ki2
+  * kf2 * cosCM) <<" a3 \t"<< a3 <<" z4 \t"<< z4 << std::endl;
+    double p12	= kineticE * kineticE + 2 * a1 * kineticE ;
+    double p32	= secEnergyLab * secEnergyLab + 2 * a3 * secEnergyLab ;
+    // double p42	= EnergyR * EnergyR + 2 * a4 * EnergyR ;
+    cosLab	= (kineticE + si) * (secEnergyLab + a3) -z3 * sqrt (s) / (p12 * p32);
+    double w4 	= (kineticE + si) * (EnergyR + a4) -z4 * sqrt (s) / (p12 * p42);
+  */
   return 0;
 }
 //------------------------------------------------------------------------------------------------------
-double TNudySampling::kinematicGama(TParticle */*particle*/, TNudyEndfRecoPoint */*recoPoint*/){
-/*
-  double a1 	=  1E6 ;
-  double a2 	=  particle[elemId].mass*1E6 ;
-  double a3 	=  residueA*1E6 ;
-  // double a4 	=  recoPoint->GetQValue(elemId, MT);
-  double fqval  =  recoPoint->GetQValue(elemId, MT);
-  double cosCM 	=  recoPoint->GetCos64(elemId, MT, kineticE);
-  double beta	=  sqrt(kineticE *(kineticE + 2*a1))/(a1 + a2 + kineticE);
-  cosLab	=  (cosCM + beta)/(1 + beta * cosCM) ; 
-  secEnergyLab	=  (fqval * (a1 + a2 + a3)/2 + a2 * kineticE )/(a1 + a2 + kineticE - cosLab * sqrt(kineticE *(kineticE + 2 * a1)));
-  //std::cout<<"secEnergyLab \t" << secEnergyLab <<" coslab \t"<< cosLab << std::endl;
-*/
+double TNudySampling::kinematicGama(TParticle * /*particle*/, TNudyEndfRecoPoint * /*recoPoint*/)
+{
+  /*
+    double a1 	=  1E6 ;
+    double a2 	=  particle[elemId].mass*1E6 ;
+    double a3 	=  residueA*1E6 ;
+    // double a4 	=  recoPoint->GetQValue(elemId, MT);
+    double fqval  =  recoPoint->GetQValue(elemId, MT);
+    double cosCM 	=  recoPoint->GetCos64(elemId, MT, kineticE);
+    double beta	=  sqrt(kineticE *(kineticE + 2*a1))/(a1 + a2 + kineticE);
+    cosLab	=  (cosCM + beta)/(1 + beta * cosCM) ;
+    secEnergyLab	=  (fqval * (a1 + a2 + a3)/2 + a2 * kineticE )/(a1 + a2 + kineticE - cosLab * sqrt(kineticE *(kineticE
+    + 2 * a1)));
+    //std::cout<<"secEnergyLab \t" << secEnergyLab <<" coslab \t"<< cosLab << std::endl;
+  */
   return 0;
 }
 //------------------------------------------------------------------------------------------------------
 void TNudySampling::FillHisto(double icosLab, double isecEnergyLab)
 {
-  //std::cout << icosLab <<"  "<< isecEnergyLab << std::endl;
+  // std::cout << icosLab <<"  "<< isecEnergyLab << std::endl;
   h->Fill(icosLab, isecEnergyLab);
   h1->Fill(icosLab);
   h2->Fill(isecEnergyLab);

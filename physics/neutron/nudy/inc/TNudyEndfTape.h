@@ -9,11 +9,10 @@
 
 */
 namespace Nudy {
-	class TNudyEndfMat;
+class TNudyEndfMat;
 }
 
 #include <TNamed.h>
-
 
 namespace Nudy {
 class TNudyEndfTape : public TNamed {
@@ -41,6 +40,6 @@ private:
 #endif
 };
 
-} //namespace
+} // namespace
 
 #endif

@@ -41,7 +41,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
     int LI  = header->GetL1();
     int LCT = header->GetL2();
     MtLct.push_back(LCT);
-//     printf("LCT = %d LTT = %d LI = %d\n",LCT, LTT, LI);
+    //     printf("LCT = %d LTT = %d LI = %d\n",LCT, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {
       TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
@@ -71,7 +71,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
             cosFile4.push_back(x);
             cosPdfFile4.push_back(fme);
           }
-//            printf("%e %e\n", x, fme);
+          //            printf("%e %e\n", x, fme);
           k1++;
         } while (k1 < 101);
         for (int l = 0; l < 100; l++) {
@@ -119,7 +119,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
         lCoef1.clear();
       }
       for (unsigned long i = 0; i < ein.size(); i++) {
-         //printf("Ein = %e\n", ein[i]);
+        // printf("Ein = %e\n", ein[i]);
         int k1     = 0;
         double fme = 0.0;
         do {
@@ -134,7 +134,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
             cosFile4.push_back(x);
             cosPdfFile4.push_back(fme);
           }
-           //printf("%e %e\n", x, fme);
+          // printf("%e %e\n", x, fme);
           k1++;
         } while (k1 < 101);
 
@@ -239,7 +239,7 @@ double TNudyEndfAng::recursionLinearLeg(int i, double x1, double x2, double pdf1
   double pdf = 0.5;
   double mid = 0.5 * (x1 + x2);
   if ((pdf1 == 0.0 && pdf2 == 0.0) || x1 == x2) return 0;
-//     std::cout <<" beg   "<< x1 <<"  "<< x2 <<"  "<< pdf1 <<"  "<< pdf2 << std::endl;
+  //     std::cout <<" beg   "<< x1 <<"  "<< x2 <<"  "<< pdf1 <<"  "<< pdf2 << std::endl;
   for (unsigned long j = 0; j < lCoef[i].size(); j++) {
     double leg = ROOT::Math::legendre(j + 1, mid);
     pdf += 0.5 * (2. * (j + 1) + 1.) * lCoef[i][j] * leg;
@@ -327,7 +327,7 @@ double TNudyEndfAng::GetCos4(int ielemId, int mt, double energyK)
   if (energyK <= energy4OfMts[ielemId][i][min])
     min = 0;
   else if (energyK >= energy4OfMts[ielemId][i][max])
-    min = max ;
+    min = max;
   else {
     while (max - min > 1) {
       mid = (min + max) / 2;

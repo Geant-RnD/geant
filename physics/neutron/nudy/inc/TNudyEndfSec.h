@@ -27,7 +27,7 @@
 #include "TNudyEndfRecord.h"
 
 namespace Nudy {
-	class TNudyEndfRecord;
+class TNudyEndfRecord;
 }
 
 namespace Nudy {
@@ -71,5 +71,5 @@ private:
 #endif
 };
 
-} //namespace 
+} // namespace
 #endif

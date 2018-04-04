@@ -6,23 +6,22 @@
 #include "TParticlePDG.h"
 
 namespace Nudy {
-	class TNudyEndfTape;
-	class TNudySubLibrary;
+class TNudyEndfTape;
+class TNudySubLibrary;
 }
 
 class TParticlePDG;
 class TGeoElementRN;
 
-
 namespace Nudy {
 class TNudyLibrary : public TNamed {
 public:
-  TNudyLibrary();                                     // Default Constructor
-  TNudyLibrary(const char *name, const char *title);  // Constructor
+  TNudyLibrary();                                           // Default Constructor
+  TNudyLibrary(const char *name, const char *title);        // Constructor
   void ReadTape(Nudy::TNudyEndfTape *tape);                 // Read data from tape into current file
-  virtual ~TNudyLibrary();                            // Destructor
+  virtual ~TNudyLibrary();                                  // Destructor
   Nudy::TNudySubLibrary *AddSubLib(TParticlePDG *particle); // Add a sublibrary for particle
-  THashTable *GetSubLibs() { return fSubLib; }        // Get all sublibraries
+  THashTable *GetSubLibs() { return fSubLib; }              // Get all sublibraries
   Nudy::TNudySubLibrary *GetSubLib(TParticlePDG *particle)
   {
     return (Nudy::TNudySubLibrary *)fSubLib->FindObject(particle->GetName());
@@ -33,7 +32,7 @@ public:
   bool IsHandled(TParticlePDG *particle, TGeoElementRN *target, unsigned long temp);
 
 private:
-  THashTable *fSubLib;         // Sub-Libaries storing the MAT-MT information for each particle
+  THashTable *fSubLib;               // Sub-Libaries storing the MAT-MT information for each particle
   Nudy::TNudySubLibrary *fCurSubLib; //! Current Sublibrary
 
 #ifdef USE_ROOT
@@ -41,5 +40,5 @@ private:
 #endif
 };
 
-} //namespace
+} // namespace
 #endif

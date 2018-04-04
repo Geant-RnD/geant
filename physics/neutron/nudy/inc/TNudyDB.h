@@ -26,5 +26,5 @@ private:
 #endif
 };
 
-} //namespace
+} // namespace
 #endif

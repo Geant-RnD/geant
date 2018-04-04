@@ -34,10 +34,10 @@ TNudyEndfPhEnergy::TNudyEndfPhEnergy(TNudyEndfFile *file)
     for (int k = 0; k < sec->GetN1(); k++) {
       TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)recIter.Next();
       int MT              = sec->GetMT();
-      //int NC              = sec->GetN1();
+      // int NC              = sec->GetN1();
       MtNumbers.push_back(MT);
       int LF = tab1->GetL2();
-      //std::cout << " LF = " << LF << " MT " << MT << "  NC " << NC << std::endl;
+      // std::cout << " LF = " << LF << " MT " << MT << "  NC " << NC << std::endl;
       NR = tab1->GetN1();
       NP = tab1->GetN2();
       //****************************************************************************
@@ -71,11 +71,12 @@ TNudyEndfPhEnergy::TNudyEndfPhEnergy(TNudyEndfFile *file)
           for (int crs = 0; crs < np3; crs++) {
             energyFile5.push_back(tab12->GetX(crs));
             energyPdfFile5.push_back(tab12->GetY(crs));
-// 	    std::cout << " E = " << tab12->GetX(crs) <<"  "<< tab12->GetY(crs) << std::endl ;
+            // 	    std::cout << " E = " << tab12->GetX(crs) <<"  "<< tab12->GetY(crs) << std::endl ;
           }
           for (int cr = 0; cr < np3 - 1; cr++) {
             // std::cout << energyFile5[cr] <<"  "<< energyPdfFile5[cr] << std::endl;
-//             recursionLinearFile5Prob(energyFile5[cr], energyFile5[cr + 1], energyPdfFile5[cr], energyPdfFile5[cr + 1]);
+            //             recursionLinearFile5Prob(energyFile5[cr], energyFile5[cr + 1], energyPdfFile5[cr],
+            //             energyPdfFile5[cr + 1]);
           }
           fillPdf1d();
           nbt3.clear();

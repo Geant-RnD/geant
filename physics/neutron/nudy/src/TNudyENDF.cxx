@@ -60,13 +60,13 @@ TNudyENDF::TNudyENDF(const char *nFileENDF, const char *nFileRENDF, const char *
   fRENDF = TFile::Open(nFileRENDF, opt);
   if (!fRENDF) ::Fatal("ctor", "Could not open output file %s", nFileRENDF);
 
-/*
-  this is checking the first line for the ENDF data file
-  so that version 6 and version 7 first line issue gets resolved
-*/
+  /*
+    this is checking the first line for the ENDF data file
+    so that version 6 and version 7 first line issue gets resolved
+  */
   fENDF.getline(fLine, LINLEN);
   char firstCharFirstLine = fLine[1];
-  isDollar = (firstCharFirstLine == '$') ? true : false;
+  isDollar                = (firstCharFirstLine == '$') ? true : false;
   if (!isDollar) fENDF.seekg(0);
 
   // Read to Tape Identifier
@@ -77,7 +77,6 @@ TNudyENDF::TNudyENDF(const char *nFileENDF, const char *nFileRENDF, const char *
   fTape = new TNudyEndfTape(fLine, fLogLev);
   fENDF.seekg(0);
   fENDF.getline(fLine, LINLEN);
-
 }
 
 //_______________________________________________________________________________
@@ -95,7 +94,7 @@ void TNudyENDF::Process()
     std::string subname = GetEndfSubName();
     EndfSub             = subname.c_str();
     fENDF.open(EndfSub);
-//    std::cout << "EndfSub " << subname << std::endl;
+    //    std::cout << "EndfSub " << subname << std::endl;
     if (!fENDF.is_open()) ::Fatal("ctor", "Could not open input file %s", EndfSub);
     fENDF.getline(fLine, LINLEN);
   }
@@ -108,7 +107,7 @@ void TNudyENDF::Process()
 
   while (!fENDF.eof()) {
     fENDF.getline(fLine, LINLEN);
-//    std::cout << fLine << std::endl;
+    //    std::cout << fLine << std::endl;
     if (fLogLev > 10) std::cout << fLine << std::endl;
 
     // See what we have
@@ -148,13 +147,12 @@ void TNudyENDF::Process()
   }
 
   // Write the tape to disk
-  //fENDF.close();
+  // fENDF.close();
 
-
-    fTape->Print();
-    fTape->Write();
-    if (!fMat->GetLFI()) fRENDF->Close();
-    fENDF.close();  
+  fTape->Print();
+  fTape->Write();
+  if (!fMat->GetLFI()) fRENDF->Close();
+  fENDF.close();
 }
 
 //_______________________________________________________________________________

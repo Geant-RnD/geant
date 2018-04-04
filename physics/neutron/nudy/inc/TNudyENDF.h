@@ -12,15 +12,15 @@
 class TFile;
 
 namespace Nudy {
-	class TNudyEndfTape;
-	class TNudyEndfMat;
-	class TNudyEndfFile;
-	class TNudyEndfSec;
-	class TNudyEndfCont;
-	class TNudyEndfList;
-	class TNudyEndfTab1;
-	class TNudyEndfTab2;
-	class TNudyEndfINTG;
+class TNudyEndfTape;
+class TNudyEndfMat;
+class TNudyEndfFile;
+class TNudyEndfSec;
+class TNudyEndfCont;
+class TNudyEndfList;
+class TNudyEndfTab1;
+class TNudyEndfTab2;
+class TNudyEndfINTG;
 }
 
 #ifdef USE_ROOT
@@ -50,8 +50,8 @@ public:
   void SetLogLev(unsigned char loglev) { fLogLev = loglev; }
   void SetPreProcess(int x1) { prepro = x1; }
   unsigned char GetLogLev() const { return fLogLev; }
-	bool GetLFI() { return fLFI;}
-	void SetLFI(bool keywd) {fLFI = keywd;}
+  bool GetLFI() { return fLFI; }
+  void SetLFI(bool keywd) { fLFI = keywd; }
   void Process();
   void Process(Nudy::TNudyEndfMat *mat);
   void Process(Nudy::TNudyEndfFile *file);
@@ -146,9 +146,9 @@ public:
     ss.clear();
     for (ii = 0; ii < 2; ii++) {
       tmp.swap(strNum[ii]);
-      if(prepro == 0){
-	std::size_t alien = tmp.find_last_of("+-");
-	if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
+      if (prepro == 0) {
+        std::size_t alien = tmp.find_last_of("+-");
+        if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
       }
       ss.str(tmp);
       c[ii] = 0.0;
@@ -184,9 +184,9 @@ public:
     for (ii = 0; ii < 6; ii++) {
       c[ii] = 0.0;
       tmp.swap(strNum[ii]);
-      if(prepro == 0){
-	std::size_t alien = tmp.find_last_of("+-");
-	if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
+      if (prepro == 0) {
+        std::size_t alien = tmp.find_last_of("+-");
+        if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
       }
       ss.str(tmp);
       ss >> c[ii];
@@ -231,20 +231,19 @@ private:
   bool isDollar = false;
   static const char fkElNam[119][4];
   static const char fkElIso[4][2];
-  unsigned char fLogLev; //  Log Level Flag
-  ifstream fENDF;        //! Input fENDF tape
-  TFile *fRENDF;         //! Output fRENDF file
-  char fLine[LINLEN];    //! Buffer to read the line
-  Nudy::TNudyEndfTape *fTape;  //! Support link for the tape structure
-  Nudy::TNudyEndfMat *fMat;    //! Support link for the current material
+  unsigned char fLogLev;      //  Log Level Flag
+  ifstream fENDF;             //! Input fENDF tape
+  TFile *fRENDF;              //! Output fRENDF file
+  char fLine[LINLEN];         //! Buffer to read the line
+  Nudy::TNudyEndfTape *fTape; //! Support link for the tape structure
+  Nudy::TNudyEndfMat *fMat;   //! Support link for the current material
   std::string ENDFSUB;
-  int prepro ;
-	bool fLFI;
+  int prepro;
+  bool fLFI;
 #ifdef USE_ROOT
   ClassDef(TNudyENDF, 1) // class for an ENDF data file
 #endif
 };
 
-
-} //namespace
+} // namespace
 #endif

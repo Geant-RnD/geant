@@ -15,7 +15,6 @@
 #include "Math/SpecFuncMathMore.h"
 #include "TNudyEndfPhAng.h"
 
-
 using namespace Nudy;
 using namespace NudyPhysics;
 
@@ -35,20 +34,20 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
   TNudyEndfSec *sec;
   while ((sec = (TNudyEndfSec *)secIter.Next())) {
     TIter recIter(sec->GetRecords());
-//    TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
-    int MT                = sec->GetMT();
+    //    TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
+    int MT = sec->GetMT();
     MtNumbers.push_back(MT);
-    int LTT 		 = sec->GetL2();
-    int LI  		 = sec->GetL1();
-    //int NK  		 = sec->GetN1();
-   //printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
+    int LTT = sec->GetL2();
+    int LI  = sec->GetL1();
+    // int NK  		 = sec->GetN1();
+    // printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {
       TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
       for (int i = 0; i < tab2->GetN2(); i++) {
         TNudyEndfList *tab = (TNudyEndfList *)recIter.Next();
         ein.push_back(tab->GetC2());
-        //std::cout<<"energy "<< tab->GetC2() << std::endl;
+        // std::cout<<"energy "<< tab->GetC2() << std::endl;
         for (int j = 0; j < tab->GetNPL(); j++) {
           lCoef1.push_back(tab->GetLIST(j));
         }
@@ -128,7 +127,7 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
           for (unsigned long j = 0; j < lCoef[i].size(); j++) {
             double leg = ROOT::Math::legendre(j + 1, x);
             fme += 0.5 * (2. * (j + 1) + 1.) * lCoef[i][j] * leg;
-            //printf("a%e = %e leg= %e\n", x, lCoef[i][j],leg);
+            // printf("a%e = %e leg= %e\n", x, lCoef[i][j],leg);
           }
           if (fme > 0.0) {
             cosFile4.push_back(x);
@@ -368,9 +367,9 @@ double TNudyEndfPhAng::GetCos4(int ielemId, int mt, double energyK)
   // std::endl;
   double plk = (cosPdf4OfMts[ielemId][i][min][k + 1] - cosPdf4OfMts[ielemId][i][min][k]) /
                (cos4OfMts[ielemId][i][min][k + 1] - cos4OfMts[ielemId][i][min][k]);
-  double plk2 = cosPdf4OfMts[ielemId][i][min][k] * cosPdf4OfMts[ielemId][i][min][k];
-  double plsq = plk2 + 2 * plk * (rnd1 - cosCdf4OfMts[ielemId][i][min][k]);
-  double Ang  = 0;
+  double plk2       = cosPdf4OfMts[ielemId][i][min][k] * cosPdf4OfMts[ielemId][i][min][k];
+  double plsq       = plk2 + 2 * plk * (rnd1 - cosCdf4OfMts[ielemId][i][min][k]);
+  double Ang        = 0;
   if (plk == 0) Ang = cos4OfMts[ielemId][i][min][k];
   if (plk != 0 && plsq > 0) {
     Ang = cos4OfMts[ielemId][i][min][k] + (sqrt(std::fabs(plsq)) - cosPdf4OfMts[ielemId][i][min][k]) / plk;

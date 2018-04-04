@@ -4,11 +4,11 @@
 #include "TNudyEndfRecoPoint.h"
 
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 namespace NudyPhysics {
-	class TNudyEndfRecoPoint;
+class TNudyEndfRecoPoint;
 }
 
 #define PI acos(-1.0)
@@ -21,7 +21,6 @@ typedef std::vector<std::vector<rowd>> matrixd3;
 #include "Rtypes.h"
 class TRandom3;
 #endif
-
 
 namespace NudyPhysics {
 class TNudyEndfPhEnergy : public NudyPhysics::TNudyEndfRecoPoint {
@@ -64,5 +63,5 @@ private:
   ClassDef(TNudyEndfPhEnergy, 1) // class for an ENDF energy reconstruction
 };
 
-} // namespace 
+} // namespace
 #endif

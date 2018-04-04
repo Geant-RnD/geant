@@ -7,18 +7,17 @@
 #include "TRandom3.h"
 
 namespace Nudy {
-	class TNudyAlias;
-	class TNudyAliasCont;
-	class TNudyEndfFile;
-	class TNudyEndfSec;
-	class TNudyEndfTab1;
-	class TNudyEndfTab2;
-	class TNudyEndfMat;
+class TNudyAlias;
+class TNudyAliasCont;
+class TNudyEndfFile;
+class TNudyEndfSec;
+class TNudyEndfTab1;
+class TNudyEndfTab2;
+class TNudyEndfMat;
 }
 class TGeoElementRN;
 class TParticlePDG;
 #include "TNudyTypes.h"
-
 
 namespace Nudy {
 class TVNudyModel : public TNamed {
@@ -64,8 +63,8 @@ private:
   int f4nens;
   TArrayD f4eins;
   Nudy::TNudyAliasCont *fAPAlias; //[f4nens]
-  double f4Tein;            //!
-  double f4Tel;             //!
+  double f4Tein;                  //!
+  double f4Tel;                   //!
 
   // File 5
   TRandom3 fRnd; //!
@@ -77,9 +76,9 @@ private:
   //  double EPtable[4000][400]; //!
   TArrayD *fEPtable; //[nens]
   // double EPtable[1100][200]; //!
-  TArrayD *fPerc;           //[nens]
-  double f5Tein;            //!
-  double f5Tel;             //!
+  TArrayD *fPerc;                 //[nens]
+  double f5Tein;                  //!
+  double f5Tel;                   //!
   Nudy::TNudyAliasCont *fEPAlias; //[nens]
 
   // Functions to read data from RENDF format
@@ -104,6 +103,5 @@ private:
 #endif
 };
 
-
-} //namespace 
+} // namespace
 #endif

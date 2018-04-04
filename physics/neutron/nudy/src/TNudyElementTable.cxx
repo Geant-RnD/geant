@@ -9,13 +9,14 @@
 ClassImp(Nudy::TNudyElementTable)
 #endif
 
-namespace Nudy {
-	class TNudyElementRN;
+    namespace Nudy
+{
+  class TNudyElementRN;
 }
 
 namespace Nudy {
 
-    TNudyElementTable::TNudyElementTable()
+TNudyElementTable::TNudyElementTable()
     : fState(0), fOx(40), fOy(40), fTable(gGeoManager->GetElementTable()), fLOD(1), fRNTable(NULL),
       fGeom(new TGeoManager("", ""))
 {
@@ -104,7 +105,8 @@ void TNudyElementTable::Draw(const char * /*option*/)
   for (int i = 0; i < fTable->GetElementsRN()->GetEntries(); i++) {
     Nudy::TNudyElementRN *newEle;
     TGeoElementRN *newRN = (TGeoElementRN *)(fTable->GetElementsRN()->At(i));
-    newEle = new Nudy::TNudyElementRN(newRN, (newRN->MassNo() - newRN->AtomicNo()) * 10 + fOx, newRN->AtomicNo() * 10 + fOy);
+    newEle =
+        new Nudy::TNudyElementRN(newRN, (newRN->MassNo() - newRN->AtomicNo()) * 10 + fOx, newRN->AtomicNo() * 10 + fOy);
     //  std::cout<<"Drawing"<<newRN->AtomicNo()*10+fOx<<","<<newRN->MassNo()*10+fOy<<std::endl;
     //    newEle->Move(newEle->GetZ()*10+fOx,newEle->GetA()*10+fOy);
     newEle->Draw();
@@ -127,5 +129,4 @@ TNudyElementTable::~TNudyElementTable()
   fTable = 0;
 }
 
-
-} //namespace 
+} // namespace
