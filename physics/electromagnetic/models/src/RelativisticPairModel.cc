@@ -26,6 +26,7 @@
 
 // from geantV
 #include "Geant/TaskData.h"
+#include "Geant/FastMath.h"
 
 namespace geantphysics {
 
@@ -197,7 +198,7 @@ int RelativisticPairModel::SampleSecondaries(LightTrack &track, geant::TaskData 
   // note: we should investigate the possibility to use the leading term of the dcs and sample cos(theta(-+))
   double *rndArray = td->fDblArray;
   td->fRndm->uniform_array(4, rndArray);
-  double uvar = -G4Log(rndArray[0] * rndArray[1]);
+  double uvar = -geant::Log(rndArray[0] * rndArray[1]);
   if (9. > 36. * rndArray[2]) {
     uvar *= 1.6;
   } else {
@@ -257,7 +258,7 @@ double RelativisticPairModel::SampleTotalEnergyTransfer(const double egamma, con
                                                         const double r2, const double r3)
 {
   // determine electron energy lower grid point
-  const double legamma = G4Log(egamma);
+  const double legamma = geant::Log(egamma);
   //
   int indxEgamma = fSTNumPhotonEnergies - 1;
   if (egamma < GetHighEnergyUsageLimit()) {
@@ -281,7 +282,7 @@ double RelativisticPairModel::SampleTotalEnergyTransfer(const double egamma, con
                                                &(als->fParaB[0]), &(als->fAliasW[0]), &(als->fAliasIndx[0]),
                                                fSTNumDiscreteEnergyTransferVals, r2, r3, 0);
   // transform back xi to eps = E_total_energy_transfer/E_{\gamma}
-  return epsMin * G4Exp(xi * G4Log(0.5 / epsMin));
+  return epsMin * geant::Exp(xi * geant::Log(0.5 / epsMin));
 }
 
 // Sample totel energy (fraction) transfered to one of the e-/e+ pair with REJECTION: i.e. first the target atom
@@ -385,8 +386,8 @@ double RelativisticPairModel::ComputeDXsectionPerAtom(const double epsmin, const
                                                       const int izet, bool istsai)
 {
   const double twoThird       = 0.666666666666;
-  const double lHalfPerEpsMin = G4Log(0.5 / epsmin);
-  const double eps            = epsmin * G4Exp(xi * lHalfPerEpsMin);
+  const double lHalfPerEpsMin = geant::Log(0.5 / epsmin);
+  const double eps            = epsmin * geant::Exp(xi * lHalfPerEpsMin);
   const double meps           = 1. - eps;
   const double halfFz         = 0.5 * gElementData[izet]->fFz;
   const double delta = gElementData[izet]->fDeltaFactor * geant::units::kElectronMassC2 / (egamma * eps * meps);
@@ -402,8 +403,8 @@ double RelativisticPairModel::ComputeLPMDXsectionPerAtom(const double epsmin, co
                                                          const double lpmenergy, const int izet, bool istsai)
 {
   const double twoThird       = 0.666666666666;
-  const double lHalfPerEpsMin = G4Log(0.5 / epsmin);
-  const double eps            = epsmin * G4Exp(xi * lHalfPerEpsMin);
+  const double lHalfPerEpsMin = geant::Log(0.5 / epsmin);
+  const double eps            = epsmin * geant::Exp(xi * lHalfPerEpsMin);
   const double meps           = 1. - eps;
   const double halfFz         = 0.5 * gElementData[izet]->fFz;
   const double delta = gElementData[izet]->fDeltaFactor * geant::units::kElectronMassC2 / (egamma * eps * meps);
@@ -461,21 +462,21 @@ void RelativisticPairModel::InitialiseElementData()
           elemData->fCoulombCor   = elem->GetElementProperties()->GetCoulombCorrection();
           elemData->fDeltaFactor  = 136. / elem->GetElementProperties()->GetZ13(); // 136/pow(z,1/3)
           elemData->fFz           = 8. * elem->GetElementProperties()->GetLogZ13() + 8 * elemData->fCoulombCor;
-          elemData->fDeltaMax     = G4Exp((42.24 - elemData->fFz) / 8.368) - 0.952;
-          elemData->fDeltaMaxTsai = 1.36 * std::sqrt(G4Exp(0.5 * 16.863 - 0.25 * elemData->fFz) - 1.) / 0.55846;
+          elemData->fDeltaMax     = geant::Exp((42.24 - elemData->fFz) / 8.368) - 0.952;
+          elemData->fDeltaMaxTsai = 1.36 * std::sqrt(geant::Exp(0.5 * 16.863 - 0.25 * elemData->fFz) - 1.) / 0.55846;
           double Fel              = 0.;
           double Finel            = 0.;
           if (izet < 5) {
             Fel   = gFelLowZet[izet];
             Finel = gFinelLowZet[izet];
           } else {
-            Fel   = G4Log(184.15) - elem->GetElementProperties()->GetLogZ() / 3.;
-            Finel = G4Log(1194.) - 2. * elem->GetElementProperties()->GetLogZ() / 3.;
+            Fel   = geant::Log(184.15) - elem->GetElementProperties()->GetLogZ() / 3.;
+            Finel = geant::Log(1194.) - 2. * elem->GetElementProperties()->GetLogZ() / 3.;
           }
           elemData->fEtaValue = Finel / (Fel - elemData->fCoulombCor);
           //
           elemData->fVarS1Cond   = std::sqrt(2.) * elem->GetElementProperties()->GetZ23() / (184.15 * 184.15);
-          elemData->fILVarS1Cond = 1. / G4Log(elemData->fVarS1Cond);
+          elemData->fILVarS1Cond = 1. / geant::Log(elemData->fVarS1Cond);
           gElementData[izet]     = elemData;
         }
       }
@@ -488,11 +489,12 @@ void RelativisticPairModel::ComputeScreeningFunctions(double &phi1, double &phi2
   if (istsai) {
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
-    phi1 = 16.863 - 2.0 * G4Log(1.0 + 0.311877 * gamma2) + 2.4 * G4Exp(-0.9 * gamma) + 1.6 * G4Exp(-1.5 * gamma);
+    phi1                = 16.863 - 2.0 * geant::Log(1.0 + 0.311877 * gamma2) + 2.4 * geant::Exp(-0.9 * gamma) +
+           1.6 * geant::Exp(-1.5 * gamma);
     phi2 = phi1 - 2.0 / (3.0 + 19.5 * gamma + 18.0 * gamma2); // phi1-phi2
   } else {
     if (delta > 1.) {
-      phi1 = 21.12 - 4.184 * G4Log(delta + 0.952);
+      phi1 = 21.12 - 4.184 * geant::Log(delta + 0.952);
       phi2 = phi1;
     } else {
       const double delta2 = delta * delta;
@@ -509,14 +511,14 @@ void RelativisticPairModel::ScreenFunction12(double &val1, double &val2, const d
   if (istsai) {
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
-    const double dum1 =
-        33.726 - 4. * G4Log(1.0 + 0.311877 * gamma2) + 4.8 * G4Exp(-0.9 * gamma) + 3.2 * G4Exp(-1.5 * gamma);
+    const double dum1   = 33.726 - 4. * geant::Log(1.0 + 0.311877 * gamma2) + 4.8 * geant::Exp(-0.9 * gamma) +
+                        3.2 * geant::Exp(-1.5 * gamma);
     const double dum2 = 2. / (3. + 19.5 * gamma + 18. * gamma2);
     val1              = dum1 + dum2;
     val2              = dum1 - 0.5 * dum2;
   } else {
     if (delta > 1.) {
-      val1 = 42.24 - 8.368 * G4Log(delta + 0.952);
+      val1 = 42.24 - 8.368 * geant::Log(delta + 0.952);
       val2 = val1;
     } else {
       val1 = 42.392 - delta * (7.796 - 1.961 * delta);
@@ -532,11 +534,11 @@ double RelativisticPairModel::ScreenFunction1(const double delta, const bool ist
   if (istsai) {
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
-    val = 33.726 - 4. * G4Log(1.0 + 0.311877 * gamma2) + 4.8 * G4Exp(-0.9 * gamma) + 3.2 * G4Exp(-1.5 * gamma) +
-          2. / (3. + 19.5 * gamma + 18. * gamma2);
+    val                 = 33.726 - 4. * geant::Log(1.0 + 0.311877 * gamma2) + 4.8 * geant::Exp(-0.9 * gamma) +
+          3.2 * geant::Exp(-1.5 * gamma) + 2. / (3. + 19.5 * gamma + 18. * gamma2);
   } else {
     if (delta > 1.) {
-      val = 42.24 - 8.368 * G4Log(delta + 0.952);
+      val = 42.24 - 8.368 * geant::Log(delta + 0.952);
     } else {
       val = 42.392 - delta * (7.796 - 1.961 * delta);
     }
@@ -551,11 +553,11 @@ double RelativisticPairModel::ScreenFunction2(const double delta, const bool ist
   if (istsai) {
     const double gamma  = delta * 0.735294; // 0.735 = 1/1.36 <= gamma = delta/1.36
     const double gamma2 = gamma * gamma;
-    val = 33.726 - 4. * G4Log(1.0 + 0.311877 * gamma2) + 4.8 * G4Exp(-0.9 * gamma) + 3.2 * G4Exp(-1.5 * gamma) -
-          1. / (3. + 19.5 * gamma + 18. * gamma2);
+    val                 = 33.726 - 4. * geant::Log(1.0 + 0.311877 * gamma2) + 4.8 * geant::Exp(-0.9 * gamma) +
+          3.2 * geant::Exp(-1.5 * gamma) - 1. / (3. + 19.5 * gamma + 18. * gamma2);
   } else {
     if (delta > 1.) {
-      val = 42.24 - 8.368 * G4Log(delta + 0.952);
+      val = 42.24 - 8.368 * geant::Log(delta + 0.952);
     } else {
       val = 41.405 - delta * (5.828 - 0.8945 * delta);
     }
@@ -575,7 +577,7 @@ void RelativisticPairModel::ComputeLPMfunctions(double &funcXiS, double &funcGS,
   if (varSprime > 1.0) {
     funcXiS = 1.0;
   } else if (varSprime > condition) {
-    const double funcHSprime = G4Log(varSprime) * gElementData[izet]->fILVarS1Cond;
+    const double funcHSprime = geant::Log(varSprime) * gElementData[izet]->fILVarS1Cond;
     funcXiS                  = 1.0 + funcHSprime -
               0.08 * (1.0 - funcHSprime) * funcHSprime * (2.0 - funcHSprime) * gElementData[izet]->fILVarS1Cond;
   }
@@ -600,17 +602,18 @@ void RelativisticPairModel::ComputeLPMGsPhis(double &funcGS, double &funcPhiS, c
     double varShat3 = varShat * varShat2;
     double varShat4 = varShat2 * varShat2;
     if (varShat < 0.415827397755) { // use Stanev approximation: for \psi(s) and compute G(s)
-      funcPhiS = 1.0 - G4Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
-                             varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
+      funcPhiS = 1.0 - geant::Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
+                                  varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
       // 1-\exp \left\{  -4s  - \frac{8s^2}{1+3.936s+4.97s^2-0.05s^3+7.5s^4} \right\}
       const double funcPsiS =
-          1.0 - G4Exp(-4.0 * varShat -
-                      8.0 * varShat2 / (1.0 + 3.936 * varShat + 4.97 * varShat2 - 0.05 * varShat3 + 7.5 * varShat4));
+          1.0 -
+          geant::Exp(-4.0 * varShat -
+                     8.0 * varShat2 / (1.0 + 3.936 * varShat + 4.97 * varShat2 - 0.05 * varShat3 + 7.5 * varShat4));
       // G(s) = 3 \psi(s) - 2 \phi(s)
       funcGS = 3.0 * funcPsiS - 2.0 * funcPhiS;
     } else if (varShat < 1.55) {
-      funcPhiS = 1.0 - G4Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
-                             varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
+      funcPhiS = 1.0 - geant::Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
+                                  varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
       const double dum0 = -0.16072300849123999 + 3.7550300067531581 * varShat - 1.7981383069010097 * varShat2 +
                           0.67282686077812381 * varShat3 - 0.1207722909879257 * varShat4;
       funcGS = std::tanh(dum0);
@@ -690,17 +693,17 @@ void RelativisticPairModel::InitSamplingTables()
   // 2. generate primary gamma energy grid
   const double minEprim = GetLowEnergyUsageLimit();
   const double maxEprim = GetHighEnergyUsageLimit();
-  fSTNumPhotonEnergies  = fSTNumPhotonEnergiesPerDecade * std::lrint(std::log10(maxEprim / minEprim)) + 1;
+  fSTNumPhotonEnergies  = fSTNumPhotonEnergiesPerDecade * std::lrint(geant::Log10(maxEprim / minEprim)) + 1;
   fSTNumPhotonEnergies  = std::max(fSTNumPhotonEnergies, 3);
   // set up the initial gamma energy grid
-  const double delta     = G4Log(maxEprim / minEprim) / (fSTNumPhotonEnergies - 1.0);
-  fSTLogMinPhotonEnergy  = G4Log(minEprim);
+  const double delta     = geant::Log(maxEprim / minEprim) / (fSTNumPhotonEnergies - 1.0);
+  fSTLogMinPhotonEnergy  = geant::Log(minEprim);
   fSTILDeltaPhotonEnergy = 1. / delta;
   std::vector<double> primEVect(fSTNumPhotonEnergies);
   primEVect[0]                        = minEprim;
   primEVect[fSTNumPhotonEnergies - 1] = maxEprim;
   for (int i = 1; i < fSTNumPhotonEnergies - 1; ++i) {
-    primEVect[i] = G4Exp(fSTLogMinPhotonEnergy + i * delta);
+    primEVect[i] = geant::Exp(fSTLogMinPhotonEnergy + i * delta);
   }
   // 3. create an AliasTable object
   if (fAliasSampler) {
@@ -773,7 +776,7 @@ void RelativisticPairModel::BuildOneRatinAlias(const double egamma, const Materi
   const double eps1    = 0.5 - 0.5 * std::sqrt(1. - dMin / dMax);
   // take the higest value between eps0 and eps'=eps1: eps will be in [epsMin,0.5]
   const double epsMin            = std::max(eps1, eps0);
-  const double invLHalfPerEpsMin = 1. / G4Log(0.5 / epsMin);
+  const double invLHalfPerEpsMin = 1. / geant::Log(0.5 / epsMin);
   //
   // allocate one RatinAliasData structure for the current element,gamma-energy combination
   RatinAliasData *raData = new RatinAliasData(fSTNumDiscreteEnergyTransferVals);
@@ -790,7 +793,7 @@ void RelativisticPairModel::BuildOneRatinAlias(const double egamma, const Materi
     const double deltaMin    = 4. * eps0 * deltaFactor; // 4*136*Z^(-1/3)*eps0
     const double eps1        = 0.5 - 0.5 * std::sqrt(1. - deltaMin / deltaMax);
     if (eps1 > epsMin) {
-      raData->fXdata[curNumData] = G4Log(eps1 / epsMin) * invLHalfPerEpsMin;
+      raData->fXdata[curNumData] = geant::Log(eps1 / epsMin) * invLHalfPerEpsMin;
       ++curNumData;
     }
   }

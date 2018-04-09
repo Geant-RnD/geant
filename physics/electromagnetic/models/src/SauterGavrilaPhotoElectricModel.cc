@@ -28,6 +28,7 @@
 // from geantV
 #include "Geant/Typedefs.h"
 #include "Geant/TaskData.h"
+#include "Geant/FastMath.h"
 
 using namespace std;
 namespace geantphysics {
@@ -524,7 +525,7 @@ double SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Alias(doubl
     return 1.;
   } else {
     // std::cout<<"::::SamplePhotoElectronDirection_Alias::::\n";
-    double lGammaEnergy = std::log(primekin);
+    double lGammaEnergy = geant::Log(primekin);
     int gammaEnergyIndx = (int)((lGammaEnergy - fPrimEnLMin) * fPrimEnILDelta);
     //
     if (gammaEnergyIndx >= fNumSamplingPrimEnergies - 1) gammaEnergyIndx = fNumSamplingPrimEnergies - 2;
@@ -543,7 +544,7 @@ double SauterGavrilaPhotoElectricModel::SamplePhotoElectronDirection_Alias(doubl
     // fAliasData[gammaEnergyIndx]->fYdata,fAliasData[gammaEnergyIndx]->fAliasW,
     // fAliasData[gammaEnergyIndx]->fAliasIndx,fAliasData[gammaEnergyIndx]->fNumdata,r2,r3);
 
-    // double ecosTheta= std::exp(xsi)-2;
+    // double ecosTheta= geant::Exp(xsi)-2;
     return ecosTheta;
   }
 }
@@ -994,7 +995,7 @@ void SauterGavrilaPhotoElectricModel::InitSamplingTables()
   // keep the prev. value of primary energy grid points.
   int oldNumGridPoints = fNumSamplingPrimEnergies;
   fNumSamplingPrimEnergies =
-      fNumSamplingPrimEnergiesPerDecade * std::lrint(std::log10(fMaxPrimEnergy / fMinPrimEnergy)) + 1;
+      fNumSamplingPrimEnergiesPerDecade * std::lrint(geant::Log10(fMaxPrimEnergy / fMinPrimEnergy)) + 1;
   if (fNumSamplingPrimEnergies < 2) {
     fNumSamplingPrimEnergies = 2;
   }
@@ -1008,16 +1009,16 @@ void SauterGavrilaPhotoElectricModel::InitSamplingTables()
   }
   fSamplingPrimEnergies     = new double[fNumSamplingPrimEnergies];
   fLSamplingPrimEnergies    = new double[fNumSamplingPrimEnergies];
-  fPrimEnLMin               = std::log(fMinPrimEnergy);
-  double delta              = std::log(fMaxPrimEnergy / fMinPrimEnergy) / (fNumSamplingPrimEnergies - 1.0);
+  fPrimEnLMin               = geant::Log(fMinPrimEnergy);
+  double delta              = geant::Log(fMaxPrimEnergy / fMinPrimEnergy) / (fNumSamplingPrimEnergies - 1.0);
   fPrimEnILDelta            = 1.0 / delta;
   fSamplingPrimEnergies[0]  = fMinPrimEnergy;
   fLSamplingPrimEnergies[0] = fPrimEnLMin;
   fSamplingPrimEnergies[fNumSamplingPrimEnergies - 1]  = fMaxPrimEnergy;
-  fLSamplingPrimEnergies[fNumSamplingPrimEnergies - 1] = std::log(fMaxPrimEnergy);
+  fLSamplingPrimEnergies[fNumSamplingPrimEnergies - 1] = geant::Log(fMaxPrimEnergy);
   for (int i = 1; i < fNumSamplingPrimEnergies - 1; ++i) {
     fLSamplingPrimEnergies[i] = fPrimEnLMin + i * delta;
-    fSamplingPrimEnergies[i]  = std::exp(fPrimEnLMin + i * delta);
+    fSamplingPrimEnergies[i]  = geant::Exp(fPrimEnLMin + i * delta);
   }
   //
   // build the sampling tables at each primary gamma energy grid point.
@@ -1066,7 +1067,7 @@ double SauterGavrilaPhotoElectricModel::CalculateDiffCrossSectionLog(double tau,
   // double tau = energy0 / geant::units::kElectronMassC2;
 
   // std::cout<<"CalculateDiffCrossSectionLog. tau: "<<tau<<" and xsi: "<<xsi<<std::endl;
-  double cosTheta = std::exp(xsi) - 2;
+  double cosTheta = geant::Exp(xsi) - 2;
 
   // gamma and beta: Lorentz factors of the photoelectron
   double gamma = tau + 1.0;
@@ -1078,7 +1079,7 @@ double SauterGavrilaPhotoElectricModel::CalculateDiffCrossSectionLog(double tau,
   double y  = 1 - cosTheta * cosTheta; // sen^2(theta)
 
   double dsigmadcostheta = (y / z4) * (1 + 0.5 * gamma * (tau) * (gamma - 2) * z);
-  double dsigmadxsi      = dsigmadcostheta * (std::exp(xsi));
+  double dsigmadxsi      = dsigmadcostheta * (geant::Exp(xsi));
   // std::cout<<"dsigmadcostheta: "<<dsigmadcostheta<<" and dsigmadxsi: "<<dsigmadxsi<<std::endl;
   return dsigmadxsi;
 }

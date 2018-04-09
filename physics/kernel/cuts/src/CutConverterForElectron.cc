@@ -4,6 +4,7 @@
 #include "Geant/Material.h"
 #include "Geant/MaterialProperties.h"
 #include "Geant/Element.h"
+#include "Geant/FastMath.h"
 
 #include <cmath>
 #include <iostream>
@@ -47,8 +48,8 @@ double CutConverterForElectron::ComputeELossOrAbsXsecPerAtom(double zet, double 
   const double fact  = geant::units::kTwoPi * geant::units::kElectronMassC2 * geant::units::kClassicElectronRadius *
                       geant::units::kClassicElectronRadius;
 
-  double ionpot    = cpot * std::exp(0.9 * std::log(zet)) / mass;
-  double ionpotlog = std::log(ionpot);
+  double ionpot    = cpot * geant::Exp(0.9 * geant::Log(zet)) / mass;
+  double ionpotlog = geant::Log(ionpot);
 
   // calculate approximated dE/dx for electrons
   double tau  = ekin / mass;
@@ -58,21 +59,21 @@ double CutConverterForElectron::ComputeELossOrAbsXsecPerAtom(double zet, double 
     double t2    = taul + 2.;
     double tsq   = taul * taul;
     double beta2 = taul * t2 / (t1 * t1);
-    double f     = 1. - beta2 + std::log(tsq / 2.) + (0.5 + 0.25 * tsq + (1. + 2. * taul) * std::log(0.5)) / (t1 * t1);
-    dEdx         = (std::log(2. * taul + 4.) - 2. * ionpotlog + f) / beta2;
-    dEdx         = fact * zet * dEdx;
-    double clow  = dEdx * std::sqrt(taul);
-    dEdx         = clow / std::sqrt(tau);
+    double f = 1. - beta2 + geant::Log(tsq / 2.) + (0.5 + 0.25 * tsq + (1. + 2. * taul) * geant::Log(0.5)) / (t1 * t1);
+    dEdx     = (geant::Log(2. * taul + 4.) - 2. * ionpotlog + f) / beta2;
+    dEdx     = fact * zet * dEdx;
+    double clow = dEdx * std::sqrt(taul);
+    dEdx        = clow / std::sqrt(tau);
   } else {
     double t1    = tau + 1.;
     double t2    = tau + 2.;
     double tsq   = tau * tau;
     double beta2 = tau * t2 / (t1 * t1);
-    double f     = 1. - beta2 + std::log(tsq / 2.) + (0.5 + 0.25 * tsq + (1. + 2. * tau) * std::log(0.5)) / (t1 * t1);
-    dEdx         = (std::log(2. * tau + 4.) - 2. * ionpotlog + f) / beta2;
-    dEdx         = fact * zet * dEdx;
+    double f = 1. - beta2 + geant::Log(tsq / 2.) + (0.5 + 0.25 * tsq + (1. + 2. * tau) * geant::Log(0.5)) / (t1 * t1);
+    dEdx     = (geant::Log(2. * tau + 4.) - 2. * ionpotlog + f) / beta2;
+    dEdx     = fact * zet * dEdx;
     // loss from bremsstrahlung follows
-    double cbrem = (cbr1 + cbr2 * zet) * (cbr3 + cbr4 * std::log(ekin / thigh));
+    double cbrem = (cbr1 + cbr2 * zet) * (cbr3 + cbr4 * geant::Log(ekin / thigh));
     cbrem        = 0.1 * zet * (zet + 1.) * cbrem * tau / beta2;
     dEdx += fact * cbrem;
   }

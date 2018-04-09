@@ -16,6 +16,7 @@
 
 // from geantV
 #include "Geant/TaskData.h"
+#include "Geant/FastMath.h"
 
 #include <fstream>
 //#include <cstdlib>
@@ -96,8 +97,8 @@ void GSMSCTable::Initialize(double lownergylimit, double highenergylimit, const 
 {
   fLowEnergyLimit    = lownergylimit;
   fHighEnergyLimit   = highenergylimit;
-  double lLambdaMin  = std::log(gLAMBMIN);
-  double lLambdaMax  = std::log(gLAMBMAX);
+  double lLambdaMin  = geant::Log(gLAMBMIN);
+  double lLambdaMax  = geant::Log(gLAMBMAX);
   fLogLambda0        = lLambdaMin;
   fLogDeltaLambda    = (lLambdaMax - lLambdaMin) / (gLAMBNUM - 1.);
   fInvLogDeltaLambda = 1. / fLogDeltaLambda;
@@ -145,7 +146,7 @@ bool GSMSCTable::Sampling(double lambdaval, double qval, double scra, double &co
                           double &transfPar, geant::TaskData *td, bool isfirst)
 {
   double rand0 = td->fRndm->uniform();
-  double expn  = std::exp(-lambdaval);
+  double expn  = geant::Exp(-lambdaval);
   //
   // no scattering case
   if (rand0 < expn) {
@@ -323,7 +324,7 @@ GSMSCTable::GSMSCAngularDtr *GSMSCTable::GetGSAngularDtr(double scra, double &la
       lambdaval = gLAMBMAX - 1.e-8;
       lamIndx   = gLAMBNUM - 1;
     }
-    double lLambda = std::log(lambdaval);
+    double lLambda = geant::Log(lambdaval);
     //
     // determine lower lambda (=s/lambda_el) index: linear interp. on log(lambda) scale
     if (lamIndx < 0) {
@@ -528,14 +529,15 @@ void GSMSCTable::InitMoliereMSCParams()
       double ipz = theNbAtomsPerVolVect[ielem] / theTotNbAtomsPerVol;
       double dum = ipz * zet * (zet + xi);
       zs += dum;
-      ze += dum * (-2.0 / 3.0) * std::log(zet);
-      zx += dum * std::log(1.0 + 3.34 * finstrc2 * zet * zet);
+      ze += dum * (-2.0 / 3.0) * geant::Log(zet);
+      zx += dum * geant::Log(1.0 + 3.34 * finstrc2 * zet * zet);
       sa += ipz * iwa;
     }
     double density = theMaterial->GetDensity() * geant::units::cm3 / geant::units::g; // [g/cm3]
     //
-    gMoliereBc[theMaterial->GetIndex()]  = const1 * density * zs / sa * std::exp(ze / zs) / std::exp(zx / zs); //[1/cm]
-    gMoliereXc2[theMaterial->GetIndex()] = const2 * density * zs / sa; // [MeV2/cm]
+    gMoliereBc[theMaterial->GetIndex()] =
+        const1 * density * zs / sa * geant::Exp(ze / zs) / geant::Exp(zx / zs); //[1/cm]
+    gMoliereXc2[theMaterial->GetIndex()] = const2 * density * zs / sa;          // [MeV2/cm]
     // change to internal units of 1/length and energ2/length
     gMoliereBc[theMaterial->GetIndex()] *= 1.0 / geant::units::cm;
     gMoliereXc2[theMaterial->GetIndex()] *= geant::units::MeV * geant::units::MeV / geant::units::cm;
@@ -550,7 +552,7 @@ double GSMSCTable::ComputeScatteringPowerCorrection(const MaterialCuts *matcut, 
     return corFactor;
   }
   // get the scattering power correction factor
-  double lekin     = std::log(ekin);
+  double lekin     = geant::Log(ekin);
   double remaining = (lekin - fSCPCPerMatCuts[imc]->fLEmin) * fSCPCPerMatCuts[imc]->fILDel;
   int lindx        = (int)remaining;
   remaining -= lindx;
@@ -602,10 +604,10 @@ void GSMSCTable::InitSCPCorrection(const std::vector<bool> &activeregionv)
       fSCPCPerMatCuts[imc]->fPrCut = min;
       continue;
     }
-    int numEbins         = fNumSPCEbinPerDec * std::lrint(std::log10(max / min));
+    int numEbins         = fNumSPCEbinPerDec * std::lrint(geant::Log10(max / min));
     numEbins             = std::max(numEbins, 3);
-    double lmin          = std::log(min);
-    double ldel          = std::log(max / min) / (numEbins - 1.0);
+    double lmin          = geant::Log(min);
+    double ldel          = geant::Log(max / min) / (numEbins - 1.0);
     fSCPCPerMatCuts[imc] = new SCPCorrection();
     fSCPCPerMatCuts[imc]->fVSCPC.resize(numEbins, 1.0);
     fSCPCPerMatCuts[imc]->fIsUse = true;
@@ -613,7 +615,7 @@ void GSMSCTable::InitSCPCorrection(const std::vector<bool> &activeregionv)
     fSCPCPerMatCuts[imc]->fLEmin = lmin;
     fSCPCPerMatCuts[imc]->fILDel = 1. / ldel;
     for (int ie = 0; ie < numEbins; ++ie) {
-      double ekin    = std::exp(lmin + ie * ldel);
+      double ekin    = geant::Exp(lmin + ie * ldel);
       double scpCorr = 1.0;
       // compute correction factor: I.Kawrakow NIMB 114(1996)307-326 (Eqs(32-37))
       if (ie > 0) {
@@ -622,13 +624,13 @@ void GSMSCTable::InitSCPCorrection(const std::vector<bool> &activeregionv)
         // Moliere's screening parameter
         int matindx = matCut->GetMaterial()->GetIndex();
         double A    = GetMoliereXc2(matindx) / (4.0 * tau * (tau + 2.) * GetMoliereBc(matindx));
-        double gr   = (1. + 2. * A) * std::log(1. + 1. / A) - 2.;
+        double gr   = (1. + 2. * A) * geant::Log(1. + 1. / A) - 2.;
         double dum0 = (tau + 2.) / (tau + 1.);
         double dum1 = tau + 1.;
-        double gm   = std::log(0.5 * tau / tauCut) +
-                    (1. + dum0 * dum0) * std::log(2. * (tau - tauCut + 2.) / (tau + 4.)) -
+        double gm   = geant::Log(0.5 * tau / tauCut) +
+                    (1. + dum0 * dum0) * geant::Log(2. * (tau - tauCut + 2.) / (tau + 4.)) -
                     0.25 * (tau + 2.) * (tau + 2. + 2. * (2. * tau + 1.) / (dum1 * dum1)) *
-                        std::log((tau + 4.) * (tau - tauCut) / tau / (tau - tauCut + 2.)) +
+                        geant::Log((tau + 4.) * (tau - tauCut) / tau / (tau - tauCut + 2.)) +
                     0.5 * (tau - 2 * tauCut) * (tau + 2.) * (1. / (tau - tauCut) - 1. / (dum1 * dum1));
         if (gm < gr) {
           gm = gm / gr;

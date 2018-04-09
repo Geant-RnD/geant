@@ -9,6 +9,8 @@
 
 #include "Geant/LightTrack.h"
 
+#include "Geant/FastMath.h"
+
 #include <iostream>
 
 // this should be replaced by some VecMath classes
@@ -187,8 +189,8 @@ double DiffuseElasticModel::SampleInvariantT(double mass, double plab, Isotope *
     aa = std::pow(A, 1.33) / bb;
     cc = 0.4 * std::pow(A, 0.4) / dd;
   }
-  double q1 = 1.0 - std::exp(-bb * tmax);
-  double q2 = 1.0 - std::exp(-dd * tmax);
+  double q1 = 1.0 - geant::Exp(-bb * tmax);
+  double q2 = 1.0 - geant::Exp(-dd * tmax);
   double s1 = q1 * aa;
   double s2 = q2 * cc;
 
@@ -197,7 +199,7 @@ double DiffuseElasticModel::SampleInvariantT(double mass, double plab, Isotope *
     bb = dd;
   }
 
-  return -GeV2 * std::log(1.0 - td->fRndm->uniform() * q1) / bb;
+  return -GeV2 * geant::Log(1.0 - td->fRndm->uniform() * q1) / bb;
 }
 
 } // namespace geantphysics

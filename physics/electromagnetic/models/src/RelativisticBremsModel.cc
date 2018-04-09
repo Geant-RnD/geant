@@ -26,6 +26,7 @@
 
 // from geantV
 #include "Geant/TaskData.h"
+#include "Geant/FastMath.h"
 
 #include <cmath>
 #include <Geant/G4Log.hh>
@@ -239,20 +240,20 @@ void RelativisticBremsModel::InitElementData()
           const double fc       = elem->GetElementProperties()->GetCoulombCorrection();
           double Fel            = 1.;
           double Finel          = 1.;
-          elemData->fLogZ       = G4Log(zet);
+          elemData->fLogZ       = geant::Log(zet);
           elemData->fFz         = elemData->fLogZ / 3. + fc;
           if (izet < 5) {
             Fel   = gFelLowZet[izet];
             Finel = gFinelLowZet[izet];
           } else {
-            Fel   = G4Log(184.15) - elemData->fLogZ / 3.;
-            Finel = G4Log(1194) - 2. * elemData->fLogZ / 3.;
+            Fel   = geant::Log(184.15) - elemData->fLogZ / 3.;
+            Finel = geant::Log(1194) - 2. * elemData->fLogZ / 3.;
           }
           elemData->fZFactor1      = (Fel - fc) + Finel / zet;
           elemData->fZFactor2      = (1. + 1. / zet) / 12.;
           elemData->fVarS1         = std::pow(zet, 2. / 3.) / (184.15 * 184.15);
-          elemData->fILVarS1Cond   = 1. / (G4Log(std::sqrt(2.0) * elemData->fVarS1));
-          elemData->fILVarS1       = 1. / G4Log(elemData->fVarS1);
+          elemData->fILVarS1Cond   = 1. / (geant::Log(std::sqrt(2.0) * elemData->fVarS1));
+          elemData->fILVarS1       = 1. / geant::Log(elemData->fVarS1);
           elemData->fGammaFactor   = 100.0 * geant::units::kElectronMassC2 / std::pow(zet, 1. / 3.);
           elemData->fEpsilonFactor = 100.0 * geant::units::kElectronMassC2 / std::pow(zet, 2. / 3.);
           gElementData[izet]       = elemData;
@@ -506,10 +507,12 @@ void RelativisticBremsModel::ComputeScreeningFunctions(double &phi1, double &phi
                                                        const double gamma, const double epsilon)
 {
   const double gamma2 = gamma * gamma;
-  phi1   = 16.863 - 2.0 * G4Log(1.0 + 0.311877 * gamma2) + 2.4 * G4Exp(-0.9 * gamma) + 1.6 * G4Exp(-1.5 * gamma);
-  phi1m2 = 2.0 / (3.0 + 19.5 * gamma + 18.0 * gamma2); // phi1-phi2
+  phi1                = 16.863 - 2.0 * geant::Log(1.0 + 0.311877 * gamma2) + 2.4 * geant::Exp(-0.9 * gamma) +
+         1.6 * geant::Exp(-1.5 * gamma);
+  phi1m2                = 2.0 / (3.0 + 19.5 * gamma + 18.0 * gamma2); // phi1-phi2
   const double epsilon2 = epsilon * epsilon;
-  xsi1   = 24.34 - 2.0 * G4Log(1.0 + 13.111641 * epsilon2) + 2.8 * G4Exp(-8.0 * epsilon) + 1.2 * G4Exp(-29.2 * epsilon);
+  xsi1                  = 24.34 - 2.0 * geant::Log(1.0 + 13.111641 * epsilon2) + 2.8 * geant::Exp(-8.0 * epsilon) +
+         1.2 * geant::Exp(-29.2 * epsilon);
   xsi1m2 = 2.0 / (3.0 + 120.0 * epsilon + 1200.0 * epsilon2); // xsi1-xsi2
 }
 
@@ -527,7 +530,7 @@ void RelativisticBremsModel::ComputeLPMfunctions(double &funcXiS, double &funcGS
   if (varSprime > 1.0) {
     funcXiSprime = 1.0;
   } else if (varSprime > condition) {
-    const double funcHSprime = G4Log(varSprime) * gElementData[izet]->fILVarS1Cond;
+    const double funcHSprime = geant::Log(varSprime) * gElementData[izet]->fILVarS1Cond;
     funcXiSprime             = 1.0 + funcHSprime -
                    0.08 * (1.0 - funcHSprime) * funcHSprime * (2.0 - funcHSprime) * gElementData[izet]->fILVarS1Cond;
   }
@@ -538,7 +541,7 @@ void RelativisticBremsModel::ComputeLPMfunctions(double &funcXiS, double &funcGS
   if (varShat > 1.0) {
     funcXiS = 1.0;
   } else if (varShat > varS1) {
-    funcXiS = 1.0 + G4Log(varShat) * gElementData[izet]->fILVarS1;
+    funcXiS = 1.0 + geant::Log(varShat) * gElementData[izet]->fILVarS1;
   }
   GetLPMFunctions(funcGS, funcPhiS, varShat);
   // ComputeLPMGsPhis(funcGS, funcPhiS, varShat);
@@ -559,17 +562,18 @@ void RelativisticBremsModel::ComputeLPMGsPhis(double &funcGS, double &funcPhiS, 
     double varShat3 = varShat * varShat2;
     double varShat4 = varShat2 * varShat2;
     if (varShat < 0.415827397755) { // use Stanev approximation: for \psi(s) and compute G(s)
-      funcPhiS = 1.0 - G4Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
-                             varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
+      funcPhiS = 1.0 - geant::Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
+                                  varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
       // 1-\exp \left\{  -4s  - \frac{8s^2}{1+3.936s+4.97s^2-0.05s^3+7.5s^4} \right\}
       const double funcPsiS =
-          1.0 - G4Exp(-4.0 * varShat -
-                      8.0 * varShat2 / (1.0 + 3.936 * varShat + 4.97 * varShat2 - 0.05 * varShat3 + 7.5 * varShat4));
+          1.0 -
+          geant::Exp(-4.0 * varShat -
+                     8.0 * varShat2 / (1.0 + 3.936 * varShat + 4.97 * varShat2 - 0.05 * varShat3 + 7.5 * varShat4));
       // G(s) = 3 \psi(s) - 2 \phi(s)
       funcGS = 3.0 * funcPsiS - 2.0 * funcPhiS;
     } else if (varShat < 1.55) {
-      funcPhiS = 1.0 - G4Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
-                             varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
+      funcPhiS = 1.0 - geant::Exp(-6.0 * varShat * (1.0 + varShat * (3.0 - geant::units::kPi)) +
+                                  varShat3 / (0.623 + 0.796 * varShat + 0.658 * varShat2));
       const double dum0 = -0.16072300849123999 + 3.7550300067531581 * varShat - 1.7981383069010097 * varShat2 +
                           0.67282686077812381 * varShat3 - 0.1207722909879257 * varShat4;
       funcGS = std::tanh(dum0);
@@ -713,14 +717,14 @@ void RelativisticBremsModel::BuildSamplingTableForMaterialCut(const MaterialCuts
   const int numElems                      = theElements.size();
   //
   // compute number of e-/e+ kinetic energy grid
-  int numElecEnergies = fSTNumElectronEnergyPerDecade * std::lrint(std::log10(maxElecEnergy / minElecEnergy)) + 1;
+  int numElecEnergies = fSTNumElectronEnergyPerDecade * std::lrint(geant::Log10(maxElecEnergy / minElecEnergy)) + 1;
   numElecEnergies     = std::max(numElecEnergies, 3);
-  double logEmin      = G4Log(minElecEnergy);
-  double delta        = G4Log(maxElecEnergy / minElecEnergy) / (numElecEnergies - 1.0);
+  double logEmin      = geant::Log(minElecEnergy);
+  double delta        = geant::Log(maxElecEnergy / minElecEnergy) / (numElecEnergies - 1.0);
   AliasDataMaterialCuts *dataMatCut = new AliasDataMaterialCuts(numElecEnergies, logEmin, 1. / delta);
   fSamplingTables[indxlocal]        = dataMatCut;
   for (int ie = 0; ie < numElecEnergies; ++ie) {
-    double eekin = G4Exp(dataMatCut->fLogEmin + ie * delta);
+    double eekin = geant::Exp(dataMatCut->fLogEmin + ie * delta);
     if (ie == 0 && minElecEnergy == gcut) {
       eekin = minElecEnergy + 1. * geant::units::eV; // would be zero otherwise
     }
@@ -732,7 +736,7 @@ void RelativisticBremsModel::BuildSamplingTableForMaterialCut(const MaterialCuts
     const bool isLPM        = (fIsUseLPM && etot > energyThLPM);
     //
     const double dumc0 = gcut * gcut + densityCor;
-    const double dumc1 = G4Log((eekin * eekin + densityCor) / dumc0);
+    const double dumc1 = geant::Log((eekin * eekin + densityCor) / dumc0);
     // create the alias data struct
     LinAlias *als = new LinAlias(fSTNumSamplingPhotEnergies);
     // fill 3 values at 0,0.8,1 of the transformed variable
@@ -747,7 +751,7 @@ void RelativisticBremsModel::BuildSamplingTableForMaterialCut(const MaterialCuts
       } else if (i == 2) {
         egamma = eekin;
       } else {
-        egamma = std::sqrt(dumc0 * G4Exp(als->fXdata[i] * dumc1) - densityCor);
+        egamma = std::sqrt(dumc0 * geant::Exp(als->fXdata[i] * dumc1) - densityCor);
       }
       double dcross = 0.0;
       for (int ielem = 0; ielem < numElems; ++ielem) {
@@ -773,7 +777,7 @@ void RelativisticBremsModel::BuildSamplingTableForMaterialCut(const MaterialCuts
       for (int i = 0; i < numdata - 1; ++i) {
         const double xx     = 0.5 * (als->fXdata[i] + als->fXdata[i + 1]); // mid point
         const double yy     = 0.5 * (als->fYdata[i] + als->fYdata[i + 1]); // lin func val at the mid point
-        const double egamma = std::sqrt(dumc0 * G4Exp(xx * dumc1) - densityCor);
+        const double egamma = std::sqrt(dumc0 * geant::Exp(xx * dumc1) - densityCor);
         double dcross       = 0.0;
         for (int ielem = 0; ielem < numElems; ++ielem) {
           double zet = theElements[ielem]->GetZ();
@@ -821,7 +825,7 @@ double RelativisticBremsModel::SamplePhotonEnergy(const MaterialCuts *matcut, do
   const double densityCor = etot * etot * dum0; // this is k_p^2
   const int mcIndxLocal   = fGlobalMatGCutIndxToLocal[matcut->GetIndex()];
   // determine electron energy lower grid point
-  const double leekin = G4Log(eekin);
+  const double leekin = geant::Log(eekin);
   //
   int indxEekin = fSamplingTables[mcIndxLocal]->fAliasData.size() - 1;
   if (eekin < GetHighEnergyUsageLimit()) {
@@ -838,7 +842,7 @@ double RelativisticBremsModel::SamplePhotonEnergy(const MaterialCuts *matcut, do
   const double dum1 = gcut * gcut + densityCor;
   const double dum2 = (eekin * eekin + densityCor) / dum1;
 
-  return std::sqrt(dum1 * G4Exp(gammae * G4Log(dum2)) - densityCor);
+  return std::sqrt(dum1 * geant::Exp(gammae * geant::Log(dum2)) - densityCor);
 }
 
 double RelativisticBremsModel::SamplePhotonEnergy(const MaterialCuts *matcut, double eekin, geant::TaskData *td)
@@ -860,8 +864,8 @@ double RelativisticBremsModel::SamplePhotonEnergy(const MaterialCuts *matcut, do
     targetElemIndx = SampleTargetElementIndex(matcut, eekin, td->fRndm->uniform());
   }
   // sample the transformed variable: u(k) = ln(k^2+k_p^2) that is in [ln(k_c^2+k_p^2), ln(E_k^2+k_p^2)]
-  const double minVal   = G4Log(gcut * gcut + densityCor);
-  const double valRange = G4Log(eekin * eekin + densityCor) - minVal;
+  const double minVal   = geant::Log(gcut * gcut + densityCor);
+  const double valRange = geant::Log(eekin * eekin + densityCor) - minVal;
   const double zet      = theElements[targetElemIndx]->GetZ();
   const int izet        = std::min(std::lrint(zet), gMaxZet - 1);
   const double funcMax  = gElementData[izet]->fZFactor1 + gElementData[izet]->fZFactor2;
@@ -870,7 +874,7 @@ double RelativisticBremsModel::SamplePhotonEnergy(const MaterialCuts *matcut, do
   double *rndArray = td->fDblArray;
   do {
     td->fRndm->uniform_array(2, rndArray);
-    egamma  = std::sqrt(std::max(G4Exp(minVal + rndArray[0] * valRange) - densityCor, 0.));
+    egamma  = std::sqrt(std::max(geant::Exp(minVal + rndArray[0] * valRange) - densityCor, 0.));
     funcVal = (isLPM) ? ComputeURelDXSecPerAtom(egamma, etot, lpmEnergy, densityCor, izet)
                       : ComputeDXSecPerAtom(egamma, etot, zet);
   } while (funcVal < rndArray[1] * funcMax);
@@ -892,7 +896,7 @@ void RelativisticBremsModel::SamplePhotonDirection(double elenergy, double &sinT
   delta += a;
   delta *= 0.5;
 
-  double cofA = -signc * G4Exp(G4Log(delta) / 3.0);
+  double cofA = -signc * geant::Exp(geant::Log(delta) / 3.0);
   cosTheta    = cofA - 1. / cofA;
 
   double tau  = elenergy / geant::units::kElectronMassC2;
@@ -965,7 +969,7 @@ double RelativisticBremsModel::ComputeDEDXPerVolume(const Material *mat, double 
   // upper limit of the integral
   const double upperlimit   = std::min(gammacut, eekin);
   const double kappacr      = upperlimit / etot;
-  const double log1mKappaCr = G4Log(1.0 - kappacr);
+  const double log1mKappaCr = geant::Log(1.0 - kappacr);
   //
   double dedx = 0.0;
   // we will need the element composition of this material
@@ -978,7 +982,7 @@ double RelativisticBremsModel::ComputeDEDXPerVolume(const Material *mat, double 
   // do the integration on reduced photon energy transformd to log(kappa) that transformed to integral between 0-1
   double integral = 0.0;
   for (int i = 0; i < fNGL; ++i) {
-    const double dumx   = 1.0 - G4Exp(glX[i] * log1mKappaCr);
+    const double dumx   = 1.0 - geant::Exp(glX[i] * log1mKappaCr);
     const double egamma = etot * dumx;
     double sum          = 0.0;
     for (int ielem = 0; ielem < numElems; ++ielem) {
@@ -1047,7 +1051,7 @@ double RelativisticBremsModel::ComputeXSectionPerAtom(const Element *elem, const
   const double energyThLPM = std::sqrt(dumc0) * lpmEnergy;
   const bool isLPM         = (fIsUseLPM && etot > energyThLPM);
 
-  const double lKappaPrimePerCr = G4Log(eekin / gcut);
+  const double lKappaPrimePerCr = geant::Log(eekin / gcut);
   //
   // we need the abscissas and weights for the numerical integral 64-points GL between 0-1
   const std::vector<double> &glW = fGL->GetWeights();
@@ -1057,7 +1061,7 @@ double RelativisticBremsModel::ComputeXSectionPerAtom(const Element *elem, const
   const int izet   = std::min(std::lrint(zet), gMaxZet - 1);
   double integral  = 0.0;
   for (int i = 0; i < fNGL; ++i) {
-    const double egamma = G4Exp(glX[i] * lKappaPrimePerCr) * gcut;
+    const double egamma = geant::Exp(glX[i] * lKappaPrimePerCr) * gcut;
     double val          = 0.0;
     if (isLPM) {
       val = ComputeURelDXSecPerAtom(egamma, etot, lpmEnergy, densityCor, izet);
@@ -1101,7 +1105,7 @@ double RelativisticBremsModel::ComputeXSectionPerVolume(const Material *mat, dou
   const double energyThLPM = std::sqrt(dumc0) * lpmEnergy;
   const bool isLPM         = (fIsUseLPM && etot > energyThLPM);
 
-  const double lKappaPrimePerCr = G4Log(eekin / gcut);
+  const double lKappaPrimePerCr = geant::Log(eekin / gcut);
   // we will need the element composition of this material
   const Vector_t<Element *> &theElements  = mat->GetElementVector();
   const double *theAtomicNumDensityVector = mat->GetMaterialProperties()->GetNumOfAtomsPerVolumeVect();
@@ -1112,7 +1116,7 @@ double RelativisticBremsModel::ComputeXSectionPerVolume(const Material *mat, dou
   // do the integration on reduced photon energy transformd to log(kappa) that transformed to integral between 0-1
   double integral = 0.0;
   for (int i = 0; i < fNGL; ++i) {
-    const double egamma = G4Exp(glX[i] * lKappaPrimePerCr) * gcut;
+    const double egamma = geant::Exp(glX[i] * lKappaPrimePerCr) * gcut;
     double sum          = 0.0;
     for (int ielem = 0; ielem < numElems; ++ielem) {
       const double zet = theElements[ielem]->GetZ();
