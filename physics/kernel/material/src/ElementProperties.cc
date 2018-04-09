@@ -3,6 +3,7 @@
 
 #include "Geant/PhysicalConstants.h"
 #include "Geant/Element.h"
+#include "Geant/FastMath.h"
 
 #include <cmath>
 
@@ -22,7 +23,7 @@ void ElementProperties::InitialiseMembers()
   double z = fElement->GetZ();
   fZ13     = std::pow(z, 1. / 3.);
   fZ23     = std::pow(z, 2. / 3.);
-  fLogZ    = std::log(z);
+  fLogZ    = geant::Log(z);
   fLogZ13  = fLogZ / 3.;
   fLogZ23  = 2. * fLogZ / 3.;
   ComputeCoulombCorrection(z);

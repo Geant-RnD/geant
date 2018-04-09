@@ -2,6 +2,7 @@
 #include "Geant/PhysicsParameters.h"
 
 #include "Geant/SystemOfUnits.h"
+#include "Geant/FastMath.h"
 
 #include <iostream>
 #include <iomanip>
@@ -76,7 +77,8 @@ void PhysicsParameters::SetMinLossTableEnergy(double val)
   if (val > 1.e-3 * geant::units::eV && val < fMaxLossTableEnergy) {
     fMinLossTableEnergy = val;
     // update number of bins
-    fNumLossTableBins = fNumLossTableBinsPerDecade * std::lrint(std::log10(fMaxLossTableEnergy / fMinLossTableEnergy));
+    fNumLossTableBins =
+        fNumLossTableBinsPerDecade * std::lrint(geant::Log10(fMaxLossTableEnergy / fMinLossTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetMinLossTableEnergy() " << std::endl
               << "    Value of fMinLossTableEnergy is out of range: " << val / geant::units::keV
@@ -89,7 +91,8 @@ void PhysicsParameters::SetMaxLossTableEnergy(double val)
   if (val > fMinLossTableEnergy && val < 1.e+7 * geant::units::TeV) {
     fMaxLossTableEnergy = val;
     // update number of bins
-    fNumLossTableBins = fNumLossTableBinsPerDecade * std::lrint(std::log10(fMaxLossTableEnergy / fMinLossTableEnergy));
+    fNumLossTableBins =
+        fNumLossTableBinsPerDecade * std::lrint(geant::Log10(fMaxLossTableEnergy / fMinLossTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetMaxLossTableEnergy() " << std::endl
               << "    Value of fMaxLossTableEnergy is out of range: " << val / geant::units::GeV
@@ -101,8 +104,9 @@ void PhysicsParameters::SetMaxLossTableEnergy(double val)
 void PhysicsParameters::SetNumLossTableBins(int val)
 {
   if (val > 4 && val < 10000000) {
-    fNumLossTableBins          = val;
-    fNumLossTableBinsPerDecade = std::lrint(fNumLossTableBins / std::log10(fMaxLossTableEnergy / fMinLossTableEnergy));
+    fNumLossTableBins = val;
+    fNumLossTableBinsPerDecade =
+        std::lrint(fNumLossTableBins / geant::Log10(fMaxLossTableEnergy / fMinLossTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetNumLossTableBins() " << std::endl
               << "    Value of fNumLossTableBins is out of range: " << val << " so it's ignored!" << std::endl;
@@ -114,7 +118,8 @@ void PhysicsParameters::SetNumLossTableBinsPerDecade(int val)
 {
   if (val > 4 && val < 1000000) {
     fNumLossTableBinsPerDecade = val;
-    fNumLossTableBins = fNumLossTableBinsPerDecade * std::lrint(std::log10(fMaxLossTableEnergy / fMinLossTableEnergy));
+    fNumLossTableBins =
+        fNumLossTableBinsPerDecade * std::lrint(geant::Log10(fMaxLossTableEnergy / fMinLossTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetNumLossTableBinsPerDecade() " << std::endl
               << "    Value of fNumLossTableBinsPerDecade is out of range: " << val << " so it's ignored!" << std::endl;
@@ -128,7 +133,7 @@ void PhysicsParameters::SetMinLambdaTableEnergy(double val)
     fMinLambdaTableEnergy = val;
     // update number of bins
     fNumLambdaTableBins =
-        fNumLambdaTableBinsPerDecade * std::lrint(std::log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
+        fNumLambdaTableBinsPerDecade * std::lrint(geant::Log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetMinLambdaTableEnergy() " << std::endl
               << "    Value of fMinLambdaTableEnergy is out of range: " << val / geant::units::keV
@@ -142,7 +147,7 @@ void PhysicsParameters::SetMaxLambdaTableEnergy(double val)
     fMaxLambdaTableEnergy = val;
     // update number of bins
     fNumLambdaTableBins =
-        fNumLambdaTableBinsPerDecade * std::lrint(std::log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
+        fNumLambdaTableBinsPerDecade * std::lrint(geant::Log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetMaxLambdaTableEnergy() " << std::endl
               << "    Value of fMaxLambdaTableEnergy is out of range: " << val / geant::units::GeV
@@ -156,7 +161,7 @@ void PhysicsParameters::SetNumLambdaTableBins(int val)
   if (val > 4 && val < 10000000) {
     fNumLambdaTableBins = val;
     fNumLambdaTableBinsPerDecade =
-        std::lrint(fNumLambdaTableBins / std::log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
+        std::lrint(fNumLambdaTableBins / geant::Log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetNumLambdaTableBins() " << std::endl
               << "    Value of fNumLambdaTableBins is out of range: " << val << " so it's ignored!" << std::endl;
@@ -169,7 +174,7 @@ void PhysicsParameters::SetNumLambdaTableBinsPerDecade(int val)
   if (val > 4 && val < 1000000) {
     fNumLambdaTableBinsPerDecade = val;
     fNumLambdaTableBins =
-        fNumLambdaTableBinsPerDecade * std::lrint(std::log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
+        fNumLambdaTableBinsPerDecade * std::lrint(geant::Log10(fMaxLambdaTableEnergy / fMinLambdaTableEnergy));
   } else {
     std::cerr << "  **** WARNING: PhysicsParameters::SetNumLambdaTableBinsPerDecade() " << std::endl
               << "    Value of fNumLambdaTableBinsPerDecade is out of range: " << val << " so it's ignored!"
