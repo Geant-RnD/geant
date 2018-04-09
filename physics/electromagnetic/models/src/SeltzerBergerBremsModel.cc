@@ -31,8 +31,6 @@
 #include <cstdio>
 #include <iostream>
 #include <iomanip>
-#include <Geant/G4Exp.hh>
-#include <Geant/G4Log.hh>
 
 namespace geantphysics {
 

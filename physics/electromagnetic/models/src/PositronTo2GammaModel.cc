@@ -25,8 +25,6 @@
 #include "Geant/FastMath.h"
 
 #include <cmath>
-#include <Geant/G4Log.hh>
-#include <Geant/G4Exp.hh>
 
 namespace geantphysics {
 
