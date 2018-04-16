@@ -99,8 +99,8 @@ TNudyEndfPhProd::~TNudyEndfPhProd()
 double TNudyEndfPhProd::GetFisYield(int ielemId, double energyK)
 {
   fRnd = new TRandom3(0);
-  // std::cout<<"element "<< einfId.size() << std::endl;
-  // std::cout<<"energies "<< einfId[ielemId].size() << std::endl;
+  // std::cout<<"element "<< fEinfId.size() << std::endl;
+  // std::cout<<"energies "<< fEinfId[ielemId].size() << std::endl;
   return fRnd;
 }
 */

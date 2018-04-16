@@ -48,7 +48,7 @@ public:
   }
   std::string GetEndfSubName() const { return ENDFSUB; }
   void SetLogLev(unsigned char loglev) { fLogLev = loglev; }
-  void SetPreProcess(int x1) { prepro = x1; }
+  void SetPreProcess(int x1) { fPrepro = x1; }
   unsigned char GetLogLev() const { return fLogLev; }
 	bool GetLFI() { return fLFI;}
 	void SetLFI(bool keywd) {fLFI = keywd;}
@@ -146,7 +146,7 @@ public:
     ss.clear();
     for (ii = 0; ii < 2; ii++) {
       tmp.swap(strNum[ii]);
-      if(prepro == 0){
+      if(fPrepro == 0){
 	std::size_t alien = tmp.find_last_of("+-");
 	if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
       }
@@ -184,7 +184,7 @@ public:
     for (ii = 0; ii < 6; ii++) {
       c[ii] = 0.0;
       tmp.swap(strNum[ii]);
-      if(prepro == 0){
+      if(fPrepro == 0){
 	std::size_t alien = tmp.find_last_of("+-");
 	if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
       }
@@ -238,7 +238,7 @@ private:
   Nudy::TNudyEndfTape *fTape;  //! Support link for the tape structure
   Nudy::TNudyEndfMat *fMat;    //! Support link for the current material
   std::string ENDFSUB;
-  int prepro ;
+  int fPrepro ;
 	bool fLFI;
 #ifdef USE_ROOT
   ClassDef(TNudyENDF, 1) // class for an ENDF data file

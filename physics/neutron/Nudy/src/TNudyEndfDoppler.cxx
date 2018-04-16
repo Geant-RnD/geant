@@ -1,8 +1,3 @@
-// This class is to doppler broaden the point ENDF data. It has been derived from F. Carminati's Fortran Function
-// Author: Dr. Harphool Kumawat
-// Email: harphool@barc.gov.in; harphool.kumawat@cern.ch
-// date of creation: March 22, 2016
-
 #include <math.h>
 #include <iostream>
 #include "TNudyEndfDoppler.h"
@@ -22,158 +17,157 @@ ClassImp(TNudyEndfDoppler)
 
 TNudyEndfDoppler::TNudyEndfDoppler(double isigDiff, double aw, double t1, double t2, std::vector<double> &x1,
                                    std::vector<double> &x2)
-    : F0K2P(0), F1K2P(0), F2K2P(0), F3K2P(0), F4K2P(0)
+    : fF0K2P(0), fF1K2P(0), fF2K2P(0), fF3K2P(0), fF4K2P(0)
 {
-#define XNEPSM(S) fabs(ONE - TW3 * sqrt(ONE / 3.0) * pow((ONE + S * (ONE + S)), THH) / (S * (ONE + S)))
-#define FTAIL(X, Y)                                                                                                \
-  OVSQPI *((1.0 + 2.0 * Y * Y) * sqrt(PI) * HALF * (erf(X - Y) - erf(X + Y)) - (X + Y) * exp(-(X - Y) * (X - Y)) \
-            + (X - Y) * exp(-(X + Y) * (X + Y)))
-  sigDiff = isigDiff ;
-  awri  = aw;
-  tk    = t2 - t1;
+#define XNEPSM(S) fabs(fONE - fTW3 * sqrt(fONE / 3.0) * pow((fONE + S * (fONE + S)), fTHH) / (S * (fONE + S)))
+#define FTAIL(X, fY)                                                                                                \
+  fOVSQPI *((1.0 + 2.0 * fY * fY) * sqrt(PI) * fHALF * (erf(X - fY) - erf(X + fY)) - (X + fY) * exp(-(X - fY) * (X - fY)) \
+            + (X - fY) * exp(-(X + fY) * (X + fY)))
+  fSigDiff = isigDiff ;
+  fAWRI  = aw;
+  fTk    = t2 - t1;
   if(t1 == t2){
     for (unsigned int j = 0; j < x1.size(); j++) {
-      sigma.push_back(x2[j]);  
+      fSigma.push_back(x2[j]);  
     } 
   } else {
-    ALPHA = awri / ( boltz * tk );
-    ncrs  = x1.size();
-    while (RATHIG - RATLOW > 1E-7) {
-      RATHLF = HALF * (RATLOW + RATHIG);
-      HTEST  = XNEPSM(RATHLF);
-      if (HTEST < isigDiff) {
-	RATLOW = RATHLF;
+    fALPHA = fAWRI / ( fBoltz * fTk );
+    fNcrs  = x1.size();
+    while (fRATHIG - fRATLOW > 1E-7) {
+      fRATHLF = fHALF * (fRATLOW + fRATHIG);
+      fHTEST  = XNEPSM(fRATHLF);
+      if (fHTEST < isigDiff) {
+	fRATLOW = fRATHLF;
       } else {
-	RATHIG = RATHLF;
+	fRATHIG = fRATHLF;
       }
     } // end of while loop
-    RATMAX = RATLOW * RATLOW;
-    EMAX   = x1[ncrs - 1];
-    EMIN   = x1[0];
+    fRATMAX = fRATLOW * fRATLOW;
     if ( x1[0] == x1[1] ) {
       x1.erase (x1.begin()+1) ;
       x2.erase (x2.begin()+1) ;
     }
-    IPP  = 0;
-    size = x1.size();
-    jloop = 0 ;
-    xss = 0.5 * (2*x2[0]+(x2[1]-x2[0])*(-x1[0])/(x1[1]-x1[0])) ;
-    if (xss < 0) xss = 0 ;
-    for (int k = 0 ; k < size ; k++) {
-//        std::cout <<"Loop begins "<< x1[jloop] <<"  "<< x2[jloop] << std::endl;
-      Y2  = x1[jloop] * ALPHA;
-      Y   = sqrt(Y2);
-      ZKT = sqrt(x1[IPP + 1] * ALPHA) - Y;
-      while (ZKT < -ZLIMI) {
-	IPP += 1;
-	ZKT = sqrt(x1[IPP + 1] * ALPHA) - Y;
-	if( ZKT + ZLIMI > 0.05 ){
-	  IPP -= 2 ;
-	  ZKT = sqrt(x1[IPP + 1] * ALPHA) - Y;
+    fIPP  = 0;
+    fSize = x1.size();
+    fJLoop = 0 ;
+    fXss = 0.5 * (2*x2[0]+(x2[1]-x2[0])*(-x1[0])/(x1[1]-x1[0])) ;
+    if (fXss < 0) fXss = 0 ;
+    for (int k = 0 ; k < fSize ; k++) {
+//         std::cout <<"Loop begins "<< x1[fJLoop] <<"  "<< x2[fJLoop] << std::endl;
+      fY2  = x1[fJLoop] * fALPHA;
+      fY   = sqrt(fY2);
+      fZKT = sqrt(x1[fIPP + 1] * fALPHA) - fY;
+      while (fZKT < -fZLIMI) {
+	fIPP += 1;
+	fZKT = sqrt(x1[fIPP + 1] * fALPHA) - fY;
+	if( fZKT + fZLIMI > 0.05 ){
+	  fIPP -= 2 ;
+	  fZKT = sqrt(x1[fIPP + 1] * fALPHA) - fY;
 	  break;
 	}
       } // end of while loop
-      mipp = IPP ;
-      XSUM = 0.0;
-      FTAIL1 = 0.0;
-      KPP  = IPP;
-      E2   = x1[KPP];
-      S2   = x2[KPP];
-      ZK2  = sqrt(E2 * ALPHA) - Y;
-      ZK22 = ZK2 * ZK2;
-      EXPA = exp(-ZK22);
-      F0K2 = erf(ZK2);
-      F1K2 = OVSQPI * (ONE - EXPA);
-      F2K2 = HALF * F0K2 - OVSQPI * ZK2 * EXPA;
-      F3K2 = OVSQPI * (ONE - (1 + ZK22) * EXPA);
-      F4K2 = HALF * THH * F0K2 - OVSQPI * ZK2 * (THH + ZK22) * EXPA;
+      fMipp = fIPP ;
+      fXSUM = 0.0;
+      fFTAIL1 = 0.0;
+      fKPP  = fIPP;
+      fE2   = x1[fKPP];
+      fS2   = x2[fKPP];
+      fZK2  = sqrt(fE2 * fALPHA) - fY;
+      fZK22 = fZK2 * fZK2;
+      fEXPA = exp(-fZK22);
+      fF0K2 = erf(fZK2);
+      fF1K2 = fOVSQPI * (fONE - fEXPA);
+      fF2K2 = fHALF * fF0K2 - fOVSQPI * fZK2 * fEXPA;
+      fF3K2 = fOVSQPI * (fONE - (1 + fZK22) * fEXPA);
+      fF4K2 = fHALF * fTHH * fF0K2 - fOVSQPI * fZK2 * (fTHH + fZK22) * fEXPA;
       
-      if (Y < ZLIMI) {
-	ZK2P  = ZK2 + 2 * Y;
-	ZK22P = ZK2P * ZK2P;
-	EXPAP = exp(-ZK22P);
-	F0K2P = erf(ZK2P);
-	F1K2P = OVSQPI * (ONE - EXPAP);
-	F2K2P = HALF * F0K2P - OVSQPI * ZK2P * EXPAP;
-	F3K2P = OVSQPI * (ONE - (1 + ZK22P) * EXPAP);
-	F4K2P = HALF * THH * F0K2P - OVSQPI * ZK2P * (THH + ZK22P) * EXPAP;
+      if (fY < fZLIMI) {
+	fZK2P  = fZK2 + 2 * fY;
+	fZK22P = fZK2P * fZK2P;
+	fEXPAP = exp(-fZK22P);
+	fF0K2P = erf(fZK2P);
+	fF1K2P = fOVSQPI * (fONE - fEXPAP);
+	fF2K2P = fHALF * fF0K2P - fOVSQPI * fZK2P * fEXPAP;
+	fF3K2P = fOVSQPI * (fONE - (1 + fZK22P) * fEXPAP);
+	fF4K2P = fHALF * fTHH * fF0K2P - fOVSQPI * fZK2P * (fTHH + fZK22P) * fEXPAP;
       }
       
-      while (ZK2 < ZLIMI && KPP < (int) x1.size() - 1) {
-	E1  = E2;
-	S1  = S2;
-	KPP = KPP + 1;
-	E2  = x1[KPP];
-	S2  = x2[KPP];
-	while ( E2 == E1 ) {
-	  KPP = KPP + 1;
-	  E2  = x1[KPP];
-	  S2  = x2[KPP];
+      while (fZK2 < fZLIMI && fKPP < (int) x1.size() - 1) {
+	fE1  = fE2;
+	fS1  = fS2;
+	fKPP = fKPP + 1;
+	fE2  = x1[fKPP];
+	fS2  = x2[fKPP];
+	while ( fE2 == fE1 ) {
+	  fKPP = fKPP + 1;
+	  fE2  = x1[fKPP];
+	  fS2  = x2[fKPP];
 	}
-	if (E2 - E1 == 0.0 || E2 == 0 || ALPHA == 0.0) {
-	  std::cout << "Doppler fails between " << E1 << "  " << E2 << "  " << Y2 << "  " << ALPHA << "  " << awri << std::endl;
+	if (fE2 - fE1 == 0.0 || fE2 == 0 || fALPHA == 0.0) {
+	  std::cout << "Doppler fails between " << fE1 << "  " << fE2 << "  " << fY2 << "  " << fALPHA << "  " << fAWRI << std::endl;
 	  continue;
 	}
-	F0K1 = F0K2;
-	F1K1 = F1K2;
-	F2K1 = F2K2;
-	F3K1 = F3K2;
-	F4K1 = F4K2;
-	ZK2  = sqrt(E2 * ALPHA) - Y;
-	ZK22 = ZK2 * ZK2;
-	EXPA = exp(-ZK22);
-	F0K2 = erf(ZK2);
-	F1K2 = OVSQPI * (ONE - EXPA);
-	F2K2 = HALF * F0K2 - OVSQPI * ZK2 * EXPA;
-	F3K2 = OVSQPI * (ONE - (1 + ZK22) * EXPA);
-	F4K2 = HALF * THH * F0K2 - OVSQPI * ZK2 * (THH + ZK22) * EXPA;
-	FACT = ONE / (E2 - E1);
-	AK   = (E2 * S1 - E1 * S2) * FACT;
-	CK   = (S2 - S1) * FACT / ALPHA;
-	CKY  = CK * Y;
-	CKY2 = CK * Y2;
-	XSUM = XSUM + CK * (F4K2 - F4K1) + 4 * CKY * (F3K2 - F3K1) + (AK + 6 * CKY2) * (F2K2 - F2K1) +
-	      2 * Y * (AK + 2 * CKY2) * (F1K2 - F1K1) + Y2 * (AK + CKY2) * (F0K2 - F0K1);
+	fF0K1 = fF0K2;
+	fF1K1 = fF1K2;
+	fF2K1 = fF2K2;
+	fF3K1 = fF3K2;
+	fF4K1 = fF4K2;
+	fZK2  = sqrt(fE2 * fALPHA) - fY;
+	fZK22 = fZK2 * fZK2;
+	fEXPA = exp(-fZK22);
+	fF0K2 = erf(fZK2);
+	fF1K2 = fOVSQPI * (fONE - fEXPA);
+	fF2K2 = fHALF * fF0K2 - fOVSQPI * fZK2 * fEXPA;
+	fF3K2 = fOVSQPI * (fONE - (1 + fZK22) * fEXPA);
+	fF4K2 = fHALF * fTHH * fF0K2 - fOVSQPI * fZK2 * (fTHH + fZK22) * fEXPA;
+	fFACT = fONE / (fE2 - fE1);
+	fAK   = (fE2 * fS1 - fE1 * fS2) * fFACT;
+	fCK   = (fS2 - fS1) * fFACT / fALPHA;
+	fCKY  = fCK * fY;
+	fCKY2 = fCK * fY2;
+	fXSUM = fXSUM + fCK * (fF4K2 - fF4K1) + 4 * fCKY * (fF3K2 - fF3K1) + (fAK + 6 * fCKY2) * (fF2K2 - fF2K1) +
+	      2 * fY * (fAK + 2 * fCKY2) * (fF1K2 - fF1K1) + fY2 * (fAK + fCKY2) * (fF0K2 - fF0K1);
 	      
-	if (Y < ZLIMI) {
-	  ZK1P  = ZK2P;
-	  F0K1P = F0K2P;
-	  F1K1P = F1K2P;
-	  F2K1P = F2K2P;
-	  F3K1P = F3K2P;
-	  F4K1P = F4K2P;
-	  ZK2P  = ZK2 + 2 * Y;
-	  ZK22P = ZK2P * ZK2P;
-	  EXPAP = exp(-ZK22P);
-	  F0K2P = erf(ZK2P);
-	  F1K2P = OVSQPI * (ONE - EXPAP);
-	  F2K2P = HALF * F0K2P - OVSQPI * ZK2P * EXPAP;
-	  F3K2P = OVSQPI * (ONE - (1 + ZK22P) * EXPAP);
-	  F4K2P = HALF * THH * F0K2P - OVSQPI * ZK2P * (THH + ZK22P) * EXPAP;
-	  XSUM  = XSUM - (CK * (F4K2P - F4K1P) - 4 * CKY * (F3K2P - F3K1P) + (AK + 6 * CKY2) * (F2K2P - F2K1P) -
-			2 * Y * (AK + 2 * CKY2) * (F1K2P - F1K1P) + Y2 * (AK + CKY2) * (F0K2P - F0K1P));
+	if (fY < fZLIMI) {
+	  fZK1P  = fZK2P;
+	  fF0K1P = fF0K2P;
+	  fF1K1P = fF1K2P;
+	  fF2K1P = fF2K2P;
+	  fF3K1P = fF3K2P;
+	  fF4K1P = fF4K2P;
+	  fZK2P  = fZK2 + 2 * fY;
+	  fZK22P = fZK2P * fZK2P;
+	  fEXPAP = exp(-fZK22P);
+	  fF0K2P = erf(fZK2P);
+	  fF1K2P = fOVSQPI * (fONE - fEXPAP);
+	  fF2K2P = fHALF * fF0K2P - fOVSQPI * fZK2P * fEXPAP;
+	  fF3K2P = fOVSQPI * (fONE - (1 + fZK22P) * fEXPAP);
+	  fF4K2P = fHALF * fTHH * fF0K2P - fOVSQPI * fZK2P * (fTHH + fZK22P) * fEXPAP;
+	  fXSUM  = fXSUM - (fCK * (fF4K2P - fF4K1P) - 4 * fCKY * (fF3K2P - fF3K1P) + (fAK + 6 * fCKY2) * (fF2K2P - fF2K1P) -
+			2 * fY * (fAK + 2 * fCKY2) * (fF1K2P - fF1K1P) + fY2 * (fAK + fCKY2) * (fF0K2P - fF0K1P));
 	} // end of if
       }   // end of if
       // while loop
-      if (XSUM < 0) XSUM = 0 ;
-//      std::cout << HALF * XSUM / Y2 <<" xsum1 \t"<< xss  <<" FTAIL1 \t"<< 2*x2[0] <<" FTAIL2 \t"<< x2[ jloop ] <<std::endl;
-      FTAIL1 = xss * (FTAIL(sqrt(x1[0] * ALPHA), Y) - FTAIL(ZERO, Y));
-      XSUM   = XSUM + FTAIL1;
-      FTAIL2 = x2[x1.size() - 1] * (FTAIL(sqrt((x1[x1.size() -1] + 0.1 * x1[x1.size() -1])* ALPHA), Y) - FTAIL(sqrt(x1[x1.size() - 1] * ALPHA), Y));
-      XSUM   = XSUM + FTAIL2;
-      sigma.push_back(HALF * XSUM / Y2);
-//        std::cout << HALF * XSUM / Y2 <<" xsum2 \t"<< HALF * FTAIL1 / Y2 <<" FTAIL1 \t"<< HALF * FTAIL2 / Y2 <<" FTAIL2 \t"<< x2[ jloop ] <<std::endl;
-      if ( jloop > 0 && k < size - 1) {
-	mloop = 0 ;
-	recursionLinear1(x1, x2, x1[ jloop - 1 ], x2[ jloop - 1 ], sigma[ jloop - 1 ], x1[ jloop ], x2[ jloop ], sigma[ jloop ]);
-	jloop += mloop ;
+      if (fXSUM < 0) fXSUM = 0 ;
+//      std::cout << fHALF * fXSUM / fY2 <<" xsum1 \t"<< fXss  <<" fFTAIL1 \t"<< 2*x2[0] <<" fFTAIL2 \t"<< x2[ fJLoop ] <<std::endl;
+      fFTAIL1 = fXss * (FTAIL(sqrt(x1[0] * fALPHA), fY) - FTAIL(fZERO, fY));
+      fXSUM   = fXSUM + fFTAIL1;
+      fFTAIL2 = x2[x1.size() - 1] * (FTAIL(sqrt((x1[x1.size() -1] + 0.1 * x1[x1.size() -1])* fALPHA), fY) - FTAIL(sqrt(x1[x1.size() - 1] * fALPHA), fY));
+      fXSUM   = fXSUM + fFTAIL2;
+      fSigma.push_back(fHALF * fXSUM / fY2);
+//        std::cout << fHALF * fXSUM / fY2 <<" xsum2 \t"<< fHALF * fFTAIL1 / fY2 <<" fFTAIL1 \t"<< fHALF * fFTAIL2 / fY2 <<" fFTAIL2 \t"<< x2[ fJLoop ] <<std::endl;
+      if ( fJLoop > 0 && k < fSize - 1) {
+	fMLoop = 0 ;
+// 	std::cout <<" before RecursionLinear1 "<< x1[ fJLoop - 1 ] <<"  "<< x1[ fJLoop ] << std::endl;
+	RecursionLinear1(x1, x2, x1[ fJLoop - 1 ], x2[ fJLoop - 1 ], fSigma[ fJLoop - 1 ], x1[ fJLoop ], x2[ fJLoop ], fSigma[ fJLoop ]);
+	fJLoop += fMLoop ;
       }
-      jloop++ ;	
+      fJLoop++ ;	
     } // end of for loop
   }
 }
 
-double TNudyEndfDoppler::recursionLinear1(std::vector<double> &x1,
+double TNudyEndfDoppler::RecursionLinear1(std::vector<double> &x1,
 					  std::vector<double> &x2,
 					  double x,
 					  double y,
@@ -181,31 +175,37 @@ double TNudyEndfDoppler::recursionLinear1(std::vector<double> &x1,
 					  double xd,
 					  double yd,
 					  double sigd ) {
-#define XNEPSM(S) fabs(ONE - TW3 * sqrt(ONE / 3.0) * pow((ONE + S * (ONE + S)), THH) / (S * (ONE + S)))
-#define FTAILX(X, Y)                                                                                                \
-  OVSQPI *((1.0 + 2.0 * Y * Y) * sqrt(PI) * HALF * (erf(X - Y) - erf(X + Y)) - (X + Y) * exp(-(X - Y) * (X - Y)) + \
-           (X - Y) * exp(-(X + Y) * (X + Y)))
+#define XNEPSM(S) fabs(fONE - fTW3 * sqrt(fONE / 3.0) * pow((fONE + S * (fONE + S)), fTHH) / (S * (fONE + S)))
+#define FTAILX(X, fY)                                                                                                \
+  fOVSQPI *((1.0 + 2.0 * fY * fY) * sqrt(PI) * fHALF * (erf(X - fY) - erf(X + fY)) - (X + fY) * exp(-(X - fY) * (X - fY)) + \
+           (X - fY) * exp(-(X + fY) * (X + fY)))
    if ( y <= 0.0 && yd <= 0.0) return 0;
+   if (fMLoop > 500) return 0;
   double mid 		 = 0.5 * ( x + xd );
   double sigmid1         = y + (yd - y) * (mid - x) / (xd - x);
   double sigmid2         = sig + (sigd - sig) * (mid - x) / (xd - x);
+//   std::cout << sig <<"  "<< sigd <<"  "<< sigmid2 <<"  "<< fMLoop << std::endl;
+//   std::cout << x <<"  "<< xd <<"  "<< mid << std::endl;
+//   std::cout << y <<"  "<< yd <<"  "<< sigmid1 << std::endl;
+ 
   std::vector<double>::iterator itx;
   itx = std::find (x1.begin(), x1.end(), x);
   int xindex = itx - x1.begin() ;
   x1.insert(x1.begin() + xindex + 1, 1 , mid);
   x2.insert(x2.begin() + xindex + 1 , 1 , sigmid1);
-  double sigmid3 = broadMore ( x1, x2, mid ) ;
+  double sigmid3 = BroadMore ( x1, x2, mid ) ;
   double errmid = fabs(sigmid2 - sigmid3)/sigmid3 ;
-//  if ( errmid >= sigDiff ) {
-  if (fabs(sig/sigd -1) > 1E-2 || errmid >= sigDiff ) {
+//  if ( errmid >= fSigDiff ) {
+  if ( errmid >= fSigDiff ) {
+//  if (fabs(sig/sigd -1) > 1E-2 || errmid >= fSigDiff ) {
 //  if (m1 > 0 && m3 > 0 && mdiff > 1E-3  && mdiff != 1) {
-    sigma.insert (sigma.begin() + xindex + 1, 1 , sigmid3 );
-    mloop++ ;
-//      std::cout << x <<"  \t"<< xd <<"  \t"<< errmid <<"  \t"<<sigmid3<<"  \t"<<sigmid2 << std::endl;
-//      std::cout << sig <<"  \t"<< sigd <<"  \t"<< mid << std::endl;
-//      std::cout << x <<"  \t"<< y <<"  \t"<< xd <<"  \t"<< yd << std::endl;
-    recursionLinear1( x1, x2, x , y, sig, mid, sigmid1, sigmid3 ) ; 
-    recursionLinear1( x1, x2, mid, sigmid1, sigmid3, xd, yd, sigd ) ; 
+    fSigma.insert (fSigma.begin() + xindex + 1, 1 , sigmid3 );
+    fMLoop++ ;
+//       std::cout << x <<"  \t"<< xd <<" error \t"<< errmid <<"  \t"<<sigmid3<<"  \t"<<sigmid2 << std::endl;
+//       std::cout << sig <<"  \t"<< sigd <<"  \t"<< mid << std::endl;
+//       std::cout << x <<"  \t"<< y <<"  \t"<< xd <<"  \t"<< yd << std::endl;
+    RecursionLinear1( x1, x2, x , y, sig, mid, sigmid1, sigmid3 ) ; 
+    RecursionLinear1( x1, x2, mid, sigmid1, sigmid3, xd, yd, sigd ) ; 
     return 0;
   } else {
     x1.erase(x1.begin() + xindex + 1);
@@ -214,107 +214,107 @@ double TNudyEndfDoppler::recursionLinear1(std::vector<double> &x1,
   }  
   return 0;
 }
-double TNudyEndfDoppler::broadMore (std::vector<double> &x1 , 
+double TNudyEndfDoppler::BroadMore (std::vector<double> &x1 , 
 				    std::vector<double> &x2 ,
 				    double ixp ) {
   
-  IPP = mipp ;
-  KPP = IPP ;
-  ncrs  = x1.size() ;
-  Y2  = ixp * ALPHA ;
-  Y   = sqrt(Y2) ;
-  ZKT = sqrt(x1[IPP + 1] * ALPHA) - Y ;
-  while (ZKT > -ZLIMI) {
-    IPP -= 1;
-    ZKT = sqrt( x1 [ IPP - 1 ] * ALPHA ) - Y;
-    if(IPP <= 0)
+  fIPP = fMipp ;
+  fKPP = fIPP ;
+  fNcrs  = x1.size() ;
+  fY2  = ixp * fALPHA ;
+  fY   = sqrt(fY2) ;
+  fZKT = sqrt(x1[fIPP + 1] * fALPHA) - fY ;
+  while (fZKT > -fZLIMI) {
+    fIPP -= 1;
+    fZKT = sqrt( x1 [ fIPP - 1 ] * fALPHA ) - fY;
+    if(fIPP <= 0)
     {
-      IPP = 0;
+      fIPP = 0;
       break;
     }
   } // end of while loop
-  XSUM = 0.0;
-  FTAIL1 = 0.0;
-  KPP  = IPP;
-  E2   = x1 [ KPP ];
-  S2   = x2 [ KPP ];
-  ZK2  = sqrt(E2 * ALPHA) - Y;
-  ZK22 = ZK2 * ZK2;
-  EXPA = exp(-ZK22);
-  F0K2 = erf(ZK2);
-  F1K2 = OVSQPI * (ONE - EXPA);
-  F2K2 = HALF * F0K2 - OVSQPI * ZK2 * EXPA;
-  F3K2 = OVSQPI * (ONE - (1 + ZK22) * EXPA);
-  F4K2 = HALF * THH * F0K2 - OVSQPI * ZK2 * (THH + ZK22) * EXPA;
-  if (Y < ZLIMI) {
-    ZK2P  = ZK2 + 2 * Y;
-    ZK22P = ZK2P * ZK2P;
-    EXPAP = exp(-ZK22P);
-    F0K2P = erf(ZK2P);
-    F1K2P = OVSQPI * (ONE - EXPAP);
-    F2K2P = HALF * F0K2P - OVSQPI * ZK2P * EXPAP;
-    F3K2P = OVSQPI * (ONE - (1 + ZK22P) * EXPAP);
-    F4K2P = HALF * THH * F0K2P - OVSQPI * ZK2P * (THH + ZK22P) * EXPAP;
+  fXSUM = 0.0;
+  fFTAIL1 = 0.0;
+  fKPP  = fIPP;
+  fE2   = x1 [ fKPP ];
+  fS2   = x2 [ fKPP ];
+  fZK2  = sqrt(fE2 * fALPHA) - fY;
+  fZK22 = fZK2 * fZK2;
+  fEXPA = exp(-fZK22);
+  fF0K2 = erf(fZK2);
+  fF1K2 = fOVSQPI * (fONE - fEXPA);
+  fF2K2 = fHALF * fF0K2 - fOVSQPI * fZK2 * fEXPA;
+  fF3K2 = fOVSQPI * (fONE - (1 + fZK22) * fEXPA);
+  fF4K2 = fHALF * fTHH * fF0K2 - fOVSQPI * fZK2 * (fTHH + fZK22) * fEXPA;
+  if (fY < fZLIMI) {
+    fZK2P  = fZK2 + 2 * fY;
+    fZK22P = fZK2P * fZK2P;
+    fEXPAP = exp(-fZK22P);
+    fF0K2P = erf(fZK2P);
+    fF1K2P = fOVSQPI * (fONE - fEXPAP);
+    fF2K2P = fHALF * fF0K2P - fOVSQPI * fZK2P * fEXPAP;
+    fF3K2P = fOVSQPI * (fONE - (1 + fZK22P) * fEXPAP);
+    fF4K2P = fHALF * fTHH * fF0K2P - fOVSQPI * fZK2P * (fTHH + fZK22P) * fEXPAP;
   }
-  while (ZK2 < ZLIMI && KPP <  (int)x1.size() - 1) {
-    E1  = E2;
-    S1  = S2;
-    KPP = KPP + 1;
-    E2  = x1[KPP];
-    S2  = x2[KPP];
-    while ( E2 == E1 ) {
-      KPP = KPP + 1;
-      E2  = x1[KPP];
-      S2  = x2[KPP];
+  while (fZK2 < fZLIMI && fKPP <  (int)x1.size() - 1) {
+    fE1  = fE2;
+    fS1  = fS2;
+    fKPP = fKPP + 1;
+    fE2  = x1[fKPP];
+    fS2  = x2[fKPP];
+    while ( fE2 == fE1 ) {
+      fKPP = fKPP + 1;
+      fE2  = x1[fKPP];
+      fS2  = x2[fKPP];
     }
-    if (E2 - E1 == 0.0 || Y2 == 0.0 || ALPHA == 0.0) {
-      std::cout << "Doppler fails " << E1 << "  " << E2 << "  " << Y2 << "  " << ALPHA << "  " << awri << std::endl;
+    if (fE2 - fE1 == 0.0 || fY2 == 0.0 || fALPHA == 0.0) {
+      std::cout << "Doppler fails " << fE1 << "  " << fE2 << "  " << fY2 << "  " << fALPHA << "  " << fAWRI << std::endl;
       continue;
     }
-    F0K1 = F0K2;
-    F1K1 = F1K2;
-    F2K1 = F2K2;
-    F3K1 = F3K2;
-    F4K1 = F4K2;
-    ZK2  = sqrt(E2 * ALPHA) - Y;
-    ZK22 = ZK2 * ZK2;
-    EXPA = exp(-ZK22);
-    F0K2 = erf(ZK2);
-    F1K2 = OVSQPI * (ONE - EXPA);
-    F2K2 = HALF * F0K2 - OVSQPI * ZK2 * EXPA;
-    F3K2 = OVSQPI * (ONE - (1 + ZK22) * EXPA);
-    F4K2 = HALF * THH * F0K2 - OVSQPI * ZK2 * (THH + ZK22) * EXPA;
-    FACT = ONE / (E2 - E1);
-    AK   = (E2 * S1 - E1 * S2) * FACT;
-    CK   = (S2 - S1) * FACT / ALPHA;
-    CKY  = CK * Y;
-    CKY2 = CK * Y2;
-    XSUM = XSUM + CK * (F4K2 - F4K1) + 4 * CKY * (F3K2 - F3K1) + (AK + 6 * CKY2) * (F2K2 - F2K1) +
-	  2 * Y * (AK + 2 * CKY2) * (F1K2 - F1K1) + Y2 * (AK + CKY2) * (F0K2 - F0K1);
-    if (Y < ZLIMI) {
-      ZK1P  = ZK2P;
-      F0K1P = F0K2P;
-      F1K1P = F1K2P;
-      F2K1P = F2K2P;
-      F3K1P = F3K2P;
-      F4K1P = F4K2P;
-      ZK2P  = ZK2 + 2 * Y;
-      ZK22P = ZK2P * ZK2P;
-      EXPAP = exp(-ZK22P);
-      F0K2P = erf(ZK2P);
-      F1K2P = OVSQPI * (ONE - EXPAP);
-      F2K2P = HALF * F0K2P - OVSQPI * ZK2P * EXPAP;
-      F3K2P = OVSQPI * (ONE - (1 + ZK22P) * EXPAP);
-      F4K2P = HALF * THH * F0K2P - OVSQPI * ZK2P * (THH + ZK22P) * EXPAP;
-      XSUM  = XSUM - (CK * (F4K2P - F4K1P) - 4 * CKY * (F3K2P - F3K1P) + (AK + 6 * CKY2) * (F2K2P - F2K1P) -
-		    2 * Y * (AK + 2 * CKY2) * (F1K2P - F1K1P) + Y2 * (AK + CKY2) * (F0K2P - F0K1P));
+    fF0K1 = fF0K2;
+    fF1K1 = fF1K2;
+    fF2K1 = fF2K2;
+    fF3K1 = fF3K2;
+    fF4K1 = fF4K2;
+    fZK2  = sqrt(fE2 * fALPHA) - fY;
+    fZK22 = fZK2 * fZK2;
+    fEXPA = exp(-fZK22);
+    fF0K2 = erf(fZK2);
+    fF1K2 = fOVSQPI * (fONE - fEXPA);
+    fF2K2 = fHALF * fF0K2 - fOVSQPI * fZK2 * fEXPA;
+    fF3K2 = fOVSQPI * (fONE - (1 + fZK22) * fEXPA);
+    fF4K2 = fHALF * fTHH * fF0K2 - fOVSQPI * fZK2 * (fTHH + fZK22) * fEXPA;
+    fFACT = fONE / (fE2 - fE1);
+    fAK   = (fE2 * fS1 - fE1 * fS2) * fFACT;
+    fCK   = (fS2 - fS1) * fFACT / fALPHA;
+    fCKY  = fCK * fY;
+    fCKY2 = fCK * fY2;
+    fXSUM = fXSUM + fCK * (fF4K2 - fF4K1) + 4 * fCKY * (fF3K2 - fF3K1) + (fAK + 6 * fCKY2) * (fF2K2 - fF2K1) +
+	  2 * fY * (fAK + 2 * fCKY2) * (fF1K2 - fF1K1) + fY2 * (fAK + fCKY2) * (fF0K2 - fF0K1);
+    if (fY < fZLIMI) {
+      fZK1P  = fZK2P;
+      fF0K1P = fF0K2P;
+      fF1K1P = fF1K2P;
+      fF2K1P = fF2K2P;
+      fF3K1P = fF3K2P;
+      fF4K1P = fF4K2P;
+      fZK2P  = fZK2 + 2 * fY;
+      fZK22P = fZK2P * fZK2P;
+      fEXPAP = exp(-fZK22P);
+      fF0K2P = erf(fZK2P);
+      fF1K2P = fOVSQPI * (fONE - fEXPAP);
+      fF2K2P = fHALF * fF0K2P - fOVSQPI * fZK2P * fEXPAP;
+      fF3K2P = fOVSQPI * (fONE - (1 + fZK22P) * fEXPAP);
+      fF4K2P = fHALF * fTHH * fF0K2P - fOVSQPI * fZK2P * (fTHH + fZK22P) * fEXPAP;
+      fXSUM  = fXSUM - (fCK * (fF4K2P - fF4K1P) - 4 * fCKY * (fF3K2P - fF3K1P) + (fAK + 6 * fCKY2) * (fF2K2P - fF2K1P) -
+		    2 * fY * (fAK + 2 * fCKY2) * (fF1K2P - fF1K1P) + fY2 * (fAK + fCKY2) * (fF0K2P - fF0K1P));
     } // end of if
   }   // end of if
   // while loop
-  if (XSUM < 0) XSUM = 0 ;
-  FTAIL1 = xss * (FTAILX(sqrt(x1[0] * ALPHA), Y) - FTAILX(ZERO, Y));
-  XSUM   = XSUM + FTAIL1;
-  FTAIL2 = x2[x1.size() - 1] * (FTAILX(sqrt((x1[x1.size() -1] + 0.1 * x1[x1.size() -1])* ALPHA), Y) - FTAILX(sqrt(x1[x1.size() - 1] * ALPHA), Y));
-  XSUM   = XSUM + FTAIL2;
-  return HALF * XSUM / Y2;
+  if (fXSUM < 0) fXSUM = 0 ;
+  fFTAIL1 = fXss * (FTAILX(sqrt(x1[0] * fALPHA), fY) - FTAILX(fZERO, fY));
+  fXSUM   = fXSUM + fFTAIL1;
+  fFTAIL2 = x2[x1.size() - 1] * (FTAILX(sqrt((x1[x1.size() -1] + 0.1 * x1[x1.size() -1])* fALPHA), fY) - FTAILX(sqrt(x1[x1.size() - 1] * fALPHA), fY));
+  fXSUM   = fXSUM + fFTAIL2;
+  return fHALF * fXSUM / fY2;
 }

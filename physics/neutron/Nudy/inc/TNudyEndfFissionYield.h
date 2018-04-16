@@ -1,3 +1,12 @@
+//===-- Nudy/TNudyEndfFissionYield.h - Instruction class definition -------*- C++ -*-===//
+//
+//                     The Project Nudy
+//===----------------------------------------------------------------------===//
+///
+/// \class TNudyEndfFissionYield
+/// \author H. Kumawat
+/// \date July 2016
+//===----------------------------------------------------------------------===//
 #ifndef TNudyEndfFissionYield_H
 #define TNudyEndfFissionYield_H
 
@@ -19,15 +28,20 @@ class TNudyEndfFissionYield : public NudyPhysics::TNudyEndfRecoPoint {
 
 public:
   TNudyEndfFissionYield();
+  /// \brief Default constructure
   TNudyEndfFissionYield(Nudy::TNudyEndfFile *file);
+  /// \brief constructure to be called in recopoint
   virtual double GetFisYield(int elemid, double energyK);
+  /// \brief getting fission yield for the element and neutron energy
   virtual ~TNudyEndfFissionYield();
 
 private:
-  double A, AWR, ABN, QX;                                      // standard ENDF parameters
-  rowd ein, einc;                                              // incident energy
-  matrixd2 zafp, fps, zafpc, fpsc, yi, cyi, dyi, yc, dyc;      // charge, mass, yield (independent and cummulative)
-  rowd zafp1, fps1, zafpc1, fpsc1, yi1, cyi1, dyi1, yc1, dyc1; // charge, mass, yield (independent and cummulative)
+  rowd fEin, fEinc;                                              
+  /// \brief incident energy
+  matrixd2 fZafp, fFps, fZafpc, fFpsc, fYi, fCyi, fDyi, fYc, fDyc;      
+  /// \brief charge, mass, yield (independent and cummulative and error)
+  rowd fZafp1, fFps1, fZafpc1, fFpsc1, fYi1, fCyi1, fDyi1, fYc1, fDyc1; 
+  /// \brief charge, mass, yield (independent and cummulative)
 #ifdef USE_ROOT
   TRandom3 *fRnd;
 #endif
