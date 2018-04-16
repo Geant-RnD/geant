@@ -43,7 +43,7 @@ public:
 
   void SampleSecondariesVector(LightTrack_v &tracks, geant::TaskData *td) override;
 
-  virtual bool IsModelUsable(const MaterialCuts *, double ekin)
+  virtual bool IsModelUsable(const MaterialCuts *, double ekin) override
   {
     return ekin < GetHighEnergyUsageLimit() && ekin > GetLowEnergyUsageLimit();
   };
