@@ -85,3 +85,12 @@ target_link_libraries(PhysVecRelativisticBremsValid Geant_v RealPhysics)
 
 add_executable(PhysVecRelativisticBremsBench RelativisticBrems/RelativisticBremsBench.cxx RelativisticBrems/RelativisticBremsTestCommon.h ${COMMON_HEADERS})
 target_link_libraries(PhysVecRelativisticBremsBench Geant_v RealPhysics benchmark pthread)
+
+add_executable(PhysVecSauterGavrilaAliasBench SauterGavrila/SauterGavrilaAliasBench.cxx SauterGavrila/SauterGavrilaTestCommon.h ${COMMON_HEADERS})
+target_link_libraries(PhysVecSauterGavrilaAliasBench Geant_v RealPhysics benchmark pthread)
+
+add_executable(PhysVecSauterGavrilaAliasValid SauterGavrila/SauterGavrilaAliasValid.cxx SauterGavrila/SauterGavrilaTestCommon.h ${COMMON_HEADERS})
+target_link_libraries(PhysVecSauterGavrilaAliasValid Geant_v RealPhysics)
+
+
+
