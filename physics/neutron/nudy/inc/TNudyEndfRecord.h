@@ -15,5 +15,5 @@ private:
   ClassDef(TNudyEndfRecord, 1)
 };
 
-} // namespace
+} // namespace 
 #endif

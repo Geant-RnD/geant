@@ -1,6 +1,7 @@
 #ifndef ROOT_TNudyTypes
 #define ROOT_TNudyTypes
 
+
 namespace Nudy {
 enum Reaction_t {
   kNoReaction    = 0,

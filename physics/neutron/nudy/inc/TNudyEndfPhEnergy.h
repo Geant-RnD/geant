@@ -22,6 +22,7 @@ typedef std::vector<std::vector<rowd>> matrixd3;
 class TRandom3;
 #endif
 
+
 namespace NudyPhysics {
 class TNudyEndfPhEnergy : public NudyPhysics::TNudyEndfRecoPoint {
 
@@ -41,7 +42,7 @@ private:
 
   double A, AWR, ABN, QX;     // standard ENDF parameters
   int NR, NP;                 // standard ENDF parameters for range and interpolation
-  double QValue[999];         // ENDF parameter and Q values from file 3
+  double fQValue[999];         // ENDF parameter and Q values from file 3
   double sigDiff;             // precision for cross-section reconstruction
   std::vector<int> MtNumbers; // MT numbers temporary
   rowd fE1, fP1, fE2, fP2, fE3, fP3, INorm;
@@ -63,5 +64,5 @@ private:
   ClassDef(TNudyEndfPhEnergy, 1) // class for an ENDF energy reconstruction
 };
 
-} // namespace
+} // namespace 
 #endif

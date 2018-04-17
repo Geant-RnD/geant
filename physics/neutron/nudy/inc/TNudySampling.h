@@ -15,6 +15,7 @@ class TNudyEndfRecoPoint;
 }
 #endif
 
+
 namespace NudyPhysics {
 class TNudySampling {
 
@@ -59,5 +60,5 @@ private:
 #endif
 };
 
-} // namespace
+} // namespace 
 #endif

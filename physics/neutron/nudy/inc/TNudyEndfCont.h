@@ -59,5 +59,6 @@ protected:
   ClassDef(TNudyEndfCont, 1)
 };
 
-} // namespace
+
+} // namespace 
 #endif

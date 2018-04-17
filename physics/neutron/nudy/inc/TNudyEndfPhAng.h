@@ -3,12 +3,13 @@
 
 #include "TNudyEndfRecoPoint.h"
 
+
 namespace Nudy {
-class TNudyEndfFile;
+	class TNudyEndfFile;
 }
 
 namespace NudyPhysics {
-class TNudyEndfRecoPoint;
+	class TNudyEndfRecoPoint;
 }
 
 typedef std::vector<double> rowd;
@@ -44,12 +45,10 @@ private:
   rowd ein, cos4, cdf, pdf, lCoef1;
   matrixd2 cos2d, pdf2d, cdf2d, lCoef, ein2d;
   matrixd3 cos3d, pdf3d, cdf3d;
-  rowd cosFile4;
-  rowd cosPdfFile4;
-  rowd cosCdfFile4;
+  rowd fCosFile4, fCosPdfFile4, fCosCdfFile4;
   rowint nbt1, int1;
   rowint MtNumbers; // MT numbers
-  rowint MtLct;     // LCT numbers
+  rowint fMtLct;     // LCT numbers
   int nr, np;       // standard ENDF parameters
 #ifdef USE_ROOT
   TRandom3 *fRnd;
@@ -59,5 +58,5 @@ private:
 #endif
 };
 
-} // namespace
+} // namespace 
 #endif

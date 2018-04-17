@@ -21,6 +21,7 @@ class TBox;
 #include "TPaveText.h"
 #include "TColor.h"
 
+
 namespace Nudy {
 class TNudyElementRN : public TObject {
 
@@ -57,5 +58,5 @@ public:
 #endif
 };
 
-} // namespace
+} // namespace 
 #endif
