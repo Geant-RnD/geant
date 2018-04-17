@@ -146,15 +146,11 @@ public:
    *                          the seconadry tracks generated in the interaction.
    * @return                  Number of secondary tracks generated in the interaction.
    */
+    
   virtual int SampleSecondaries(LightTrack & /*track*/, geant::TaskData * /*td*/) { return 0; }
 
   virtual void SampleSecondariesVector(LightTrack_v &tracks, geant::TaskData *td);
 
-  /**
-  * @brief Method to SampleShells in p.e. Added only for testing purposes */
-  virtual void SampleShell(Real /*kinE_v*/, size_t &/*zed*/, Real &/*rand_v*/, size_t  &/*sampledShells_v*/){std::cout<<"EMMODEL::SampleShell\n"; exit(-1);}
-  virtual void SampleShellAlias(Real /*kinE_v*/, size_t &/*zed*/, Real &/*r1*/, Real &/*r2*/,size_t  &/*sampledShells_v*/){std::cout<<"EMMODEL::SampleShellAlias\n"; exit(-1);}
-  virtual void SampleShellAliasVec(const double* /*ekin_v*/, const double * /*zed*/, const double */*r1*/, const double */*r2*/, int */*sampledShells*/, int /*nTracks*/){std::cout<<"EMMODEL::SampleShellAliasVec\n";exit(-1);}
   /**
    * @brief Method to obtain minim primary particle kinetic energy at which the discrete part (if any) of the
    * interaction
