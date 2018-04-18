@@ -4,23 +4,25 @@
 set(NUDYSRC "${CMAKE_SOURCE_DIR}/physics/neutron/nudy")
 
 file(GLOB sources ${NUDYSRC}/src/*.cxx)
-file(GLOB headers ${NUDYSRC}/inc/*.h)
+file(GLOB headers ${NUDYSRC}/inc/Geant/*.h)
 
-include_directories(
- ${NUDYSRC}/inc
-)
+include_directories( ${NUDYSRC}/inc)
 
-ROOT_GENERATE_DICTIONARY(NudyDict ${headers} MODULE Nudy LINKDEF ${NUDYSRC}/LinkDef.h)
+if(USE_ROOT)
+ ROOT_GENERATE_DICTIONARY(NudyDict ${headers} MODULE Nudy LINKDEF ${NUDYSRC}/LinkDef.h)
+ set(sources ${sources} NudyDict.cxx)
+endif()
 
 #----------------------------------------------------------------------------------------------
 # Add the executable
 #
-add_library(Nudy SHARED ${sources} NudyDict.cxx)
+add_library(Nudy SHARED ${sources} )
 target_link_libraries(Nudy -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${ROOT_LIBRARIES} MathMore ${VC_LIBRARIES})
 
 #----------------------------------------------------------------------------------------------
 # Install the files
 #
+install(FILES ${headers} DESTINATION inc/Geant)
 if(APPLE) 
 # for some reason the installation process alters the libraries on Mac, and the program fails
   install(FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libNudy${CMAKE_SHARED_LIBRARY_SUFFIX} DESTINATION lib)

@@ -4,7 +4,7 @@
  * @brief This interface links to the GV through NUDYCrossSection of realphysics/physics/HAD/CrossSection
  **********************************************/
 #include <iostream>
-#include "TNudyInterface.h"
+#include "Geant/TNudyInterface.h"
 
 using namespace geantphysics;
 using namespace Nudy;

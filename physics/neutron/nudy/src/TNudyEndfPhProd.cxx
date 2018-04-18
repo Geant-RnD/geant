@@ -4,11 +4,11 @@
 // 	date of creation: March 24, 2016
 
 #include "TList.h"
-#include "TNudyEndfFile.h"
-#include "TNudyEndfList.h"
-#include "TNudyEndfTab1.h"
-#include "TNudyCore.h"
-#include "TNudyEndfPhProd.h"
+#include "Geant/TNudyEndfFile.h"
+#include "Geant/TNudyEndfList.h"
+#include "Geant/TNudyEndfTab1.h"
+#include "Geant/TNudyCore.h"
+#include "Geant/TNudyEndfPhProd.h"
 using namespace Nudy;
 using namespace NudyPhysics;
 

@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include "TList.h"
-#include <TNudyEndfTape.h>
-#include "TNudyEndfMat.h"
+#include "Geant/TNudyEndfTape.h"
+#include "Geant/TNudyEndfMat.h"
 
 using namespace Nudy;
 

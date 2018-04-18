@@ -1,6 +1,6 @@
 #include <math.h>
 #include <iostream>
-#include "TNudyEndfDoppler.h"
+#include "Geant/TNudyEndfDoppler.h"
 #include <iomanip>
 #include <algorithm>
 

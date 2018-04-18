@@ -11,8 +11,8 @@
 
 */
 
-#include <TNudyEndfSec.h>
-#include "TNudyEndfCont.h"
+#include "Geant/TNudyEndfSec.h"
+#include "Geant/TNudyEndfCont.h"
 
 using namespace Nudy;
 

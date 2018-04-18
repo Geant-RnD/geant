@@ -3,13 +3,9 @@ file (GLOB sources
  ${NUDYSRC}/standalone/NudyMain.cc
 )
 
-file (GLOB headers 
- ${NUDYSRC}/inc/*.h
-)
+file (GLOB headers ${NUDYSRC}/inc/Geant/*.h)
 
-include_directories(
- ${NUDYSRC}/inc
-)
+include_directories( ${NUDYSRC}/inc)
 
 #---------------------------------
 #  Executable

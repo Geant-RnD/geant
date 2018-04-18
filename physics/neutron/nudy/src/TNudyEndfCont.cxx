@@ -12,7 +12,7 @@
 */
 
 
-#include <TNudyEndfCont.h>
+#include "Geant/TNudyEndfCont.h"
 
 using namespace Nudy;
 

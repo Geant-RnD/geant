@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "TNudyInterface.h"
+#include "Geant/TNudyInterface.h"
 
 using namespace Nudy;
 using NudyPhysics::TNudyInterface;

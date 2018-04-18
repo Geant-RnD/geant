@@ -5,11 +5,11 @@
 // 	date of creation: March 24, 2016
 
 #include "TList.h"
-#include "TNudyEndfFile.h"
-#include "TNudyEndfTab1.h"
-#include "TNudyEndfTab2.h"
-#include "TNudyCore.h"
-#include "TNudyEndfPhEnergy.h"
+#include "Geant/TNudyEndfFile.h"
+#include "Geant/TNudyEndfTab1.h"
+#include "Geant/TNudyEndfTab2.h"
+#include "Geant/TNudyCore.h"
+#include "Geant/TNudyEndfPhEnergy.h"
 #include "Math/SpecFuncMathMore.h"
 #include "TMath.h"
 using namespace Nudy;
@@ -34,7 +34,7 @@ TNudyEndfPhEnergy::TNudyEndfPhEnergy(TNudyEndfFile *file)
     for (int k = 0; k < sec->GetN1(); k++) {
       TNudyEndfTab1 *tab1 = (TNudyEndfTab1 *)recIter.Next();
       int MT              = sec->GetMT();
-      int NC              = sec->GetN1();
+      // int NC              = sec->GetN1();
       MtNumbers.push_back(MT);
       int LF = tab1->GetL2();
       //std::cout << " LF = " << LF << " MT " << MT << "  NC " << NC << std::endl;

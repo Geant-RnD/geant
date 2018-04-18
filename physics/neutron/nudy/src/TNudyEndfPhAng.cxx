@@ -5,15 +5,15 @@
 // 	date of creation: March 24, 2016
 
 #include "TList.h"
-#include "TNudyEndfFile.h"
-#include "TNudyEndfCont.h"
-#include "TNudyEndfTab1.h"
-#include "TNudyEndfTab2.h"
-#include "TNudyEndfList.h"
-#include "TNudyCore.h"
-#include "TNudyEndfMat.h"
+#include "Geant/TNudyEndfFile.h"
+#include "Geant/TNudyEndfCont.h"
+#include "Geant/TNudyEndfTab1.h"
+#include "Geant/TNudyEndfTab2.h"
+#include "Geant/TNudyEndfList.h"
+#include "Geant/TNudyCore.h"
+#include "Geant/TNudyEndfMat.h"
 #include "Math/SpecFuncMathMore.h"
-#include "TNudyEndfPhAng.h"
+#include "Geant/TNudyEndfPhAng.h"
 
 
 using namespace Nudy;
@@ -40,7 +40,7 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
     MtNumbers.push_back(MT);
     int LTT 		 = sec->GetL2();
     int LI  		 = sec->GetL1();
-    int NK  		 = sec->GetN1();
+    // int NK  		 = sec->GetN1();
    //printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {

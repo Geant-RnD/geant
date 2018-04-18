@@ -11,7 +11,7 @@
 
 */
 
-#include <TNudyEndfFile.h>
+#include "Geant/TNudyEndfFile.h"
 
 using namespace Nudy;
 

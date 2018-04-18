@@ -8,14 +8,14 @@
 #include <string>
 #include <iostream>
 
-#include "TNudyENDF.h"
-#include "TNudyEndfTape.h"
-#include "TNudyEndfMat.h"
-#include "TNudyEndfCont.h"
-#include "TNudyEndfList.h"
-#include "TNudyEndfTab1.h"
-#include "TNudyEndfTab2.h"
-#include "TNudyEndfINTG.h"
+#include "Geant/TNudyENDF.h"
+#include "Geant/TNudyEndfTape.h"
+#include "Geant/TNudyEndfMat.h"
+#include "Geant/TNudyEndfCont.h"
+#include "Geant/TNudyEndfList.h"
+#include "Geant/TNudyEndfTab1.h"
+#include "Geant/TNudyEndfTab2.h"
+#include "Geant/TNudyEndfINTG.h"
 
 #include "TFile.h"
 #include "TError.h"
@@ -61,8 +61,10 @@ TNudyENDF::TNudyENDF(const char *nFileENDF, const char *nFileRENDF, const char *
   if (!fRENDF) ::Fatal("ctor", "Could not open output file %s", nFileRENDF);
   // std::cout<<"Open input stream 2 "<< nFileENDF <<"   "<< nFileRENDF << std::endl;
 
+/*
   // this is checking the first line for the ENDF data file\
   // so that version 6 and version 7 first line issue gets resolved
+*/
   fENDF.getline(fLine, LINLEN);
   char firstCharFirstLine = fLine[1];
   isDollar = (firstCharFirstLine == '$') ? true : false;

@@ -1,5 +1,5 @@
 #include "Rtypes.h"
-#include "TNudyEndfRecord.h"
+#include "Geant/TNudyEndfRecord.h"
 
 using namespace Nudy;
 
