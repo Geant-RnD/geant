@@ -3,8 +3,8 @@
 //                     The Project Nudy
 //===----------------------------------------------------------------------===//
 ///
-/// \brief The class reads doppler broadened cross-sections from the root file 
-///  and gives all the corss-sections/ secondary parameters forthe outgoing particles 
+/// \brief The class reads doppler broadened cross-sections from the root file
+///  and gives all the corss-sections/ secondary parameters forthe outgoing particles
 /// \class TNudyEndfDoppler
 /// \author H. Kumawat
 /// \date March 2016
@@ -21,8 +21,7 @@ class TNudyEndfDoppler : public TNudyEndfSigma {
 public:
   TNudyEndfDoppler();
   /// \brief Default constructure
-  TNudyEndfDoppler(double isigDiff, double aw, double t1, double t2, std::vector<double> &x1, 
-                   std::vector<double> &x2);
+  TNudyEndfDoppler(double isigDiff, double aw, double t1, double t2, std::vector<double> &x1, std::vector<double> &x2);
   /// \brief constructor to be called for in TNudyEndfSigma class
   virtual ~TNudyEndfDoppler() {}
   std::vector<double> fSigma;
@@ -30,7 +29,7 @@ public:
 private:
   double fOVSQPI = 0.564189583547756279;
   /// \brief constant from Cullen's description of the doppler broadening with continuous cross-sections
-  double fBoltz  = 8.617385E-05;
+  double fBoltz = 8.617385E-05;
   /// \brief boltzman constant
   double fONE = 1.0, fTWO = 2.0, fTHH = 3.0 / fTWO, fTW3 = fTWO / 3.0, fZERO = 0.0, fHALF = fONE / fTWO;
   /// \brief numerical constants
@@ -68,19 +67,19 @@ private:
   /// \brief temp. variable
   double fY;
   /// \brief temp. variable
-  double fXSUM, fSigDiff,fXss;
+  double fXSUM, fSigDiff, fXss;
   /// \brief temp. variables
   int fNcrs, fIPP, fKPP, fSize, fMipp, fJLoop, fMLoop;
-  /// \brief temp. variables  
-  double RecursionLinear1(std::vector<double> &x1, std::vector<double> &x2, double x,  double y,  double sig,  
-                          double xd,  double yd, double sigd);
+  /// \brief temp. variables
+  double RecursionLinear1(std::vector<double> &x1, std::vector<double> &x2, double x, double y, double sig, double xd,
+                          double yd, double sigd);
   /// \brief recursive linear function to linearize far from peak region
-  double BroadMore(std::vector<double> &x1 , std::vector<double> &x2 , double xp) ;
-  /// \brief Broadening far from peak region
+  double BroadMore(std::vector<double> &x1, std::vector<double> &x2, double xp);
+/// \brief Broadening far from peak region
 #ifdef USE_ROOT
   ClassDef(TNudyEndfDoppler, 1)
 #endif
 };
 
-} // namespace 
+} // namespace
 #endif

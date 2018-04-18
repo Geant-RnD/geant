@@ -48,13 +48,13 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
       double NA1 = AA - ZA;
       int ZAP    = tab1->GetC1();
       double AWP = tab1->GetC2();
-      //std::cout<<"ZAP = \t"<< ZAP <<" MT "<< MT <<  std::endl;
+      // std::cout<<"ZAP = \t"<< ZAP <<" MT "<< MT <<  std::endl;
       // int LIP =tab1->GetL1();
       int LAW = tab1->GetL2();
       if (LAW == 3 || LAW == 4 || LAW == 0) continue;
       fLaw.push_back(LAW);
-      fNR            = tab1->GetN1();
-      fNP            = tab1->GetN2();
+      fNR           = tab1->GetN1();
+      fNP           = tab1->GetN2();
       divr          = div(ZAP, 1000);
       int particleA = divr.rem;
       int particleZ = divr.quot;
@@ -62,14 +62,14 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
       fAd.push_back(particleA);
       fMtNumbers6.push_back(MT);
       if (particleZ == 0 && particleA == 1) {
-	fMtNumNeutron.push_back (MT) ;
+        fMtNumNeutron.push_back(MT);
       } else if (particleZ == 0 && particleA == 0) {
-	fMtNumPhoton.push_back (MT) ;
+        fMtNumPhoton.push_back(MT);
       } else if (particleZ != 0 && particleA >= 1) {
-	fMtNumCharge.push_back (MT) ;
+        fMtNumCharge.push_back(MT);
       }
-    //  std::cout<<"LAW = "<< LAW <<" MT "<<MT <<" fNP "<< fNP <<" ZAP = "<< ZAP <<" AWP "<<AWP <<" parZ "<< particleZ
-    //   <<" parA "<< particleA << std::endl;
+      //  std::cout<<"LAW = "<< LAW <<" MT "<<MT <<" fNP "<< fNP <<" ZAP = "<< ZAP <<" AWP "<<AWP <<" parZ "<< particleZ
+      //   <<" parA "<< particleA << std::endl;
       if (LAW == 2) {
         fMtNumbers4.push_back(MT);
         int LANG, NL;
@@ -78,16 +78,16 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
           fInt1.push_back(tab1->GetINT(cr));
         }
         TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
-        fNp2                 = tab2->GetN2();
+        fNp2                = tab2->GetN2();
         // std::cout<<"LANG "<< LANG <<" LEP "<< LEP <<" fNE2 "<< fNE2 << std::endl;
         for (int lis = 0; lis < fNp2; lis++) {
           TNudyEndfList *header = (TNudyEndfList *)recIter.Next();
           fEin.push_back(header->GetC2());
           LANG = header->GetL1();
           // NW   = header->GetN1();
-          NL = header->GetN2();
+          NL  = header->GetN2();
           fNP = NL;
-           //std::cout<<"energy " <<fEin[lis] <<" LANG "<< LANG << std::endl;
+          // std::cout<<"energy " <<fEin[lis] <<" LANG "<< LANG << std::endl;
           if (LANG == 0) {
             // std::cout<<"energy "<< fEin[lis] << std::endl;
             for (int j = 0; j < NL; j++) {
@@ -101,14 +101,14 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               fme      = 0.5;
               double x = -1. + k1 * 0.02;
               for (unsigned long j = 0; j < fLegendCoef[lis].size(); j++) {
-                double leg = ROOT::Math::legendre(j+1, x);
+                double leg = ROOT::Math::legendre(j + 1, x);
                 fme += 0.5 * (2. * (j + 1) + 1.) * fLegendCoef[lis][j] * leg;
               }
-             if (fme > 0.0) {
-		fCosFile4.push_back(x);
-		fCosPdfFile4.push_back(fme);
-	     }
-	      //std::cout << x << "   "<< fme << std::endl;
+              if (fme > 0.0) {
+                fCosFile4.push_back(x);
+                fCosPdfFile4.push_back(fme);
+              }
+              // std::cout << x << "   "<< fme << std::endl;
               k1++;
             } while (k1 < 101);
 
@@ -121,7 +121,7 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               fCosc.push_back(fCosFile4[i]);
               fPdfc.push_back(fCosPdfFile4[i]);
               fCdfc.push_back(fCosCdfFile4[i]);
-               //std::cout << fCosFile4[i] << "  "<< fCosPdfFile4[i] <<"  "<< fCosCdfFile4[i] << std::endl;
+              // std::cout << fCosFile4[i] << "  "<< fCosPdfFile4[i] <<"  "<< fCosCdfFile4[i] << std::endl;
             }
             fCos2dc.push_back(fCosc);
             fPdf2dc.push_back(fPdfc);
@@ -203,7 +203,7 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
           // ND   = header->GetL1();
           NA  = header->GetL2();
           NEP = header->GetN2();
-           //std::cout <<"fEin  "<<header->GetC2() <<" NA "<< NA <<" lang "<< LANG << std::endl;
+          // std::cout <<"fEin  "<<header->GetC2() <<" NA "<< NA <<" lang "<< LANG << std::endl;
           if (LANG == 2 && NA < 2) {
             for (int lis1 = 0; lis1 < NEP; lis1++) {
               fEdes6.push_back(header->GetLIST(lis1 * 3 + 0));
@@ -257,13 +257,14 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               //}
               double fsum = 0.0;
               for (unsigned int cr = 1; cr < fEnergyFile5.size(); cr++) {
-                fsum += 0.5 * (fEnergyPdfFile5[cr] + fEnergyPdfFile5[cr - 1]) * (fEnergyFile5[cr] - fEnergyFile5[cr - 1]);
+                fsum +=
+                    0.5 * (fEnergyPdfFile5[cr] + fEnergyPdfFile5[cr - 1]) * (fEnergyFile5[cr] - fEnergyFile5[cr - 1]);
               }
               // if(fsum > 1E-20){
               sumein += fsum;
               fCosIn.push_back(x);
               fCosInPdf.push_back(fsum);
-               //std::cout<<"fsum "<< fsum <<" sumprob "<< sumprob << std::endl;
+              // std::cout<<"fsum "<< fsum <<" sumprob "<< sumprob << std::endl;
               TNudyCore::Instance()->Sort(fEnergyFile5, fEnergyPdfFile5);
               TNudyCore::Instance()->ThinningDuplicate(fEnergyFile5, fEnergyPdfFile5);
               TNudyCore::Instance()->cdfGenerateT(fEnergyFile5, fEnergyPdfFile5, fEnergyCdfFile5);
@@ -271,7 +272,8 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
                 fEoute.push_back(fEnergyFile5[i]);
                 fPdfe.push_back(fEnergyPdfFile5[i]);
                 fCdfe.push_back(fEnergyCdfFile5[i]);
-                //std::cout <<"energy pdf "<< fEnergyFile5[i] << "  "<< fEnergyPdfFile5[i] <<"  "<< fEnergyCdfFile5[i] << std::endl;
+                // std::cout <<"energy pdf "<< fEnergyFile5[i] << "  "<< fEnergyPdfFile5[i] <<"  "<< fEnergyCdfFile5[i]
+                // << std::endl;
               }
               fEout2de.push_back(fEoute);
               fPdf2de.push_back(fPdfe);
@@ -286,9 +288,9 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               k1++;
             } while (k1 < 101);
             TNudyCore::Instance()->cdfGenerateT(fCosIn, fCosInPdf, fCosInCdf);
-             //std::cout<<"cos size "<<  fCosIn.size() <<std::endl;
-             for(unsigned long i = 0; i < fCosIn.size(); i++){
-             //std::cout << " cospdf "<< fCosIn[i] <<"  "<< fCosInPdf[i] <<"  "<< fCosInCdf[i] << std::endl;
+            // std::cout<<"cos size "<<  fCosIn.size() <<std::endl;
+            for (unsigned long i = 0; i < fCosIn.size(); i++) {
+              // std::cout << " cospdf "<< fCosIn[i] <<"  "<< fCosInPdf[i] <<"  "<< fCosInCdf[i] << std::endl;
             }
             // if(sumein > 1E-50){
             fCos2d.push_back(fCosIn);
@@ -316,7 +318,8 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               fF06.push_back(header->GetLIST(lis1 * 4 + 1));
               fR6.push_back(header->GetLIST(lis1 * 4 + 2));
               fA6.push_back(header->GetLIST(lis1 * 4 + 3));
-              //	  std::cout<<lis1<<"  "<<fEdes6[lis1]<<"  "<<fF06[lis1] <<"  "<<fR6[lis1]<<"  "<<fA6[lis1]<< std::endl;
+              //	  std::cout<<lis1<<"  "<<fEdes6[lis1]<<"  "<<fF06[lis1] <<"  "<<fR6[lis1]<<"  "<<fA6[lis1]<<
+              // std::endl;
             }
             fEdes6.clear();
             fF06.clear();
@@ -340,20 +343,22 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               for (unsigned long m = 0; m < fEdes6.size(); m++) {
                 fme = 0.5;
                 for (unsigned long j = 0; j < fLegendCoef[m].size(); j++) {
-                  double leg = ROOT::Math::legendre(j+1, x);
-                  fme += 0.5 * (2. * (j+1) + 1.) * fLegendCoef[m][j] * leg;
-                  // std::cout << x <<"  "<< leg<<" leg "<<fLegendCoef[m][j] <<"  "<<fLegendCoef[m].size() <<"  "<< fme << std::endl;
+                  double leg = ROOT::Math::legendre(j + 1, x);
+                  fme += 0.5 * (2. * (j + 1) + 1.) * fLegendCoef[m][j] * leg;
+                  // std::cout << x <<"  "<< leg<<" leg "<<fLegendCoef[m][j] <<"  "<<fLegendCoef[m].size() <<"  "<< fme
+                  // << std::endl;
                 }
-                 if(fme > 1E-15){
-                fEnergyFile5.push_back(fEdes6[m]);
-                fEnergyPdfFile5.push_back(fme);
-                sumprob += fme;
-                // std::cout<<"eout "<< fEdes6[m] <<"  "<< fme << std::endl;
+                if (fme > 1E-15) {
+                  fEnergyFile5.push_back(fEdes6[m]);
+                  fEnergyPdfFile5.push_back(fme);
+                  sumprob += fme;
+                  // std::cout<<"eout "<< fEdes6[m] <<"  "<< fme << std::endl;
                 }
               }
               double fsum = 0.0;
               for (unsigned int cr = 1; cr < fEnergyFile5.size(); cr++) {
-                fsum += 0.5 * (fEnergyPdfFile5[cr] + fEnergyPdfFile5[cr - 1]) * (fEnergyFile5[cr] - fEnergyFile5[cr - 1]);
+                fsum +=
+                    0.5 * (fEnergyPdfFile5[cr] + fEnergyPdfFile5[cr - 1]) * (fEnergyFile5[cr] - fEnergyFile5[cr - 1]);
               }
               // if(fsum > 1E-20){
               sumein += fsum;
@@ -383,8 +388,8 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
             } while (k1 < 201);
             // if(sumein > 1E-50){
             TNudyCore::Instance()->cdfGenerateT(fCosIn, fCosInPdf, fCosInCdf);
-             for(unsigned long i = 0; i < fCosIn.size(); i++){
-             // std::cout << fCosIn[i] << " cospdf "<< fCosInPdf[i] <<"  "<< fCosInCdf[i] << std::endl;
+            for (unsigned long i = 0; i < fCosIn.size(); i++) {
+              // std::cout << fCosIn[i] << " cospdf "<< fCosInPdf[i] <<"  "<< fCosInCdf[i] << std::endl;
             }
             fCos2d.push_back(fCosIn);
             fCosinpdf2d.push_back(fCosInPdf);
@@ -432,19 +437,19 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
           fNbt1.push_back(tab1->GetNBT(cr));
           fInt1.push_back(tab1->GetINT(cr));
         }
-        TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
-        fNp2                 = tab2->GetN2();
-	TNudyEndfList *header = (TNudyEndfList *)recIter.Next();
-	fEin.push_back(header->GetC2());
-	LANG = header->GetL1();
-        //std::cout<<"LANG "<< LANG << std::endl;
+        TNudyEndfTab2 *tab2   = (TNudyEndfTab2 *)recIter.Next();
+        fNp2                  = tab2->GetN2();
+        TNudyEndfList *header = (TNudyEndfList *)recIter.Next();
+        fEin.push_back(header->GetC2());
+        LANG = header->GetL1();
+        // std::cout<<"LANG "<< LANG << std::endl;
         for (int lis = 0; lis < fNp2; lis++) {
           // NW   = header->GetN1();
-          NL = header->GetN2();
+          NL  = header->GetN2();
           fNP = NL;
           // std::cout<<"energy " <<fEin[lis] <<" LANG "<< LANG << std::endl;
           if (LANG == 0) {
-            //std::cout<<"energy "<< fEin[lis] << std::endl;
+            // std::cout<<"energy "<< fEin[lis] << std::endl;
             for (int j = 0; j < NL; j++) {
               fLegendCoef1.push_back(header->GetLIST(j));
             }
@@ -456,12 +461,12 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               fme      = 0.5;
               double x = -1. + k1 * 0.02;
               for (unsigned long j = 0; j < fLegendCoef[lis].size(); j++) {
-                double leg = ROOT::Math::legendre(j+1, x);
-                fme += 0.5 * (2. * (j+1) + 1.) * fLegendCoef[lis][j] * leg;
+                double leg = ROOT::Math::legendre(j + 1, x);
+                fme += 0.5 * (2. * (j + 1) + 1.) * fLegendCoef[lis][j] * leg;
               }
               fCosFile4.push_back(x);
               fCosPdfFile4.push_back(fme);
-            //std::cout<<"cos "<< x <<"  "<< fme << std::endl;
+              // std::cout<<"cos "<< x <<"  "<< fme << std::endl;
               k1++;
             } while (k1 < 101);
             // for(int l = 0; l < 100; l++){
@@ -588,14 +593,14 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
             int iei = 0;
             do {
               do {
-                rn1 	      	= fRnd->Uniform(1);
-                rn2 		= fRnd->Uniform(1);
-		rn12 		= rn1 * rn1 + rn2 * rn2;
+                rn1  = fRnd->Uniform(1);
+                rn2  = fRnd->Uniform(1);
+                rn12 = rn1 * rn1 + rn2 * rn2;
               } while (rn12 > 1);
               do {
-                rn3 		= fRnd->Uniform(1);
-                rn4 		= fRnd->Uniform(1);
-		rn34 		= rn3 * rn3 + rn4 * rn4;
+                rn3  = fRnd->Uniform(1);
+                rn4  = fRnd->Uniform(1);
+                rn34 = rn3 * rn3 + rn4 * rn4;
               } while (rn34 > 1);
               rn5              = fRnd->Uniform(1);
               rn6              = fRnd->Uniform(1);
@@ -622,7 +627,8 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
               fEoute.push_back(fEnergyFile5[i]);
               fPdfe.push_back(fEnergyPdfFile5[i]);
               fCdfe.push_back(fEnergyCdfFile5[i]);
-              // std::cout<< fEnergyFile5[i] << "  "<< fEnergyPdfFile5[i] << "  "<< fEnergyCdfFile5[i] <<"  "<< cosCM << std::endl;
+              // std::cout<< fEnergyFile5[i] << "  "<< fEnergyPdfFile5[i] << "  "<< fEnergyCdfFile5[i] <<"  "<< cosCM <<
+              // std::endl;
             }
             fEout2de.push_back(fEoute);
             fPdf2de.push_back(fPdfe);
@@ -683,8 +689,8 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
         }
 
         TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
-        fNR2                 = tab2->GetN1();
-        fNE2                 = tab2->GetN2();
+        fNR2                = tab2->GetN1();
+        fNE2                = tab2->GetN2();
         for (int cr = 0; cr < fNR2; cr++) {
           fNbt2.push_back(tab2->GetNBT(cr));
           fInt2.push_back(tab2->GetINT(cr));
@@ -790,7 +796,7 @@ TNudyEndfEnergyAng::TNudyEndfEnergyAng(TNudyEndfFile *file, double iQValue[])
   fEnergyCdf6OfMts.push_back(fCdf4de);
   fMt6Values.push_back(fMtNumbers6);
   fMt5Values.push_back(fMtNumbers);
-  fMt6Neutron.push_back (fMtNumNeutron);
+  fMt6Neutron.push_back(fMtNumNeutron);
   fMt4Lct.push_back(fMtLct);
   fLaw6.push_back(fLaw);
   fZD6.push_back(fZd);
@@ -1015,7 +1021,7 @@ double TNudyEndfEnergyAng::GetCos64(int ielemId, int mt, double energyK)
 {
   fRnd  = new TRandom3(0);
   int i = -1;
-//   std::cout <<"mt4 values in file 6  "<< fMt4Values[ielemId].size() << std::endl;
+  //   std::cout <<"mt4 values in file 6  "<< fMt4Values[ielemId].size() << std::endl;
   for (unsigned int l = 0; l < fMt4Values[ielemId].size(); l++) {
     if (fMt4Values[ielemId][l] == mt) {
       i = l;
@@ -1038,9 +1044,9 @@ double TNudyEndfEnergyAng::GetCos64(int ielemId, int mt, double energyK)
         min = mid;
     }
   }
-  double fraction =
-      (energyK - fEnergy4OfMts[ielemId][i][min]) / (fEnergy4OfMts[ielemId][i][min + 1] - fEnergy4OfMts[ielemId][i][min]);
-   //std::cout <<" fraction "<< fraction <<"  "<< energyK <<"  "<< fEnergy4OfMts[ielemId][i][min] << std::endl;
+  double fraction = (energyK - fEnergy4OfMts[ielemId][i][min]) /
+                    (fEnergy4OfMts[ielemId][i][min + 1] - fEnergy4OfMts[ielemId][i][min]);
+  // std::cout <<" fraction "<< fraction <<"  "<< energyK <<"  "<< fEnergy4OfMts[ielemId][i][min] << std::endl;
   double rnd1              = fRnd->Uniform(1);
   double rnd2              = fRnd->Uniform(1);
   if (rnd1 < fraction) min = min + 1;
@@ -1056,14 +1062,15 @@ double TNudyEndfEnergyAng::GetCos64(int ielemId, int mt, double energyK)
       break;
     }
   }
-//    for(int j = 0; j < size; j++){
-//      std::cout << fEnergy4OfMts[ielemId][i][min]<< "  "<< fMt4Values[ielemId][i]
-//      <<"  "<< fCos4OfMts[ielemId][i][min][j] <<"  "<<fCosPdf4OfMts[ielemId][i][min][j]
-//      <<"  "<<fCosCdf4OfMts[ielemId][i][min][j] << std::endl;
-//    }
+  //    for(int j = 0; j < size; j++){
+  //      std::cout << fEnergy4OfMts[ielemId][i][min]<< "  "<< fMt4Values[ielemId][i]
+  //      <<"  "<< fCos4OfMts[ielemId][i][min][j] <<"  "<<fCosPdf4OfMts[ielemId][i][min][j]
+  //      <<"  "<<fCosCdf4OfMts[ielemId][i][min][j] << std::endl;
+  //    }
   // std::cout<< k <<"  "<<fCos4OfMts[ielemId][i][min][k]<<"  "<<fCosPdf4OfMts[ielemId][i][min][k] <<"
   // "<<fCosCdf4OfMts[ielemId][i][min][ k] << std::endl;
-  // std::cout<<" pdf "<<k<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 3]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k
+  // std::cout<<" pdf "<<k<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 3]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 *
+  // k
   // + 1] << std::endl;
   // std::cout<<" cos "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 2]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k ] <<
   // std::endl;
@@ -1075,7 +1082,7 @@ double TNudyEndfEnergyAng::GetCos64(int ielemId, int mt, double energyK)
   if (plk != 0 && plsq > 0) {
     Ang = fCos4OfMts[ielemId][i][min][k] + (sqrt(plsq) - fCosPdf4OfMts[ielemId][i][min][k]) / plk;
   } else {
-     //std::cout <<"uniform angle "<< mt <<"  "<< rnd1 <<"   "<< rnd2 << std::endl;
+    // std::cout <<"uniform angle "<< mt <<"  "<< rnd1 <<"   "<< rnd2 << std::endl;
     Ang = 2 * fRnd->Uniform(1) - 1;
   }
   return Ang;
@@ -1111,8 +1118,8 @@ double TNudyEndfEnergyAng::GetCos6(int ielemId, int mt, double energyK)
         min = mid;
     }
   }
-  double fraction =
-      (energyK - fEnergy5OfMts[ielemId][i][min]) / (fEnergy5OfMts[ielemId][i][min + 1] - fEnergy5OfMts[ielemId][i][min]);
+  double fraction = (energyK - fEnergy5OfMts[ielemId][i][min]) /
+                    (fEnergy5OfMts[ielemId][i][min + 1] - fEnergy5OfMts[ielemId][i][min]);
   // std::cout <<" fraction "<< fraction <<"  "<< energyK <<"  "<< fEnergy4OfMts[ielemId][i][min] << std::endl;
   double rnd1              = fRnd->Uniform(1);
   double rnd2              = fRnd->Uniform(1);
@@ -1150,8 +1157,9 @@ double TNudyEndfEnergyAng::GetEnergy6(int ielemId, int mt, double energyK)
 {
   fRnd  = new TRandom3(0);
   int i = -1;
-//    std::cout <<"mt5 values in file 6  "<< fMt5Values[ielemId].size() <<"  "<< fZD6[ielemId][0] <<"  "<< fZD6[ielemId][1] << std::endl;
- for (unsigned int l = 0; l < fMt5Values[ielemId].size(); l++) {
+  //    std::cout <<"mt5 values in file 6  "<< fMt5Values[ielemId].size() <<"  "<< fZD6[ielemId][0] <<"  "<<
+  //    fZD6[ielemId][1] << std::endl;
+  for (unsigned int l = 0; l < fMt5Values[ielemId].size(); l++) {
     if (fMt5Values[ielemId][l] == mt) {
       i = l;
       break;
@@ -1174,8 +1182,8 @@ double TNudyEndfEnergyAng::GetEnergy6(int ielemId, int mt, double energyK)
         min = mid;
     }
   }
-  double fraction =
-      (energyK - fEnergy5OfMts[ielemId][i][min]) / (fEnergy5OfMts[ielemId][i][min + 1] - fEnergy5OfMts[ielemId][i][min]);
+  double fraction = (energyK - fEnergy5OfMts[ielemId][i][min]) /
+                    (fEnergy5OfMts[ielemId][i][min + 1] - fEnergy5OfMts[ielemId][i][min]);
   double rnd1              = fRnd->Uniform(1);
   double rnd2              = fRnd->Uniform(1);
   double rnd3              = fRnd->Uniform(1);

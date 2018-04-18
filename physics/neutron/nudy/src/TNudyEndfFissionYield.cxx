@@ -39,22 +39,23 @@ TNudyEndfFissionYield::TNudyEndfFissionYield(TNudyEndfFile *file)
         fEin.push_back(list1->GetC1());
         // int NN   = list1->GetN1();
         int NFP = list1->GetN2();
-        //std::cout<<"energy i " <<fEin[i] << std::endl;
-	double sum = 0;
+        // std::cout<<"energy i " <<fEin[i] << std::endl;
+        double sum = 0;
         for (int j = 0; j < NFP; j++) {
-	  if (list1->GetLIST(4 * j + 2) > 0) {
-	    fZafp1.push_back(10*list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1));
-	    fFps1.push_back(list1->GetLIST(4 * j + 1));
-	    fYi1.push_back(list1->GetLIST(4 * j + 2)/2);
-	    fDyi1.push_back(list1->GetLIST(4 * j + 3));
-	    sum += list1->GetLIST(4 * j + 2) ;
-	    fCyi1.push_back( sum/2 );
-	  }
+          if (list1->GetLIST(4 * j + 2) > 0) {
+            fZafp1.push_back(10 * list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1));
+            fFps1.push_back(list1->GetLIST(4 * j + 1));
+            fYi1.push_back(list1->GetLIST(4 * j + 2) / 2);
+            fDyi1.push_back(list1->GetLIST(4 * j + 3));
+            sum += list1->GetLIST(4 * j + 2);
+            fCyi1.push_back(sum / 2);
+          }
           // divr = div(fZafp1[j],1000);
-          // std::cout<< 10*list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1) <<"  "<<  list1->GetLIST(4 * j + 2)/2 << std::endl;
+          // std::cout<< 10*list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1) <<"  "<<  list1->GetLIST(4 * j + 2)/2
+          // << std::endl;
         }
-//        TNudyCore::Instance()->cdfGenerateT(fZafp1, fYi1, fCyi1);
-        //std::cout << "sum fission yield \t" << sum << std::endl;
+        //        TNudyCore::Instance()->cdfGenerateT(fZafp1, fYi1, fCyi1);
+        // std::cout << "sum fission yield \t" << sum << std::endl;
         fZafp.push_back(fZafp1);
         fFps.push_back(fFps1);
         fYi.push_back(fYi1);
@@ -82,7 +83,7 @@ TNudyEndfFissionYield::TNudyEndfFissionYield(TNudyEndfFile *file)
         int NFP = list1->GetN2();
         //          std::cout<<"energy c " <<fEinc[i] << std::endl;
         for (int j = 0; j < NFP; j++) {
-          fZafpc1.push_back(10*list1->GetLIST(4 * j + 0)+list1->GetLIST(4 * j + 1));
+          fZafpc1.push_back(10 * list1->GetLIST(4 * j + 0) + list1->GetLIST(4 * j + 1));
           fFpsc1.push_back(list1->GetLIST(4 * j + 1));
           fYc1.push_back(list1->GetLIST(4 * j + 2));
           fDyc1.push_back(list1->GetLIST(4 * j + 3));
@@ -161,11 +162,12 @@ double TNudyEndfFissionYield::GetFisYield(int ielemId, double energyK)
   }
   double plk = (fPdfYieldId[ielemId][min][k + 1] - fPdfYieldId[ielemId][min][k]) /
                (fZafId[ielemId][min][k + 1] - fZafId[ielemId][min][k]);
-  double plk2 = fPdfYieldId[ielemId][min][k] * fPdfYieldId[ielemId][min][k];
-  double plsq = plk2 + 2 * plk * (rnd1 - fCdfYieldId[ielemId][min][k]);
-  double zaf                    = 0;
-  if (plk == 0 && rnd1 < 0.5) zaf = fZafId[ielemId][min][k];
-  if (plk == 0 && rnd1 >= 0.5) zaf = fZafId[ielemId][min][k+1];
-  if (plk != 0 && plsq > 0) zaf = fZafId[ielemId][min][k] + (sqrt(std::fabs(plsq)) - fPdfYieldId[ielemId][min][k]) / plk;
+  double plk2                      = fPdfYieldId[ielemId][min][k] * fPdfYieldId[ielemId][min][k];
+  double plsq                      = plk2 + 2 * plk * (rnd1 - fCdfYieldId[ielemId][min][k]);
+  double zaf                       = 0;
+  if (plk == 0 && rnd1 < 0.5) zaf  = fZafId[ielemId][min][k];
+  if (plk == 0 && rnd1 >= 0.5) zaf = fZafId[ielemId][min][k + 1];
+  if (plk != 0 && plsq > 0)
+    zaf = fZafId[ielemId][min][k] + (sqrt(std::fabs(plsq)) - fPdfYieldId[ielemId][min][k]) / plk;
   return zaf;
 }

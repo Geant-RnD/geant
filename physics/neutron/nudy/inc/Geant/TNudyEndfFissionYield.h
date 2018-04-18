@@ -36,12 +36,12 @@ public:
   virtual ~TNudyEndfFissionYield();
 
 private:
-  rowd fEin, fEinc;                                              
+  rowd fEin, fEinc;
   /// \brief incident energy
-  matrixd2 fZafp, fFps, fZafpc, fFpsc, fYi, fCyi, fDyi, fYc, fDyc;      
+  matrixd2 fZafp, fFps, fZafpc, fFpsc, fYi, fCyi, fDyi, fYc, fDyc;
   /// \brief charge, mass, yield (independent and cummulative and error)
-  rowd fZafp1, fFps1, fZafpc1, fFpsc1, fYi1, fCyi1, fDyi1, fYc1, fDyc1; 
-  /// \brief charge, mass, yield (independent and cummulative)
+  rowd fZafp1, fFps1, fZafpc1, fFpsc1, fYi1, fCyi1, fDyi1, fYc1, fDyc1;
+/// \brief charge, mass, yield (independent and cummulative)
 #ifdef USE_ROOT
   TRandom3 *fRnd;
 #endif

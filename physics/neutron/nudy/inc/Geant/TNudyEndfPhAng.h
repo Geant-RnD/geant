@@ -3,13 +3,12 @@
 
 #include "Geant/TNudyEndfRecoPoint.h"
 
-
 namespace Nudy {
-	class TNudyEndfFile;
+class TNudyEndfFile;
 }
 
 namespace NudyPhysics {
-	class TNudyEndfRecoPoint;
+class TNudyEndfRecoPoint;
 }
 
 typedef std::vector<double> rowd;
@@ -48,7 +47,7 @@ private:
   rowd fCosFile4, fCosPdfFile4, fCosCdfFile4;
   rowint nbt1, int1;
   rowint MtNumbers; // MT numbers
-  rowint fMtLct;     // LCT numbers
+  rowint fMtLct;    // LCT numbers
   int nr, np;       // standard ENDF parameters
 #ifdef USE_ROOT
   TRandom3 *fRnd;
@@ -58,5 +57,5 @@ private:
 #endif
 };
 
-} // namespace 
+} // namespace
 #endif

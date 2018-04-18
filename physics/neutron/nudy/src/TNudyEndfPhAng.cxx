@@ -15,7 +15,6 @@
 #include "Math/SpecFuncMathMore.h"
 #include "Geant/TNudyEndfPhAng.h"
 
-
 using namespace Nudy;
 using namespace NudyPhysics;
 
@@ -35,20 +34,20 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
   TNudyEndfSec *sec;
   while ((sec = (TNudyEndfSec *)secIter.Next())) {
     TIter recIter(sec->GetRecords());
-//    TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
-    int MT                = sec->GetMT();
+    //    TNudyEndfCont *header = (TNudyEndfCont *)recIter.Next();
+    int MT = sec->GetMT();
     MtNumbers.push_back(MT);
-    int LTT 		 = sec->GetL2();
-    int LI  		 = sec->GetL1();
+    int LTT = sec->GetL2();
+    int LI  = sec->GetL1();
     // int NK  		 = sec->GetN1();
-   //printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
+    // printf("NK = %d LTT = %d LI = %d\n",NK, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {
       TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
       for (int i = 0; i < tab2->GetN2(); i++) {
         TNudyEndfList *tab = (TNudyEndfList *)recIter.Next();
         ein.push_back(tab->GetC2());
-        //std::cout<<"energy "<< tab->GetC2() << std::endl;
+        // std::cout<<"energy "<< tab->GetC2() << std::endl;
         for (int j = 0; j < tab->GetNPL(); j++) {
           lCoef1.push_back(tab->GetLIST(j));
         }
@@ -128,7 +127,7 @@ TNudyEndfPhAng::TNudyEndfPhAng(TNudyEndfFile *file)
           for (unsigned long j = 0; j < lCoef[i].size(); j++) {
             double leg = ROOT::Math::legendre(j + 1, x);
             fme += 0.5 * (2. * (j + 1) + 1.) * lCoef[i][j] * leg;
-            //printf("a%e = %e leg= %e\n", x, lCoef[i][j],leg);
+            // printf("a%e = %e leg= %e\n", x, lCoef[i][j],leg);
           }
           if (fme > 0.0) {
             fCosFile4.push_back(x);
@@ -338,8 +337,8 @@ double TNudyEndfPhAng::GetCos4(int ielemId, int mt, double energyK)
     }
   }
   // std::cout<<" min "<< min << std::endl;
-  double fraction =
-      (energyK - fEnergy4OfMts[ielemId][i][min]) / (fEnergy4OfMts[ielemId][i][min + 1] - fEnergy4OfMts[ielemId][i][min]);
+  double fraction = (energyK - fEnergy4OfMts[ielemId][i][min]) /
+                    (fEnergy4OfMts[ielemId][i][min + 1] - fEnergy4OfMts[ielemId][i][min]);
   // std::cout <<" fraction "<< fraction <<"  "<< energyK <<"  "<< fEnergy4OfMts[ielemId][i][min] << std::endl;
   double rnd1              = fRnd->Uniform(1);
   double rnd2              = fRnd->Uniform(1);
@@ -362,15 +361,16 @@ double TNudyEndfPhAng::GetCos4(int ielemId, int mt, double energyK)
 
   // std::cout<< k <<"  "<<fCos4OfMts[ielemId][i][min][k]<<"  "<<fCosPdf4OfMts[ielemId][i][min][k] <<"
   // "<<fCosCdf4OfMts[ielemId][i][min][ k] << std::endl;
-  // std::cout<<" pdf "<<k<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 3]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k
+  // std::cout<<" pdf "<<k<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 3]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 *
+  // k
   // + 1] << std::endl;
   // std::cout<<" cos "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 2]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k ] <<
   // std::endl;
   double plk = (fCosPdf4OfMts[ielemId][i][min][k + 1] - fCosPdf4OfMts[ielemId][i][min][k]) /
                (fCos4OfMts[ielemId][i][min][k + 1] - fCos4OfMts[ielemId][i][min][k]);
-  double plk2 = fCosPdf4OfMts[ielemId][i][min][k] * fCosPdf4OfMts[ielemId][i][min][k];
-  double plsq = plk2 + 2 * plk * (rnd1 - fCosCdf4OfMts[ielemId][i][min][k]);
-  double Ang  = 0;
+  double plk2       = fCosPdf4OfMts[ielemId][i][min][k] * fCosPdf4OfMts[ielemId][i][min][k];
+  double plsq       = plk2 + 2 * plk * (rnd1 - fCosCdf4OfMts[ielemId][i][min][k]);
+  double Ang        = 0;
   if (plk == 0) Ang = fCos4OfMts[ielemId][i][min][k];
   if (plk != 0 && plsq > 0) {
     Ang = fCos4OfMts[ielemId][i][min][k] + (sqrt(std::fabs(plsq)) - fCosPdf4OfMts[ielemId][i][min][k]) / plk;

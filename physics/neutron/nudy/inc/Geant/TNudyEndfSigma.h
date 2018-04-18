@@ -5,7 +5,7 @@
 ///
 /// \file This class processes the neutron cross-section from endf file 2 and 3
 ///  makes it linearly interpolable, constructs resonance cross-section
-/// \brief The class has declaration of  TNudyEndfDoppler which does doppler broadening 
+/// \brief The class has declaration of  TNudyEndfDoppler which does doppler broadening
 /// TNudyEndfAng processes energy integrated angular distribution for neutron
 /// TNudyEndfEnergy processes angle integrated energy distribution for neutron
 /// TNudyEndfEnergyAng processes energy and angle corelated distribution
@@ -63,7 +63,7 @@ class TRandom3;
 #define x6(x) (x4(x) * x2(x))
 #define x8(x) (x6(x) * x2(x))
 #define kconst 2.196771e-3
-#define Mn 939.565378e+6        
+#define Mn 939.565378e+6
 #define Fac1(x) (1.0 + x2(x))
 #define Fac2(x) (9.0 + 3.0 * x2(x) + x4(x))
 #define Fac3(x) 225.0 + 50445.0 * x2(x) - 13500.0 * x3(x) + 1386.0 * x4(x) - 60.0 * x5(x) + x6(x)
@@ -84,7 +84,7 @@ public:
   TNudyEndfSigma(const char *irENDF, double isigDiff);
   /// \brief constructor to pass root input data file and tolerance  to reconstruct the resonance cross-section
   virtual ~TNudyEndfSigma();
-  /// \brief destructor 
+  /// \brief destructor
   void GetData(const char *irENDF, double isigDiff);
   /// \brief this the main function to interact from outside of this class to get the cross-sections
   void SetsigPrecision(double x1) { fSigDiff = x1; }
@@ -93,10 +93,10 @@ public:
   /// \brief set initial temperature for the doppler broadening
   void SetOutTempDop(double t2) { fDoppTemp2 = t2; }
   /// \brief set final temperature for the doppler broadening
-  double GetsigPrecision() const {return fSigDiff;}
+  double GetsigPrecision() const { return fSigDiff; }
   /// \brief get precision for the linearly interpolable cross-sections which was set by SetsigPrecision function
-  double GetOutTempDop() const {return fDoppTemp2;}
-  /// \brief get final temperature for the doppler broadening which was set by SetOutTempDop function  
+  double GetOutTempDop() const { return fDoppTemp2; }
+  /// \brief get final temperature for the doppler broadening which was set by SetOutTempDop function
   void SetPreProcess(int x1) { fPrepro = x1; }
   /// \brief set x1 = 0 for basic endf file and x1 = 1 if file is processed by Prepro and written in ENDF format
   std::fstream out, outtotal;
@@ -121,58 +121,58 @@ private:
   double RecursionLinearFile3(double x1, double x2, double sig1, double sig2, rowd x3, rowd x4);
   /// \brief linearization program for the cross-section data
   void RecoPlusBroad(int flagNer);
-  /// \brief call for reconstruction extra points near thermal region and urr region  
+  /// \brief call for reconstruction extra points near thermal region and urr region
   void GetSigma(int lrfp, double x, double &siga, double &sigb, double &sigc);
-  /// \brief getting reconstructed cross-section based on different type of formulation  
+  /// \brief getting reconstructed cross-section based on different type of formulation
   void Linearize(int flagNer);
-  /// \brief call to reconstruct cross-sections for different angular momentum values  
+  /// \brief call to reconstruct cross-sections for different angular momentum values
   void GetSigmaRMP(double x, double &siga, double &sigb, double &sigc);
-  /// \brief getting reconstructed cross-section based on RM formulation  
+  /// \brief getting reconstructed cross-section based on RM formulation
   void InverseMatrix();
-  /// \brief matrix inversion  
+  /// \brief matrix inversion
   double BackCrsAdler(double x, int l1);
-  /// \brief background cross-section for adler adler formulation  
+  /// \brief background cross-section for adler adler formulation
   double CalcPhi(double x, int l);
-  /// \brief angle phi claculation for the SLBW and MLBW cross-section calculation  
+  /// \brief angle phi claculation for the SLBW and MLBW cross-section calculation
   double CalcShift(double x, int l);
-  /// \brief shift in angle phi  
+  /// \brief shift in angle phi
   double CalcPene(double x, int l);
-  /// \brief penetration factor for different l values  
+  /// \brief penetration factor for different l values
   double GetERP(double x, int r, int lVal);
-  /// \brief Shifted resonance energy after phi and penetration factor  
+  /// \brief Shifted resonance energy after phi and penetration factor
   double GetRho(double x, int lVal);
-  /// \brief neutron wave number times channel radius parameter \cite ENDF manual 
+  /// \brief neutron wave number times channel radius parameter \cite ENDF manual
   double GetRhoC(double x, int isDiff, int lVal);
-  /// \brief neutron wave number times energy dependent radius parameter  
+  /// \brief neutron wave number times energy dependent radius parameter
   double Gamma_reduced(double y, int ii, int lval);
-  /// \brief reduced gamma widths  
+  /// \brief reduced gamma widths
   double K_wnum(double x);
-  /// \brief neutron wave number  
+  /// \brief neutron wave number
   double Gamma_nrE(double x, int ii, int lval);
-  /// \brief neutron width calculation  
+  /// \brief neutron width calculation
   double Gamma_xrE(int ii, int lrx);
-  /// \brief extra channel width calculation  
+  /// \brief extra channel width calculation
   double Gamma_rE(double x, int ii, int lval, int lrx);
-  /// \brief Total width calculation  
+  /// \brief Total width calculation
   void AdditionalSigma(int LRF, double x);
-  /// \brief adding additional cross-section points for linearization to work  
+  /// \brief adding additional cross-section points for linearization to work
   double RecursionLinear(double x1, double x2, double sig1, double sig2);
-  /// \brief Recursive linear cross-section between two energy points  
+  /// \brief Recursive linear cross-section between two energy points
   double RecursionLinear(double x1, double x2, double sig1, double sig2, double sig3, double sig4, double sig5,
                          double sig6);
-  /// \brief Recursive linear cross-section between two energy points  
+  /// \brief Recursive linear cross-section between two energy points
   int WidthFluctuation(double gnr, double gx, double gg, double gf, int jval);
-  /// \brief width fluction parameter for the urr region  
+  /// \brief width fluction parameter for the urr region
   double Thinning(rowd &x1, rowd &x2);
-  /// \brief eleminating cross-section points if it is more than linear interpolable and within tolerance  
+  /// \brief eleminating cross-section points if it is more than linear interpolable and within tolerance
   double AddFile3Resonance(double &x1, double &x2, rowd &x3, rowd &x4);
-  /// \brief adding file 3 cross-section data in URR region LSSF=0 
+  /// \brief adding file 3 cross-section data in URR region LSSF=0
   double InsertFile3(rowd &x1, rowd &x2);
-  /// \brief adding file 3 cross-section data in URR region LSSF=1 
+  /// \brief adding file 3 cross-section data in URR region LSSF=1
   double InsertFile3High(rowd &x1, rowd &x2);
-  /// \brief adding file 3 cross-section data after RR+URR region (high energy region) 
+  /// \brief adding file 3 cross-section data after RR+URR region (high energy region)
   int BinarySearch(double x1, rowd &x2);
-  /// \brief binary search algo 
+  /// \brief binary search algo
   void AddSecFile3(Nudy::TNudyEndfFile *file, double a, double b, int MF2Add, rowd &x1, rowd &x2);
   /// \brief adding integral charge particle cross-sections from MT =103-107 if it does not exist
   /// but exist in terms of individual excited state cross-section
@@ -193,48 +193,48 @@ private:
   /// \brief filling 1 dimentional pdf for anglular distribution
   void FillPdf2d();
   /// \brief filling 2 dimentional pdf for anglular distribution
-  void SetIsFission(bool FissKey) {IsFission = FissKey;}
+  void SetIsFission(bool FissKey) { IsFission = FissKey; }
   /// \brief setting if fission takes place
 
-  const char *rENDF;             
+  const char *rENDF;
   /// \brief Name of the endf to root data file
-  double fDoppTemp1, fDoppTemp2 ;                
+  double fDoppTemp1, fDoppTemp2;
   /// \brief initial and final temperature for the doppler broadening
-  double fSigDiff;                
+  double fSigDiff;
   /// \brief precision/tolerance for cross-section reconstruction while linearization from true values
-  matrixd4 fCos4OfMts;            
+  matrixd4 fCos4OfMts;
   /// \brief 2-D vector: cosine in file 4 for each given reaction and element
-  matrixd4 fCosPdf4OfMts;         
+  matrixd4 fCosPdf4OfMts;
   /// \brief cosine pdf in file 4 for each given reaction and element
-  matrixd4 fCosCdf4OfMts;         
+  matrixd4 fCosCdf4OfMts;
   /// \brief cosine cdf from file 4 for each given reaction and element
-  matrixd3 fEnergy4OfMts;         
+  matrixd3 fEnergy4OfMts;
   /// \brief incident energy in file 4 for which cosine angles are given
-  matrixint fMt4Values;           
+  matrixint fMt4Values;
   /// \brief MT values for which angular distributions are given in file 4
-  matrixint fMt4Lct;              
+  matrixint fMt4Lct;
   /// CM and Lab flag for angular distributions as given in file 4
-  matrixd4 fEnergyOut5OfMts;      
+  matrixd4 fEnergyOut5OfMts;
   /// \brief secondary energy for neutron from file 5 for each given reaction and element
-  matrixd4 fEnergyPdf5OfMts;      
+  matrixd4 fEnergyPdf5OfMts;
   /// \brief secondary energy pdf for neutron from file 5 for each given reaction and element
-  matrixd4 fEnergyCdf5OfMts;      
+  matrixd4 fEnergyCdf5OfMts;
   /// \brief secondary energy cdf for neutron from file 5 for each given reaction and element
-  matrixd4 fCos6OfMts;            
+  matrixd4 fCos6OfMts;
   /// \brief incident cosine from file 6 for given reaction and element
-  matrixd4 fCosin6Pdf, fCosin6Cdf; 
+  matrixd4 fCosin6Pdf, fCosin6Cdf;
   /// \brief given cosine pdf  and cdf in file 6 for given reaction and element
-  matrixd5 fEnergyOut6OfMts;      
+  matrixd5 fEnergyOut6OfMts;
   /// \brief energy from file 6 for each reaction and element
-  matrixd5 fEnergyPdf6OfMts;      
+  matrixd5 fEnergyPdf6OfMts;
   /// \brief outgoing neutron's pdf from file 6 for given reaction and element
-  matrixd5 fEnergyCdf6OfMts;      
+  matrixd5 fEnergyCdf6OfMts;
   /// \brief outgoing neutron's cdf from file 6 for given reaction and element
-  matrixd3 fEnergy5OfMts;         
+  matrixd3 fEnergy5OfMts;
   /// \brief incident neutron energy in file 5 for given reaction and element for which energy distribution is given
-  matrixd3 fFraction5OfMts;       
+  matrixd3 fFraction5OfMts;
   /// \brief delayed neutron fraction for incident energy for given reaction and element
-  matrixint fMt5Values;           
+  matrixint fMt5Values;
   /// \brief MT values for which energy distributions are given in file 5
   rowd fEintFile1, fNutFile1, fEinFile1, fNuFile1;
   /// \brief energy, total fission neutron multiplicity, energy, prompt fission neutron multiplicity
@@ -244,74 +244,73 @@ private:
   /// \brief energy, fission heat
   rowd fCnc, fNui;
   /// \brief coefficients for getting neutron multiplicity \cite ENDF manual
-  matrixd2 fEint, fNut;                     
+  matrixd2 fEint, fNut;
   /// \brief incident energy and total nu,  all elements
-  matrixd2 fEinp, fNup;                     
+  matrixd2 fEinp, fNup;
   /// \brief prompt incident energy and nu,  all elements
-  matrixd2 fEind, fNud, fLambdaD;            
+  matrixd2 fEind, fNud, fLambdaD;
   /// \brief delayed incident energy and nu and delay lambda for all elements
-  matrixd2 fEinFissHeat, fFissHeat;         
+  matrixd2 fEinFissHeat, fFissHeat;
   /// \brief fission incident energy and heat,  all elements
-  matrixd2 fEinfId, fQvalue;                
+  matrixd2 fEinfId, fQvalue;
   /// \brief incident energy for fission yield and qvalues for the reactions
-  matrixd3 fZafId, fPdfYieldId, fCdfYieldId; 
+  matrixd3 fZafId, fPdfYieldId, fCdfYieldId;
   /// \brief za, pdf and cdf for fssion yield
   double AWRI;
   /// \brief mass per neutron, standard ENDF parameters
-  int Z, ZA, ZAI, LFW, NER, LRU, LRF, NRO, NAPS, NLS, LSSF, NLS2, NJS, INT, NIS,
-      intLinLru1 = 0;  
+  int Z, ZA, ZAI, LFW, NER, LRU, LRF, NRO, NAPS, NLS, LSSF, NLS2, NJS, INT, NIS, intLinLru1 = 0;
   /// \brief standard ENDF parameters
-  bool IsFission;  
+  bool IsFission;
   /// \brief Abhijit:: to simply know whether fit for fission
-  int fLrx, fCueMat = 0; 
+  int fLrx, fCueMat = 0;
   /// \brief flag for inelastic reaction, number of J
   int fFlagRead = -1;
-  /// \brief flag for reading charge particle production cross-sections  
+  /// \brief flag for reading charge particle production cross-sections
   double fQValue[999];
   /// \brief q-value for all the reactions
-  int fDopplerBroad = 0, fFlagResolve = 0, fFlagUnResolve = 0; 
+  int fDopplerBroad = 0, fFlagResolve = 0, fFlagUnResolve = 0;
   /// \brief flag for thinning before doppler broadening, flas if, Resolve and URR parameter exist
   double fElo1 = 0, fElo2 = 0, fEhi1 = 0, fEhi2 = 0, fElo = 0, fEhi = 0;
   /// \brief Resonance energy range Low, High energy boundaries for RR and URR regions
-  double fSpi, fAp, fApl[10], fRad_a; 
+  double fSpi, fAp, fApl[10], fRad_a;
   /// \brief Target Spin (I), Scattering Radius (AP), L-dependent AP, Channel radius (a)
-  double fA, fAWR, fABN, fQX;        
+  double fA, fAWR, fABN, fQX;
   /// \brief mass number mass in units of neutron mass, abundance, q-value from ENDF parameters
-  double fFactor_k;                
+  double fFactor_k;
   /// \brief factor for wave vector
-  double fJMin, fJMax;              
+  double fJMin, fJMax;
   /// \brief min and max J values
-  double fRN, fRG, fRF, fRX;          
+  double fRN, fRG, fRF, fRX;
   /// \brief standard ENDF parameters for URR for neutron, gamma, fission and extra channel
-  int totalAdler, crsAdler[4];    
+  int totalAdler, crsAdler[4];
   /// \brief adler adler cross-section
-  double fR[3][3], fS[3][3];        
+  double fR[3][3], fS[3][3];
   /// \brief matrix for RM formalism
-  double fRI[3][3], fSI[3][3];      
+  double fRI[3][3], fSI[3][3];
   /// \brief matrix for RM formalism
   double fMissingJ[5][50], fMisGj[5];
   /// \brief J vlaues for calculation of the missing J value factor, spin factor
-  int fNJValue[5]; 
+  int fNJValue[5];
   /// \brief J values in sorted form
-  int fNR, fNP, fNE, fMAT, fMT, fMF; 
+  int fNR, fNP, fNE, fMAT, fMT, fMF;
   /// \brief standard ENDF parameters for range and interpolation
-  matrixint fMt4, fMt5, fMt6; 
+  matrixint fMt4, fMt5, fMt6;
   /// \brief MT values for which angular, energy/ angular-energy distributions are given in file 4, 5, 6
-  rowd energyUni, sigmaUniTotal;            
+  rowd energyUni, sigmaUniTotal;
   /// \brief unionization of energy and total cross-section
-  matrixd2 fSigmaOfMts;                      
+  matrixd2 fSigmaOfMts;
   /// \brief sigma for each reaction
-  matrixd2 fSigmaOfMtsDop;                   
+  matrixd2 fSigmaOfMtsDop;
   /// \brief sigma for each reaction after doppler
-  matrixd2 fSigmaUniOfMts;                   
+  matrixd2 fSigmaUniOfMts;
   /// \brief sigma for each reaction afte unionization of energy
-  rowint fEnergyLocationMts;                 
+  rowint fEnergyLocationMts;
   /// \brief MT wise starting energy for cross-section
-  rowint MtNumbers, MtNum4, MtNum5, MtNum6; 
+  rowint MtNumbers, MtNum4, MtNum5, MtNum6;
   /// \brief MT numbers for different distributions in file 4, 5, 6
-  rowint MtNumSig4Photon, MtNumAng4Photon, MtNumEng4Photon; 
+  rowint MtNumSig4Photon, MtNumAng4Photon, MtNumEng4Photon;
   /// \brief MT numbers for photon cross-section, angle, energy
-  rowd fSigmaMts, fQvalueTemp;                
+  rowd fSigmaMts, fQvalueTemp;
   /// \brief MT numbers for sigma in file3 and temp. varaible for q-value
   rowd fELinElastic, fELinCapture, fELinFission;
   /// \brief linear energy points for elastic, capture and fission cross-section
@@ -321,7 +320,7 @@ private:
   /// \brief linear cross-section points after doppler broadening for elastic, capture and fission
   rowint nbt1, int1;
   rowd fELinearFile3, fXLinearFile3;
-  /// \brief linear cross-section points for file 3 data  
+  /// \brief linear cross-section points for file 3 data
   rowd fSigma;
   /// \brief temp. cross-section variable for doppler broadening
   rowd ein, cos4, cdf, pdf, lCoef1;
@@ -331,115 +330,115 @@ private:
   /// \brief cosine, pdf and cdf for angular distribution
   rowint fMtLct;
   /// \brief LCT number flag for lab or center of momentum system
-  rowint l;                    	// l values
-  rowint fNRS;                  
+  rowint l; // l values
+  rowint fNRS;
   /// \brief no. of resolved resonances
-  rowint fNRJ;                  
+  rowint fNRJ;
   /// \brief no. of URR J values
-  rowint fJSM;                  
+  rowint fJSM;
   /// \brief URR J values
-  rowd fEr;                     
+  rowd fEr;
   /// \brief resolved resonance energy
-  rowd J;                      
+  rowd J;
   /// \brief associated J
-  rowd fGJ;                     
+  rowd fGJ;
   /// \brief spin multiplication factor
-  rowd fGamma_r;                
+  rowd fGamma_r;
   /// \brief total width = Gamma_n + Gamma_g + Gamma_f
-  rowd fGamma_n;                
+  rowd fGamma_n;
   /// \brief neutron scattering width
-  rowd fGamma_g;                
+  rowd fGamma_g;
   /// \brief Capture width
-  rowd fGamma_f;                
+  rowd fGamma_f;
   /// \brief fission width
-  rowd fGamma_x;                
+  rowd fGamma_x;
   /// \brief Inelastic width
-  rowd fGamma_fa, fGamma_fasq;   
+  rowd fGamma_fa, fGamma_fasq;
   /// \brief fission width 1 for RM formulation \cite ENDF Manual
-  rowd fGamma_fb, fGamma_fbsq;   
+  rowd fGamma_fb, fGamma_fbsq;
   /// \brief fission width 2 for RM formulation \cite ENDF Manual
-  rowd fAt1;                    
+  rowd fAt1;
   /// \brief 1st background constant (Reich-Moore)
-  rowd fAt2;                    
+  rowd fAt2;
   /// \brief 2 background constant (Reich-Moore)
-  rowd fAt3;                    
+  rowd fAt3;
   // \brief 3 background constant (Reich-Moore)
-  rowd fAt4;                    
+  rowd fAt4;
   /// \brief 4 background constant (Reich-Moore)
-  rowd fBt1;                    
+  rowd fBt1;
   /// \brief 5 background constant (Reich-Moore)
-  rowd fBt2;                    
+  rowd fBt2;
   /// \brief 6 background constant (Reich-Moore)
-  rowd fDet1;                   
+  rowd fDet1;
   /// \brief 1 resonance energy (Reich-Moore)
-  rowd fDwt1;                   
+  rowd fDwt1;
   /// \brief 2 half width (Reich-Moore)
-  rowd fGrt1;                   
+  rowd fGrt1;
   /// \brief 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd fGit1;                   
+  rowd fGit1;
   /// \brief 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd fDef1;                   
+  rowd fDef1;
   /// \brief 5 background constant (Reich-Moore)
-  rowd fDwf1;                   
+  rowd fDwf1;
   /// \brief 6 background constant (Reich-Moore)
-  rowd fGrf1;                   
+  rowd fGrf1;
   /// \brief 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd fGif1;                   
+  rowd fGif1;
   /// \brief 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd fDec1;                   
+  rowd fDec1;
   /// \brief 5 background constant (Reich-Moore)
-  rowd fDwc1;                   
+  rowd fDwc1;
   /// \brief 6 background constant (Reich-Moore)
-  rowd fGrc1;                   
+  rowd fGrc1;
   /// \brief 3 symmetrical cross-section parameter G (Reich-Moore)
-  rowd fGic1;                   
+  rowd fGic1;
   /// \brief 4 Asymmetrical total cross section parameter, HTr (Reich-Moore)
-  rowd fAmux, fAmun, fAmug, fAmuf; 
+  rowd fAmux, fAmun, fAmug, fAmuf;
   /// \brief standard ENDF parameters for degrees of freedom in URR for inelastic, elastic, cap., and fiss.
-  rowd fEs;                     
+  rowd fEs;
   /// \brief centroid energy URR
-  rowd fD, fGX, fGNO, fGG, fGF;     
+  rowd fD, fGX, fGNO, fGG, fGF;
   /// \brief URR parameters \cite ENDF Manual
-  rowd fPhiEr, fShiftEr;         
+  rowd fPhiEr, fShiftEr;
   /// \brief penetration and shift factors
-  rowd fEneTemp, fSigTemp;       
+  rowd fEneTemp, fSigTemp;
   /// \brief temporary vectors to store energy and sigma
-  rowd fEneUniP, fSigUniP;       
+  rowd fEneUniP, fSigUniP;
   /// \brief unionization of energy and total cross-section for n,p
-  rowd fEneUniD, fSigUniD;       
+  rowd fEneUniD, fSigUniD;
   /// \brief unionization of energy and total cross-section for n,d
-  rowd fEneUniT, fSigUniT;      
+  rowd fEneUniT, fSigUniT;
   /// \brief unionization of energy and total cross-section for n,t
-  rowd fEneUniHe3, fSigUniHe3;  
+  rowd fEneUniHe3, fSigUniHe3;
   /// \brief unionization of energy and total cross-section for n,He3
-  rowd fEneUniHe4, fSigUniHe4;   
+  rowd fEneUniHe4, fSigUniHe4;
   /// \brief unionization of energy and total cross-section for n,He4
-  rowint fEneLocP, fEneLocD, fEneLocT, fEneLocHe3, fEneLocHe4;   
+  rowint fEneLocP, fEneLocD, fEneLocT, fEneLocHe3, fEneLocHe4;
   /// \brief location of the first energy grid point
   matrixd2 fSigUniOfP, fSigUniOfD, fSigUniOfT, fSigUniOfHe3, fSigUniOfHe4;
   /// \brief cross-section at union energy grids for charge particles
-  rowd fEneUniPAll, fSigUniPAll;      
+  rowd fEneUniPAll, fSigUniPAll;
   /// \brief unionization of energy and total cross-section for n,p + n,pX
-  rowd fEneUniDAll, fSigUniDAll;       
+  rowd fEneUniDAll, fSigUniDAll;
   /// \brief unionization of energy and total cross-section for n,d + n,dX
-  rowd fEneUniTAll, fSigUniTAll;      
+  rowd fEneUniTAll, fSigUniTAll;
   /// \brief unionization of energy and total cross-section for n,t + n,tX
-  rowd fEneUniHe3All, fSigUniHe3All;  
- /// \brief unionization of energy and total cross-section for n,He3 + n,He3X
-  rowd fEneUniHe4All, fSigUniHe4All;   
+  rowd fEneUniHe3All, fSigUniHe3All;
+  /// \brief unionization of energy and total cross-section for n,He3 + n,He3X
+  rowd fEneUniHe4All, fSigUniHe4All;
   /// \brief unionization of energy and total cross-section for n,He4 + n,He4X
-  rowint fEneLocPAll, fEneLocDAll, fEneLocTAll, fEneLocHe3All, fEneLocHe4All;   
+  rowint fEneLocPAll, fEneLocDAll, fEneLocTAll, fEneLocHe3All, fEneLocHe4All;
   /// \brief location of the first energy grid point
   matrixd2 fSigUniOfPAll, fSigUniOfDAll, fSigUniOfTAll, fSigUniOfHe3All, fSigUniOfHe4All;
   /// \brief cross-section at union energy grids for charge particles for all the excited states
-  /// and other than charge particle is also emitted  
-  int fMTChargeFlag[10] ; 
+  /// and other than charge particle is also emitted
+  int fMTChargeFlag[10];
   /// \brief flag if charge particle production is added in MT = 103-107
-  int fPrepro = 0 ;
+  int fPrepro = 0;
   /// \brief flag =0 if endf file is processed =1 if prepro processed file is processed (for comparision)
-  rowint fNSecNeutron, fNSecPhoton;   
+  rowint fNSecNeutron, fNSecPhoton;
   /// \brief counter for neutron, photon producing reactions
-  rowint fNReacNeutron, fNDelayFamily; 
+  rowint fNReacNeutron, fNDelayFamily;
   /// \brief number of neutron reactions, delayed neutron families
   int fMloop;
   /// \brief termination of recursive loop

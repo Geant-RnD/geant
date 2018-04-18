@@ -42,13 +42,13 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
       }
       fMtNumbers.push_back(MT);
       int LF = tab1->GetL2();
-      //std::cout << " LF = " << LF << " MT " << MT << "  k " << k << "  " << sec->GetN1() << std::endl;
+      // std::cout << " LF = " << LF << " MT " << MT << "  k " << k << "  " << sec->GetN1() << std::endl;
       fNR = tab1->GetN1();
       fNP = tab1->GetN2();
       //****************************************************************************
       // arbitrary tabulated function
       if (LF == 1) {
-//         std::cout << " fNR = " << fNR << " fNP " << fNP << std::endl;
+        //         std::cout << " fNR = " << fNR << " fNP " << fNP << std::endl;
         for (int cr = 0; cr < fNR; cr++) {
           fNbt1.push_back(tab1->GetNBT(cr));
           fInt1.push_back(tab1->GetINT(cr));
@@ -58,8 +58,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           fP1.push_back(tab1->GetY(crs));
         }
         TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
-        fNr2                 = tab2->GetN1();
-        fNp2                 = tab2->GetN2();
+        fNr2                = tab2->GetN1();
+        fNp2                = tab2->GetN2();
 
         for (int cr = 0; cr < fNr2; cr++) {
           fNbt2.push_back(tab2->GetNBT(cr));
@@ -68,7 +68,7 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         for (int cr = 0; cr < fNp2; cr++) {
           TNudyEndfTab1 *tab12 = (TNudyEndfTab1 *)recIter.Next();
           fEin.push_back(tab12->GetC2());
-//  	  std::cout<<"energy "<< tab12->GetC2() << std::endl;
+          //  	  std::cout<<"energy "<< tab12->GetC2() << std::endl;
           fNr3 = tab12->GetNR();
           fNp3 = tab12->GetNP();
           for (int i = 0; i < fNr3; i++) {
@@ -79,11 +79,12 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
             fEnergyFile5.push_back(tab12->GetX(crs));
             fEnergyPdfFile5.push_back(tab12->GetY(crs));
           }
-          for (int cr = 0; cr < fNp3 - 1 ; cr++) {
-//               std::cout << fEnergyFile5[cr] <<"  "<< fEnergyPdfFile5[cr] << std::endl;
-            RecursionLinearFile5Prob(fEnergyFile5[cr], fEnergyFile5[cr + 1], fEnergyPdfFile5[cr], fEnergyPdfFile5[cr + 1]);
+          for (int cr = 0; cr < fNp3 - 1; cr++) {
+            //               std::cout << fEnergyFile5[cr] <<"  "<< fEnergyPdfFile5[cr] << std::endl;
+            RecursionLinearFile5Prob(fEnergyFile5[cr], fEnergyFile5[cr + 1], fEnergyPdfFile5[cr],
+                                     fEnergyPdfFile5[cr + 1]);
           }
-//           std::cout<<"linearization complete "<< std::endl;
+          //           std::cout<<"linearization complete "<< std::endl;
           FillPdf1D();
           fNbt3.clear();
           fInt3.clear();
@@ -106,8 +107,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           fP1.push_back(tab1->GetY(crs));
         }
         TNudyEndfTab1 *tab11 = (TNudyEndfTab1 *)recIter.Next();
-        fNr2                  = tab11->GetN1();
-        fNp2                  = tab11->GetN2();
+        fNr2                 = tab11->GetN1();
+        fNp2                 = tab11->GetN2();
         for (int cr = 0; cr < fNr2; cr++) {
           fNbt2.push_back(tab11->GetNBT(cr));
           fInt2.push_back(tab11->GetINT(cr));
@@ -118,8 +119,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           // fEin.push_back(tab11->GetX(crs));
         }
         TNudyEndfTab1 *tab12 = (TNudyEndfTab1 *)recIter.Next();
-        fNr3                  = tab12->GetN1();
-        fNp3                  = tab12->GetN2();
+        fNr3                 = tab12->GetN1();
+        fNp3                 = tab12->GetN2();
         for (int cr = 0; cr < fNr3; cr++) {
           fNbt3.push_back(tab12->GetNBT(cr));
           fInt3.push_back(tab12->GetINT(cr));
@@ -131,17 +132,18 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         double energy, eout;
         for (int i = 0; i < fNp2; i++) {
           energy = fE2[i];
-           //std::cout<<"energy "<<energy<<std::endl;
-          double sumprob = 0.0;
-          eout           = fE3[1]/100;
-	  if(eout < 1E-05) eout = 1E-05;
+          // std::cout<<"energy "<<energy<<std::endl;
+          double sumprob         = 0.0;
+          eout                   = fE3[1] / 100;
+          if (eout < 1E-05) eout = 1E-05;
           do {
-            double gx            = 0.0;
-            double pe            = TNudyCore::Instance()->Interpolate(fNbt1, fInt1, fNR, fE1, fP1, fNP, energy);
-            double thetae        = TNudyCore::Instance()->Interpolate(fNbt2, fInt2, fNr2, fE2, fP2, fNp2, energy);
-            if (thetae > 0.0) gx = TNudyCore::Instance()->Interpolate(fNbt3, fInt3, fNr3, fE3, fP3, fNp3, eout / thetae);
-            double ppe           = 0.0;
-            ppe                  = pe * gx;
+            double gx     = 0.0;
+            double pe     = TNudyCore::Instance()->Interpolate(fNbt1, fInt1, fNR, fE1, fP1, fNP, energy);
+            double thetae = TNudyCore::Instance()->Interpolate(fNbt2, fInt2, fNr2, fE2, fP2, fNp2, energy);
+            if (thetae > 0.0)
+              gx       = TNudyCore::Instance()->Interpolate(fNbt3, fInt3, fNr3, fE3, fP3, fNp3, eout / thetae);
+            double ppe = 0.0;
+            ppe        = pe * gx;
             if (ppe > 0.0) {
               fEnergyFile5.push_back(eout);
               fEnergyPdfFile5.push_back(ppe);
@@ -152,14 +154,16 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
             eout *= 2;
           } while (eout < energy - u);
           if (sumprob > 0.0) fEin.push_back(energy);
-           int size = fEnergyFile5.size();
-           for(int cr = 0 ; cr < size - 1 ; cr ++){
-//            std::cout << fEnergyFile5[cr] <<"  "<< fEnergyPdfFile5[cr] << std::endl;
-	    RecursionLinearFile5GenEva(fEnergyFile5[cr], fEnergyFile5[cr+1], fEnergyPdfFile5[cr], fEnergyPdfFile5[cr+1], energy);
+          int size = fEnergyFile5.size();
+          for (int cr = 0; cr < size - 1; cr++) {
+            //            std::cout << fEnergyFile5[cr] <<"  "<< fEnergyPdfFile5[cr] << std::endl;
+            RecursionLinearFile5GenEva(fEnergyFile5[cr], fEnergyFile5[cr + 1], fEnergyPdfFile5[cr],
+                                       fEnergyPdfFile5[cr + 1], energy);
           }
-//           for(unsigned int cr = 0 ; cr < fEnergyFile5.size() ; cr ++){
-//             std::cout <<"fill1d "<< energy <<"  "<< fEnergyFile5[cr] <<"  "<< fEnergyPdfFile5[cr] << std::endl;
-// 	  }
+          //           for(unsigned int cr = 0 ; cr < fEnergyFile5.size() ; cr ++){
+          //             std::cout <<"fill1d "<< energy <<"  "<< fEnergyFile5[cr] <<"  "<< fEnergyPdfFile5[cr] <<
+          //             std::endl;
+          // 	  }
           FillPdf1D();
         }
         fNbt1.clear();
@@ -186,8 +190,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           fP1.push_back(tab1->GetY(crs));
         }
         TNudyEndfTab1 *tab11 = (TNudyEndfTab1 *)recIter.Next();
-        fNr2                  = tab11->GetN1();
-        fNp2                  = tab11->GetN2();
+        fNr2                 = tab11->GetN1();
+        fNp2                 = tab11->GetN2();
         for (int cr = 0; cr < fNr2; cr++) {
           fNbt2.push_back(tab11->GetNBT(cr));
           fInt2.push_back(tab11->GetINT(cr));
@@ -202,10 +206,10 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         }
         double energy, eout;
         for (int i = 0; i < fNp2; i++) {
-          energy         = fE2[i];
-          eout           = fE2[0]/100;
-	  if(eout < 1E-05) eout = 1E-05;
-          double sumprob = 0.0;
+          energy                 = fE2[i];
+          eout                   = fE2[0] / 100;
+          if (eout < 1E-05) eout = 1E-05;
+          double sumprob         = 0.0;
           do {
             double pe        = TNudyCore::Instance()->Interpolate(fNbt1, fInt1, fNR, fE1, fP1, fNP, energy);
             double I         = TNudyCore::Instance()->Interpolate(fNbt2, fInt2, fNr2, fE2, INorm, fNp2, energy);
@@ -222,9 +226,10 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
             eout *= 2;
           } while (eout < energy - u);
           if (sumprob > 0.0) fEin.push_back(energy);
-           int size = fEnergyFile5.size();
-           for(int cr=0; cr < size - 1 ; cr ++){
-	    RecursionLinearFile5Maxwell(fEnergyFile5[cr], fEnergyFile5[cr+1], fEnergyPdfFile5[cr], fEnergyPdfFile5[cr+1],energy);
+          int size = fEnergyFile5.size();
+          for (int cr = 0; cr < size - 1; cr++) {
+            RecursionLinearFile5Maxwell(fEnergyFile5[cr], fEnergyFile5[cr + 1], fEnergyPdfFile5[cr],
+                                        fEnergyPdfFile5[cr + 1], energy);
           }
           FillPdf1D();
         }
@@ -257,8 +262,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           fP1.push_back(tab1->GetY(crs));
         }
         TNudyEndfTab1 *tab11 = (TNudyEndfTab1 *)recIter.Next();
-        fNr2                  = tab11->GetN1();
-        fNp2                  = tab11->GetN2();
+        fNr2                 = tab11->GetN1();
+        fNp2                 = tab11->GetN2();
         for (int cr = 0; cr < fNr2; cr++) {
           fNbt2.push_back(tab11->GetNBT(cr));
           fInt2.push_back(tab11->GetINT(cr));
@@ -272,10 +277,10 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         }
         double energy, eout;
         for (int i = 0; i < fNp2; i++) {
-          energy         = fE2[i];
-          eout           = fE2[0]/100;
-	  if(eout < 1E-05) eout = 1E-05;
-          double sumprob = 0.0;
+          energy                 = fE2[i];
+          eout                   = fE2[0] / 100;
+          if (eout < 1E-05) eout = 1E-05;
+          double sumprob         = 0.0;
           do {
             double pe        = TNudyCore::Instance()->Interpolate(fNbt1, fInt1, fNR, fE1, fP1, fNP, energy);
             double I         = TNudyCore::Instance()->Interpolate(fNbt2, fInt2, fNr2, fE2, INorm, fNp2, energy);
@@ -301,9 +306,10 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
             continue;
           }
           // std::cout<<energy <<"  "<<sumprob<<std::endl;
-           int size = fEnergyFile5.size();
-           for(int cr=0; cr < size - 1 ; cr ++){
-	      RecursionLinearFile5Maxwell(fEnergyFile5[cr], fEnergyFile5[cr+1], fEnergyPdfFile5[cr], fEnergyPdfFile5[cr+1],energy);
+          int size = fEnergyFile5.size();
+          for (int cr = 0; cr < size - 1; cr++) {
+            RecursionLinearFile5Maxwell(fEnergyFile5[cr], fEnergyFile5[cr + 1], fEnergyPdfFile5[cr],
+                                        fEnergyPdfFile5[cr + 1], energy);
           }
           FillPdf1D();
         }
@@ -329,8 +335,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           fP1.push_back(tab1->GetY(crs));
         }
         TNudyEndfTab1 *tab11 = (TNudyEndfTab1 *)recIter.Next();
-        fNr2                  = tab11->GetN1();
-        fNp2                  = tab11->GetN2();
+        fNr2                 = tab11->GetN1();
+        fNp2                 = tab11->GetN2();
         for (int cr = 0; cr < fNr2; cr++) {
           fNbt2.push_back(tab11->GetNBT(cr));
           fInt2.push_back(tab11->GetINT(cr));
@@ -342,8 +348,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
           // fEin.push_back(tab11->GetX(crs));
         }
         TNudyEndfTab1 *tab12 = (TNudyEndfTab1 *)recIter.Next();
-        fNr3                  = tab12->GetN1();
-        fNp3                  = tab12->GetN2();
+        fNr3                 = tab12->GetN1();
+        fNp3                 = tab12->GetN2();
         for (int cr = 0; cr < fNr3; cr++) {
           fNbt3.push_back(tab12->GetNBT(cr));
           fInt3.push_back(tab12->GetINT(cr));
@@ -362,10 +368,10 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         }
         double energy, eout;
         for (int i = 0; i < fNp2; i++) {
-          energy         = fE2[i];
-          eout           = fE2[0]/100;
-	  if(eout < 1E-05) eout = 1E-05;
-          double sumprob = 0.0;
+          energy                 = fE2[i];
+          eout                   = fE2[0] / 100;
+          if (eout < 1E-05) eout = 1E-05;
+          double sumprob         = 0.0;
           do {
             double pe        = TNudyCore::Instance()->Interpolate(fNbt1, fInt1, fNR, fE1, fP1, fNP, energy);
             double I         = TNudyCore::Instance()->Interpolate(fNbt2, fInt2, fNr2, fE2, INorm, fNp2, energy);
@@ -378,14 +384,16 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
               fEnergyPdfFile5.push_back(ppe);
               sumprob += ppe;
             }
-            //    std:: cout<<"I = "<< I <<" pe "<< pe <<" ae "<< ae <<"  prob "<< ppe <<"  fEin "<< energy <<"  eout "<<
+            //    std:: cout<<"I = "<< I <<" pe "<< pe <<" ae "<< ae <<"  prob "<< ppe <<"  fEin "<< energy <<"  eout
+            //    "<<
             //    eout << std::endl;
             eout *= 2;
           } while (eout < energy - u);
           if (sumprob > 0.0) fEin.push_back(energy);
-           int size = fEnergyFile5.size();
-           for(int cr=0; cr < size - 1 ; cr ++){
-	      RecursionLinearFile5Watt(fEnergyFile5[cr], fEnergyFile5[cr+1], fEnergyPdfFile5[cr], fEnergyPdfFile5[cr+1], energy);
+          int size = fEnergyFile5.size();
+          for (int cr = 0; cr < size - 1; cr++) {
+            RecursionLinearFile5Watt(fEnergyFile5[cr], fEnergyFile5[cr + 1], fEnergyPdfFile5[cr],
+                                     fEnergyPdfFile5[cr + 1], energy);
           }
           FillPdf1D();
         }
@@ -428,9 +436,9 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
         }
         double energy, eout;
         for (int i = 0; i < fNp2; i++) {
-          energy = fE2[i];
-          eout           = fE2[0]/100;
-	  if(eout < 1E-05) eout = 1E-05;
+          energy                 = fE2[i];
+          eout                   = fE2[0] / 100;
+          if (eout < 1E-05) eout = 1E-05;
           do {
             double pe  = TNudyCore::Instance()->Interpolate(fNbt1, fInt1, fNR, fE1, fP1, fNP, energy);
             double tm  = TNudyCore::Instance()->Interpolate(fNbt2, fInt2, fNr2, fE2, fP2, fNp2, energy);
@@ -465,7 +473,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
             fEnergyFile5.push_back(eout);
             fEnergyPdfFile5.push_back(ppe);
             //    std:: cout<< eout <<"  "<< ppe <<"  "<< energy <<"  "<< eout << std::endl;
-            //    std:: cout<<"I = "<< I <<" pe "<< pe <<" ae "<< ae <<"  prob "<< ppe <<"  fEin "<< energy <<"  eout "<<
+            //    std:: cout<<"I = "<< I <<" pe "<< pe <<" ae "<< ae <<"  prob "<< ppe <<"  fEin "<< energy <<"  eout
+            //    "<<
             //    eout << std::endl;
             eout *= 2;
           } while (eout < fE1[fNP - 1]);
@@ -521,7 +530,8 @@ TNudyEndfEnergy::TNudyEndfEnergy(TNudyEndfFile *file)
     for(unsigned long j = 0; j < fEnergy5OfMts[0][i].size(); j++){
       std::cout << fEnergy5OfMts[0][i][j] <<"  "<< fFraction5OfMts[0][i][j] << std::endl;
      // for(unsigned long k =0; k < fEnergyPdf5OfMts[i][j].size()/2; k++){
-  //std::cout << fEnergyPdf5OfMts[i][j][2*k] <<"  "<< fEnergyPdf5OfMts[i][j][2*k + 1] <<"  "<< fEnergyCdf5OfMts[i][j][2*k +
+  //std::cout << fEnergyPdf5OfMts[i][j][2*k] <<"  "<< fEnergyPdf5OfMts[i][j][2*k + 1] <<"  "<<
+  fEnergyCdf5OfMts[i][j][2*k +
   1]<< std::endl;
       //}
     }
@@ -581,8 +591,8 @@ double TNudyEndfEnergy::RecursionLinearFile5Prob(double x1, double x2, double pd
 
 double TNudyEndfEnergy::RecursionLinearFile5GenEva(double x1, double x2, double pdf1, double pdf2, double energy)
 {
-//   std::cout << std::setprecision(12) << x1 <<"  "<< std::setprecision(12) << x2 <<"  "<<
-//   std::setprecision(12) << pdf1 <<"  "<< std::setprecision(12) << pdf2 << std::endl;
+  //   std::cout << std::setprecision(12) << x1 <<"  "<< std::setprecision(12) << x2 <<"  "<<
+  //   std::setprecision(12) << pdf1 <<"  "<< std::setprecision(12) << pdf2 << std::endl;
   double pdf = 1.0;
   double mid = 0.5 * (x1 + x2);
   if ((pdf1 == 0.0 && pdf2 == 0.0) || x1 == x2) return 0;
@@ -655,7 +665,7 @@ void TNudyEndfEnergy::FillPdf1D()
       fEneE.push_back(fEnergyFile5[i]);
       fPdf.push_back(fEnergyPdfFile5[i]);
       fCdf.push_back(fEnergyCdfFile5[i]);
-//         std::cout << fEnergyFile5[i] <<"  "<< fEnergyPdfFile5[i] <<"  "<< fEnergyCdfFile5[i] << std::endl ;
+      //         std::cout << fEnergyFile5[i] <<"  "<< fEnergyPdfFile5[i] <<"  "<< fEnergyCdfFile5[i] << std::endl ;
     }
   }
   fEne2D.push_back(fEneE);
@@ -688,7 +698,7 @@ double TNudyEndfEnergy::GetEnergy5(int ielemId, int mt, double energyK)
   if (energyK <= fEnergy5OfMts[ielemId][i][min])
     min = 0;
   else if (energyK >= fEnergy5OfMts[ielemId][i][max])
-    min = max ;
+    min = max;
   else {
     while (max - min > 1) {
       mid = (min + max) / 2;
@@ -699,45 +709,51 @@ double TNudyEndfEnergy::GetEnergy5(int ielemId, int mt, double energyK)
     }
   }
   if (min < 0) min = 0;
-   //for(unsigned int kk = 0; kk < fEnergy5OfMts[ielemId][i].size(); kk++)
-   //std::cout << min <<"  "<< fEnergy5OfMts[ielemId][i][kk] <<"  "<< fEnergy5OfMts[ielemId][i].size() << std::endl;
-  double fraction =
-      (energyK - fEnergy5OfMts[ielemId][i][min]) / (fEnergy5OfMts[ielemId][i][min + 1] - fEnergy5OfMts[ielemId][i][min]);
+  // for(unsigned int kk = 0; kk < fEnergy5OfMts[ielemId][i].size(); kk++)
+  // std::cout << min <<"  "<< fEnergy5OfMts[ielemId][i][kk] <<"  "<< fEnergy5OfMts[ielemId][i].size() << std::endl;
+  double fraction = (energyK - fEnergy5OfMts[ielemId][i][min]) /
+                    (fEnergy5OfMts[ielemId][i][min + 1] - fEnergy5OfMts[ielemId][i][min]);
   double rnd1              = fRnd->Uniform(1);
   double rnd2              = fRnd->Uniform(1);
   if (rnd2 < fraction) min = min + 1;
   // std::cout<<"min "<< min <<"  "<< fEnergy5OfMts[ielemId][i][min] << std::endl;
-  int k    = 0;
-//   for (unsigned int j = 0; j < fEnergyPdf5OfMts[ielemId][i][min].size(); j++) {
-//     std::cout << j <<"  "<< fEnergyPdf5OfMts[ielemId][i][min].size() <<"  "<< fEnergyCdf5OfMts[ielemId][i][min][j] <<"  "<< rnd1 << std::endl;
-//   }
+  int k = 0;
+  //   for (unsigned int j = 0; j < fEnergyPdf5OfMts[ielemId][i][min].size(); j++) {
+  //     std::cout << j <<"  "<< fEnergyPdf5OfMts[ielemId][i][min].size() <<"  "<< fEnergyCdf5OfMts[ielemId][i][min][j]
+  //     <<"  "<< rnd1 << std::endl;
+  //   }
   int size = fEnergyCdf5OfMts[ielemId][i][min].size();
   for (unsigned int j = 0; j < fEnergyPdf5OfMts[ielemId][i][min].size(); j++) {
-//     std::cout << j <<"  "<< fEnergyPdf5OfMts[ielemId][i][min].size() <<"  "<< fEnergyCdf5OfMts[ielemId][i][min][j] <<"  "<< rnd1 << std::endl;
+    //     std::cout << j <<"  "<< fEnergyPdf5OfMts[ielemId][i][min].size() <<"  "<<
+    //     fEnergyCdf5OfMts[ielemId][i][min][j] <<"  "<< rnd1 << std::endl;
     if (rnd1 <= fEnergyCdf5OfMts[ielemId][i][min][j]) {
-      k                    = j ;
+      k                    = j;
       if (k >= size - 1) k = size - 1;
       break;
     }
   }
-//    for (unsigned int j1 = 0; j1 < fEnergyOut5OfMts[ielemId][i][min].size(); j1++){
-//     std::cout<< fEnergyOut5OfMts[ielemId][i][min][j1] <<"  "<< fEnergyPdf5OfMts[ielemId][i][min][j1] <<std::endl;
-//   }
-  double plk = (fEnergyPdf5OfMts[ielemId][i][min][k] - fEnergyPdf5OfMts[ielemId][i][min][k-1]) /
-               (fEnergyOut5OfMts[ielemId][i][min][k] - fEnergyOut5OfMts[ielemId][i][min][k-1]);
-  double plk2 = fEnergyPdf5OfMts[ielemId][i][min][k-1] * fEnergyPdf5OfMts[ielemId][i][min][k-1];
+  //    for (unsigned int j1 = 0; j1 < fEnergyOut5OfMts[ielemId][i][min].size(); j1++){
+  //     std::cout<< fEnergyOut5OfMts[ielemId][i][min][j1] <<"  "<< fEnergyPdf5OfMts[ielemId][i][min][j1] <<std::endl;
+  //   }
+  double plk = (fEnergyPdf5OfMts[ielemId][i][min][k] - fEnergyPdf5OfMts[ielemId][i][min][k - 1]) /
+               (fEnergyOut5OfMts[ielemId][i][min][k] - fEnergyOut5OfMts[ielemId][i][min][k - 1]);
+  double plk2 = fEnergyPdf5OfMts[ielemId][i][min][k - 1] * fEnergyPdf5OfMts[ielemId][i][min][k - 1];
 
   double edes = 0;
   if (plk != 0)
-    edes = fEnergyOut5OfMts[ielemId][i][min][k-1] +
-           (sqrt(plk2 + 2 * plk * (rnd1 - fEnergyCdf5OfMts[ielemId][i][min][k-1])) - fEnergyPdf5OfMts[ielemId][i][min][k-1]) /
+    edes = fEnergyOut5OfMts[ielemId][i][min][k - 1] +
+           (sqrt(plk2 + 2 * plk * (rnd1 - fEnergyCdf5OfMts[ielemId][i][min][k - 1])) -
+            fEnergyPdf5OfMts[ielemId][i][min][k - 1]) /
                plk;
-   double emin = fEnergyOut5OfMts[ielemId][i][min][1] + fraction * (fEnergyOut5OfMts[ielemId][i][min+1][1] - fEnergyOut5OfMts[ielemId][i][min][1]) ;
-   double emax = fEnergyOut5OfMts[ielemId][i][min][size - 1] + fraction * \
-                 (fEnergyOut5OfMts[ielemId][i][min+1][fEnergyCdf5OfMts[ielemId][i][min+1].size() - 1] - fEnergyOut5OfMts[ielemId][i][min][size - 1]) ;
-   edes = fEnergyOut5OfMts[ielemId][i][min][1] + (edes - emin) * (fEnergyOut5OfMts[ielemId][i][min][size - 1] - \
-          fEnergyOut5OfMts[ielemId][i][min][1])/(emax - emin);
-//	       std::cout<<plk <<"  "<< edes << std::endl;
+  double emin = fEnergyOut5OfMts[ielemId][i][min][1] +
+                fraction * (fEnergyOut5OfMts[ielemId][i][min + 1][1] - fEnergyOut5OfMts[ielemId][i][min][1]);
+  double emax = fEnergyOut5OfMts[ielemId][i][min][size - 1] +
+                fraction * (fEnergyOut5OfMts[ielemId][i][min + 1][fEnergyCdf5OfMts[ielemId][i][min + 1].size() - 1] -
+                            fEnergyOut5OfMts[ielemId][i][min][size - 1]);
+  edes = fEnergyOut5OfMts[ielemId][i][min][1] +
+         (edes - emin) * (fEnergyOut5OfMts[ielemId][i][min][size - 1] - fEnergyOut5OfMts[ielemId][i][min][1]) /
+             (emax - emin);
+  //	       std::cout<<plk <<"  "<< edes << std::endl;
   return edes;
 }
 

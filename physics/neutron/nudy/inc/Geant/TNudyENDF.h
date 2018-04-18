@@ -147,8 +147,8 @@ public:
     for (ii = 0; ii < 2; ii++) {
       tmp.swap(strNum[ii]);
       if (fPrepro == 0) {
-         std::size_t alien = tmp.find_last_of("+-");
-         if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
+        std::size_t alien = tmp.find_last_of("+-");
+        if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
       }
       ss.str(tmp);
       c[ii] = 0.0;
@@ -185,8 +185,8 @@ public:
       c[ii] = 0.0;
       tmp.swap(strNum[ii]);
       if (fPrepro == 0) {
-	 std::size_t alien = tmp.find_last_of("+-");
-	 if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
+        std::size_t alien = tmp.find_last_of("+-");
+        if (0 < alien && alien != std::string::npos) tmp.replace(alien, 1, std::string("E") + tmp[alien]);
       }
       ss.str(tmp);
       ss >> c[ii];
@@ -231,20 +231,19 @@ private:
   bool isDollar = false;
   static const char fkElNam[119][4];
   static const char fkElIso[4][2];
-  unsigned char fLogLev;       //  Log Level Flag
-  ifstream fENDF;              //! Input fENDF tape
-  TFile *fRENDF;               //! Output fRENDF file
-  char fLine[LINLEN];          //! Buffer to read the line
-  Nudy::TNudyEndfTape *fTape;  //! Support link for the tape structure
-  Nudy::TNudyEndfMat *fMat;    //! Support link for the current material
+  unsigned char fLogLev;      //  Log Level Flag
+  ifstream fENDF;             //! Input fENDF tape
+  TFile *fRENDF;              //! Output fRENDF file
+  char fLine[LINLEN];         //! Buffer to read the line
+  Nudy::TNudyEndfTape *fTape; //! Support link for the tape structure
+  Nudy::TNudyEndfMat *fMat;   //! Support link for the current material
   std::string ENDFSUB;
-  int fPrepro ;
+  int fPrepro;
   bool fLFI;
 #ifdef USE_ROOT
-  ClassDef(TNudyENDF, 1)       // class for an ENDF data file
+  ClassDef(TNudyENDF, 1) // class for an ENDF data file
 #endif
 };
-
 
 } // namespace
 #endif

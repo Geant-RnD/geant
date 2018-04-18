@@ -38,7 +38,7 @@ class TNudyEndfAng : public NudyPhysics::TNudyEndfRecoPoint {
 
 public:
   TNudyEndfAng();
-  /// \brief default constructure 
+  /// \brief default constructure
   TNudyEndfAng(Nudy::TNudyEndfFile *file);
   /// \brief constructure to be used
   virtual double GetCos4(int elemid, int mt, double energyK);
@@ -58,21 +58,21 @@ private:
   void FillPdf2D();
   /// \brief filling 2 dimentional pdf for anglular distribution
   rowd fEin, fCos4, fCdf, fPdf, fLegendCoef1;
-  /// \brief Temp. variables for cosine, cdf, cdf and legendre coefficient for angular distribution  
+  /// \brief Temp. variables for cosine, cdf, cdf and legendre coefficient for angular distribution
   matrixd2 fCos2D, fPdf2D, fCdf2D, fLegendCoef, fEin2D;
-  /// \brief Temp. variables for cosine, pdf, cdf and legendre coefficient and energy for angular distribution    
+  /// \brief Temp. variables for cosine, pdf, cdf and legendre coefficient and energy for angular distribution
   matrixd3 fCos3D, fPdf3D, fCdf3D;
-  /// \brief Temp. variables for cosine, pdf, cdf for angular distribution    
+  /// \brief Temp. variables for cosine, pdf, cdf for angular distribution
   rowd fCosFile4, fCosPdfFile4, fCosCdfFile4;
   /// \brief cosine, pdf and cdf for angular distribution
   rowint fNbt1, fInt1;
   /// \brief standard ENDF interpolation parameter \cite ENDF Manual
-  rowint fMtNumbers; 
+  rowint fMtNumbers;
   /// \brief temp. MT numbers
-  rowint fMtLct;     
+  rowint fMtLct;
   /// \brief temp. LCT numbers (flag for angular distribution in cm or lab system)
-  int fNr, fNp;       
-  /// \brief standard ENDF parameters for no .of regions and points for interpolation
+  int fNr, fNp;
+/// \brief standard ENDF parameters for no .of regions and points for interpolation
 #ifdef USE_ROOT
   TRandom3 *fRnd;
 #endif
@@ -81,5 +81,5 @@ private:
 #endif
 };
 
-} // namespace 
+} // namespace
 #endif

@@ -53,10 +53,10 @@ private:
   char fName[9]; // File Name
   int fMAT;      // MAT number
   int fMF;       // MF number
-  TList *fSecs; // List of the sections of this file
+  TList *fSecs;  // List of the sections of this file
 
   ClassDef(TNudyEndfFile, 1)
 };
 
-} // namespace 
+} // namespace
 #endif

@@ -41,7 +41,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
     int LI  = header->GetL1();
     int LCT = header->GetL2();
     fMtLct.push_back(LCT);
-//     printf("LCT = %d LTT = %d LI = %d\n",LCT, LTT, LI);
+    //     printf("LCT = %d LTT = %d LI = %d\n",LCT, LTT, LI);
     // Legendre polynomial coefficients
     if (LTT == 1 && LI == 0) {
       TNudyEndfTab2 *tab2 = (TNudyEndfTab2 *)recIter.Next();
@@ -71,7 +71,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
             fCosFile4.push_back(x);
             fCosPdfFile4.push_back(fme);
           }
-//            printf("%e %e\n", x, fme);
+          //            printf("%e %e\n", x, fme);
           k1++;
         } while (k1 < 101);
         for (int l = 0; l < 100; l++) {
@@ -119,7 +119,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
         fLegendCoef1.clear();
       }
       for (unsigned long i = 0; i < fEin.size(); i++) {
-         //printf("Ein = %e\n", fEin[i]);
+        // printf("Ein = %e\n", fEin[i]);
         int k1     = 0;
         double fme = 0.0;
         do {
@@ -134,7 +134,7 @@ TNudyEndfAng::TNudyEndfAng(TNudyEndfFile *file)
             fCosFile4.push_back(x);
             fCosPdfFile4.push_back(fme);
           }
-           //printf("%e %e\n", x, fme);
+          // printf("%e %e\n", x, fme);
           k1++;
         } while (k1 < 101);
 
@@ -239,7 +239,7 @@ double TNudyEndfAng::RecursionLinearLeg(int i, double x1, double x2, double pdf1
   double pdf = 0.5;
   double mid = 0.5 * (x1 + x2);
   if ((pdf1 == 0.0 && pdf2 == 0.0) || x1 == x2) return 0;
-//     std::cout <<" beg   "<< x1 <<"  "<< x2 <<"  "<< pdf1 <<"  "<< pdf2 << std::endl;
+  //     std::cout <<" beg   "<< x1 <<"  "<< x2 <<"  "<< pdf1 <<"  "<< pdf2 << std::endl;
   for (unsigned long j = 0; j < fLegendCoef[i].size(); j++) {
     double leg = ROOT::Math::legendre(j + 1, mid);
     pdf += 0.5 * (2. * (j + 1) + 1.) * fLegendCoef[i][j] * leg;
@@ -327,7 +327,7 @@ double TNudyEndfAng::GetCos4(int ielemId, int mt, double energyK)
   if (energyK <= fEnergy4OfMts[ielemId][i][min])
     min = 0;
   else if (energyK >= fEnergy4OfMts[ielemId][i][max])
-    min = max ;
+    min = max;
   else {
     while (max - min > 1) {
       mid = (min + max) / 2;
@@ -338,8 +338,8 @@ double TNudyEndfAng::GetCos4(int ielemId, int mt, double energyK)
     }
   }
   // std::cout<<" min "<< min << std::endl;
-  double fraction =
-      (energyK - fEnergy4OfMts[ielemId][i][min]) / (fEnergy4OfMts[ielemId][i][min + 1] - fEnergy4OfMts[ielemId][i][min]);
+  double fraction = (energyK - fEnergy4OfMts[ielemId][i][min]) /
+                    (fEnergy4OfMts[ielemId][i][min + 1] - fEnergy4OfMts[ielemId][i][min]);
   // std::cout <<" fraction "<< fraction <<"  "<< energyK <<"  "<< fEnergy4OfMts[ielemId][i][min] << std::endl;
   double rnd1              = fRnd->Uniform(1);
   double rnd2              = fRnd->Uniform(1);
@@ -362,7 +362,8 @@ double TNudyEndfAng::GetCos4(int ielemId, int mt, double energyK)
 
   // std::cout<< k <<"  "<<fCos4OfMts[ielemId][i][min][k]<<"  "<<fCosPdf4OfMts[ielemId][i][min][k] <<"
   // "<<fCosCdf4OfMts[ielemId][i][min][ k] << std::endl;
-  // std::cout<<" fPdf "<<k<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 3]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k
+  // std::cout<<" fPdf "<<k<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 3]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 *
+  // k
   // + 1] << std::endl;
   // std::cout<<" cos "<< fCosPdf4OfMts[ielemId][i][min][2 * k + 2]<<"  "<< fCosPdf4OfMts[ielemId][i][min][2 * k ] <<
   // std::endl;

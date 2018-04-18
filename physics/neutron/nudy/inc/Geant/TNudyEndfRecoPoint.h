@@ -3,8 +3,8 @@
 //                     The Project Nudy
 //===----------------------------------------------------------------------===//
 ///
-/// \brief The class reads doppler broadened cross-sections from the root file 
-///  and gives all the corss-sections/ secondary parameters forthe outgoing particles 
+/// \brief The class reads doppler broadened cross-sections from the root file
+///  and gives all the corss-sections/ secondary parameters forthe outgoing particles
 /// \class TNudyEndfRecoPoint
 /// \author H. Kumawat
 /// \date March 2016
@@ -38,7 +38,6 @@ class TNudyEndfPhEnergy;
 class TRandom3;
 #endif
 
-
 namespace NudyPhysics {
 
 #define PI acos(-1.0)
@@ -49,8 +48,6 @@ typedef std::vector<rowd> matrixd2;
 typedef std::vector<std::vector<rowd>> matrixd3;
 typedef std::vector<std::vector<std::vector<rowd>>> matrixd4;
 typedef std::vector<std::vector<std::vector<std::vector<rowd>>>> matrixd5;
-
-
 
 class TNudyEndfRecoPoint {
 
@@ -110,70 +107,69 @@ public:
   /// \brief getting delayed fraction for each group of the emitter family
   std::fstream out, outtotal;
   std::string outstring, outstringTotal;
-  matrixint MtValues; 
-  /// \brief MT values for which cross-section/ heating values are given 
-
+  matrixint MtValues;
+  /// \brief MT values for which cross-section/ heating values are given
 
 protected:
-  int       fElemId;
+  int fElemId;
   /// \brief serial no of the element in the material list of the simulation
-  const char *rENDF;                      
+  const char *rENDF;
   /// \brief root file name
-  matrixd2  fEneUni, fSigUniT;               
+  matrixd2 fEneUni, fSigUniT;
   /// \brief unionization of energy and total cross-section
-  matrixd3  fSigUniOfMt;                    
+  matrixd3 fSigUniOfMt;
   /// \brief Xsec for each reaction after unionization of energy for all reactions
-  matrixint fEnergyLocMtId;                
+  matrixint fEnergyLocMtId;
   /// \brief MT wise starting energy locations for all cross-sections
-  matrixd4  fCos4OfMts;                     
+  matrixd4 fCos4OfMts;
   /// \brief cosine from file 4 for each reaction
-  matrixd4  fCosPdf4OfMts;                  
+  matrixd4 fCosPdf4OfMts;
   /// \brief pdf from file 4 for each reaction
-  matrixd4  fCosCdf4OfMts;                  
+  matrixd4 fCosCdf4OfMts;
   /// \brief cdf from file 4 for each reaction
-  matrixd3  fEnergy4OfMts;                  
+  matrixd3 fEnergy4OfMts;
   /// \brief incident energy in file 4 for each reaction
-  matrixint fMt4Values;                    
+  matrixint fMt4Values;
   ///  \brief MT values for which angular distributions are given in file 4
-  matrixint fMt4Lct;                       
+  matrixint fMt4Lct;
   /// \brief CM and Lab flag for angular distributions as given in file 4
-  matrixd4  fEnergyOut5OfMts;               
+  matrixd4 fEnergyOut5OfMts;
   /// \brief energy from file 5 for each reaction
-  matrixd4  fEnergyPdf5OfMts;               
+  matrixd4 fEnergyPdf5OfMts;
   /// \brief pdf from file 5 for each reaction
-  matrixd4  fEnergyCdf5OfMts;               
+  matrixd4 fEnergyCdf5OfMts;
   /// \brief cdf from file 5 for each reaction
-  matrixd4  fCos6OfMts;                     
+  matrixd4 fCos6OfMts;
   /// \brief cosine 6 for each reaction
-  matrixd4  fCosin6Pdf, fCosin6Cdf;          
+  matrixd4 fCosin6Pdf, fCosin6Cdf;
   /// \brief pdf cdf file 6 for each reaction
-  matrixd5  fEnergyOut6OfMts;               
+  matrixd5 fEnergyOut6OfMts;
   /// \brief energy from file 6 for each reaction
-  matrixd5  fEnergyPdf6OfMts;               
+  matrixd5 fEnergyPdf6OfMts;
   /// \brief pdf from file 6 for each reaction
-  matrixd5  fEnergyCdf6OfMts;               
+  matrixd5 fEnergyCdf6OfMts;
   /// \brief cdf from file 6 for each reaction
-  matrixd3  fEnergy5OfMts;                  
+  matrixd3 fEnergy5OfMts;
   /// \brief incident energy in file 5 for each reaction
-  matrixd3  fFraction5OfMts;                
+  matrixd3 fFraction5OfMts;
   /// \brief fraction for incident energy in file 5 for each reaction
-  matrixint fMt5Values;                    
+  matrixint fMt5Values;
   /// \brief MT values for which energy distributions are given in file 5
-  matrixint fLaw6;                         
+  matrixint fLaw6;
   /// \brief law 6 for angular-energy distributions are given in file 6
-  matrixint fZD6, fAD6;                     
+  matrixint fZD6, fAD6;
   /// \brief Z, A of law 6 distributions
-  matrixd2  fEint, fNut;                     
+  matrixd2 fEint, fNut;
   /// \brief total incident energy and nu
-  matrixd2  fEinp, fNup;                     
+  matrixd2 fEinp, fNup;
   /// \brief prompt incident energy and nu
-  matrixd2  fEind, fNud, fLambdaD;            
+  matrixd2 fEind, fNud, fLambdaD;
   /// \brief delayed incident energy, nu and lambda
-  matrixd2  fEinFissHeat, fFissHeat;         
+  matrixd2 fEinFissHeat, fFissHeat;
   /// \brief fission incident energy and heat
-  matrixd2  fEinfId, fQvalue;                
+  matrixd2 fEinfId, fQvalue;
   /// \brief incident energy for fission yield and q-value
-  matrixd3  fZafId, fPdfYieldId, fCdfYieldId; 
+  matrixd3 fZafId, fPdfYieldId, fCdfYieldId;
   /// \brief za and yield fission
   double AWRI;
   /// \brief Mass in units of the neutron
@@ -186,27 +182,27 @@ private:
   void FixupTotal(rowd &x1);
   /// \brief making total cross-section
 
-  int        fFlagRead = -1;
+  int fFlagRead = -1;
   /// \brief flag for reading charge particle and photon production cross-sections
-  double     fQValue[999];
+  double fQValue[999];
   /// \brief q-value for all the reactions
-  int        fNR, fNP; 
+  int fNR, fNP;
   /// \brief standard ENDF parameters for range and interpolation
-  matrixint  fMt4, fMt5, fMt6; 
+  matrixint fMt4, fMt5, fMt6;
   /// \brief MT values for which angular, energy/ angular-energy distributions are given in file 4, 5, 6
-  matrixd2   fSigmaOfMts;                      
+  matrixd2 fSigmaOfMts;
   /// \brief sigma for each reaction
-  matrixd2   fSigmaUniOfMts;                   
+  matrixd2 fSigmaUniOfMts;
   /// \brief sigma for each reaction after unionization of energy
-  rowint     fEnergyLocationMts;                 
+  rowint fEnergyLocationMts;
   /// \breif MT wise starting energy for cross-section
-  rowint     fMtNumbers, fMtNum4, fMtNum5, fMtNum6; 
+  rowint fMtNumbers, fMtNum4, fMtNum5, fMtNum6;
   /// \breif MT numbers
-  rowd       fEnergyMts, fSigmaMts, fQvalueTemp;                
+  rowd fEnergyMts, fSigmaMts, fQvalueTemp;
   /// \brief MT numbers for sigma in file3
-  rowd       fELinearFile3, fXLinearFile3;
+  rowd fELinearFile3, fXLinearFile3;
   /// \breif energy and Xsec
-  rowd       fEneTemp, fSigTemp;       
+  rowd fEneTemp, fSigTemp;
   /// \breif temporary vectors to store energy and sigma
   NudyPhysics::TNudyEndfAng *recoAng;
   NudyPhysics::TNudyEndfEnergy *recoEnergy;
@@ -225,6 +221,5 @@ private:
   ClassDef(TNudyEndfRecoPoint, 1) // class for an ENDF reconstruction
 #endif
 };
-
 }
 #endif
