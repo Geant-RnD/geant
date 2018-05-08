@@ -11,8 +11,7 @@
 //#include "test/unit_tests/ApproxEqual.h"
 #include "Geant/ApproxEqual.h"
 
-// #include "MagField.h"
-#include "Geant/CMSmagField.h"
+#include "CMSmagField.h"
 #include <Geant/VectorTypes.h>
 
 // ensure asserts are compiled in
@@ -36,6 +35,7 @@ private:
   string dataFile;
   void PleaseReadData()
   {
+    int lineNum=0;
     string line;
     string s1, s2, s3, s4, s5, s0;
     float d1, d2, d3, d4, d5, d0;
@@ -50,6 +50,8 @@ private:
         fBz.push_back(d3);
         fBr.push_back(d4);
         fBphi.push_back(d5);
+
+        // if( lineNum++ < 10 ) std::cout << " Line# " << lineNum << " : " << s0 << " " << d1 << " " << s1 << " " << s2 << " " << d2 << " " << s3 << " " << d3 << " " << s4 << " " << d4 << " " << s5 << " " << d5 << endl;
       }
       pFile.close();
     } else {
@@ -63,10 +65,9 @@ int main()
 
   CMSmagField m1;
   // input file is copied to build/examples/magneticfield/simplifiedCMS using CMakeLists
-  std::string inputMap("../examples/magneticfield/simplifiedCMS/cms2015.txt");
-
-  m1.ReadVectorData(inputMap);      // "../examples/magneticfield/simplifiedCMS/cms2015.txt");
-  ReadVectorData dataMap(inputMap); // "../examples/magneticfield/simplifiedCMS/cms2015.txt");
+  std::string inputMap("cmsmagfield2015.txt");
+  m1.ReadVectorData(inputMap); 
+  ReadVectorData dataMap(inputMap);
 
   const float kRDiff    = 50.;
   const float kZDiff    = 200.;
@@ -80,24 +81,34 @@ int main()
   const float halfWeight = 0.5;
   const float zero       = 0.;
 
+  const float toTesla    = 1.0 / geant::units::tesla;
+  std::cout << " toTesla = " << toTesla << std::endl;
+
+  // using TypeFlt = float;
+  using TypeFlt = double;  
+  
   //(r,0,z) corresponds exactly to (r,z) in terms that xyzField obtained is same as rzField since
   // theta=0 in this case. Hence can check GetFieldValue<vecgeom::kScalar> in place of GetFieldValueTest
   // Limitation however is that can't check for points with non zero y.
   for (float r = 0; r <= kRMax; r = r + kRDiff) {
     for (float z = -kZMax; z <= kZMax; z = z + kZDiff) {
       // Checks for (r,0,z) and (r,0,z) against (r,z)
-      // cout<<r<<endl;
-      // cout<<z<<endl;
-      vecgeom::Vector3D<float> pos1(r, zero, z);
-      vecgeom::Vector3D<float> xyzField1;
-      m1.GetFieldValue<float>(pos1, xyzField1);
+      // cout << " r= " << r << " z =  " << z << endl;
+      vecgeom::Vector3D<TypeFlt> pos1(r, zero, z);
+      vecgeom::Vector3D<TypeFlt> xyzField1;
+      m1.EstimateFieldValues<TypeFlt>(pos1, xyzField1);
 
-      int i = r * kRDiffInv * noZValues + halfZValues + z * kZDiffInv;
+      // std::cout << "Field r= " << r << " z= " << z << " vec= " << xyzField1[1] << " " << xyzField1[2] << " " << xyzField1[0] << " internal GeantV unites" << std::endl;;
+      xyzField1 *= toTesla;
+      cout << "Field r= " << r << " z= " << z << " vec= " << xyzField1[1] << " " << xyzField1[2] << " " << xyzField1[0] << " Tesla " << endl;
+      
+      int i = std::round ( r * kRDiffInv * noZValues + halfZValues + z * kZDiffInv );
 
-      // cout<<"Correct index is: "<<i<<endl;
+      cout << "Expected index is: " << i << endl;
       vecgeom::Vector3D<float> rzCheckField1(dataMap.fBr[i], dataMap.fBphi[i], dataMap.fBz[i]);
-      // cout<<"xyzField1: "<<xyzField1<<" vs rzCheckField1: "<<rzCheckField1<<endl;
+      cout << "xyzField1: " << xyzField1 << " vs rzCheckField1: " << rzCheckField1 << endl;
       assert(ApproxEqual(xyzField1, rzCheckField1, r, z, 0)); // Working for floats
+      cout << endl;
     }
   }
 
@@ -109,7 +120,7 @@ int main()
 
       vecgeom::Vector3D<float> pos2(r + kRDiff * halfWeight, zero, z), pos3(r, zero, z + kZDiff * halfWeight);
       vecgeom::Vector3D<float> xyzField2, xyzField3;
-      m1.GetFieldValue<float>(pos2, xyzField2);
+      m1.EstimateFieldValues<float>(pos2, xyzField2);
 
       // Say i1, i2, i3, i4
       vecgeom::Vector3D<float> rzCheckField2, rzCheckField3;
@@ -135,7 +146,7 @@ int main()
       // cout<<"xyzField2: "<<xyzField2<<" vs rzCheckField2: "<<rzCheckField2<<endl;
       assert(ApproxEqual(xyzField2, rzCheckField2, r, z, 1));
 
-      m1.GetFieldValue<float>(pos3, xyzField3);
+      m1.EstimateFieldValues<float>(pos3, xyzField3);
 
       rzCheckField3.x() = (dataMap.fBr[i3] + dataMap.fBr[i4]) * halfWeight;
       rzCheckField3.y() = (dataMap.fBphi[i3] + dataMap.fBphi[i4]) * halfWeight;
@@ -152,7 +163,7 @@ int main()
       // cout<<"r: "<<r<<" and z: "<<z<<endl;
       vecgeom::Vector3D<float> pos4(r + kRDiff * halfWeight, zero, z + kZDiff * halfWeight);
       vecgeom::Vector3D<float> xyzField4, rzCheckField4;
-      m1.GetFieldValue<float>(pos4, xyzField4);
+      m1.EstimateFieldValues<float>(pos4, xyzField4);
 
       // need to get rzcheckfield4
       // going to be average of 4 points

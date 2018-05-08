@@ -32,7 +32,7 @@ using Double_v = geant::Double_v;
 
 // #define REPORT_AND_CHECK 1
 
-// #define STATS_METHODS 1
+#define STATS_METHODS 1
 // #define DEBUG_FIELD   1
 
 #ifdef CHECK_VS_HELIX
@@ -51,7 +51,8 @@ constexpr double FieldPropagationHandler::gEpsDeflection = 1.E-2 * units::cm;
 auto stageAfterCrossing = kPostPropagationStage;
 
 #ifdef STATS_METHODS
-static std::atomic<unsigned long> numRK, numHelixZ, numHelixGen, numTot;
+static std::atomic<unsigned long> numTot, numRK, numHelixZ, numHelixGen, numVecRK;
+const unsigned long gPrintStatsMod = 500000;
 #endif
 
 //______________________________________________________________________________
@@ -319,6 +320,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
   using ThreeVector            = vecgeom::Vector3D<double>;
   constexpr double toKiloGauss = 1.0 / units::kilogauss; // Converts to kilogauss
 
+  auto fieldConfig = FieldLookup::GetFieldConfig();
   bool useRungeKutta = td->fPropagator->fConfig->fUseRungeKutta;
   double bmag        = -1.0;
 
@@ -373,7 +375,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
   ThreeVector PositionNewCheck(0., 0., 0.);
   ThreeVector DirectionNewCheck(0., 0., 0.);
 
-  if (useRungeKutta) {
+  if (useRungeKutta || !fieldConfig->IsFieldUniform()  ) {
     fieldPropagator->DoStep(Position, Direction, track.Charge(), track.P(), crtstep, PositionNew, DirectionNew);
 #ifdef DEBUG_FIELD
 // cross check
@@ -406,6 +408,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
 // method= 'R';
 #ifdef STATS_METHODS
     numRK++;
+    numTot++;    
 #endif
   } else {
     // Must agree with values in magneticfield/inc/Units.h
@@ -420,6 +423,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
 // method= 'z';
 #ifdef STATS_METHODS
       numHelixZ++;
+      numTot++;      
 #endif
     } else {
       // geant::
@@ -430,6 +434,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
 // method= 'v';
 #ifdef STATS_METHODS
       numHelixGen++;
+      numTot++;
 #endif
     }
   }
@@ -450,11 +455,12 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
       DirectionNew.x(), DirectionNew.y(), DirectionNew.z());
 #endif
 
+  // std::cout << " total calls: " << numTot << std::endl;
 #ifdef STATS_METHODS
-  unsigned long modbase = 100;
-  if (numTot % modbase < 1) {
+  unsigned long ntot = numTot;
+  if (ntot % gPrintStatsMod < 1) {
     PrintStats();
-    if (numTot > 10 * modbase) modbase = 10 * modbase;
+    // if (numTot > 10 * gPrintStatsMod) gPrintStatsMod = 10 * gPrintStatsMod;
   }
 #endif
 
@@ -498,7 +504,8 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double
   constexpr double toKiloGauss = 1.0 / units::kilogauss; // Converts to kilogauss
   constexpr double perBillion  = 1.0e-9;
   const int nTracks            = tracks.size();
-
+  bool useRungeKutta   = td->fPropagator->fConfig->fUseRungeKutta;
+  
   auto fieldConfig = FieldLookup::GetFieldConfig();
   assert(fieldConfig != nullptr);
 
@@ -546,8 +553,11 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double
     position3D.push_back(pTrack->X(), pTrack->Y(), pTrack->Z());
     direction3D.push_back(pTrack->Dx(), pTrack->Dy(), pTrack->Dz());
   }
-
-  if (0 /*fieldConfig->IsFieldUniform()*/) {
+#ifdef STATS_METHODS
+  unsigned long oldNumTot= numTot;
+#endif
+  
+  if ( fieldConfig->IsFieldUniform() && !useRungeKutta ) {
     vecgeom::Vector3D<double> BfieldUniform = fieldConfig->GetUniformFieldValue();
     ConstFieldHelixStepper stepper(BfieldUniform * toKiloGauss);
     // stepper.DoStep<ThreeVector,double,int>(Position,    Direction,  track.Charge(), track.P(), stepSize,
@@ -559,7 +569,10 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double
     stepper.DoStepArr<Double_v>(position3D.x(), position3D.y(), position3D.z(), direction3D.x(), direction3D.y(),
                                 direction3D.z(), fltCharge, momentumMag, stepSize, PositionOut.x(), PositionOut.y(),
                                 PositionOut.z(), DirectionOut.x(), DirectionOut.y(), DirectionOut.z(), nTracks);
-
+#ifdef STATS_METHODS
+    numTot += nTracks;
+    numHelixGen += nTracks;
+#endif    
     for (int itr = 0; itr < nTracks; ++itr) {
       Track &track = *tracks[itr];
 
@@ -678,6 +691,12 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double
       // Integrate using Runge Kutta method
       vectorDriver->AccurateAdvance(fldTracksIn, steps, fltCharge, fEpsTol, fldTracksOut, nTracks, succeeded);
 
+#ifdef STATS_METHODS
+    numTot += nTracks;
+    numVecRK += nTracks;
+    numRK += nTracks;
+#endif  
+      
 #ifdef CHECK_VS_SCALAR
       bool checkVsScalar = true;
 #ifdef CHECK_VS_HELIX
@@ -782,6 +801,13 @@ void FieldPropagationHandler::PropagateInVolume(TrackVec_t &tracks, const double
       exit(1);
     }
   }
+
+#ifdef STATS_METHODS
+  if(  (oldNumTot / gPrintStatsMod) < (numTot / gPrintStatsMod ) ) {
+    PrintStats();
+  }
+#endif
+
 #else
   // Placeholder - implemented just as a loop
   for (int itr = 0; itr < nTracks; ++itr)
@@ -869,10 +895,11 @@ VECCORE_ATT_HOST_DEVICE
 void FieldPropagationHandler::PrintStats()
 {
 #ifdef STATS_METHODS
-  unsigned long nTot = numTot++;
-  unsigned long rk = numRK, hZ = numHelixZ, hGen = numHelixGen;
-  std::cerr << "Step statistics (field Propagation):  total= " << nTot << " RK = " << rk << "  HelixGen = " << hGen
-            << " Helix-Z = " << hZ << std::endl;
+  unsigned long nTot = numTot;
+  unsigned long rk = numRK, hZ = numHelixZ, hGen = numHelixGen, vecRK = numVecRK ;
+  std::cerr << "Step statistics (field Propagation):  total= " << nTot << " RK = " << rk
+            << " ( vecRK = " << vecRK << " ) "
+            << "  HelixGen = " << hGen << " Helix-Z = " << hZ << std::endl;
 #endif
 }
 

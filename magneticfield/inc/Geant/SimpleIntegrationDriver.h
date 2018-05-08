@@ -756,7 +756,7 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
       if (partDebug) cout << "Store and Report Stored lanes - v1.5 allDone - about to break." << endl;
 
       StoreGoodValues(ytemp, h, errmax_sq, goodStep, yFinal, hFinal, errmax_sqFinal);
-
+      //*************
       break;
     }
 
@@ -785,9 +785,11 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
     // Idea 1.5 :  Use only one store for goodStep & underflow lanes (if continuing)
     if (!vecCore::MaskEmpty(stepSizeUnderflow || goodStep)) {
       if (partDebug) cout << "Store and Report Stored lanes - v1.5 allDone - good or Underflow." << endl;
+      //*************
       StoreGoodValues(ytemp, h, errmax_sq,
                       (goodStep || stepSizeUnderflow), // && !alreadyFinished,
                       yFinal, hFinal, errmax_sqFinal);
+      //*************      
     }
 #endif
     finished = finished || stepSizeUnderflow;
@@ -812,6 +814,7 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
 #ifdef STORE_ONCE
   //  'Idea 3' - Store exactly one time ( here - except on loop exit)
   StoreGoodValues(ytemp, h, errmax_sq, finished, yFinal, hFinal, errmax_sqFinal);
+  //*************        
 //   Why not store all ?
 #endif
 

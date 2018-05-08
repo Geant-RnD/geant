@@ -20,7 +20,7 @@
 // set up the run manager and run the simulation.
 void GetArguments(int argc, char *argv[]);
 void SetupDetectorConstruction(cmsapp::CMSDetectorConstruction *det);
-void SetupUserFieldConfig(geant::RunManager *runMgr);
+void SetupFieldConfig(geant::RunManager *runMgr);
 void SetupPrimaryGenerator(cmsapp::CMSParticleGun *gun);
 void SetupApplication(cmsapp::CMSFullApp *app);
 geant::RunManager *RunManager();
@@ -47,12 +47,13 @@ int parConfigNumTracksPerBasket = 16; // default number of tracks per basket
 int parConfigIsPerformance      = 0;  // run without any user actions
 int parConfigVectorizedGeom     = 0;  // activate geometry basketizing
 int parConfigExternalLoop       = 0;  // activate external loop mode
+int parVerboseTracking          = 0;  // verbosity for *every* track
 
 //
 // field configuration parameters
-int parFieldActive      = 1;            // activate magnetic field
-double parFieldEpsRK    = 0.0003;       // Revised / reduced accuracy - vs. 0.0003 default
-int parFieldBasketized  = 0;            // basketize magnetic field
+int    parFieldActive     = 1;            // activate magnetic field
+double parFieldEpsRK      = 0.0003;       // Revised / reduced accuracy - vs. 0.0003 default
+int    parFieldBasketized = 0;            // basketize magnetic field
 // float parFieldVector[3] = {0., 0., 2.}; // Constant field value
 
 //
@@ -76,11 +77,16 @@ int main(int argc, char *argv[])
   SetupDetectorConstruction(det);
   runMgr->SetDetectorConstruction(det);
   // 
-  // Create field    construction & get field flags
+  // Create   field  construction  & Get field flags
   CMSFieldConstruction *fieldCtion= nullptr;
   if (parFieldActive)  fieldCtion = new /* cmsapp:: */ CMSFieldConstruction();
-  SetupUserFieldConfig(runMgr);
   det->SetUserFieldConstruction(fieldCtion);
+  SetupFieldConfig(runMgr);
+  
+  // Activate integration of tracks in field
+  // auto config = runMgr->GetConfig();    
+  // fieldCtion->CreateFieldAndSolver(config->fUseRungeKutta);
+
   //
   // Create primary generator
   cmsapp::CMSParticleGun *gun = new cmsapp::CMSParticleGun();
@@ -121,9 +127,10 @@ static struct option options[] = {{"gun-set-primary-energy", required_argument, 
                                   {"config-run-performance", required_argument, 0, 's'},
                                   {"config-vectorized-geom", required_argument, 0, 't'},
                                   {"config-external-loop", required_argument, 0, 'u'},
+                                  {"verbose-tracking", required_argument, 0, 'v'},   
 
                                   {"field-active", required_argument, 0, 'E'},
-//                                {"field-use-RK", required_argument, 0, 'G'},
+//                                {"field-use-RK", required_argument, 0, 'G'},   // Mandatory for now
                                   {"field-eps-RK", required_argument, 0, 'H'},
                                   {"field-basketized", required_argument, 0, 'I'},
                                   
@@ -225,6 +232,9 @@ void GetArguments(int argc, char *argv[])
     case 'u':
       parConfigExternalLoop = (int)strtol(optarg, NULL, 10);
       break;
+    case 'v':
+      parVerboseTracking    = (int)strtol(optarg, NULL, 10);
+      break;      
     //---- Field
     case 'E':
       parFieldActive = (int)strtol(optarg, NULL, 10);
@@ -280,7 +290,7 @@ void SetupDetectorConstruction(cmsapp::CMSDetectorConstruction *det)
   }
 }
 
-void SetupUserFieldConfig(geant::RunManager *runMgr)
+void SetupFieldConfig(geant::RunManager *runMgr)
 {
   auto config = runMgr->GetConfig();
   config->fUseRungeKutta = parFieldActive;
