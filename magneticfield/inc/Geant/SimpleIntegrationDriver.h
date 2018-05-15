@@ -156,12 +156,12 @@ protected:
 
   template <class Real_v>
   int InitializeLanes(const FieldTrack yInput[], const double hstep[], const double charge[], int nTracks,
-                      //         bool        badStepSize[],   // Output - redundant
-                      int indexArr[], // [vecCore::VectorSize<Real_v>()] - Output
-                      Real_v y[],     // [Nvar]        - Output
-                      Real_v &hStepLane, Real_v &chargeLane, Real_v &startCurveLength,
-                      int &numFilled, // [Out]: number of filled lanes
-                      int &numBadSize) const;
+                      int      indexArr[], // [vecCore::VectorSize<Real_v>()] - Output
+                      Real_v   y[],     // [Nvar]        - Output
+                      Real_v & hStepLane, Real_v &chargeLane, Real_v &startCurveLength,
+                      int    & numFilled, // [Out]: number of filled lanes
+                      bool     badStepSize[],   // Output - needed to reset values
+                      int    & numBadSize) const;
   // Load 'work' into array y, indices of lanes into indexArr, etc
   // Return array index of 'next' track - i.e. first track not yet loaded
 
@@ -1037,14 +1037,18 @@ void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::ReportConditionLanes(
 template <class T_Stepper, unsigned int Nvar>
 template <class Real_v>
 int SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::InitializeLanes(
-    const FieldTrack yInput[], const double hstep[], const double charge[],
-    // const  double     xStart [], // --> Now in FieldTrack
-    int nTracks,
-    //     bool       badStepSize[],  // Output - redundant
-    int indexArr[], // [vecCore::VectorSize<Real_v>()]
-    Real_v y[], Real_v &hStepLane, Real_v &chargeLane, Real_v &startSlen,
-    int &numFilled, // How many were loaded.
-    int &numBadSize) const
+    const FieldTrack yInput[],
+    const double     hstep[],
+    const double     charge[],
+    int              nTracks,
+    int       indexArr[], // [vecCore::VectorSize<Real_v>()]
+    Real_v    y[],
+    Real_v  & hStepLane,
+    Real_v  & chargeLane,
+    Real_v  & startSlen,
+    int     & numFilled, // How many were loaded.
+    bool      badStepSize[],  // Output
+    int     & numBadSize ) const
 // Converts input scalar stream to acceptable form of Vc vectors
 // for vector processing in OneStep
 {
@@ -1066,19 +1070,22 @@ int SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::InitializeLanes(
   hStepLane  = Real_v(-12345.6789); //  Signals 'inactive' for lanes not loaded
   chargeLane = Real_v(0.0);         //    >>  Ditto  >>
 
+  // Rest only at the start 
   numBadSize  = 0; // Ensure it starts at Zero !?
   int j       = 0;
+  
   size_t slot = 0;
   do {
     double hVal       = hstep[j];
     double chargeVal  = charge[j];
     bool invalidTrack = (hVal <= 0.0) || (chargeVal == 0.0);
-    // badStepSize[j] =  invalidTrack;
+    badStepSize[j] =  invalidTrack;
 
     if (invalidTrack) {
       if (hVal <= 0.0)
         std::cout << " WARNING> Non-positive step-size h = " << std::setw(5) << hVal << " for j= " << j << std::endl;
       if (chargeVal == 0.0) std::cout << " WARNING> Zero charge " << chargeVal << " for j= " << j << std::endl;
+      // Will need to copy input to output ...
       numBadSize++;
     } else {
       indexArr[j] = slot;
@@ -1279,10 +1286,10 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
       dydx[ncompSVEC];
 
   // Real_v ySubStepStart[ncompSVEC];
-  // bool badStepSize[nTracks];      // Step size is illegal, ie. h <= 0
+  bool badStepSize[nTracks];      // Step size is illegal, ie. h <= 0
 
-  std::fill_n(stillOK, nTracks, 1); //  Assume success, flag failure ... Strange/JA
-  // std::fill_n( badStepSize,  nTracks, false);
+  std::fill_n( stillOK,      nTracks, true); 
+  std::fill_n( badStepSize,  nTracks, false);
   if (partDebug) ReportArray(methodName, "hstep", hstep, nTracks);
 
   Bool_v lastStepOK, succeededLane(false), isLastStepLane(false);
@@ -1294,11 +1301,18 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
   for (unsigned int i = 0; i < VecSize; ++i)
     indexArr[i]       = -1;
 
-  int idNext = InitializeLanes(yInput, hstep, charge, /* xStart, */ nTracks, /* badStepSize,*/ indexArr, y, hStepLane,
-                               chargeLane, xStartLane, numFilled, numBadSize);
+  int idNext = InitializeLanes(yInput, hstep, charge, nTracks,                             // Input
+                               indexArr, y, hStepLane, chargeLane, xStartLane, numFilled,  // Main output
+                               badStepSize, numBadSize);                                   // 'Bad' output
   // OLD:
   // int     idNext = vecCore::VectorSize<Real_v>(); // ASSUMES that nTracks >= vecCore::VectorSize<Real_v>() !!! FIX
 
+  if( numBadSize > 0)
+   for (int i = 0; i < idNext; ++i)
+      if( badStepSize[i] )
+      {
+         yOutput[i] = yInput[i];
+      }
   // const maxSize = std::max( (int) vecCore::VectorSize<Real_v>(), (int) numTracks );
   if (idNext > (int)vecCore::VectorSize<Real_v>()) // Some lanes had hstep <= 0.0
   {
