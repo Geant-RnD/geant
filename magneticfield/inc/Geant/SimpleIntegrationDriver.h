@@ -1616,7 +1616,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
 
     } // end if ( ! vecCore::MaskFull( laneContinues ) )  // At least one lane is finished
 
-
     /*    Bool_v leftLanes = (nstp<=fMaxNoSteps) && (x < x2) && (!isLastStepLane) ;
         int countLeftLanes=0;
         int indLastLane;
