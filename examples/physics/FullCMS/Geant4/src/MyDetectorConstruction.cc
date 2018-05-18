@@ -51,6 +51,18 @@ void MyDetectorConstruction::SetMagField() {
   if (fUniformMagField ) {
     delete fUniformMagField;
   }
+  if (fSimplifiedCMSfield ) {
+    delete fSimplifiedCMSfield;
+  }
+#ifndef USE_UNIFORM
+  fUniformMagField = nullptr;
+  const char *fieldFileName="cmsmagneticfield2015.txt";
+  fSimplifiedCMSfield = new G4ScalarRZMagFieldFromMap(fieldFileName);
+  fFieldMgr->SetDetectorField(fSimplifiedCMSfield);
+  fFieldMgr->CreateChordFinder(fSimplifiedCMSfield);  
+#else
+  fSimplifiedCMSfield = nullptr;
+
   if (std::abs(fFieldValue)>0.0) {
     // Apply a global uniform magnetic field along the Z axis.
     // Notice that only if the magnetic field is not zero, the Geant4
@@ -68,4 +80,5 @@ void MyDetectorConstruction::SetMagField() {
            << " *** NO MAGNETIC FIELD SET  *** " << G4endl
 	         << G4endl;
   }
+#endif  
 }
