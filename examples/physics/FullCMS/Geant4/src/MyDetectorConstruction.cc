@@ -11,11 +11,13 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4RunManager.hh"
 #include "MyDetectorMessenger.hh"
+#include "G4ScalarRZMagFieldFromMap.hh"
 
 G4double MyDetectorConstruction::gFieldValue = 0.0;
 
 MyDetectorConstruction::MyDetectorConstruction()
-: fWorld(nullptr), fFieldMgr(nullptr), fUniformMagField(nullptr) , fDetectorMessenger(nullptr) {
+: fWorld(nullptr), fFieldMgr(nullptr), fUniformMagField(nullptr),
+  fSimplifiedCMSfield(nullptr), fDetectorMessenger(nullptr) {
   fGDMLFileName = "cms.gdml";
   fFieldValue   = 0.0;
   fDetectorMessenger = new MyDetectorMessenger(this);
@@ -48,21 +50,17 @@ G4VPhysicalVolume* MyDetectorConstruction::Construct() {
 
 
 void MyDetectorConstruction::SetMagField() {
-  if (fUniformMagField ) {
-    delete fUniformMagField;
-  }
-  if (fSimplifiedCMSfield ) {
-    delete fSimplifiedCMSfield;
-  }
-#ifndef USE_UNIFORM
+  delete fUniformMagField;
+  delete fSimplifiedCMSfield;
+  fSimplifiedCMSfield= nullptr;
   fUniformMagField = nullptr;
+  
+#ifndef USE_UNIFORM
   const char *fieldFileName="cmsmagneticfield2015.txt";
   fSimplifiedCMSfield = new G4ScalarRZMagFieldFromMap(fieldFileName);
   fFieldMgr->SetDetectorField(fSimplifiedCMSfield);
   fFieldMgr->CreateChordFinder(fSimplifiedCMSfield);  
 #else
-  fSimplifiedCMSfield = nullptr;
-
   if (std::abs(fFieldValue)>0.0) {
     // Apply a global uniform magnetic field along the Z axis.
     // Notice that only if the magnetic field is not zero, the Geant4

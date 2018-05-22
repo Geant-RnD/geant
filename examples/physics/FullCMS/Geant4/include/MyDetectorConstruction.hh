@@ -11,7 +11,7 @@ class G4VPhysicalVolume;
 class G4FieldManager;
 class G4UniformMagField;
 class MyDetectorMessenger;
-
+class G4ScalarRZMagFieldFromMap;
 
 class MyDetectorConstruction : public G4VUserDetectorConstruction {
 
@@ -35,12 +35,14 @@ private:
   // this static member is for the print out
   static G4double        gFieldValue;
 
-  G4String               fGDMLFileName;
-  G4double               fFieldValue;
-  G4GDMLParser           fParser;
-  G4VPhysicalVolume*     fWorld;
-  G4FieldManager*        fFieldMgr;
-  G4UniformMagField*     fUniformMagField;
+  G4String                   fGDMLFileName;
+  G4double                   fFieldValue;
+  G4GDMLParser               fParser;
+  G4VPhysicalVolume*         fWorld;
+  G4FieldManager*            fFieldMgr;
+  G4UniformMagField*         fUniformMagField;
+  G4ScalarRZMagFieldFromMap* fSimplifiedCMSfield;
+ 
   MyDetectorMessenger*   fDetectorMessenger;
 };
 

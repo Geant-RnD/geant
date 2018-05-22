@@ -11,7 +11,6 @@
 #include "G4Types.hh"
 #include "G4ScalarRZMagFieldFromMap.hh"
 
-
 using namespace std;
 
 G4ScalarRZMagFieldFromMap::G4ScalarRZMagFieldFromMap()
@@ -56,7 +55,7 @@ void G4ScalarRZMagFieldFromMap::ReadVectorData(string inputMap)
 }
 
 void G4ScalarRZMagFieldFromMap::
-  GetFieldValueRZ(const double r, const double Z, G4ThreeVector &rzField)
+  GetFieldValueRZ(double r, double Z, G4ThreeVector &rzField) const
 {
 
   // Take care that radius and z for out of limit values take values at end points
@@ -97,18 +96,9 @@ void G4ScalarRZMagFieldFromMap::
   rzField = G4ThreeVector( BR, BPhi, BZ );
 }
 
-void G4ScalarRZMagFieldFromMap::GetFieldValueRZ(std::vector<double> radius, std::vector<double> z)
-{
-  int len= std::min( radius.size(), z.size() );
-  for (int i = 0; i < len; ++i) {
-    G4ThreeVector rzField;
-    GetFieldValueRZ(radius[i], z[i], rzField);
-  }
-}
-
 // Sidenote: For theta =0; xyzField = rzField.
 // theta =0 corresponds to y=0
-void G4ScalarRZMagFieldFromMap::GetFieldValueXYZ(const G4ThreeVector &pos, G4ThreeVector &xyzField)
+void G4ScalarRZMagFieldFromMap::GetFieldValueXYZ(const G4ThreeVector &pos, G4ThreeVector &xyzField) const
 {
   double cyl[2];
   CartesianToCylindrical(pos, cyl);
