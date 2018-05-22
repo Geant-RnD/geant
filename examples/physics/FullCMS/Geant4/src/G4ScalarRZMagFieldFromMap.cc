@@ -8,6 +8,8 @@
 #include <vector>
 #include <stdlib.h>
 
+#include <cassert>
+
 #include "G4Types.hh"
 #include "G4ScalarRZMagFieldFromMap.hh"
 
@@ -49,29 +51,37 @@ void G4ScalarRZMagFieldFromMap::ReadVectorData(string inputMap)
       fBphi.push_back(d5);
     }
     pFile.close();
+    G4cout << "ReadVectorData> Data read - closing file " << inputMap << G4endl;
   } else {
-    cout << "Unable to open file";
+    G4cerr << "G4ScalarRZMagFieldFromMap::ReadVectorData> Unable to open file"
+           << inputMap << G4endl;
+    exit(1);
   }
 }
 
 void G4ScalarRZMagFieldFromMap::
-  GetFieldValueRZ(double r, double Z, G4ThreeVector &rzField) const
+  GetFieldValueRZ(double r, double Zin, G4ThreeVector &rzField) const
 {
 
   // Take care that radius and z for out of limit values take values at end points
   double radius = min(r, kRMax);
-  double z      = max(min(Z, kZMax), -kZMax); // max(min(Z,Zmax), Zmin )
+  double z      = max(min(Zin, kZMax), -kZMax); // max(min(Z,Zmax), Zmin )
 
   // to make sense of the indices, consider any particular instance e.g. (25,-200)
-  int rFloor   = floor(radius * kRDiffInv);
+  int rFloor   = std::min( (int) floor(radius * kRDiffInv), kNoRValues - 2 );
   int rIndLow  = rFloor * kNoZValues;
-  int rIndHigh = rIndLow + kNoZValues;
+  int rIndHigh = rIndLow + kNoZValues;  
+  // int rIndHigh = (radius < kRMax) ? rIndLow + kNoZValues ? rIndLow;
 
   // if we use z-z0 in place of two loops for Z<0 and Z>0
   // z-z0 = [0,32000]
   // so indices 0 to 160 : total 161 indices for (z-z0)/200
-  // i.e. we are saying:
-  int zInd = floor((z - kZ0) * kZDiffInv);
+
+  int zInd = std::min( (int) std::floor(z * kZDiffInv) + kHalfZValues, kNoZValues - 2);
+
+  // cout << " r:  floor = " << rFloor << " Index = " << rIndLow << " hi= " << rIndHigh << endl;
+  // cout << " z-Index = " << zInd    << endl;
+
   // need i1,i2,i3,i4 for 4 required indices
   int i1            = rIndLow + zInd;
   int i2            = i1 + 1;
@@ -89,6 +99,16 @@ void G4ScalarRZMagFieldFromMap::
   double a3 = (radius - radiusLow) * (zHigh - z);
   double a4 = (radius - radiusLow) * (z - zLow);
 
+  unsigned long minSzUL= std::min( std::min( fBr.size(), fBphi.size()) , fBz.size() );
+  int minSize= minSzUL;
+
+  assert( 0 <= i1 );
+  assert( i4 <= minSize ) ;
+  assert( 0. <= a1  && a1 * kAInverse <= 1.0 );
+  assert( 0. <= a2  && a2 * kAInverse <= 1.0 );
+  assert( 0. <= a3  && a3 * kAInverse <= 1.0 );
+  assert( 0. <= a4  && a4 * kAInverse <= 1.0 );  
+  
   double BR   = (fBr[i1] * a1 + fBr[i2] * a2 + fBr[i3] * a3 + fBr[i4] * a4) * kAInverse;
   double BZ   = (fBz[i1] * a1 + fBz[i2] * a2 + fBz[i3] * a3 + fBz[i4] * a4) * kAInverse;
   double BPhi = (fBphi[i1] * a1 + fBphi[i2] * a2 + fBphi[i3] * a3 + fBphi[i4] * a4) * kAInverse;

@@ -20,28 +20,32 @@ public:
   MyDetectorConstruction();
   ~MyDetectorConstruction();
 
-  G4VPhysicalVolume* Construct();
+  G4VPhysicalVolume* Construct() override final;
 
   void SetGDMLFileName ( const G4String& gdmlfile ) { fGDMLFileName = gdmlfile; }
-  void SetMagFieldValue(const G4double fieldValue ) { fFieldValue   = fieldValue; gFieldValue = fFieldValue; }
+   void SetMagFieldValue(const G4double fieldValue ) { fFieldValue   = fieldValue; gFieldValue = fFieldValue; }
 
+  static void     UseUniformField(G4bool val= true) {  fUseUniformField= val; }
+   
   static G4double GetFieldValue() { return gFieldValue; }
+  static G4bool   IsFieldUniform() { return fUseUniformField; }
+
+  void ConstructSDandField() override final;  // needed to create field in each thread
+   // Replaces the old 'SetMagField();' 
 
 private:
-  void SetMagField();
+  // Configuration parameters
+  static G4double        gFieldValue;      // primarily used for printout (if uniform...)
+  static G4bool          fUseUniformField;
 
-
-private:
-  // this static member is for the print out
-  static G4double        gFieldValue;
-
+  // 
   G4String                   fGDMLFileName;
   G4double                   fFieldValue;
   G4GDMLParser               fParser;
   G4VPhysicalVolume*         fWorld;
-  G4FieldManager*            fFieldMgr;
-  G4UniformMagField*         fUniformMagField;
-  G4ScalarRZMagFieldFromMap* fSimplifiedCMSfield;
+  // G4FieldManager*            fFieldMgr;            // Per-thread !!
+  // G4UniformMagField*         fUniformMagField;     // Per-thread !!
+  // G4ScalarRZMagFieldFromMap* fSimplifiedCMSfield;  // Per-thread !!
  
   MyDetectorMessenger*   fDetectorMessenger;
 };
