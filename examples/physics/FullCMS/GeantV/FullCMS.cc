@@ -31,6 +31,7 @@ geant::RunManager *RunManager();
 //
 // detector parameters
 std::string parDetGDMFile = ""; // i.e. default application values
+std::string parFieldFile = "";
 //
 // primary generator parameters (primary particle gun)
 std::string parGunPrimaryParticleName = "";           // i.e. default application value
@@ -79,7 +80,9 @@ int main(int argc, char *argv[])
   // 
   // Create   field  construction  & Get field flags
   CMSFieldConstruction *fieldCtion= nullptr;
-  if (parFieldActive)  fieldCtion = new /* cmsapp:: */ CMSFieldConstruction();
+  if (parFieldActive)  fieldCtion = new CMSFieldConstruction();
+  if( parFieldFile!="") fieldCtion->SetFileForField(parFieldFile);
+  
   det->SetUserFieldConstruction(fieldCtion);
   SetupFieldConfig(runMgr);
   
@@ -118,7 +121,8 @@ static struct option options[] = {{"gun-set-primary-energy", required_argument, 
                                   {"gun-set-primary-direction", required_argument, 0, 'd'},
 
                                   {"det-set-gdml", required_argument, 0, 'e'},
-
+                                  {"det-set-field", required_argument, 0, 'f'},
+                                  
                                   {"config-number-of-buffered-events", required_argument, 0, 'm'},
                                   {"config-total-number-of-events", required_argument, 0, 'n'},
                                   {"config-number-of-threads", required_argument, 0, 'p'},
@@ -131,8 +135,8 @@ static struct option options[] = {{"gun-set-primary-energy", required_argument, 
 
                                   {"field-active", required_argument, 0, 'E'},
 //                                {"field-use-RK", required_argument, 0, 'G'},   // Mandatory for now
-                                  {"field-eps-RK", required_argument, 0, 'H'},
-                                  {"field-basketized", required_argument, 0, 'I'},
+                                  {"field-eps-RK", required_argument, 0, 'I'},
+                                  {"field-basketized", required_argument, 0, 'J'},                          
                                   
                                   {"help", no_argument, 0, 'h'},
                                   {0, 0, 0, 0}};
@@ -207,6 +211,10 @@ void GetArguments(int argc, char *argv[])
     case 'e':
       parDetGDMFile = optarg;
       break;
+    case 'f':
+      parFieldFile = optarg;
+      break;
+      
     //---- Run configuration
     case 'm':
       parConfigNumBufferedEvt = (int)strtol(optarg, NULL, 10);
@@ -216,6 +224,7 @@ void GetArguments(int argc, char *argv[])
       break;
     case 'p':
       parConfigNumThreads = (int)strtol(optarg, NULL, 10);
+      std::cout << "  Argument read: ConfigNumThreads = " << parConfigNumThreads << std::endl;
       break;
     case 'q':
       parConfigNumPropagators = (int)strtol(optarg, NULL, 10);
@@ -234,12 +243,13 @@ void GetArguments(int argc, char *argv[])
       break;
     case 'v':
       parVerboseTracking    = (int)strtol(optarg, NULL, 10);
+      // std::cout << "  Argument read: VerboseTracking = " << parVerboseTracking << std::endl;      
       break;      
     //---- Field
     case 'E':
       parFieldActive = (int)strtol(optarg, NULL, 10);
       break;
-    case 'I':
+    case 'J':
       parFieldBasketized = (int)strtol(optarg, NULL, 10);
       break;
       
@@ -259,7 +269,12 @@ geant::RunManager *RunManager()
 {
   // create the GeantConfiguration object and the RunManager object
   geant::GeantConfig *runConfig = new geant::GeantConfig();
-  geant::RunManager *runManager = new geant::RunManager(parConfigNumPropagators, parConfigNumThreads, runConfig);
+  std::cout << " Instantiation RunManager with : \n"
+            << "    # Threads     = " << parConfigNumThreads  << std::endl
+            << "    # Propagators = " << parConfigNumPropagators << std::endl;
+  geant::RunManager *runManager = new geant::RunManager(parConfigNumPropagators,
+                                                        parConfigNumThreads,
+                                                        runConfig);
   // create the real physics main manager/interface object and set it in the RunManager
   runManager->SetPhysicsInterface(new geantphysics::PhysicsProcessHandler());
   //
