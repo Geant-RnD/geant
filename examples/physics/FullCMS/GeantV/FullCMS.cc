@@ -52,7 +52,7 @@ int parVerboseTracking          = 0;  // verbosity for *every* track
 
 //
 // field configuration parameters
-int    parFieldActive     = 1;            // activate magnetic field
+int    parFieldActive     = 0;            // activate magnetic field
 double parFieldEpsRK      = 0.0003;       // Revised / reduced accuracy - vs. 0.0003 default
 int    parFieldBasketized = 0;            // basketize magnetic field
 // float parFieldVector[3] = {0., 0., 2.}; // Constant field value
