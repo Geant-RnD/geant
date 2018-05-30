@@ -1,6 +1,7 @@
 
 #include "MyDetectorConstruction.hh"
 
+#include <atomic>
 #include "globals.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VisAttributes.hh"
