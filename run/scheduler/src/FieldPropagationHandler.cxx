@@ -104,10 +104,14 @@ GUFieldPropagator *FieldPropagationHandler::Initialize(TaskData *td)
     assert(fieldPropagator);
     td->fFieldPropagator = fieldPropagator;
   }
-
-  size_t basketSize    = td->fPropagator->fConfig->fNperBasket;
-  td->fSpace4FieldProp = new WorkspaceForFieldPropagation(basketSize);
 #endif
+  std::cout << "FieldPropagationHandler::Initialize called. " << std::endl;
+
+  if( ! td->fSpace4FieldProp ) {
+    size_t basketSize    = td->fPropagator->fConfig->fNperBasket;
+    td->fSpace4FieldProp = new WorkspaceForFieldPropagation(basketSize);
+  }
+  
   // For the moment return the field Propagator.
   // Once this method is called by the framework, this can be obtained from td->fFieldPropagator
   return fieldPropagator;
@@ -330,7 +334,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
 
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
   auto fieldPropagator = GetFieldPropagator(td);
-  if (!fieldPropagator || !td->fSpace4FieldProp) {
+  if (!fieldPropagator && !td->fSpace4FieldProp) {
     fieldPropagator = Initialize(td);
   }
 #endif
@@ -376,6 +380,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
   ThreeVector DirectionNewCheck(0., 0., 0.);
 
   if (useRungeKutta || !fieldConfig->IsFieldUniform()  ) {
+    assert(fieldPropagator);
     fieldPropagator->DoStep(Position, Direction, track.Charge(), track.P(), crtstep, PositionNew, DirectionNew);
 #ifdef DEBUG_FIELD
 // cross check
@@ -405,7 +410,7 @@ void FieldPropagationHandler::PropagateInVolume(Track &track, double crtstep, Ta
       }
     }
 #endif
-// method= 'R';
+// method= 'R';    
 #ifdef STATS_METHODS
     numRK++;
     numTot++;    
