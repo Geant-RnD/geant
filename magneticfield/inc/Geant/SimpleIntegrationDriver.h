@@ -312,7 +312,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::ReportStatus(const Real_v x, cons
 
   ReportRowOfDoubles("x", x);
   ReportRowOfDoubles("charge", charge);
-  // std::cout << " Check - charge: " << charge << std::endl;
   ReportRowOfDoubles("hTry", hTry);
   ReportRowOfDoubles("errMaxSq/F", errmaxSqFinal);
 
@@ -340,27 +339,18 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::ReportResults(const Real_v hFinal
   using vecCore::Get;
 
   const int chName = 10, chValue = 10;
-  std::cout << setw(chName) << "h"
-            << " : ";
   for (size_t i = 0; i < vecCore::VectorSize<Real_v>(); ++i) {
-    cout << " " << setw(chValue) << Get(hFinal, i) << " | ";
   }
-  cout << endl;
 
   ReportRowOfDoubles("hFinal", hFinal);
   //
-  cout << setw(chName) << "errMaxSq/M"
-       << " : ";
   for (size_t i = 0; i < vecCore::VectorSize<Real_v>(); ++i) {
-    cout << " " << setw(chValue) << Get(errmaxSqFinal, i) << " | ";
   }
-  cout << endl;
 
   ReportRowOfDoubles("errMaxSq/F", errmaxSqFinal);
 
   ReportManyRowsOfDoubles("yOut/R", yOutput, Nvar);
 
-  std::cout << "-- Same value with 'manual' loop (to check): " << std::endl;
   std::string baseName = "yOut";
   for (int i = 0; i < Nvar; i++) {
     std::string varName = baseName + "[" + std::to_string(i) + "]/M";
@@ -445,9 +435,6 @@ inline void SimpleIntegrationDriver<T_Stepper, Nvar>::CheckParameters()
     exit(1);
   }
 
-  if (fVerboseLevel)
-    std::cout << "SimpleIntegrationDriver::CheckParameters > Powers used: " << std::endl
-              << "  shrink = " << fPowerShrink << "  grow = " << fPowerGrow << std::endl;
 }
 
 /*********
@@ -512,12 +499,8 @@ SimpleIntegrationDriver<T_Stepper, Nvar>::SimpleIntegrationDriver(double hminimu
 #endif
 
   if (fVerboseLevel) {
-    std::cout << "SiD:ctor> Stepper Order= " << pStepper->GetIntegratorOrder() << " > Powers used: "
-              << " shrink = " << fPowerShrink << "  grow = " << fPowerGrow << std::endl;
   }
   if ((fVerboseLevel > 0) || (fStatisticsVerboseLevel > 1)) {
-    std::cout << "MagIntDriver version: Accur-Adv: "
-              << "invE_nS, QuickAdv-2sqrt with Statistics " << fStatsStatus << std::endl;
     // ( fStatsEnabled ? "enabled" : "disabled" )
   }
 
@@ -561,8 +544,6 @@ SimpleIntegrationDriver<T_Stepper, Nvar>::SimpleIntegrationDriver(
   fMaxNoSteps = fMaxStepBase / fpStepper->GetIntegratorOrder();
 
   if ((fVerboseLevel > 0) || (fStatisticsVerboseLevel > 1)) {
-    std::cout << "MagIntDriver version: Accur-Adv: "
-              << "invE_nS, QuickAdv-2sqrt with Statistics " << fStatsStatus << std::endl;
   }
 }
 
@@ -637,7 +618,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
   using FormattedReporter::ReportRowOfBools;
 
   if (partDebug) {
-    cout << "\n" << endl;
   }
 
   // const int vecCore::VectorSize<Real_v>() = vecgeom::vecCore::VectorSize<Real_v>();
@@ -680,7 +660,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
     itersLeft--;
     iter++;
 
-    if (partDebug) cout << " OneGoodStep - iteration = " << iter << endl;
 
     // #ifdef STORE_ONCE
     vecCore::MaskedAssign(h, finished, Real_v(0.0)); // Set h = 0.0 for finished lanes -- ensure no change !
@@ -693,7 +672,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
 
     bool DebugEachIteration = false;
     if (partDebug && DebugEachIteration) {
-      cout << "1st Report - after call to Step-With-Error-Estimate" << endl;
       // ReportRowOfBools<Real_v>( "(already) finished", finished );
       ReportRowOfBools<Real_v>("active", Active);
       // ReportManyRowsOfDoubles( "yStart",  yStart, Nvar );
@@ -754,7 +732,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
     if (allDone) // All (or remaining) steps succeeded.
     {
       // Idea 1.5
-      if (partDebug) cout << "Store and Report Stored lanes - v1.5 allDone - about to break." << endl;
 
       StoreGoodValues(ytemp, h, errmax_sq, goodStep, yFinal, hFinal, errmax_sqFinal);
 
@@ -777,7 +754,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
           numUnder++;
         }
       }
-      cout << "WARNING> Underflow detected in " << numUnder << " lanes." << endl;
       // Idea 1.0
       // StoreGoodValues( ytemp,      h,        errmax_sq,
       //                   stepSizeUnderflow, // && !finished,
@@ -785,7 +761,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
     }
     // Idea 1.5 :  Use only one store for goodStep & underflow lanes (if continuing)
     if (!vecCore::MaskEmpty(stepSizeUnderflow || goodStep)) {
-      if (partDebug) cout << "Store and Report Stored lanes - v1.5 allDone - good or Underflow." << endl;
       StoreGoodValues(ytemp, h, errmax_sq,
                       (goodStep || stepSizeUnderflow), // && !alreadyFinished,
                       yFinal, hFinal, errmax_sqFinal);
@@ -823,9 +798,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
     ReportConditionLanes(stepSizeUnderflow, x, xnew, h, htry);
   }
 
-  if (partDebug)
-    cout << "SimpleIntDrv: 1-step - Loop done at iter = " << iter << " with h = " << h << " from htry= " << htry
-         << std::endl;
 
   h = hFinal;
   // errmax_sq = errmax_sqFinal;
@@ -855,8 +827,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
 
   // #ifdef CHECK_STRETCH_FACTOR
   if (!vecCore::MaskEmpty(errStretch - errStretchOld > 1.0e-12 * errStretch)) {
-    cout << "ERROR> Lanes found with differences in calculated value of 'errStretch'"
-         << "       ( factor for stretching step size for 'good' next step." << endl;
     ReportRowOfDoubles("old-new: errStretch", errStretch - errStretchOld);
     ReportRowOfDoubles("old: errStretch", errStretchOld);
     ReportRowOfDoubles("new: errStretch", errStretch);
@@ -881,8 +851,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::OneGoodStep(const Real_v yStart[]
   // for(int k=0;k<Nvar ;k++) { y[k] = yFinal[k]; }
 
   if (partDebug) {
-    cout << " hdid= " << hdid << " and hnext= " << hnext << std::endl
-         << " end of  OneGoodStep method .......................... " << std::endl;
   }
   return;
 } // end of OneGoodStep()
@@ -904,7 +872,6 @@ inline void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::StoreGoodValue
   using vecCore::Set;
 
   if (vecCore::MaskFull(storeFlag)) {
-    // std::cout << "StoreGoodValues: Unconditional assignment to output - all together." << std::endl;
 
     for (unsigned int j = 0; j < Nvar; ++j)
       yFinal[j]         = yWork[j];
@@ -926,20 +893,15 @@ inline void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::StoreGoodValue
     using FormattedReporter::ReportRowOfBools;
     using FormattedReporter::ReportRowOfDoubles;
     using FormattedReporter::ReportManyRowsOfDoubles;
-    cout << "==============================================" << endl;
-    cout << "Called Store-Final-Values.  Input is " << endl;
     ReportRowOfDoubles("h", hValue);
     ReportManyRowsOfDoubles("y", yWork, Nvar);
     ReportRowOfDoubles("errmaxSq", errMaxSqValue);
 
     ReportRowOfBools<Real_v>("storeFlag", storeFlag);
-    cout << "==============================================" << endl;
-    cout << "Report of Stored lanes - in Store-Final-Values" << endl;
     // ReportArray( methodName, "hFinal", hFinal );
     ReportRowOfDoubles("hFinal", hFinalStore);
     ReportManyRowsOfDoubles("yFinal", yFinal, Nvar);
     ReportRowOfDoubles("errmaxSq/Final", errMaxSqStore);
-    // cout<< " yerr is: " << yerr[0] << endl;
   }
 
 #ifdef CHECK_STORE
@@ -948,7 +910,6 @@ inline void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::StoreGoodValue
     for (unsigned int i = 0; i < vecCore::VectorSize<Real_v>(); ++i) {
       if (storeFlag[i]) {
         if (partDebug)
-          cout << "Checking store of lane " << i << " :  "
                << " h = " << Get(hValue, i)               // hValue[i]
                << " errMaxSq = " << Get(errMaxSqValue, i) // errMaxSqValue[i]
                << " ... ";                                // << endl;
@@ -966,7 +927,6 @@ inline void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::StoreGoodValue
           double yOriginal = Get(yWork[j], i);
           assert(std::fabs(yStored - yOriginal) <= epsTol * std::fabs(yOriginal));
         }
-        if (partDebug) cout << " .. OK " << endl;
       } // else // Check that they are unchanged ... ?
     }
   }
@@ -975,7 +935,6 @@ inline void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::StoreGoodValue
 #ifdef ORIGINAL_CODE
   for (int i = 0; i < vecCore::VectorSize<Real_v>(); ++i) {
     if (storeFlag[i]) {
-      cout << "Storing lane " << i << " :  "
            << " h = " << Get(hValue, i)                        // hValue[i]
            << " errMaxSq = " << Get(errMaxSqValue, i) << endl; // errMaxSqValue[i]
 
@@ -1051,13 +1010,10 @@ int SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::InitializeLanes(
   // void ReportArray( const std::string& context, const std::string& varName,
   //                  const double Arr[],         int numTracks,             bool banner= false );
 
-  if (partDebug) std::cout << "----Initializing Lanes ----" << std::endl;
   // const int NumComptFT= FieldTrack::NumCompFT;
   double yStartScalar[ncompSVEC]; // Size depends on needs of DumpToArray
 
   if (partDebug) {
-    std::cout << "InitLanes:  chargeArr [0] = " << charge[0] << " ,  [1] = " << charge[1] << ",  [2] = " << charge[2]
-              << ",  [3] = " << charge[3] << std::endl;
     ReportArray("InitLanes", "hStepArr", hstep, nTracks, true);
     ReportArray("InitLanes", "chargeArr", charge, nTracks);
   }
@@ -1075,8 +1031,6 @@ int SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::InitializeLanes(
 
     if (invalidTrack) {
       if (hVal <= 0.0)
-        std::cout << " WARNING> Non-positive step-size h = " << std::setw(5) << hVal << " for j= " << j << std::endl;
-      if (chargeVal == 0.0) std::cout << " WARNING> Zero charge " << chargeVal << " for j= " << j << std::endl;
       numBadSize++;
     } else {
       indexArr[j] = slot;
@@ -1086,7 +1040,6 @@ int SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::InitializeLanes(
       Set(hStepLane, slot, hVal);
       //   chargeLane  []  = chargeVal ;  // -- i.e. charge[j];
       Set(chargeLane, slot, chargeVal); // charge[j] );
-      // std::cout << " slot = " << slot << " j= " << j << " charge = " << charge[j] << std::endl;
       //  startSlen  [j] = xStart[j] ); // yInput[j].GetCurveLength();
       Set(startSlen, slot, // xStart[j] );
           yInput[j].GetCurveLength());
@@ -1138,7 +1091,6 @@ bool SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::InsertNewTrack(
 {
   using vecCore::Set;
 
-  if (partDebug) std::cout << "----Inserting New Track " << trackNextInput << " at position " << slot << std::endl;
 
   bool filled = false; // to get the while loop starting
   while (trackNextInput < nTracks && !filled) {
@@ -1202,9 +1154,6 @@ void SimpleIntegrationDriver</*Real_v,*/ T_Stepper, Nvar>::StoreOutput(const Rea
 //
 {
   if (partDebug)
-    std::cout << "----Storage position (out-arr): " << indOut
-              // << " (ntracks= " << nTracks << ")"
-              << std::endl;
 
   (void)nTracks; // Use the value in case on non-Debug builds - avoids compilation warning
 
@@ -1313,7 +1262,7 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
   // Assume that all lanes are currently Full ?? ===>>> TEST it !!
 
   using Index_v = vecCore::Index<Real_v>;
-  Index_v nstp(0); // Should be Int_v with size compatible with Real_v ( likely 64-bit )
+  Real_v nstp(0.0); // Should be Int_v with size compatible with Real_v ( likely 64-bit )
 
   // Real_v StartPosAr[3];
   // StartPosAr[0] = y[0];   StartPosAr[1] = y[1];  StartPosAr[2] = y[2];
@@ -1339,9 +1288,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
       (!vecCore::MaskFull(isDoneLane) && !vecCore::MaskEmpty((nstp <= fMaxNoSteps) && (x < x2) && (!isLastStepLane))) ||
       idNext < nTracks) {
     if (partDebug)
-      std::cout << "************************************" << std::endl
-                << "** Top of while loop ***************" << endl
-                << "----hStepLane is: " << hStepLane << endl;
 
     // if( h > fMinimumStep ) { QuickAdvance .. } else { .. below  //  ( Sequential code  )
     // if (useOneStep) {
@@ -1352,14 +1298,12 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
     // } else KeepStepping( y, dydx, x, h, epsilon, hdid, hnext, hStepLane, hDone) ;
 
     if (partDebug) {
-      cout << "### Accurate Advance ---- After return from OneGood Step" << endl;
       ReportManyRowsOfDoubles("yStart", y, Nvar);
       ReportManyRowsOfDoubles("dydx", dydx, Nvar);
       ReportRowOfDoubles("h-ask", h);
       ReportRowOfDoubles("h-did", hdid);
       ReportRowOfDoubles("x", x);
       ReportRowOfDoubles("(end) x2", x2);
-      cout << "##-------------------------------------------------------------------------------" << endl;
       // ReportManyRowsOfDoubles( "yNext", yNext, Nvar);
       Real_v momStart = GetMomentumMag(y);
       ReportRowsOfPositionsMomenta("yNext", yNext, Nvar, momStart);
@@ -1396,11 +1340,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
     // For rest, check the proposed next stepsize
 
     if (partDebug) {
-      cout << " hRequest= " << hStepLane << endl;
-      // cout << " x-Start = " << xStartLane << endl;
-      cout << " hdid    = " << hdid << endl;
-      cout << " x-Now   = " << x << endl;
-      cout << " x2 -x   = " << xremains << endl;
     }
     hnext = Max(hnext, Real_v(fMinimumStep));
     // Note: This has potential for instability i.e. if MinStep is 'too long'
@@ -1408,7 +1347,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
     // Ensure that the next step does not overshoot
     hnext = Min(xremains, hnext);
 
-    if (partDebug) cout << "AccurateAdvance: hnext = " << hnext << " to replace h = " << h << endl;
 
     h = hnext;
 
@@ -1417,7 +1355,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
 
     isLastStepLane = (h == 0.0) || isLastStepLane;
 
-    if (partDebug) std::cout << " lastStep : " << isLastStepLane << std::endl;
 
     nstp += 1; // nstp++;
 
@@ -1433,9 +1370,7 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
       for (unsigned int i = 0; i < Nvar; ++i) {
         y[i] = yNext[i];
       }
-      if (partDebug) cout << "Copying      y <- yNext , as 1+ lanes continue." << endl;
     } else {
-      if (partDebug) cout << "Did NOT copy y <- yNext , as NO lanes continue." << endl;
     }
 
     if (!vecCore::MaskFull(laneContinues)) // At least one lane is finished
@@ -1443,12 +1378,7 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
       Bool_v finishedLane = !laneContinues;
 
       if (partDebug) {
-        cout << "SiD: At least one lane finished " << std::endl;
-        cout << "  finishedLane        : " << finishedLane << std::endl;
         Bool_v CondNoOfSteps = (nstp <= fMaxNoSteps);
-        cout << "  Cond numSteps < Max : " << /* (nstp<=fMaxNoSteps)*/ CondNoOfSteps << std::endl;
-        cout << "  Cond    (x < x2)    : " << !succeededLane << std::endl;
-        cout << "  Cond  not Last Step : " << !isLastStepLane << std::endl;
       }
 
       // #if SINGLE_INSERT
@@ -1459,14 +1389,11 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
       for (unsigned int i = 0; i < vecCore::VectorSize<Real_v>(); ++i) {
         using vecCore::Set;
         if (partDebug)
-          cout << "Checking for storing lane [ " << i << " ]  nstp = " << vecCore::Get(nstp, i)
-               << " <= ? ( = fMaxNoSteps ) " << endl;
 
         // if ( finishedLane[i] &&  indexArr[i] != -1)
         if (vecCore::Get(finishedLane, i) && indexArr[i] != -1) {
           // 1. Store the Results (Output)
           stillOK[indexArr[i]] = vecCore::Get(succeededLane, i); // succeededLane[i];
-          if (partDebug) std::cout << "----Storing Output at position: " << i << std::endl;
           StoreOutput(yNext, x, i, yOutput, indexArr[i], hstep, stillOK, nTracks); // Second - can change 'succeeded'
           //*********----------------------------------------------
           // Ananya: Do not pass succeededLane to StoreOutput (preference?), so
@@ -1486,8 +1413,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
 
             bool reportInsertNewTrack = true;
             if (partDebug && reportInsertNewTrack) {
-              cout << " --Inserting New Track - part 1/2: loaded new state: " << (filled ? " Yes " : " No  ");
-              cout << endl;
               ReportRowOfBools<Real_v>("renewedLanes", renewedLanes);
               ReportRowOfDoubles("hstep", hStepLane);
               ReportManyRowsOfDoubles("yCurrent", y, Nvar);
@@ -1501,7 +1426,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
             //   renewedLanes [i] = false;      // Not needed - it's the starting value
             // Set( renewedLanes, i,   false);
             indexArr[i] = -1;
-            if (partDebug) cout << " --No New Tracks available: idNext = " << idNext << " nTracks= " << nTracks << endl;
           }
         }
       } // for ( uint i = 0; i < vecCore::VectorSize<Real_v>(); ++i)
@@ -1510,20 +1434,17 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
       if (!vecCore::MaskEmpty(renewedLanes)) {
         using vecCore::MaskedAssign;
         if (partDebug) {
-          cout << " --Inserting New Track - part 2/2: (New) 'masked' reset of remaining state: " << endl;
-          cout << " *** Existing values - values before change" << endl;
           ReportRowOfDoubles("x1", x1);
           ReportRowOfDoubles("x", x);
           ReportRowOfDoubles("h", h);
           ReportRowOfDoubles("hdid", hdid);
           ReportRowOfDoubles("numStep", nstp);
-          cout << " *** Existing values - recall" << endl;
           ReportRowOfBools<Real_v>("renewedLanes", renewedLanes);
           ReportRowOfDoubles("xStart", xStartLane);
         }
 
         // -- Reset working variables for lanes -- vectorised & clean
-        MaskedAssign(nstp, renewedLanes, Index_v(0)); // ==> Requires compatible Integer type ...
+        MaskedAssign(nstp, renewedLanes, Real_v(0.0)); // ==> Requires compatible Integer type ...
         // MaskedAssign(  nstp,  renewedLanes, Real_v(0.0) );
         MaskedAssign(x1, renewedLanes, xStartLane);
         MaskedAssign(x, renewedLanes, xStartLane);
@@ -1543,7 +1464,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
         isLastStepLane = isLastStepLane && !renewedLanes;
 
         if (partDebug) {
-          cout << " *** Vectors changed together after 'loop':" << endl;
           ReportRowOfDoubles("x1", x1);
           ReportRowOfDoubles("x", x);
           ReportRowOfDoubles("h", h);
@@ -1552,15 +1472,12 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
           // ReportRowOfDoubles( "hDone",   hDone);
         }
       } else {
-        if (partDebug) cout << "-- Insert New Track - part 2/2:  No New Tracks found." << endl;
       }
 
       // bool ReportAtBottomOfLoop= true;
       // if (ReportAtBottomOfLoop && partDebug)
       bool ReportAfterResets = true;
       if (ReportAfterResets && partDebug) {
-        cout << " After all resets --  " << endl;
-        cout << " ====================================================================" << endl;
         ReportManyRowsOfDoubles("yCurrent", y, Nvar);
         ReportRowOfDoubles("charge", chargeLane);
         ReportRowOfDoubles("x", x);
@@ -1575,7 +1492,6 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
     /*    Bool_v leftLanes = (nstp<=fMaxNoSteps) && (x < x2) && (!isLastStepLane) ;
         int countLeftLanes=0;
         int indLastLane;
-        // cout << " leftLanes is: " << leftLanes << std::endl;
         if( !vecCore::MaskEmpty(leftLanes) )
         {
           for (int i = 0; i < vecCore::VectorSize<Real_v>(); ++i)
@@ -1584,12 +1500,10 @@ void SimpleIntegrationDriver<T_Stepper, Nvar>::AccurateAdvance(const FieldTrack 
             {
               countLeftLanes++;
               indLastLane = i;
-              // cout << indLastLane << std::endl;
             }
           }
         }
 
-        // cout<< "countLeftLanes is: "<<countLeftLanes << std::endl;
 
         if (countLeftLanes == 1)
         {
@@ -1667,7 +1581,6 @@ SimpleIntegrationDriver< T_Stepper, Nvar>
 #ifdef  GUDEBUG_FIELD
   if(fVerboseLevel>2)
   {
-    cout << "G4MagIntDrv: Quick Advance" << std::endl;
     PrintStatus( yarrin, s_start, yarrout, s_start+hstep, hstep,  1);
   }
 #endif
@@ -1862,7 +1775,6 @@ bool SimpleIntegrationDriver<T_Stepper, Nvar>::TestInitializeLanes() // int numT
 
   bool allOk = true;
 
-  cout << " TestInitializeLanes() called. " << endl;
 
   constexpr int numTracks = 8;
   FieldTrack yInput[numTracks];
@@ -1875,19 +1787,13 @@ bool SimpleIntegrationDriver<T_Stepper, Nvar>::TestInitializeLanes() // int numT
   //     ======
   int numBadSize = -1;
 
-  cout << "    calling CreateInput() " << endl;
   CreateInput(yInput, numTracks);
 
-  cout << "    test:  chargeArr [0] = " << chargeArr[0] << " ,  [1] = " << chargeArr[1] << ",  [2] = " << chargeArr[2]
-       << ",  [3] = " << chargeArr[3] << endl;
-  cout << "    calling InitializeLanes() " << endl;
   int nFilled1 = -1;
   int numNext1 = InitializeLanes(yInput, hStep, chargeArr, /* xStart, */ numTracks, // badStepSize,
                                  yWorkLanes, hStepLane, chargeLane, sBegin, nFilled1, numBadSize);
-  cout << " - Init Lanes returned = " << nFilled1 << endl;
 
   Real_v xLanes(0.0);
-  // cout << " - Printing  x, charge, 0.0,  y[] " << endl;
   ReportStatus(xLanes, chargeLane, hStepLane, Real_v(0.0), yWorkLanes);
 
   std::string testName("Test of InitializeLanes # ");
@@ -1912,19 +1818,15 @@ bool SimpleIntegrationDriver<T_Stepper, Nvar>::TestInitializeLanes() // int numT
   assert(numBadSize == 0);
 
   // Calling Checking method
-  cout << "      calling Checking method" << endl;
   std::string varNameOutput("yWorkLanes");
   for (unsigned int iSlot = 0; iSlot < vecCore::VectorSize<Real_v>(); iSlot++) {
     bool ok = CheckOutput(yWorkLanes, iSlot, iSlot, testName, varNameOutput);
     allOk   = allOk && ok;
   }
-  cout << " END of first test of Initialize Lanes. " << endl;
-  cout << endl;
 
   // ------------------------ Test case 2 ------------------------
   Real_v yWorkLanes2[Nvar]; // hStepLane2, sBegin2; ==> To check clean (not overwrite)
   testId = 2;
-  cout << " START of 2nd test of Initialize Lanes. " << endl;
 
   // int identityNum[9]=     { 0,     1,   2,    3,   4,    5,   6,    7,  8 };
   double hStep2[numTracks] = {0.0, -1.0, 2.0, -3.0, 4.0, -5.0, 6.0, -7.0};
