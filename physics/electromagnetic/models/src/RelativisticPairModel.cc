@@ -322,8 +322,8 @@ Double_v RelativisticPairModel::SampleTotalEnergyTransferAlias(const Double_v eg
   const Double_v legamma = Math::Log(egamma);
 
   Double_v val        = (legamma - fSTLogMinPhotonEnergy) * fSTILDeltaPhotonEnergy;
-  IndexD_v indxEgamma = (IndexD_v)val; // lower electron energy bin index
-  Double_v pIndxHigh  = val - indxEgamma;
+  IndexD_v indxEgamma = vecCore::Convert<IndexD_v,Double_v>(val); // lower electron energy bin index
+  Double_v pIndxHigh  = val - vecCore::Convert<Double_v,IndexD_v>(indxEgamma);
   MaskD_v mask        = r1 < pIndxHigh;
   if (!MaskEmpty(mask)) {
     vecCore::MaskedAssign(indxEgamma, mask, indxEgamma + 1);

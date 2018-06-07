@@ -416,8 +416,8 @@ Double_v MollerBhabhaIonizationModel::SampleEnergyTransfer(Double_v elProdCut, I
   Double_v logEmin      = vecCore::Gather<Double_v>(tableEmin, mcLocalIdx);
   Double_v ilDelta      = vecCore::Gather<Double_v>(tableILDeta, mcLocalIdx);
   Double_v val          = (lPrimEkin - logEmin) * ilDelta;
-  IndexD_v indxPrimEkin = (IndexD_v)val; // lower electron energy bin index
-  Double_v pIndxHigh    = val - indxPrimEkin;
+  IndexD_v indxPrimEkin = vecCore::Convert<IndexD_v,Double_v>(val); // lower electron energy bin index
+  Double_v pIndxHigh    = val - vecCore::Convert<Double_v,IndexD_v>(indxPrimEkin);
   MaskD_v mask          = r1 < pIndxHigh;
   if (!MaskEmpty(mask)) {
     vecCore::MaskedAssign(indxPrimEkin, mask, indxPrimEkin + 1);

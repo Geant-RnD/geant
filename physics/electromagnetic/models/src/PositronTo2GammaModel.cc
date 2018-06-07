@@ -231,8 +231,8 @@ geant::Double_v PositronTo2GammaModel::SampleEnergyTransferAlias(geant::Double_v
   Double_v lpekin = Math::Log(pekin);
   //
   Double_v val       = (lpekin - fSTLogMinPositronEnergy) * fSTILDeltaPositronEnergy;
-  IndexD_v indxPekin = (IndexD_v)val; // lower electron energy bin index
-  Double_v pIndxHigh = val - indxPekin;
+  IndexD_v indxPekin = vecCore::Convert<IndexD_v,Double_v>(val); // lower electron energy bin index
+  Double_v pIndxHigh = val - vecCore::Convert<Double_v,IndexD_v>(indxPekin);
   MaskD_v mask       = r1 < pIndxHigh;
   if (!MaskEmpty(mask)) {
     vecCore::MaskedAssign(indxPekin, mask, indxPekin + 1);

@@ -774,8 +774,8 @@ Double_v SeltzerBergerBremsModel::SamplePhotonEnergy(Double_v gammaCut, Double_v
   Double_v logEmin      = vecCore::Gather<Double_v>(tableEmin, mcLocalIdx);
   Double_v ilDelta      = vecCore::Gather<Double_v>(tableILDeta, mcLocalIdx);
   Double_v val          = (lPrimEkin - logEmin) * ilDelta;
-  IndexD_v indxPrimEkin = (IndexD_v)val; // lower electron energy bin index
-  Double_v pIndxHigh    = val - indxPrimEkin;
+  IndexD_v indxPrimEkin = vecCore::Convert<IndexD_v,Double_v>(val); // lower electron energy bin index
+  Double_v pIndxHigh    = val - vecCore::Convert<Double_v,IndexD_v>(indxPrimEkin);
   MaskD_v mask          = r1 < pIndxHigh;
   if (!MaskEmpty(mask)) {
     vecCore::MaskedAssign(indxPrimEkin, mask, indxPrimEkin + 1);
@@ -875,10 +875,8 @@ void SeltzerBergerBremsModel::SamplePhotonEnergy(const double *eEkin, const doub
 
     Double_v lekin  = Math::Log(eekin);
     Double_v eresid = (lekin - fLogLoadDCSMinElecEnergy) * fInvLogLoadDCSDeltaEnergy;
-    IndexD_v ie     = (IndexD_v)eresid; // y1 index
-    eresid -= (Double_v)ie;             // (y2-y1)*resid + y1
-    assert((eekin < fLoadDCSElectronEnergyGrid[0]).isEmpty());
-    assert((eekin >= fLoadDCSElectronEnergyGrid[fLoadDCSNumElectronEnergies - 1]).isEmpty());
+    IndexD_v ie     = vecCore::Convert<IndexD_v,Double_v>(eresid); // y1 index
+    eresid -= vecCore::Convert<Double_v,IndexD_v>(ie);             // (y2-y1)*resid + y1
 
     Double_v vmax;
     for (int l = 0; l < kVecLenD; ++l) {
@@ -888,8 +886,8 @@ void SeltzerBergerBremsModel::SamplePhotonEnergy(const double *eEkin, const doub
       constexpr double epeaklimit = 300.0 * geant::units::MeV;
       constexpr double elowlimit  = 20.0 * geant::units::keV;
       if (fIsElectron && Get(kappac, l) < 0.97 && ((Get(eekin, l) > epeaklimit) || (Get(eekin, l) < elowlimit))) {
-        vmax = std::max(vmax, std::min(fXsecLimits[IZet[Get(idx, l)] - 1],
-                                       1.1 * GetDXSECValue(IZet[Get(idx, l)], Get(ie, l), Get(eresid, l), 0.97)));
+        Set(vmax,l,std::max(Get(vmax,l), std::min(fXsecLimits[IZet[Get(idx, l)] - 1],
+						  1.1 * GetDXSECValue(IZet[Get(idx, l)], Get(ie, l), Get(eresid, l), 0.97))));
       }
     }
     MaskD_v tmp = kappac < 0.05;
@@ -1199,7 +1197,6 @@ void SeltzerBergerBremsModel::SampleSecondaries(LightTrack_v &tracks, geant::Tas
     }
     Double_v totalEn = primEkin + geant::units::kElectronMassC2;
     densityCor *= gMigdalConst * (totalEn * totalEn);
-    assert((primEkin >= gammaCut).isFull()); // Cut filtering should be applied up the call chain.
     if (GetUseSamplingTables()) {
       Double_v r1          = td->fRndm->uniformV();
       Double_v r2          = td->fRndm->uniformV();

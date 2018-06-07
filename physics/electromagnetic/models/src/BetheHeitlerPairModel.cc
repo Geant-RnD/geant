@@ -459,8 +459,8 @@ Double_v BetheHeitlerPairModel::SampleTotalEnergyTransfer(const Double_v egamma,
 
   // Compute energy index
   Double_v val        = (legamma - fSTLogMinPhotonEnergy) * fSTILDeltaPhotonEnergy;
-  IndexD_v indxEgamma = (IndexD_v)val; // lower electron energy bin index
-  Double_v pIndxHigh  = val - indxEgamma;
+  IndexD_v indxEgamma = vecCore::Convert<IndexD_v,Double_v>(val); // lower electron energy bin index
+  Double_v pIndxHigh  = val - vecCore::Convert<Double_v,IndexD_v>(indxEgamma);
   MaskD_v mask        = r1 < pIndxHigh;
   if (!MaskEmpty(mask)) {
     vecCore::MaskedAssign(indxEgamma, mask, indxEgamma + 1);
@@ -633,7 +633,7 @@ void BetheHeitlerPairModel::SampleTotalEnergyTransfer(const double *egamma, cons
     Double_v egammaV        = vecCore::Gather<Double_v>(egamma, idx);
     const Double_v eps0     = geant::units::kElectronMassC2 / egammaV;
     const Double_v deltaMin = 4. * eps0 * deltaFac;
-    const Double_v eps1     = 0.5 - 0.5 * Math::Sqrt(1. - deltaMin / deltaMax);
+    const Double_v eps1 = vecCore::Blend(deltaMin > deltaMax, (Double_v)0.0, 0.5 - 0.5 * Math::Sqrt(1. - deltaMin / deltaMax));
     const Double_v epsMin   = Math::Max(eps0, eps1);
     const Double_v epsRange = 0.5 - epsMin;
 

@@ -195,11 +195,21 @@ double RelativisticBremsModel::ComputeXSectionPerAtom(const Element *elem, const
 template <typename R>
 void RelativisticBremsModel::GetLPMFunctions(R &lpmGs, R &lpmPhis, const R s)
 {
+  for (int l = 0; l < (int)vecCore::VectorSize<R>(); ++l) {
+    double gs_l = Get(lpmGs,l);
+    double phis_l = Get(lpmPhis,l);
+    double s_l = Get(s,l);
+    GetLPMFunctions(gs_l,phis_l,s_l);
+    Set(lpmGs,l,gs_l);
+    Set(lpmPhis,l,phis_l);
+  }
+  return;
+
   vecCore::Mask<R> tmp = s < gLPMFuncs.fSLimit;
 
   R val                  = s / gLPMFuncs.fSDelta;
-  vecCore::Index<R> ilow = vecCore::Index<R>(val);
-  val -= ilow;
+  vecCore::Index<R> ilow = vecCore::Convert<vecCore::Index<R>,R>(val);
+  val -= vecCore::Convert<R,vecCore::Index<R>>(ilow);
   for (int l = 0; l < (int)vecCore::VectorSize<R>(); ++l) {
     if (!Get(tmp, l)) Set(ilow, l, gLPMFuncs.fLPMFuncPhi.size() - 2); // above limit
   }
@@ -996,8 +1006,8 @@ Double_v RelativisticBremsModel::SampleEnergyTransfer(Double_v gammaCut, Double_
   Double_v logEmin      = vecCore::Gather<Double_v>(tableEmin, mcLocalIdx);
   Double_v ilDelta      = vecCore::Gather<Double_v>(tableILDeta, mcLocalIdx);
   Double_v val          = (lPrimEkin - logEmin) * ilDelta;
-  IndexD_v indxPrimEkin = (IndexD_v)val; // lower electron energy bin index
-  Double_v pIndxHigh    = val - indxPrimEkin;
+  IndexD_v indxPrimEkin = vecCore::Convert<IndexD_v,Double_v>(val); // lower electron energy bin index
+  Double_v pIndxHigh    = val - vecCore::Convert<Double_v,IndexD_v>(indxPrimEkin);
   MaskD_v mask          = r1 < pIndxHigh;
   if (!MaskEmpty(mask)) {
     vecCore::MaskedAssign(indxPrimEkin, mask, indxPrimEkin + 1);
@@ -1425,7 +1435,6 @@ void RelativisticBremsModel::SampleSecondaries(LightTrack_v &tracks, geant::Task
     }
     Double_v totalEn    = primEkin + geant::units::kElectronMassC2;
     Double_v densityCor = densityCorConst * (totalEn * totalEn);
-    assert((primEkin >= gammaCut).isFull()); // Cut filtering should be applied up the call chain.
     if (GetUseSamplingTables()) {
       // Sample alias table here
       Double_v r1          = td->fRndm->uniformV();

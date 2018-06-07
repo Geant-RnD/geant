@@ -436,8 +436,8 @@ void GSMSCTableSimplified::SampleGSSRCosThetaVector(GSMSCTableSimplified::GSMSCA
       Set(delta, l, gsDtr[i + l]->fDelta);
     }
 
-    IndexD_v indxl = (IndexD_v)(rndm * ndatm1);
-    aval           = rndm - indxl * delta;
+    IndexD_v indxl = vecCore::Convert<IndexD_v,Double_v>(rndm * ndatm1);
+    aval           = rndm - vecCore::Convert<Double_v,IndexD_v>(indxl) * delta;
 
     for (int l = 0; l < kVecLenD; ++l) {
       // sampling form the selected distribution
