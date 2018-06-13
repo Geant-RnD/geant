@@ -169,6 +169,8 @@ void FieldPropagationHandler::DoIt(Track *track, Basket &output, TaskData *td)
 VECCORE_ATT_HOST_DEVICE
 void FieldPropagationHandler::DoIt(Basket &input, Basket &output, TaskData *td)
 {
+  Handler::DoItScalar(input, output, td);
+  return;
   // Vector geometry length computation. The tracks are moved into the output basket.
   using vecCore::math::Max;
   using vecCore::math::Min;

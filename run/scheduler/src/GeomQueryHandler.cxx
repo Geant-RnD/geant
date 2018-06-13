@@ -47,6 +47,7 @@ void GeomQueryHandler::ActivateBasketizing(bool flag)
 {
   // Special basketizing in case of logical volumes
   if (fActive == flag) return;
+#ifndef LIGHT_BASKETIZER
   int basket_size = fThreshold;
   // Set a 'compromise' size for the basketizer buffer for all geometry handlers
   int buffer_size = 1 << 10; // This makes ~16 MBytes of basketizer buffers for 4K volumes
@@ -65,6 +66,7 @@ void GeomQueryHandler::ActivateBasketizing(bool flag)
     fBasketizer = new basketizer_t(buffer_size, basket_size);
 #endif
   }
+#endif // LIGHT_BASKETIZER
   fActive = flag;
 }
 

@@ -20,7 +20,6 @@
 #include "Geant/BasketCounters.h"
 
 #ifdef USE_ROOT
-#include "TSystem.h"
 #include "TApplication.h"
 #include "TCanvas.h"
 #include "management/RootGeoManager.h"
@@ -56,6 +55,8 @@ namespace geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
 using namespace vecgeom;
+
+//#define PERF_RECORD 1
 
 //______________________________________________________________________________
 RunManager::RunManager(unsigned int npropagators, unsigned int nthreads, GeantConfig *config)
@@ -176,13 +177,24 @@ bool RunManager::Initialize()
     mgr->SetBlockSize(1000); // <- must be configurable
     mgr->Init();
     if (fConfig->fUseVectorizedGeom) {
-      printf("*** Using vectorized geometry, default basket size is %d\n", fConfig->fMaxPerBasket);
+      printf("=== Using vectorized geometry\n");
       if (fNthreads > 1) {
         printf("### \e[5mWARNING!    Basketized mode + MT not suported yet\e[m\n###\n");
       }
     } else {
-      printf("*** Using scalar geometry\n");
+      printf("=== Using scalar geometry\n");
     }
+    if (fConfig->fUseVectorizedPhysics) {
+      printf("=== Using vectorized physics\n");
+    } else {
+      printf("=== Using scalar physics\n");
+    }
+    if (fConfig->fUseVectorizedField) {
+      printf("=== Using vectorized field propagator\n");
+    } else {
+      printf("=== Using scalar field propagator\n");
+    }
+
 #if defined(GEANT_USE_NUMA) && !defined(VECCORE_CUDA_DEVICE_COMPILATION)
     if (fConfig->fUseNuma) {
       int nnodes = mgr->GetPolicy().GetNnumaNodes();

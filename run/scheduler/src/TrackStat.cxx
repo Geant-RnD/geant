@@ -21,7 +21,6 @@ int TrackStat::CountBalance()
   fNstagebuff           = 0;
   fNbasketized          = 0;
   SimulationStage *stage;
-  Basketizer<Track> *basketizer;
   for (int istage = 0; istage < nstages; ++istage) {
     // Count tracks in the input buffer
     fNstagebuff += fTd->fStageBuffers[istage]->size();
@@ -30,8 +29,7 @@ int TrackStat::CountBalance()
     // Count tracks in the baskets
     for (int i = 0; i < nhandlers; ++i) {
       if (stage->GetHandler(i)->IsActive()) {
-        basketizer = stage->GetHandler(i)->GetBasketizer();
-        fNbasketized += basketizer->GetNstored();
+        fNbasketized += stage->GetHandler(i)->GetNbasketized();
       }
     }
   }

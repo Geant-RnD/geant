@@ -60,6 +60,7 @@ protected:
   bool fUniqueFollowUp    = false;         ///< All tracks go to single follow-up after this stage
   bool fEndStage          = false;         ///< Marker for stage at end of stepping
   bool fBasketized        = false;         ///< Stage is basketized
+  bool fDynamicBaskets    = false;         ///< Handlers are basketized dynamically
   Handlers_t fHandlers;                    ///< Array of handlers for the stage
   atomic_t<int> fCheckCountdown;           ///< Countdown fir checking basketizer efficiency
 
@@ -126,9 +127,18 @@ public:
   GEANT_FORCE_INLINE
   void SetBasketizing(bool flag) { fBasketized = flag; }
 
+  /** @brief Set basketizing on/off */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  void SetDynamicBaskets(bool flag) { fDynamicBaskets = flag; }
+
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
   bool IsBasketized() const { return fBasketized; }
+
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  bool HasDynamicBaskets() const { return fDynamicBaskets; }
 
   /** @brief Activate basketizing */
   VECCORE_ATT_HOST_DEVICE

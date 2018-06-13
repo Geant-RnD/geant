@@ -16,6 +16,7 @@
 
 #ifndef GEANT_HANDLER
 #define GEANT_HANDLER
+//#define LIGHT_BASKETIZER
 
 #include "Geant/Typedefs.h"
 #include "Geant/Basketizer.h"
@@ -48,15 +49,19 @@ public:
   using basketizer_t = Basketizer<Track>;
 
 protected:
-  bool fActive       = false;          ///< Activity flag
-  bool fMayBasketize = false;          ///< This handler can basketize
-  size_t fId         = 0;              ///< Handler id in the stage
-  int fBcap          = 0;              ///< Minimum capacity for the handled baskets
-  atomic_t<int> fThreshold;            ///< Basketizing threshold
-  atomic_t<size_t> fNflushed;          ///< Number of basket flushes
-  atomic_t<size_t> fNfired;            ///< Number of times the basketizer fired
+  bool fActive       = false; ///< Activity flag
+  bool fMayBasketize = false; ///< This handler can basketize
+  size_t fId         = 0;     ///< Handler id in the stage
+  int fBcap          = 0;     ///< Minimum capacity for the handled baskets
+  atomic_t<int> fThreshold;   ///< Basketizing threshold
+  atomic_t<size_t> fNflushed; ///< Number of basket flushes
+  atomic_t<size_t> fNfired;   ///< Number of times the basketizer fired
+#ifndef LIGHT_BASKETIZER
   basketizer_t *fBasketizer = nullptr; ///< Basketizer for this handler
-  Propagator *fPropagator   = nullptr; ///< Associated propagator
+#else
+  TrackVec_t fBasketizer; ///< Basketizer for this handler
+#endif
+  Propagator *fPropagator = nullptr; ///< Associated propagator
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
   std::atomic_flag fLock; ///< Lock for flushing
 #endif
@@ -94,10 +99,12 @@ public:
   VECCORE_ATT_HOST_DEVICE
   void DoItScalar(Basket &input, Basket &output, TaskData *td);
 
-  /** @brief NUMA node getter */
+#ifndef LIGHT_BASKETIZER
+  /** @brief Basketizer getter */
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
   basketizer_t *GetBasketizer() const { return fBasketizer; }
+#endif
 
   /** @brief Handler id getter */
   VECCORE_ATT_HOST_DEVICE
@@ -167,7 +174,20 @@ public:
   /** @brief Check if handler has basketized tracks */
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
+#ifndef LIGHT_BASKETIZER
   bool HasTracks() const { return fBasketizer->GetNstored() > 0; }
+#else
+  bool HasTracks() const { return fBasketizer.size() > 0; }
+#endif
+
+  /** @brief Check if handler has basketized tracks */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+#ifndef LIGHT_BASKETIZER
+  size_t GetNbasketized() const { return fBasketizer->GetNstored(); }
+#else
+  size_t GetNbasketized() const { return fBasketizer.size(); }
+#endif
 
   /** @brief Check if handler is active for basketizing */
   VECCORE_ATT_HOST_DEVICE

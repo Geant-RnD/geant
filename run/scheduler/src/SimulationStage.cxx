@@ -118,7 +118,7 @@ int SimulationStage::FlushAndProcess(TaskData *td)
   // and continue to other handlers, then to the next stage.
 
   Basket &input = *td->fStageBuffers[fId];
-  if (fBasketized) {
+  if (fBasketized && fDynamicBaskets) {
     int check_countdown = fCheckCountdown.fetch_sub(input.Tracks().size()) - input.Tracks().size();
     if (check_countdown <= 0) CheckBasketizers(td, fFireFlushRatio);
   }
@@ -176,7 +176,7 @@ int SimulationStage::Process(TaskData *td)
   assert(fFollowUpStage >= 0);
   Basket &input = *td->fStageBuffers[fId];
   int ninput    = input.Tracks().size();
-  if (fBasketized) {
+  if (fBasketized && fDynamicBaskets) {
     int check_countdown = fCheckCountdown.fetch_sub(ninput) - ninput;
     if (check_countdown <= 0) CheckBasketizers(td, fFireFlushRatio);
   }

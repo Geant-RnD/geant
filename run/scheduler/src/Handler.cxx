@@ -26,6 +26,8 @@ Handler::Handler(int threshold, Propagator *propagator) : fPropagator(propagator
 VECCORE_ATT_HOST_DEVICE
 Handler::~Handler()
 {
+
+#ifndef LIGHT_BASKETIZER
 #if defined(GEANT_USE_NUMA) && !defined(VECCORE_CUDA_DEVICE_COMPILATION)
   if (GetNode() < 0)
     delete fBasketizer;
@@ -35,6 +37,7 @@ Handler::~Handler()
   delete fBasketizer;
 #endif
   fBasketizer = nullptr;
+#endif // LIGH_BASKETIZER
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
   fLock.clear();
 #endif
@@ -65,6 +68,7 @@ void Handler::DoItScalar(Basket &input, Basket &output, TaskData *td)
 VECCORE_ATT_HOST_DEVICE
 void Handler::ActivateBasketizing(bool flag)
 {
+#ifndef LIGHT_BASKETIZER
   if (fActive == flag) return;
   int basket_size = fThreshold;
   int buffer_size = 1 << 12; // 16 kBytes per handler
@@ -83,6 +87,7 @@ void Handler::ActivateBasketizing(bool flag)
     fBasketizer = new basketizer_t(buffer_size, basket_size);
 #endif
   }
+#endif
   fActive = flag;
 }
 
@@ -90,11 +95,12 @@ void Handler::ActivateBasketizing(bool flag)
 VECCORE_ATT_HOST_DEVICE
 bool Handler::AddTrack(Track *track, Basket &collector)
 {
-  // Adding a track to the handler assumes that the handler is basketized.
-  // The track will be pushed into the basketizer. The calling thread has to
-  // provide an empy collector basket which can possibly be filled by the track
-  // vector extracted during the operation.
+// Adding a track to the handler assumes that the handler is basketized.
+// The track will be pushed into the basketizer. The calling thread has to
+// provide an empy collector basket which can possibly be filled by the track
+// vector extracted during the operation.
 
+#ifndef LIGHT_BASKETIZER
   // Make sure the collector is fit to store the number of tracks required
   collector.Tracks().reserve(fBcap);
   bool extracted = fBasketizer->AddElement(track, collector.Tracks());
@@ -103,6 +109,15 @@ bool Handler::AddTrack(Track *track, Basket &collector)
     fNfired++;
   }
   return extracted;
+#else
+  fBasketizer.push_back(track);
+  if (fBasketizer.size() == (size_t)fThreshold) {
+    std::copy(fBasketizer.begin(), fBasketizer.end(), std::back_inserter(collector.Tracks()));
+    fBasketizer.clear();
+    return true;
+  }
+  return false;
+#endif
 }
 
 //______________________________________________________________________________
@@ -113,6 +128,7 @@ bool Handler::Flush(Basket &collector)
 // NOTE: The operation is not guaranteed to succeed, even if the basketizer
 //       contains tracks in case it is 'hot' (e.g. adding tracks or finishing
 //       other flush). Flushing is blocking for other flushes!
+#ifndef LIGHT_BASKETIZER
 #ifndef VECCORE_CUDA_DEVICE_COMPILATION
   // do not touch if other flushing operation is ongoing
   if (fLock.test_and_set(std::memory_order_acquire)) return false;
@@ -125,6 +141,14 @@ bool Handler::Flush(Basket &collector)
   fLock.clear();
 #endif
   return flushed;
+#else
+  bool flushed = fBasketizer.size() > 0;
+  if (flushed) {
+    std::copy(fBasketizer.begin(), fBasketizer.end(), std::back_inserter(collector.Tracks()));
+    fBasketizer.clear();
+  }
+  return flushed;
+#endif
 }
 
 } // GEANT_IMPL_NAMESPACE

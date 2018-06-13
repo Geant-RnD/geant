@@ -184,6 +184,15 @@ void Propagator::PropagatorGeom(int nthreads)
 
   // Loop baskets and transport particles until there is nothing to transport anymore
   fTransportOngoing = true;
+  // Activate basketizing for non-dynamic handlers
+  for (size_t i = 0; i < kNstages; ++i) {
+    if (fStages[i]->IsBasketized() && !fStages[i]->HasDynamicBaskets()) {
+      // loop stage handlers and check if they may basketize
+      for (auto h = 0; h < fStages[i]->GetNhandlers(); ++h) {
+        if (fStages[i]->GetHandler(h)->MayBasketize()) fStages[i]->GetHandler(h)->ActivateBasketizing(true);
+      }
+    }
+  }
 
 #ifdef USE_CALLGRIND_CONTROL
   CALLGRIND_START_INSTRUMENTATION;
@@ -338,6 +347,7 @@ int Propagator::CreateSimulationStages()
   // Follow-up not unique: tracks may have done pre-propagation/propagation returning to
   // geometry due to partial field propagation
   GetStage(kGeometryStepStage)->SetBasketizing(fConfig->fUseVectorizedGeom);
+  GetStage(kGeometryStepStage)->SetDynamicBaskets(true);
   //        V
   //        V
   //        V
