@@ -140,16 +140,16 @@ int NeutronNudyFissionModel::SampleFinalState(LightTrack &track, Isotope *target
     track.SetTrackStatus(LTrackStatus::kKill);
     track.SetKinE(0.0);
 
-    auto &secondarySoA = td->fPhysicsData->InsertSecondary();
+    auto &secondary = td->fPhysicsData->InsertSecondary();
     // Add neutron
     //    int idx = secondarySoA.InsertTrack();
-    secondarySoA.SetDirX(nDirX);
-    secondarySoA.SetDirY(nDirY);
-    secondarySoA.SetDirZ(nDirZ);
-    secondarySoA.SetKinE(energy);
-    secondarySoA.SetGVcode(track.GetGVcode());
-    secondarySoA.SetMass(track.GetMass());
-    secondarySoA.SetTrackIndex(track.GetTrackIndex()); // parent Track index
+    secondary.SetDirX(nDirX);
+    secondary.SetDirY(nDirY);
+    secondary.SetDirZ(nDirZ);
+    secondary.SetKinE(energy);
+    secondary.SetGVcode(track.GetGVcode());
+    secondary.SetMass(track.GetMass());
+    secondary.SetTrackIndex(track.GetTrackIndex()); // parent Track index
   }
   return numSecondaries;
 }

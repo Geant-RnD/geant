@@ -233,14 +233,14 @@ private:
   static const char fkElIso[4][2];
   unsigned char fLogLev;      //  Log Level Flag
   char fLine[LINLEN];         //! Buffer to read the line
-  std::string ENDFSUB;
-  int fPrepro;
   bool fLFI;
   ifstream fENDF;             //! Input fENDF tape
   TFile *fRENDF;              //! Output fRENDF file
   Nudy::TNudyEndfTape *fTape; //! Support link for the tape structure
   Nudy::TNudyEndfMat *fMat;   //! Support link for the current material
-#ifdef USE_ROOT
+  std::string ENDFSUB;
+  int fPrepro;
+  #ifdef USE_ROOT
   ClassDef(TNudyENDF, 1) // class for an ENDF data file
 #endif
 };
