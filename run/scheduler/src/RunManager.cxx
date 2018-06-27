@@ -20,6 +20,7 @@
 #include "Geant/BasketCounters.h"
 
 #ifdef USE_ROOT
+#include "TSystem.h"
 #include "TApplication.h"
 #include "TCanvas.h"
 #include "management/RootGeoManager.h"

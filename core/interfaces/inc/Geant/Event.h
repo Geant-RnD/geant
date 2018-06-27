@@ -38,7 +38,6 @@ private:
   int fNprimaries    = 0;            /** Number of primaries */
   std::atomic_int fNtracks;          /** Number of tracks */
   std::atomic_int fNdone;            /** Number of done tracks */
-  std::atomic_int fNmax;             /** Maximum number of tracks in flight */
   std::atomic_flag fLock;            /** Lock for priority forcing */
   std::vector<Track *> fPrimaries;   /** Vector containing all primary tracks */
 public:
@@ -46,7 +45,7 @@ public:
   std::atomic_int fNdispatched; /** Number of tracks dispatched */
 
   /** @brief Event default constructor */
-  Event() : fNtracks(0), fNdone(0), fNmax(0), fLock(), fNfilled(0), fNdispatched(0) {}
+  Event() : fNtracks(0), fNdone(0), fLock(), fNfilled(0), fNdispatched(0) {}
 
   /** @brief Event destructor */
   ~Event() {}
@@ -127,13 +126,6 @@ public:
   int GetNtracks() const { return fNtracks.load(); }
 
   /**
-   * @brief Function that returns the max number of tracks in flight
-   * @return Maximum number of tracks in flight
-   */
-  GEANT_FORCE_INLINE
-  int GetNmax() const { return fNmax.load(); }
-
-  /**
    * @brief Getter for priority flag
    * @return Priority flag value
    */
@@ -179,7 +171,6 @@ public:
   {
     fNtracks.store(0);
     fNdone.store(0);
-    fNmax.store(0);
     fPrioritize = false;
   }
 

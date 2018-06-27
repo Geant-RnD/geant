@@ -10,13 +10,6 @@ int Event::AddTrack()
 {
   // Thread safe track addition
   int ntracks   = ++fNtracks;
-  int ninflight = ntracks - fNdone.load();
-  //  int nmax = fNmax.load();
-  // The fNmax does not need to be accurate, avoid expensive compare_exchange
-  if (fNmax < ninflight) fNmax.store(ninflight);
-  // Thread safe update of the max number of tracks in flight
-  //  while ( fNmax < ninflight && !fNmax.compare_exchange_weak(nmax, ninflight) )
-  //    ;
   return (ntracks - 1);
 }
 
@@ -31,8 +24,6 @@ void Event::Clear(TaskData *td)
   fNprimaries  = 0;
   fNtracks.store(0);
   fNdone.store(0);
-  fNmax.store(0);
-  fNmax.store(0);
   fLock.clear();
   fNfilled.store(0);
   // Release primary tracks
@@ -61,6 +52,7 @@ bool Event::StopTrack(RunManager *runmgr, TaskData *td)
     runmgr->EventTransported(this, td);
     return false;
   }
+  /*
   if (!fPrioritize) {
     // Check if the event needs to be prioritized
     int npriority = runmgr->GetNpriority();
@@ -73,6 +65,7 @@ bool Event::StopTrack(RunManager *runmgr, TaskData *td)
       }
     }
   }
+  */
 #endif
   return false;
 }
@@ -81,8 +74,7 @@ bool Event::StopTrack(RunManager *runmgr, TaskData *td)
 void Event::Print(const char *) const
 {
   // Print events content
-  std::cout << "Event " << fEvent << ": " << GetNtracks() << " tracks transported, max in flight " << GetNmax()
-            << std::endl;
+  std::cout << "Event " << fEvent << ": " << GetNtracks() << " tracks transported\n";
 }
 
 //______________________________________________________________________________
