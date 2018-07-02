@@ -13,14 +13,14 @@ namespace geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 class UserDetectorConstruction;
 class RunManager;
-}
-}
+} // namespace GEANT_IMPL_NAMESPACE
+} // namespace geant
 
 namespace geantphysics {
 inline namespace GEANT_IMPL_NAMESPACE {
 class Material;
 }
-}
+} // namespace geantphysics
 
 namespace userapplication {
 

@@ -101,7 +101,8 @@ TestNudy1DataPerEvent &TestNudy1DataPerEvent::operator+=(const TestNudy1DataPerE
 
 //
 // TestNudy1ThreadDataEvents
-TestNudy1ThreadDataEvents::TestNudy1ThreadDataEvents(int nevtbuffered, int nprimperevent) : fNumBufferedEvents(nevtbuffered)
+TestNudy1ThreadDataEvents::TestNudy1ThreadDataEvents(int nevtbuffered, int nprimperevent)
+    : fNumBufferedEvents(nevtbuffered)
 {
   fPerEventData.reserve(fNumBufferedEvents);
   for (int i = 0; i < fNumBufferedEvents; ++i) {
@@ -117,9 +118,7 @@ bool TestNudy1ThreadDataEvents::Merge(int evtslotindx, const TestNudy1ThreadData
 
 //
 // TestNudy1ThreadDataRun
-TestNudy1ThreadDataRun::TestNudy1ThreadDataRun() : fHisto1(nullptr)
-{
-}
+TestNudy1ThreadDataRun::TestNudy1ThreadDataRun() : fHisto1(nullptr) {}
 
 TestNudy1ThreadDataRun::~TestNudy1ThreadDataRun()
 {

@@ -16,8 +16,8 @@ class RunManager;
 class TaskDataHandle;
 class Event;
 class Track;
-}
-}
+} // namespace geant
+} // namespace GEANT_IMPL_NAMESPACE
 
 #include "Hist1.h"
 #include "TestNudy1Data.h"
@@ -64,11 +64,11 @@ public:
   virtual void SteppingActions(geant::Track &track, geant::TaskData *td);
 
   /** @brief Interace method that is called when the transportation of an event (including all primary and their
-    *        secondary particles) is completed .*/
+   *        secondary particles) is completed .*/
   virtual void FinishEvent(geant::Event *event);
 
   /** @brief Interface method that is called at the end of the simulation (when the transportation of all events are
-    *        are completed). */
+   *        are completed). */
   virtual void FinishRun();
 
   // Some application specific methods to set the angular distribution histogram parameters.
@@ -114,8 +114,8 @@ private:
   //
   TestNudy1DetectorConstruction *fDetector;
   TestNudy1PrimaryGenerator *fPrimaryGun;
-  // mutex to prevent multiple threads writing into the unique, run-global TestNudy1Data object (in the Digitization after
-  // the merge of the user defined per-event data distributed among the threads)
+  // mutex to prevent multiple threads writing into the unique, run-global TestNudy1Data object (in the Digitization
+  // after the merge of the user defined per-event data distributed among the threads)
   std::mutex fMutex;
 };
 

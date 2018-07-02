@@ -43,17 +43,20 @@ int main(int argc, char *argv[])
   // Create a user defined pysics list object, set its configurable parameters and register it in the global
   // PhysicsListManager
   // NOTE: if the user not register its own physics list then the default physics list will be used
-  userapplication::TestNudy1PhysicsList *userPhysList = new userapplication::TestNudy1PhysicsList("testEm5-user-physics");
+  userapplication::TestNudy1PhysicsList *userPhysList =
+      new userapplication::TestNudy1PhysicsList("testEm5-user-physics");
   SetupUserPhysicsList(userPhysList);
   geantphysics::PhysicsListManager::Instance().RegisterPhysicsList(userPhysList);
   //
   // create the user detector construction object, set its configurable parameters and register in the RunManager
-  userapplication::TestNudy1DetectorConstruction *detector = new userapplication::TestNudy1DetectorConstruction(runManager);
+  userapplication::TestNudy1DetectorConstruction *detector =
+      new userapplication::TestNudy1DetectorConstruction(runManager);
   SetupUserDetector(detector);
   runManager->SetDetectorConstruction(detector);
   //
   // create the user primary generator object, set its configurable parameters and register in the RunManager
-  userapplication::TestNudy1PrimaryGenerator *primaryGenerator = new userapplication::TestNudy1PrimaryGenerator(detector);
+  userapplication::TestNudy1PrimaryGenerator *primaryGenerator =
+      new userapplication::TestNudy1PrimaryGenerator(detector);
   SetupUserPrimaryGenerator(primaryGenerator);
   runManager->SetPrimaryGenerator(primaryGenerator);
   //
@@ -61,7 +64,8 @@ int main(int argc, char *argv[])
   SetupUserField(runManager);
   //
   // create the testEm5 user application object, set its configurable parameters and register in the RunManager
-  userapplication::TestNudy1 *testEm5Application = new userapplication::TestNudy1(runManager, detector, primaryGenerator);
+  userapplication::TestNudy1 *testEm5Application =
+      new userapplication::TestNudy1(runManager, detector, primaryGenerator);
   SetupUserApplication(testEm5Application);
   runManager->SetUserApplication(testEm5Application);
   //
@@ -78,22 +82,22 @@ int main(int argc, char *argv[])
 // application(parApp), run configuration(parConfig) and some physics processes(parProcess):
 //
 // detector parameters
-std::string parDetTargetMaterial = ""; // i.e. default application value
+std::string parDetTargetMaterial = "";  // i.e. default application value
 double parDetTargetThickness     = 10.; // i.e. default application value
-double parDetProductionCuts      = 0.; // i.e. default application value
-double parDetGammaProdCut        = 0.; // i.e. default application value
-double parDetElectronProdCut     = 0.; // i.e. default application value
-double parDetPositronProdCut     = 0.; // i.e. default application value
+double parDetProductionCuts      = 0.;  // i.e. default application value
+double parDetGammaProdCut        = 0.;  // i.e. default application value
+double parDetElectronProdCut     = 0.;  // i.e. default application value
+double parDetPositronProdCut     = 0.;  // i.e. default application value
 //
 // primary generator parameters (primary particle gun)
 std::string parGunPrimaryParticleName = "neutron"; // i.e. default application value
-double parGunPrimaryKinEnergy         = 10E-3; // i.e. default application value
+double parGunPrimaryKinEnergy         = 10E-3;     // i.e. default application value
 //
 // TestNudy1 application parameters
-std::string parAppHist1FileName = "nudy";  // i.e. default application value
-double parAppHist1NumBins       = 0.;  // i.e. default application value
-double parAppHist1MinVal        = -1.; // i.e. default application value
-double parAppHist1MaxVal        = -1.; // i.e. default application value
+std::string parAppHist1FileName = "nudy"; // i.e. default application value
+double parAppHist1NumBins       = 0.;     // i.e. default application value
+double parAppHist1MinVal        = -1.;    // i.e. default application value
+double parAppHist1MaxVal        = -1.;    // i.e. default application value
 //
 // run configuration parameters
 int parConfigNumBufferedEvt   = 4;    // number of events taken to be transported on the same time (buffered)
@@ -155,8 +159,10 @@ static struct option options[] = {{"det-Target-Material-Name", required_argument
                                   {0, 0, 0, 0}};
 
 enum DIR_OPTIONS { DIR_X_OPT = 0, DIR_Y_OPT, DIR_Z_OPT };
-char *const dir_token[] = {[DIR_OPTIONS::DIR_X_OPT] = (char *const) "x", [DIR_OPTIONS::DIR_Y_OPT] = (char *const) "y",
-                           [DIR_OPTIONS::DIR_Z_OPT] = (char *const) "z", NULL};
+char *const dir_token[] = {[DIR_OPTIONS::DIR_X_OPT] = (char *const) "x",
+                           [DIR_OPTIONS::DIR_Y_OPT] = (char *const) "y",
+                           [DIR_OPTIONS::DIR_Z_OPT] = (char *const) "z",
+                           NULL};
 
 void help()
 {

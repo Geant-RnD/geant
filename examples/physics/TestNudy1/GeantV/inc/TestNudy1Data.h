@@ -52,7 +52,9 @@ class Hist1;
 class TestNudy1DataPerPrimary {
 public:
   TestNudy1DataPerPrimary();
-  ~TestNudy1DataPerPrimary() { /*nothing to do*/}
+  ~TestNudy1DataPerPrimary()
+  { /*nothing to do*/
+  }
 
   void AddChargedStep() { fNumChargedSteps += 1.; }
   double GetChargedSteps() const { return fNumChargedSteps; }
@@ -127,7 +129,9 @@ private:
 class TestNudy1Data {
 public:
   TestNudy1Data();
-  ~TestNudy1Data() { /*nothing to do*/}
+  ~TestNudy1Data()
+  { /*nothing to do*/
+  }
 
   void AddChargedSteps(double val)
   {
@@ -248,7 +252,9 @@ private:
 class TestNudy1DataPerEvent {
 public:
   TestNudy1DataPerEvent(int nprimperevent);
-  ~TestNudy1DataPerEvent() { /*nothing to do*/}
+  ~TestNudy1DataPerEvent()
+  { /*nothing to do*/
+  }
 
   int GetNumberOfPrimaryPerEvent() const { return fNumPrimaryPerEvent; }
   void Clear();
@@ -270,7 +276,9 @@ private:
 class TestNudy1ThreadDataEvents {
 public:
   TestNudy1ThreadDataEvents(int nevtbuffered, int nprimperevent);
-  ~TestNudy1ThreadDataEvents() { /*nothing to do*/}
+  ~TestNudy1ThreadDataEvents()
+  { /*nothing to do*/
+  }
 
   void Clear(int evtslotindx) { fPerEventData[evtslotindx].Clear(); }
   //  void  Clear() {
@@ -286,9 +294,9 @@ private:
   std::vector<TestNudy1DataPerEvent> fPerEventData;
 };
 
-// Thread local data structure for TestNudy1 to collecet/handle thread local run-global data structures. The user defined
-// needs to implement both the Merge and Clear methods: these methods are called when the simulation is completed and
-// these thread local run-global data are merged from the working threads.
+// Thread local data structure for TestNudy1 to collecet/handle thread local run-global data structures. The user
+// defined needs to implement both the Merge and Clear methods: these methods are called when the simulation is
+// completed and these thread local run-global data are merged from the working threads.
 class TestNudy1ThreadDataRun {
 public:
   TestNudy1ThreadDataRun();

@@ -36,9 +36,7 @@ TestNudy1PrimaryGenerator::TestNudy1PrimaryGenerator(const TestNudy1DetectorCons
   fPTotal = 0.;
 }
 
-TestNudy1PrimaryGenerator::~TestNudy1PrimaryGenerator()
-{
-}
+TestNudy1PrimaryGenerator::~TestNudy1PrimaryGenerator() {}
 
 void TestNudy1PrimaryGenerator::InitPrimaryGenerator()
 {

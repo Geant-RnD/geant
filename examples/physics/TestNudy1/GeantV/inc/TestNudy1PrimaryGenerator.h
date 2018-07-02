@@ -13,8 +13,8 @@ namespace geant {
 class Track;
 class TaskData;
 class EventInfo;
-}
-}
+} // namespace geant
+} // namespace GEANT_IMPL_NAMESPACE
 
 // geantphysics classdef
 namespace geantphysics {
@@ -61,7 +61,7 @@ public:
   virtual void GetTrack(int n, geant::Track &gtrack, geant::TaskData *td);
 
 private:
-  TestNudy1PrimaryGenerator()                                = delete;
+  TestNudy1PrimaryGenerator()                                  = delete;
   TestNudy1PrimaryGenerator(const TestNudy1PrimaryGenerator &) = delete;
   TestNudy1PrimaryGenerator &operator=(const TestNudy1PrimaryGenerator &) = delete;
 
@@ -83,7 +83,7 @@ private:
   double fETotal; // total energy of the primary in internal [energy] unit
   double fPTotal; // total momentum of the primary in internal [energy] unit
   //
-  const geantphysics::Particle *fParticle;      // the primary particle
+  const geantphysics::Particle *fParticle;        // the primary particle
   const TestNudy1DetectorConstruction *fDetector; // the detector
 };
 

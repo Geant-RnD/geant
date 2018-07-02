@@ -131,18 +131,19 @@ double sampleDistribution(double numSamples, double primaryEnergy, const Materia
                           Particle *primParticle, HadronicFinalStateModel *nudyModel, Hist *h1, Hist *h2, Hist *h3);
 
 static struct option options[] = {
-  {"model identifier for test    (possible identifier, Elastic: 1, Capture: 2, Fission:3, Inelastic:4) - default: 1", required_argument, 0, 'i'},
-  {"particle-name    (possible particle: n) - default: n", required_argument, 0, 'p'},
-  {"material-name    (with a NIST_MAT_ prefix; see more in material doc.)          - default: NIST_MAT_Pb",
+    {"model identifier for test    (possible identifier, Elastic: 1, Capture: 2, Fission:3, Inelastic:4) - default: 1",
+     required_argument, 0, 'i'},
+    {"particle-name    (possible particle: n) - default: n", required_argument, 0, 'p'},
+    {"material-name    (with a NIST_MAT_ prefix; see more in material doc.)          - default: NIST_MAT_Pb",
      required_argument, 0, 'm'},
-  {"number-of-samples (number of required final state samples)                 - default: 1.e+7", required_argument,
+    {"number-of-samples (number of required final state samples)                 - default: 1.e+7", required_argument,
      0, 'f'},
-  {"primary-energy   (in internal energy units i.e. [GeV])                         - default: 1E-3",
+    {"primary-energy   (in internal energy units i.e. [GeV])                         - default: 1E-3",
      required_argument, 0, 'E'},
-  {"sampling target Z    (proton number: z) - default: 82", required_argument, 0, 'z'},
-  {"sampling target A    (Mass number (proton + neutron): A) - default: 208", required_argument, 0, 'a'},
-  {"help", no_argument, 0, 'h'},
-  {0, 0, 0, 0}};
+    {"sampling target Z    (proton number: z) - default: 82", required_argument, 0, 'z'},
+    {"sampling target A    (Mass number (proton + neutron): A) - default: 208", required_argument, 0, 'a'},
+    {"help", no_argument, 0, 'h'},
+    {0, 0, 0, 0}};
 void help();
 
 //===========================================================================================//
@@ -433,18 +434,18 @@ int main(int argc, char *argv[])
   // one can test models one by one (keep only one active model and comment others)
   geantphysics::HadronicFinalStateModel *nudyModel = nullptr;
   switch (model) {
-    case 1:
-      nudyModel = new geantphysics::NeutronNudyElasticModel();
-      break;
-    case 2:
-      nudyModel = new geantphysics::NeutronNudyCaptureModel();
-      break;
-    case 3:
-      nudyModel = new geantphysics::NeutronNudyFissionModel();
-      break;
-    case 4:
-      nudyModel = new geantphysics::NeutronNudyInelasticModel();
-      break;
+  case 1:
+    nudyModel = new geantphysics::NeutronNudyElasticModel();
+    break;
+  case 2:
+    nudyModel = new geantphysics::NeutronNudyCaptureModel();
+    break;
+  case 3:
+    nudyModel = new geantphysics::NeutronNudyFissionModel();
+    break;
+  case 4:
+    nudyModel = new geantphysics::NeutronNudyInelasticModel();
+    break;
   }
   Isotope *isotope = Isotope::GetIsotope(Z, N);
   std::cout << "   -------------------------------------------------------------------------------- " << std::endl;

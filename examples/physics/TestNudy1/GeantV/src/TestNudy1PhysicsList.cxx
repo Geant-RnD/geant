@@ -68,9 +68,7 @@ TestNudy1PhysicsList::TestNudy1PhysicsList(const std::string &name) : geantphysi
   fStepMaxValue         = geantphysics::PhysicsProcess::GetAVeryLargeValue();
 }
 
-TestNudy1PhysicsList::~TestNudy1PhysicsList()
-{
-}
+TestNudy1PhysicsList::~TestNudy1PhysicsList() {}
 
 void TestNudy1PhysicsList::Initialize()
 {
@@ -132,7 +130,6 @@ void TestNudy1PhysicsList::Initialize()
       eMSCProc->AddModel(gsMSCModel);
       // add process to particle
       AddProcessToParticle(particle, eMSCProc);
-      
     }
     if (particle == geantphysics::Proton::Definition() || particle == geantphysics::Neutron::Definition() ||
         particle == geantphysics::PionPlus::Definition() || particle == geantphysics::PionMinus::Definition() ||
@@ -148,7 +145,7 @@ void TestNudy1PhysicsList::Initialize()
       geantphysics::HadronicFinalStateModel *nudyElModel = new geantphysics::NeutronNudyElasticModel();
       // create the cross sections
       geantphysics::HadronicCrossSection *nElasticXS = new geantphysics::NeutronNudyElasticXsec();
-      
+
       // set min/max energies of the model
       nudyElModel->SetLowEnergyUsageLimit(1E-5 * geant::units::eV);
       nudyElModel->SetHighEnergyUsageLimit(20.0 * geant::units::MeV);
@@ -161,12 +158,12 @@ void TestNudy1PhysicsList::Initialize()
       // create hadronic Capture process for proton:
       //
       geantphysics::HadronicProcess *hcapProc = new geantphysics::CaptureProcess();
-      
-      // create the ENDF based Capture model for n,g 
+
+      // create the ENDF based Capture model for n,g
       geantphysics::HadronicFinalStateModel *nudyCapModel = new geantphysics::NeutronNudyCaptureModel();
       // create the cross sections
       geantphysics::HadronicCrossSection *nCaptureXS = new geantphysics::NeutronNudyCaptureXsec();
-      
+
       // set min/max energies of the model
       nudyCapModel->SetLowEnergyUsageLimit(1E-5 * geant::units::eV);
       nudyCapModel->SetHighEnergyUsageLimit(20.0 * geant::units::MeV);
@@ -179,11 +176,11 @@ void TestNudy1PhysicsList::Initialize()
       //
       geantphysics::HadronicProcess *hfisProc = new geantphysics::FissionProcess();
       //
-      // create the ENDF based Fission model for n,fission 
+      // create the ENDF based Fission model for n,fission
       geantphysics::HadronicFinalStateModel *nudyFisModel = new geantphysics::NeutronNudyFissionModel();
       // create the cross sections
       geantphysics::HadronicCrossSection *nFissionXS = new geantphysics::NeutronNudyFissionXsec();
-      
+
       // set min/max energies of the model
       nudyFisModel->SetLowEnergyUsageLimit(1E-5 * geant::units::eV);
       nudyFisModel->SetHighEnergyUsageLimit(20.0 * geant::units::MeV);
@@ -196,11 +193,11 @@ void TestNudy1PhysicsList::Initialize()
       // create hadronic Inelastic process for proton:
       //
       geantphysics::HadronicProcess *hinelProc = new geantphysics::InelasticProcess();
-      // create the ENDF based Inelastic reaction model for Inelastic scattering and reactions 
+      // create the ENDF based Inelastic reaction model for Inelastic scattering and reactions
       geantphysics::HadronicFinalStateModel *nudyInelModel = new geantphysics::NeutronNudyInelasticModel();
       // create the cross sections
       geantphysics::HadronicCrossSection *nInelasticXS = new geantphysics::NeutronNudyInelasticXsec();
-      
+
       // set min/max energies of the model
       nudyInelModel->SetLowEnergyUsageLimit(1E-5 * geant::units::eV);
       nudyInelModel->SetHighEnergyUsageLimit(20.0 * geant::units::MeV);
@@ -224,4 +221,4 @@ void TestNudy1PhysicsList::SetStepMaxValue(double val)
   fStepMaxValue = val;
 }
 
-} // userapplication
+} // namespace userapplication

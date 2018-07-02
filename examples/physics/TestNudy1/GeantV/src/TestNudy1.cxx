@@ -87,8 +87,9 @@ bool TestNudy1::Initialize()
   fNumBufferedEvents  = fRunMgr->GetConfig()->fNbuff;
   //
   // register thread local user data and get handler for them
-  fDataHandlerEvents = fRunMgr->GetTDManager()->RegisterUserData<TestNudy1ThreadDataEvents>("TestNudy1ThreadDataEvents");
-  fDataHandlerRun    = fRunMgr->GetTDManager()->RegisterUserData<TestNudy1ThreadDataRun>("TestNudy1ThreadDataRun");
+  fDataHandlerEvents =
+      fRunMgr->GetTDManager()->RegisterUserData<TestNudy1ThreadDataEvents>("TestNudy1ThreadDataEvents");
+  fDataHandlerRun = fRunMgr->GetTDManager()->RegisterUserData<TestNudy1ThreadDataRun>("TestNudy1ThreadDataRun");
   //
   // create the unique, global data struture that will be used to store cumulated per-primary data during the simulation
   fData = new TestNudy1Data();
@@ -395,7 +396,7 @@ void TestNudy1::FinishRun()
   //
   // print the merged histogram into file
   FILE *f       = fopen(fHist1FileName.c_str(), "w");
-  Hist1 *hist    = runData->GetHisto1();
+  Hist1 *hist   = runData->GetHisto1();
   double dTheta = hist->GetDelta();
   for (int i = 0; i < hist->GetNumBins(); ++i) {
     double theta  = hist->GetX()[i];
