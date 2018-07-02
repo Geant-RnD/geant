@@ -9,10 +9,7 @@
  * particle kinetic energy and secondary production threshold. EM processes, that has
  * discrete part and assigned to the given particle in the given physics-list, are
  * extracted from the physics-list and the integrated quantities are computed by calling
- * EMProcess/EMModel interface methods. Quantites, that are available in tables (built
- * at the physics initialisation), also extracted (i.e. interpolated) from these tables
- * by using the corresponding interface methods. Note, that atomic cross sections are
- * computed only for materials that has a single elemnt.
+ * HadronicProcess/HadronicFinalStateModel interface methods.
  *
  * Run ./TestNudy0_GV --help    for more details!
  */
@@ -120,6 +117,7 @@ using userapplication::Hist;
 // default values of the input parameters
 static std::string particleName("n");           // primary particle is neutron
 static std::string materialName("NIST_MAT_Pb"); // material is lead
+static int model              = 1;              // model identifier
 static int Z                  = 82;             // Charge number of the isotope
 static int N                  = 208;            // Total nucleons of the isotope
 static int numHistBins1       = 50;             // number of histogram bins between min/max values
@@ -133,17 +131,18 @@ double sampleDistribution(double numSamples, double primaryEnergy, const Materia
                           Particle *primParticle, HadronicFinalStateModel *nudyModel, Hist *h1, Hist *h2, Hist *h3);
 
 static struct option options[] = {
-    {"particle-name    (possible particle: n) - default: n", required_argument, 0, 'p'},
-    {"material-name    (with a NIST_MAT_ prefix; see more in material doc.)          - default: NIST_MAT_Pb",
+  {"model identifier for test    (possible identifier, Elastic: 1, Capture: 2, Fission:3, Inelastic:4) - default: 1", required_argument, 0, 'i'},
+  {"particle-name    (possible particle: n) - default: n", required_argument, 0, 'p'},
+  {"material-name    (with a NIST_MAT_ prefix; see more in material doc.)          - default: NIST_MAT_Pb",
      required_argument, 0, 'm'},
-    {"number-of-samples (number of required final state samples)                 - default: 1.e+7", required_argument,
+  {"number-of-samples (number of required final state samples)                 - default: 1.e+7", required_argument,
      0, 'f'},
-    {"primary-energy   (in internal energy units i.e. [GeV])                         - default: 1E-3",
+  {"primary-energy   (in internal energy units i.e. [GeV])                         - default: 1E-3",
      required_argument, 0, 'E'},
-    {"sampling target Z    (proton number: z) - default: 82", required_argument, 0, 'z'},
-    {"sampling target A    (Mass number (proton + neutron): A) - default: 208", required_argument, 0, 'a'},
-    {"help", no_argument, 0, 'h'},
-    {0, 0, 0, 0}};
+  {"sampling target Z    (proton number: z) - default: 82", required_argument, 0, 'z'},
+  {"sampling target A    (Mass number (proton + neutron): A) - default: 208", required_argument, 0, 'a'},
+  {"help", no_argument, 0, 'h'},
+  {0, 0, 0, 0}};
 void help();
 
 //===========================================================================================//
@@ -153,7 +152,7 @@ int main(int argc, char *argv[])
   // Get input parameters
   while (true) {
     int c, optidx = 0;
-    c = getopt_long(argc, argv, "p:m:E:f:c:z:a:", options, &optidx);
+    c = getopt_long(argc, argv, "p:m:E:f:c:z:a:i:", options, &optidx);
     if (c == -1) break;
     switch (c) {
     case 0:
@@ -187,6 +186,10 @@ int main(int argc, char *argv[])
     case 'a':
       N = (double)strtof(optarg, NULL);
       if (N <= 0) errx(1, "Mass no. must be positive");
+      break;
+    case 'i':
+      model = (double)strtof(optarg, NULL);
+      if (model <= 0) errx(1, "model identifier must be 1 ,2 ,3 or 4");
       break;
     case 'h':
       help();
@@ -428,10 +431,21 @@ int main(int argc, char *argv[])
   xMax         = 20; //
   Hist *hisSec = new Hist(xMin, xMax, numHistBins3);
   // one can test models one by one (keep only one active model and comment others)
-  // geantphysics::HadronicFinalStateModel *nudyModel = new geantphysics::NeutronNudyElasticModel();
-  // geantphysics::HadronicFinalStateModel *nudyModel = new geantphysics::NeutronNudyFissionModel();
-  geantphysics::HadronicFinalStateModel *nudyModel = new geantphysics::NeutronNudyInelasticModel();
-
+  geantphysics::HadronicFinalStateModel *nudyModel = nullptr;
+  switch (model) {
+    case 1:
+      nudyModel = new geantphysics::NeutronNudyElasticModel();
+      break;
+    case 2:
+      nudyModel = new geantphysics::NeutronNudyCaptureModel();
+      break;
+    case 3:
+      nudyModel = new geantphysics::NeutronNudyFissionModel();
+      break;
+    case 4:
+      nudyModel = new geantphysics::NeutronNudyInelasticModel();
+      break;
+  }
   Isotope *isotope = Isotope::GetIsotope(Z, N);
   std::cout << "   -------------------------------------------------------------------------------- " << std::endl;
   std::cout << "   Model name     =  " << nudyModel->GetName() << std::endl;

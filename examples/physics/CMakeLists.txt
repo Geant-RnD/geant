@@ -25,6 +25,10 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/core/interfaces/inc
   ${CMAKE_SOURCE_DIR}/core/concurrency/inc
   ${CMAKE_SOURCE_DIR}/core/numa/inc
+  ${CMAKE_SOURCE_DIR}/physics/neutron/nudy/inc
+  ${CMAKE_SOURCE_DIR}/physics/neutron/models/inc
+  ${CMAKE_SOURCE_DIR}/physics/neutron/xsec/inc
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc
 )
 
 if (USE_TBB)
@@ -55,6 +59,12 @@ set(sources
   ${CMAKE_SOURCE_DIR}/examples/physics/TestEm5/GeantV/src/TestEm5PhysicsList.cxx
   ${CMAKE_SOURCE_DIR}/examples/physics/TestEm5/GeantV/src/StepMaxProcess.cxx
   ${CMAKE_SOURCE_DIR}/examples/physics/TestEm5/GeantV/src/Hist.cxx
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/src/TestNudy1.cxx
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/src/TestNudy1Data.cxx
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/src/TestNudy1DetectorConstruction.cxx
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/src/TestNudy1PrimaryGenerator.cxx
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/src/TestNudy1PhysicsList.cxx
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/src/Hist1.cxx
   )
 
 set(headers
@@ -92,7 +102,14 @@ set(headers
   ${CMAKE_SOURCE_DIR}/examples/physics/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Schedule.cpp
   ${CMAKE_SOURCE_DIR}/examples/physics/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/Path.cpp
   ${CMAKE_SOURCE_DIR}/examples/physics/cmsToyGV/TBBProcessingDemo/TBBFrameworkCore/EventProcessor.cpp
-  )
+
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc/TestNudy1.h
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc/TestNudy1Data.h
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc/TestNudy1DetectorConstruction.h
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc/TestNudy1PrimaryGenerator.h
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc/TestNudy1PhysicsList.h
+  ${CMAKE_SOURCE_DIR}/examples/physics/TestNudy1/GeantV/inc/Hist1.h
+ )
 
 #if (USE_ROOT)
 #  ROOT_GENERATE_DICTIONARY(G__ExamplesRP ${headers} MODULE GeantExamplesRP
@@ -109,7 +126,7 @@ set(headers
 #
 add_library(GeantExamplesRP SHARED ${sources})
 
-target_link_libraries(GeantExamplesRP -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Geant_v RealPhysics Material ${HEPMC_LIBRARIES}
+target_link_libraries(GeantExamplesRP -L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} Geant_v RealPhysics Material Nudy ${HEPMC_LIBRARIES}
   ${TBB_LIBRARIES})
 
 if (USE_ROOT)
@@ -155,6 +172,7 @@ add_subdirectory(TestEm5/GeantV)
 if (USE_ROOT)
   add_subdirectory(FullCMS/GeantV)
   add_subdirectory(FullLHCb/GeantV)
+  add_subdirectory(TestNudy1/GeantV)
 endif()
 
 #----------------------------------------------------------------------------------------------
