@@ -8,6 +8,27 @@
 namespace geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
+// Global using declaration defining geant::RngState_t and geant::RngSize_t
+#define GEANT_RNG_MRG32K3A
+
+#if defined(GEANT_RNG_MRG32K3A)
+
+using RngState_s = typename vecRng::MRG32k3a<vecCore::backend::Scalar>::State_t;
+using RngState_v = typename vecRng::MRG32k3a<VectorBackend>::State_t;
+using RngSize_t  = size_t;
+
+namespace RngProxy {
+/** @brief Generate a state from the pedegree index of the mother and the index of the daughter */
+void GenerateState(const RngSize_t /*pedegree_mother*/, const RngSize_t /*idaughter*/, RngState_s & /*state*/);
+
+/** @brief Generate a state by skipping forward from a previous state, given the index of the daughter */
+void GenerateState(RngState_s const & /*mother*/, RngState_s & /*state*/);
+} // namespace RngProxy
+
+#elif defined(GEANT_OTHER_RNG)
+
+#endif // Rng engine types
+
 class RngWrapper {
 public:
   RngWrapper()
@@ -30,10 +51,13 @@ public:
     vecCore::AlignedFree(mrg32k3aVec);
   }
 
+  GEANT_FORCE_INLINE
   double uniform() { return mrg32k3aScalar->Uniform<vecCore::backend::Scalar>(); }
 
+  GEANT_FORCE_INLINE
   double uniform(double a, double b) { return a + (b - a) * uniform(); }
 
+  GEANT_FORCE_INLINE
   void uniform_array(size_t n, double *array, const double min = 0., const double max = 1.)
   {
     for (size_t i = 0; i < n; ++i) {
@@ -41,6 +65,7 @@ public:
     }
   }
 
+  GEANT_FORCE_INLINE
   Double_v uniformV() { return mrg32k3aVec->Uniform<VectorBackend>(); }
 
   double Gauss(double mean, double sigma) { return mrg32k3aScalar->Gauss<vecCore::backend::Scalar>(mean, sigma); }
@@ -49,7 +74,7 @@ private:
   vecRng::MRG32k3a<vecCore::backend::Scalar> *mrg32k3aScalar;
   vecRng::MRG32k3a<VectorBackend> *mrg32k3aVec;
 };
-}
-}
+} // namespace GEANT_IMPL_NAMESPACE
+} // namespace geant
 
 #endif // GEANTV_VECRNGWRAPPER_H

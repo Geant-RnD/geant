@@ -30,6 +30,7 @@ endif()
 set(sources
    ${CMAKE_SOURCE_DIR}/core/base/src/Error.cxx
    ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskData.cxx
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/RngWrapper.cxx
    ${CMAKE_SOURCE_DIR}/core/interfaces/src/Track.cxx
    ${CMAKE_CURRENT_SOURCE_DIR}/src/TrackGeo.cxx
    ${CMAKE_CURRENT_SOURCE_DIR}/src/Basket.cxx
