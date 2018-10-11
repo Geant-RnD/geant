@@ -24,6 +24,7 @@
 #include <atomic>
 #include <mutex>
 #include "Geant/Typedefs.h"
+#include "Geant/RngWrapper.h"
 
 #ifndef GEANT_ALIGN_PADDING
 #define GEANT_ALIGN_PADDING 64
@@ -173,6 +174,8 @@ private:
   int fPhysicsProcessIndex = -1; // selected physics process
   double fPhysicsNumOfInteractLengthLeft[kNumPhysicsProcess];
   double fPhysicsInteractLength[kNumPhysicsProcess]; // mfp
+
+  RngState_s fRngState;               /** Scalar RNG state */
 
 private:
 #ifdef GEANT_NEW_DATA_FORMAT
@@ -596,6 +599,11 @@ public:
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
   bool Pending() const { return fPending; }
+
+  /** @brief Getter for the RNG state */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  RngState_s &RngState() { return fRngState; }
 
   /** @brief Getter for path ownership */
   VECCORE_ATT_HOST_DEVICE

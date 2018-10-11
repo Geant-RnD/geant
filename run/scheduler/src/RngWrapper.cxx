@@ -12,14 +12,33 @@ void GenerateState(const RngSize_t /*pedegree_mother*/, const RngSize_t /*idaugh
 
 void GenerateState(RngState_s const & /*mother*/, RngState_s & /*state*/) {}
 
+double Uniform(RngState_s &/*state*/)
+{
+  return 0.;
+}
+
+double Gauss(RngState_s &/*state*/, double /*mean*/, double /*sigma*/)
+{
+  return 0.;
+}
+
 #elif defined(GEANT_OTHER_RNG)
 
 // Recipes for generating new Rng states
-void GenerateState(const RngSize_t /*pedegree_mother*/, const RngSize_t /*idaughter*/, RngState_s & /*state*/) {}
-
-void GenerateState(RngState_s const & /*mother*/, RngState_s & /*state*/) {}
 
 #endif // Rng engine types
+
+double Uniform(RngState_s &state, double a, double b)
+{
+  return a + (b - a) * RngProxy::Uniform(state);
+}
+
+void UniformArray(RngState_s &state, size_t n, double *array, const double min, const double max)
+{
+  for (size_t i = 0; i < n; ++i) {
+    array[i] = RngProxy::Uniform(state, min, max);
+  }
+}
 
 } // namespace RngProxy
 } // namespace GEANT_IMPL_NAMESPACE

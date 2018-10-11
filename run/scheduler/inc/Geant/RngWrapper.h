@@ -19,10 +19,29 @@ using RngSize_t  = size_t;
 
 namespace RngProxy {
 /** @brief Generate a state from the pedegree index of the mother and the index of the daughter */
+GEANT_FORCE_INLINE
 void GenerateState(const RngSize_t /*pedegree_mother*/, const RngSize_t /*idaughter*/, RngState_s & /*state*/);
 
 /** @brief Generate a state by skipping forward from a previous state, given the index of the daughter */
+GEANT_FORCE_INLINE
 void GenerateState(RngState_s const & /*mother*/, RngState_s & /*state*/);
+
+/** @brief Generate a uniformly distributed random number between (0,1) from a given state **/
+GEANT_FORCE_INLINE
+double Uniform(RngState_s &state);
+
+/** @brief Generate a uniformly distributed random number between (a,b) from a given state **/
+GEANT_FORCE_INLINE
+double Uniform(RngState_s &state, double a, double b);
+
+/** @brief Generate an array of  uniformly distributed random numbers between (min,max) from a given state */
+GEANT_FORCE_INLINE
+void UniformArray(RngState_s &state, size_t n, double *array, const double min = 0., const double max = 1.);
+
+/** @brief Generate Gaussian-distributed random number from a given state */
+GEANT_FORCE_INLINE
+double Gauss(RngState_s &state, double mean, double sigma);
+
 } // namespace RngProxy
 
 #elif defined(GEANT_OTHER_RNG)
