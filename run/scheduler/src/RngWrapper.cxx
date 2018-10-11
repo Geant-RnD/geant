@@ -7,6 +7,11 @@ namespace RngProxy {
 
 #if defined(GEANT_RNG_MRG32K3A)
 
+// Recipes for gather/scatter of states
+void Gather(RngState_s const **/*states*/, RngState_v & /*vstate*/) {}
+
+void Scatter(RngState_v const & /*vstate*/, RngState_s **/*states*/) {}
+
 // Recipes for generating new Rng states
 void GenerateState(const RngSize_t /*pedegree_mother*/, const RngSize_t /*idaughter*/, RngState_s & /*state*/) {}
 
@@ -21,6 +26,8 @@ double Gauss(RngState_s &/*state*/, double /*mean*/, double /*sigma*/)
 {
   return 0.;
 }
+
+void Uniform(RngState_v &/*state*/, Double_v &/*rng*/, Double_v /*min*/, Double_v /*max*/) {}
 
 #elif defined(GEANT_OTHER_RNG)
 
