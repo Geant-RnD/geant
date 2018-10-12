@@ -6,24 +6,19 @@
 
 namespace geantphysics {
 
-LightTrack::LightTrack()
-    : fTrackStatus(LTrackStatus::kNew), fGVcode(-1), fGTrackIndex(-1), fMaterialCutCoupleIndex(-1), fProcessIndex(0),
-      fTargetZ(0), fTargetN(0), fXdir(0.0), fYdir(0.0), fZdir(0.0), fKinE(-1.0), fLogKinE(-1.0), fMass(-1.0),
-      fTime(-1.0), fWeight(1.0), fStepLength(0.0), fEdep(0.0), fNintLen(-1.0), fIntLen(0.0), fExtraInfo(nullptr)
-{
-}
+LightTrack::LightTrack() {}
 
 LightTrack::LightTrack(const LTrackStatus aTrackStatus, const int aGVcode, const int aGTrackIndex,
                        const int aMaterialCutCoupleIndex, const int aProcessIndex, const int aTargetZ,
                        const int aTargetN, const double aXdir, const double aYdir, const double aZdir,
                        const double aKinE, const double aLogKinE, const double aMass, const double aTime,
                        const double aWeight, const double aStepLength, const double aEdep, const double aNintLen,
-                       const double aIntLen, ExtraInfo *aExtraInfo)
+                       const double aIntLen, geant::RngState_s *state, ExtraInfo *aExtraInfo)
     : fTrackStatus(aTrackStatus), fGVcode(aGVcode), fGTrackIndex(aGTrackIndex),
       fMaterialCutCoupleIndex(aMaterialCutCoupleIndex), fProcessIndex(aProcessIndex), fTargetZ(aTargetZ),
       fTargetN(aTargetN), fXdir(aXdir), fYdir(aYdir), fZdir(aZdir), fKinE(aKinE), fLogKinE(aLogKinE), fMass(aMass),
       fTime(aTime), fWeight(aWeight), fStepLength(aStepLength), fEdep(aEdep), fNintLen(aNintLen), fIntLen(aIntLen),
-      fExtraInfo(aExtraInfo)
+      fRngState(state), fExtraInfo(aExtraInfo)
 {
 }
 
@@ -32,7 +27,7 @@ LightTrack::LightTrack(const LightTrack &other)
       fMaterialCutCoupleIndex(other.fMaterialCutCoupleIndex), fProcessIndex(other.fProcessIndex),
       fTargetZ(other.fTargetZ), fTargetN(other.fTargetN), fXdir(other.fXdir), fYdir(other.fYdir), fZdir(other.fZdir),
       fKinE(other.fKinE), fLogKinE(other.fLogKinE), fMass(other.fMass), fTime(other.fTime), fWeight(other.fWeight),
-      fStepLength(other.fStepLength), fEdep(other.fEdep), fExtraInfo(other.fExtraInfo)
+      fStepLength(other.fStepLength), fEdep(other.fEdep), fRngState(other.fRngState), fExtraInfo(other.fExtraInfo)
 {
 }
 
@@ -56,6 +51,7 @@ LightTrack &LightTrack::operator=(const LightTrack &other)
     fWeight                 = other.fWeight;
     fStepLength             = other.fStepLength;
     fEdep                   = other.fEdep;
+    fRngState               = other.fRngState;
     SetExtraInfo(other.fExtraInfo);
   }
   return *this;
@@ -75,6 +71,7 @@ LightTrack_v::LightTrack_v() : fNtracks(0)
 {
   for (int i = 0; i < kSOAMaxSize; ++i) {
     fExtraInfoV[i] = nullptr;
+    fRngStates[i]  = nullptr;
   }
   fXdirV    = (double *)vecCore::AlignedAlloc(64, kSOAMaxSize * sizeof(double));
   fYdirV    = (double *)vecCore::AlignedAlloc(64, kSOAMaxSize * sizeof(double));
@@ -126,6 +123,7 @@ void LightTrack_v::SetTrack(const int i, const LightTrack &aLightTrack)
   fWeightV[i]                 = aLightTrack.GetWeight();
   fStepLengthV[i]             = aLightTrack.GetStepLength();
   fEdepV[i]                   = aLightTrack.GetEnergyDeposit();
+  fRngStates[i]               = aLightTrack.GetRngState();
   fExtraInfoV[i]              = aLightTrack.GetExtraInfo();
 }
 
@@ -149,6 +147,7 @@ void LightTrack_v::AddTrack(LightTrack &aLightTrack)
   fWeightV[itrack]                 = aLightTrack.GetWeight();
   fStepLengthV[itrack]             = aLightTrack.GetStepLength();
   fEdepV[itrack]                   = aLightTrack.GetEnergyDeposit();
+  fRngStates[itrack]               = aLightTrack.GetRngState();
   fExtraInfoV[itrack]              = aLightTrack.GetExtraInfo();
   fNtracks++;
 }

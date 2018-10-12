@@ -63,6 +63,7 @@ void PostStepActionHandler::DoIt(geant::Track *track, geant::Basket &output, gea
   primaryLT.SetDirX(track->Dx());
   primaryLT.SetDirY(track->Dy());
   primaryLT.SetDirZ(track->Dz());
+  primaryLT.SetRngState(&track->RngState());
   //  primaryLT.SetTotalMFP(track->GetIntLen());
   //
   // clean the number of secondary tracks used (in PhysicsData)

@@ -19,11 +19,9 @@ using RngSize_t  = size_t;
 
 namespace RngProxy {
 /** @brief Gather kVecLenD scalar states into a vector state*/
-GEANT_FORCE_INLINE
-void Gather(RngState_s const **/*states*/, RngState_v & /*vstate*/);
+void Gather(RngState_s **/*states*/, RngState_v & /*vstate*/);
 
 /** @brief Gather kVecLenD scalar states into a vector state*/
-GEANT_FORCE_INLINE
 void Scatter(RngState_v const &/*vstate*/, RngState_s **/*states*/);
 
 /** @brief Generate a state by skipping forward from a previous state, given the index of the daughter */
@@ -51,7 +49,6 @@ GEANT_FORCE_INLINE
 double Gauss(RngState_s &state, double mean, double sigma);
 
 // Vector case
-GEANT_FORCE_INLINE
 void Uniform(RngState_v &state, Double_v &rng, Double_v min = Double_v(0.), Double_v max = Double_v(1.));
 
 } // namespace RngProxy

@@ -3,6 +3,7 @@
 #define LIGHT_TRACK
 
 #include <atomic>
+#include <Geant/RngWrapper.h>
 #include <Geant/VectorTypes.h>
 
 namespace geantphysics {
@@ -38,35 +39,36 @@ enum class LTrackStatus {
  */
 class LightTrack {
 private:
-  LTrackStatus fTrackStatus;   /** Status of the track */
-  int fGVcode;                 /** GV particle code */
-  int fGTrackIndex;            /** Index of the track in the Track_v vector */
-  int fMaterialCutCoupleIndex; /** Index of the material-cut couple where the track is */
-  int fProcessIndex;           /** Index of the selected process (in the list of
+  LTrackStatus fTrackStatus = LTrackStatus::kNew;   /** Status of the track */
+  int fGVcode = -1;                 /** GV particle code */
+  int fGTrackIndex = -1;            /** Index of the track in the Track_v vector */
+  int fMaterialCutCoupleIndex = -1; /** Index of the material-cut couple where the track is */
+  int fProcessIndex = 0;           /** Index of the selected process (in the list of
                                    active discrete or at-rest processes kept by the
                                    PhysicsManagerPerParticle; negative if the winner
                                    is a continuous process) */
-  int fTargetZ;                /** Atomic number (Z) of the target atom where the
+  int fTargetZ = 0;                /** Atomic number (Z) of the target atom where the
                                    particle has a physical interaction */
-  int fTargetN;                /** Number of nucleons of the target atom where the
+  int fTargetN = 0;                /** Number of nucleons of the target atom where the
                                    particle has a physical interaction */
 
-  double fXdir;       /** X direction (normalized, adimensional) of the particle */
-  double fYdir;       /** Y direction (normalized, adimensional) of the particle */
-  double fZdir;       /** Z direction (normalized, adimensional) of the particle */
-  double fKinE;       /** Kinetic energy (in GeV) of the particle */
-  double fLogKinE;    /** Logarithm of kinetic energy (in GeV) of the particle */
-  double fMass;       /** Dynamic mass (in GeV) of the particle */
-  double fTime;       /** Time (global, in sec) of the particle */
-  double fWeight;     /** Weight (adimensional) of the particle */
-  double fStepLength; /** True, physical length (in cm) of the last step of the particle */
-  double fEdep;       /** Energy deposit (in GeV) in the last step of the particle */
+  double fXdir = 0.;       /** X direction (normalized, adimensional) of the particle */
+  double fYdir = 0.;       /** Y direction (normalized, adimensional) of the particle */
+  double fZdir = 0.;       /** Z direction (normalized, adimensional) of the particle */
+  double fKinE = -1.;       /** Kinetic energy (in GeV) of the particle */
+  double fLogKinE = -1.;    /** Logarithm of kinetic energy (in GeV) of the particle */
+  double fMass = -1.;       /** Dynamic mass (in GeV) of the particle */
+  double fTime = -1.;       /** Time (global, in sec) of the particle */
+  double fWeight = 1.;     /** Weight (adimensional) of the particle */
+  double fStepLength = 0.; /** True, physical length (in cm) of the last step of the particle */
+  double fEdep = 0.;       /** Energy deposit (in GeV) in the last step of the particle */
                       /** Note: in the future we could add the non-ionizing energy deposit
                                 in the last step of the particle */
-  double fNintLen;    /** Number of discrete interaction left */
-  double fIntLen;     /** Total mean free path i.e. macroscopic cross section */
+  double fNintLen = -1.;    /** Number of discrete interaction left */
+  double fIntLen = 0.;     /** Total mean free path i.e. macroscopic cross section */
+  geant::RngState_s *fRngState = nullptr; /** Rng state */
 
-  ExtraInfo *fExtraInfo; /** Pointer to an arbitrary struct to keep extra information */
+  ExtraInfo *fExtraInfo = nullptr; /** Pointer to an arbitrary struct to keep extra information */
 
 public:
   /** @brief LightTrack default constructor */
@@ -77,7 +79,7 @@ public:
              const int aMaterialCutCoupleIndex, const int aProcessIndex, const int aTargetZ, const int aTargetN,
              const double aXdir, const double aYdir, const double aZdir, const double aKinE, const double aLogKinE,
              const double aMass, const double aTime, const double aWeight, const double aStepLength, const double aEdep,
-             const double aNintLen, const double aIntLen, ExtraInfo *aExtraInfo = 0);
+             const double aNintLen, const double aIntLen, geant::RngState_s *state, ExtraInfo *aExtraInfo = 0);
 
   /** @brief LightTrack copy constructor */
   LightTrack(const LightTrack &other);
@@ -146,6 +148,9 @@ public:
 
   /** Method to get the total mean free path i.e. the macroscopic cross section . */
   double GetTotalMFP() const { return fIntLen; }
+
+  /** Method to get the RngState of the track */
+  geant::RngState_s *GetRngState() const { return fRngState; }
 
   /** Method that returns the pointer to extra information */
   ExtraInfo *GetExtraInfo() const { return fExtraInfo; }
@@ -284,6 +289,9 @@ public:
    */
   void SetTotalMFP(const double val) { fIntLen = val; }
 
+  /** @brief Method to set the RngState of the track */
+  void SetRngState(geant::RngState_s *state) { fRngState = state; }
+  
   /**
    * @brief Method that sets the pointer to extra information
    * @param aExtraInfo pointer to extra information
@@ -334,6 +342,8 @@ public:
   double fNintLenV[kSOAMaxSize];    /** Number of discrete interaction left */
   double fIntLenV[kSOAMaxSize];     /** Total mean free path i.e. macroscopic scross section */
   short fSortKey[kSOAMaxSize];
+  geant::RngState_s *fRngStates[kSOAMaxSize]; /** Array of scalar RNG states */
+  geant::RngState_v fVectorRngState;       /** Vector Rng state */
 
   ExtraInfo *fExtraInfoV[kSOAMaxSize]; /** Pointers to arbitrary structs to keep extra information */
 
@@ -629,6 +639,13 @@ public:
     // Note: we assume that the light track has the ownership of the extra information.
     if (fExtraInfoV[i] != nullptr && fExtraInfoV[i] != aExtraInfo) delete fExtraInfoV[i];
     fExtraInfoV[i] = aExtraInfo;
+  }
+
+  void Uniform(geant::Double_v const &min, geant::Double_v const &max, geant::Double_v &rng, size_t stride = 0)
+  {
+    geant::RngProxy::Gather(fRngStates + stride, fVectorRngState);
+    geant::RngProxy::Uniform(fVectorRngState, rng, min, max);
+    geant::RngProxy::Scatter(fVectorRngState, fRngStates + stride);
   }
 
   short *GetSortKeyV() { return &fSortKey[0]; }

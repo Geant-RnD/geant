@@ -8,7 +8,7 @@ namespace RngProxy {
 #if defined(GEANT_RNG_MRG32K3A)
 
 // Recipes for gather/scatter of states
-void Gather(RngState_s const **/*states*/, RngState_v & /*vstate*/) {}
+void Gather(RngState_s **/*states*/, RngState_v & /*vstate*/) {}
 
 void Scatter(RngState_v const & /*vstate*/, RngState_s **/*states*/) {}
 
