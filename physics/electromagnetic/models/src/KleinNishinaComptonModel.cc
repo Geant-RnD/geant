@@ -442,6 +442,7 @@ void KleinNishinaComptonModel::SampleReducedPhotonEnergyRej(const double *egamma
     Set(idx, l, currN++);
   }
 
+  auto *rngVec= td->fRndm;
   while (currN < N || !MaskFull(lanesDone)) {
 
     // Prepare data for one round of sampling
@@ -451,9 +452,9 @@ void KleinNishinaComptonModel::SampleReducedPhotonEnergyRej(const double *egamma
     Double_v al1   = -Math::Log(eps0);
     Double_v cond  = al1 / (al1 + 0.5 * (1. - eps02));
 
-    Double_v rnd1 = td->fRndm->uniformV();
-    Double_v rnd2 = td->fRndm->uniformV();
-    Double_v rnd3 = td->fRndm->uniformV();
+    Double_v rnd1 = rngVec->uniformV();
+    Double_v rnd2 = rngVec->uniformV();
+    Double_v rnd3 = rngVec->uniformV();
 
     Double_v eps, eps2, gf;
 
@@ -688,31 +689,40 @@ void KleinNishinaComptonModel::SampleSecondaries(LightTrack_v &tracks, geant::Ta
   double *sin2tArr    = td->fPhysicsData->fPhysicsScratchpad.fDoubleArr2; // Used with rejection
 
   //get the pointer to the RNG states of LightTrack_v  
-  geant::cxx::JoiningProxyVecMRG32k3a<vecRng::VectorBackend> *proxy = td->fRngProxy;
+  using VectorRngProxyType = vecRng::JoiningProxyVecMRG32k3a<vecRng::VectorBackend>;
+  // geant::cxx::JoiningProxyVecMRG32k3a<vecRng::VectorBackend> 
+  // OLD: using VectorRngProxyType = vecRng::JoiningProxyVecRNG< vecRng::cxx::MRG32k3a<VectorBackend>>;
 
-  if (GetUseSamplingTables()) {
-    for (int i = 0; i < N; i += kVecLenD) {
-      Double_v ekin = tracks.GetKinEVec(i);
-      Double_v r1   = td->fRndm->uniformV();
-      Double_v r2   = td->fRndm->uniformV();
-      Double_v r3   = td->fRndm->uniformV();
-      Double_v eps  = SampleReducedPhotonEnergyVec(ekin, r1, r2, r3);
-      vecCore::Store(eps, epsArr + i);
-    }
-  } else {
+  VectorRngProxyType* proxy = td->fRngProxy;
+  // auto *proxy = td->fRngProxy;
+  //  VectorRngProxyType vecRng( arrayScalarRngPtr, vsize );  // Auto mode - object on stack !
+
+  auto *rngVec= repeatableSim ?  proxy :  // New case: proxy using per-track RNG
+                           td->fRndm ;   // Old case - simple per-task vector RNG
+
+  const bool useSamplingTables = GetUseSamplingTables();
+
+  if (!GetUseSamplingTables()) {
+
     // Always create fake particle at the end of the input arrays to vector rejection sampling method
     tracks.GetKinEArr()[N] = tracks.GetKinEArr()[N - 1];
     SampleReducedPhotonEnergyRej(tracks.GetKinEArr(), onemcostArr, sin2tArr, epsArr, N, td);
   }
 
   for (int i = 0; i < N; i += kVecLenD) {
+    Double_v eps, oneMinusCost, sint2;
     Double_v ekin = tracks.GetKinEVec(i);
-    Double_v eps;
-    vecCore::Load(eps, &epsArr[i]);
 
-    Double_v oneMinusCost;
-    Double_v sint2;
     if (GetUseSamplingTables()) {
+         // Load RNG proxy
+      if( repeatableSim ) {
+        proxy->Join( tracks.fRngStates(i), vSize );
+      }
+      Double_v r1   = rngVec->uniformV();
+      Double_v r2   = rngVec->uniformV();
+      Double_v r3   = rngVec->uniformV();
+      Double_v eps  = SampleReducedPhotonEnergyVec(ekin, r1, r2, r3);
+
       const Double_v kappa = ekin / geant::units::kElectronMassC2;
       oneMinusCost         = (1. / eps - 1.) / kappa;
       sint2                = oneMinusCost * (2. - oneMinusCost);
@@ -792,6 +802,11 @@ void KleinNishinaComptonModel::SampleSecondaries(LightTrack_v &tracks, geant::Ta
     }
 
     tracks.SetEnergyDepositVec(enDeposit, i);
+
+    if (GetUseSamplingTables() && repeatableSim ) { 
+        proxy->Split(); // () trackRngs, vSize );
+    }
+
   }
 }
 
