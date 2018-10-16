@@ -19,6 +19,8 @@
 // from geantV
 #include "Geant/TaskData.h"
 #include "Geant/math_wrappers.h"
+#include "Geant/RngWrapper.h"
+#include "Geant/JoiningProxyVecMRG32k3a.h"
 
 namespace geantphysics {
 
@@ -684,6 +686,9 @@ void KleinNishinaComptonModel::SampleSecondaries(LightTrack_v &tracks, geant::Ta
   double *epsArr      = td->fPhysicsData->fPhysicsScratchpad.fEps;
   double *onemcostArr = td->fPhysicsData->fPhysicsScratchpad.fDoubleArr;  // Used with rejection
   double *sin2tArr    = td->fPhysicsData->fPhysicsScratchpad.fDoubleArr2; // Used with rejection
+
+  //get the pointer to the RNG states of LightTrack_v  
+  geant::cxx::JoiningProxyVecMRG32k3a<vecRng::VectorBackend> *proxy = td->fRngProxy;
 
   if (GetUseSamplingTables()) {
     for (int i = 0; i < N; i += kVecLenD) {
