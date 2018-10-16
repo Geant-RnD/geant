@@ -38,6 +38,9 @@ TaskData::TaskData(size_t nthreads, int maxPerBasket)
   fGeoTrack                       = new TrackGeo_v(4 * maxPerBasket);
   fRndm                           = new RngWrapper;
   fQshare                         = new queue_t(1 << 13);
+
+  fRndm                           = new geant::cxx::RngWrapper();
+  fRngProxy                       = new geant::cxx::JoiningProxyVecMRG32k3a<vecRng::VectorBackend>(); 
 }
 
 //______________________________________________________________________________
@@ -66,6 +69,9 @@ TaskData::~TaskData()
     }
   }
   fStages.clear();
+
+  delete fRndm;
+  delete fRngProxy;
 }
 
 //______________________________________________________________________________
