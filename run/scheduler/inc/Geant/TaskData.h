@@ -25,6 +25,8 @@
 #include "Geant/Propagator.h"
 #include "Geant/Track.h"
 #include "Geant/RngWrapper.h"
+#include "Geant/JoiningProxyVecMRG32k3a.h"
+#include "VecMath/Rng/RngDefs.h"
 
 namespace geantphysics {
 class PhysicsData;
@@ -70,6 +72,8 @@ public:
   bool fTaskCompleted;                     /** Flag set when a task is completed */
   Volume_t *fVolume         = nullptr;     /** Current volume per thread */
   RngWrapper *fRndm         = nullptr;     /** Random generator for thread */
+  JoiningProxyVecMRG32k3a<vecRng::VectorBackend> *fRngProxy  = nullptr;     /** Proxy for the Random generator for thread */
+   /** Proxy for the Random generator for thread */
   bool *fBoolArray          = nullptr;     /** [fSizeBool] Thread array of bools */
   double *fDblArray         = nullptr;     /** [fSizeDbl] Thread array of doubles */
   int *fIntArray            = nullptr;     /** [fSizeInt] Thread array of ints */
