@@ -74,10 +74,11 @@ void FastSimHandler::DoIt(geant::Track *track, geant::Basket &output, geant::Tas
   */
 
   // I guess, I need to kill the track here?? Or should it be in the method above??
-
-  track->SetE(track->Mass());
-  track->SetP(0.);
-  track->Kill();
+  // I need to add an 'if' statement to kill or not to kill depending on what happend in the process
+  double newEkin = primaryLT.GetKinE();
+  track->SetE(newEkin + track->Mass() );
+  track->SetP((std::sqrt(newEkin * (newEkin + 2.0 * track->Mass()))));
+  if (primaryLT.GetTrackStatus()==geantphysics::LTrackStatus::kKill)  track->Kill();
   track->SetStage(geant::kSteppingActionsStage);
   output.AddTrack(track);
 }
