@@ -79,6 +79,37 @@ void
 }
 
 //  ---------------------------================---------------------------
+//  Partial filling / join method (partial gather)
+template <typename BackendT>
+void
+  JoiningProxyVecMRG32k3a<BackendT>::
+   Join( BaseScalarRNGType* trackPrng[], int numStates, vecCore::Mask_v<BackendT> laneMask )
+{
+   //  Recommendation to use VectorSize<decltype(x)>(); with x a variable of relevant type;
+   typename BackendT::Double_v  dbVec;
+   constexpr int vecSize= VectorSize<decltype(dbVec)>(); // = VectorSize<BackendT>();
+   assert( numStates == vecSize );
+   assert( fScalarTrackPrng );
+
+   if( !vecCore::MaskEmpty( laneMask ) )
+   {
+     for( int i= 0; i < vecSize; ++i ) {
+       assert( trackPrng[i] != nullptr );
+       assert( fScalarTrackPrng[i] == nullptr );  // Do not overwrite valid ones (a choice).
+
+       MRG32k3a<BackendT>::SetPartOfState( *trackPrng[i]->GetState(), i);
+       // Keep record of locations of per-track PRNG - in order to copy back the final state
+       fScalarTrackPrng[i] = trackPrng[i];
+
+       // std::cout << " [ " << i << " ] : " << trackPrng[i] << " stored: " << fScalarTrackPrng[i] << std::endl;
+     }
+   }
+   // Must decide whether 'full' means that all lanes are filled - and whether flag for 'valid' lanes is needed.
+   fFullState= true;
+   if( vecCore::MaskFull( laneMask ) ) fFullState= true;
+}
+
+//  ---------------------------================---------------------------
 template <typename BackendT>
 void JoiningProxyVecMRG32k3a<BackendT>::Split()
 {
@@ -96,6 +127,32 @@ void JoiningProxyVecMRG32k3a<BackendT>::Split()
       fScalarTrackPrng[i] = nullptr;
    }
    fFullState= false;
+}
+
+//  ---------------------------================---------------------------
+// using Bool_v = vecCore::Mask_v<Real_v>;
+
+//  Partial split / scatter method
+
+template <typename BackendT>
+void JoiningProxyVecMRG32k3a<BackendT>::Split( BackendT::Mask_v /*vecCore::Mask_v<BackendT>*/ laneMask)
+{
+   // std::cout << "Split called for object " << this << " State addr = " << this->fState
+   //          << " vecSize= " << vecSize << std::endl;
+   // std::cout << "Split called - vecSize = " << vecSize << std::endl;
+   // PrintComponents(); 
+   if( !vecCore::MaskEmpty( laneMask ) )
+   {
+     for( int i= 0; i < vecSize; ++i ) {
+       // std::cout << " [ " << i << " ] : " << fScalarTrackPrng[i] << std::endl;
+       if( laneMask) {
+         auto partState = MRG32k3a<BackendT>::GetPartOfState(i); // Sets full state
+         fScalarTrackPrng[i]->CopyState(partState);
+         fScalarTrackPrng[i] = nullptr;
+       }
+     }
+     fFullState= false;
+   }
 }
 
 //  ---------------------------================---------------------------
