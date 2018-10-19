@@ -17,6 +17,7 @@
 #include "CMSDetectorConstruction.h"
 #include "CMSParticleGun.h"
 #include "CMSPhysicsList.h"
+#include "CMSFieldConstruction.h"
 
 // some helper methods to get the possible input arguments and configure the user defined components of the application,
 // set up the run manager and run the simulation.
@@ -35,26 +36,26 @@ geant::RunManager *RunManager();
 std::string parDetGDMFile = ""; // i.e. default application values
 //
 // primary generator parameters (primary particle gun)
-std::string parGunPrimaryParticleName = "";           // i.e. default application value
-int parGunPrimaryPerEvent             = 0;            // i.e. default application value
-double parGunPrimaryKinEnergy         = 0.;           // i.e. default application value
+std::string parGunPrimaryParticleName = "e-";           // i.e. default application value
+int parGunPrimaryPerEvent             = 16;             // i.e. default application value
+double parGunPrimaryKinEnergy         = 10.;            // i.e. default application value
 double parGunPrimaryDir[3]            = {0., 0., 0.}; // i.e. default application value
 //
 // run configuration parameters
-int parConfigNumBufferedEvt     = 4;  // number of events taken to be transported on the same time (buffered)
-int parConfigNumRunEvt          = 10; // total number of events to be transported during the run
-int parConfigNumThreads         = 4;  // number of working threads
+int parConfigNumBufferedEvt     = 16;  // number of events taken to be transported on the same time (buffered)
+int parConfigNumRunEvt          = 100; // total number of events to be transported during the run
+int parConfigNumThreads         = 1;  // number of working threads
 int parConfigNumPropagators     = 1;  // number of propagators per working threads
 int parConfigNumTracksPerBasket = 16; // default number of tracks per basket
-int parConfigIsPerformance      = 0;  // run without any user actions
+int parConfigIsPerformance      = 1;  // run without any user actions
 int parConfigVectorizedGeom     = 0;  // activate geometry basketizing
 int parConfigVectorizedPhysics  = 0;  // activate physics basketizing
 int parConfigVectorizedMSC      = 0;  // activate MSC basketizing
 int parConfigExternalLoop       = 0;  // activate external loop mode
 //
 // field configuration parameters
-int parFieldActive      = 0;         // activate magnetic field
-int parFieldUseRK       = 0;         // use Runge-Kutta instead of helix
+int parFieldActive      = 1;         // activate magnetic field
+int parFieldUseRK       = 1;         // use Runge-Kutta instead of helix
 double parFieldEpsRK    = 0.0003;    // Revised / reduced accuracy - vs. 0.0003 default
 int parFieldBasketized  = 0;         // basketize magnetic field
 float parFieldVector[3] = {0, 0, 2}; // default constant field value
@@ -349,21 +350,44 @@ void SetupDetectorConstruction(cmsapp::CMSDetectorConstruction *det)
 void SetupField(geant::RunManager *runMgr)
 {
   auto config = runMgr->GetConfig();
-  if (parFieldActive) {
-    // Create magnetic field and needed classes for trajectory integration
-    auto fieldConstructor = new geant::UserFieldConstruction();
-    fieldConstructor->UseConstantMagField(parFieldVector, "kilogauss");
+  switch (parFieldActive) {
+    case 0:
+      {
+        config->fUseRungeKutta      = false;
+        config->fUseVectorizedField = false;
+        printf("main: no magnetic field configured.\n");
+      }
+      break;
+    case 1:
+      {
+        // Create constant magnetic field and needed classes for trajectory integration
+        auto fieldConstructor = new geant::UserFieldConstruction();
+        fieldConstructor->UseConstantMagField(parFieldVector, "kilogauss");
 
-    config->fUseRungeKutta      = parFieldUseRK;
-    config->fEpsilonRK          = parFieldEpsRK;
-    config->fUseVectorizedField = parFieldBasketized;
+        config->fUseRungeKutta      = parFieldUseRK;
+        config->fEpsilonRK          = parFieldEpsRK;
+        config->fUseVectorizedField = parFieldBasketized;
 
-    runMgr->SetUserFieldConstruction(fieldConstructor);
-    printf("main: Created uniform field and set up field-propagation.\n");
-  } else {
-    config->fUseRungeKutta      = false;
-    config->fUseVectorizedField = false;
-    printf("main: no magnetic field configured.\n");
+        runMgr->SetUserFieldConstruction(fieldConstructor);
+        printf("main: Created uniform field and set up field-propagation.\n");
+      }
+      break;
+    case 2:
+      // Create CMS field map
+      {
+        auto cmsfieldConstructor = new CMSFieldConstruction();
+        cmsfieldConstructor->SetFileForField("../cmsmagfield2015.txt");
+        config->fUseRungeKutta      = parFieldUseRK;
+        config->fEpsilonRK          = parFieldEpsRK;
+        config->fUseVectorizedField = parFieldBasketized;
+        runMgr->SetUserFieldConstruction(cmsfieldConstructor);
+        printf("main: Created simplified CMS field and set up field-propagation.\n");
+      }
+      break;
+    default:
+      config->fUseRungeKutta      = false;
+      config->fUseVectorizedField = false;
+      printf("main: Unknown field option - no magnetic field configured.\n");
   }
 }
 

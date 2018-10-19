@@ -3,25 +3,16 @@
 
 #include "Geant/UserFieldConstruction.h"
 
-// Delete ASAP - if possible.    JA 2017.09.14
-#ifdef USE_ROOT_TObject
-#ifndef ROOT_TObject
-#include "TObject.h"
-#endif
-#endif
-
 #include <string>
 #include "Geant/Error.h"
 #include "Geant/UserFieldConstruction.h"
+#include "Geant/FieldConfig.h"
+#include "Geant/CMSmagField.h"
 
 class CMSmagField;
 class GUVMagneticField;
 
 class CMSFieldConstruction : public geant::cxx::UserFieldConstruction
-#ifdef USE_ROOT_TObject
-                             ,
-                             public TObject
-#endif
 {
 public:
   /** @brief Destructor */
@@ -42,15 +33,7 @@ private:
   CMSmagField *fCMSfield;
   // ScalarUniformMagField*  fUniformField; // Alternative - for debugging only
   /** Field is created and owned by this class */
-
-  // ClassDef(CMSFieldConstruction, 1) // User application
-
-  // };
-
-  //  Implementations made inline, in order to cope with need to load dynamically,
-  //   using ROOT v6.
 public:
-  // CMSFieldConstruction::
   CMSFieldConstruction(const char *fieldFilename) : fFieldFilename(fieldFilename), fCMSfield(nullptr) {}
 
   // CMSFieldConstruction::
@@ -58,8 +41,6 @@ public:
 
   // ClassImp(CMSFieldConstruction);
 };
-
-#include "Geant/CMSmagField.h"
 
 CMSFieldConstruction::~CMSFieldConstruction()
 {
@@ -87,8 +68,8 @@ bool CMSFieldConstruction::CreateFieldAndSolver(bool useRungeKutta, VVectorField
   useRungeKutta = true; // Must initialize it always --
   printf("CMSFieldConstruction::CratedFieldAndSolver> useRungeKutta - forced ON, until 'general helix' is available ");
 
-  auto fieldConfig = new FieldConfig(fUniformMagField, bool isUniform = true);
-  FieldLookup::SetFieldConfig(fieldConfig);
+  auto fieldConfig = new geant::FieldConfig(fCMSfield, false);
+  geant::FieldLookup::SetFieldConfig(fieldConfig);
 
   auto fieldPtr = fCMSfield;
 
@@ -108,5 +89,4 @@ bool CMSFieldConstruction::CreateFieldAndSolver(bool useRungeKutta, VVectorField
   return true;
 }
 
-// };  // Added for ROOT
 #endif

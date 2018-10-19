@@ -50,7 +50,7 @@
 
 #define FORCE_INLINE 1
 
-// #include "Geant/VVectorField.h"
+#include "Geant/VVectorField.h"
 
 template <typename T>
 struct MagVector3 {
@@ -59,7 +59,7 @@ struct MagVector3 {
   T fBz   = 0.;
 };
 
-class CMSmagField // : public VVectorField
+class CMSmagField : public VVectorField
 {
   using Double_v = geant::Double_v;
   using Float_v  = geant::Float_v;
@@ -72,7 +72,18 @@ public:
   CMSmagField(std::string inputMap);
   CMSmagField(const CMSmagField &right);
 
-  /** @brief Scalar interface for field retrieval */
+  /** @brief Scalar interface for field retrieval  */
+  virtual void ObtainFieldValue(const Vector3D<double> &position, Vector3D<double> &fieldValue)
+  {
+    GetFieldValue<double>(position, fieldValue);
+  }
+
+  /** @brief Vector interface for field retrieval */
+  virtual void ObtainFieldValueSIMD(const Vector3D<Double_v> &position, Vector3D<Double_v> &fieldValue)
+  {
+    GetFieldValue<Double_v>(position, fieldValue);
+  }
+
   // virtual
   void GetFieldValue(const Vector3D<double> &position, Vector3D<double> &fieldValue) // override
   {
@@ -98,6 +109,11 @@ public:
   ~CMSmagField();
 
   void ReportVersion();
+ 
+ /** @brief For old interface - when cloning was needed for each thread */
+  VVectorField *Clone() const;
+
+  CMSmagField *CloneOrSafeSelf(bool *pSafe);
 
 public:
   //  Invariants -- parameters of the field
@@ -165,7 +181,7 @@ private:
 };
 
 CMSmagField::CMSmagField()
-    : // VVectorField(gNumFieldComponents, gFieldChangesEnergy),
+    : VVectorField(gNumFieldComponents, gFieldChangesEnergy),
       fReadData(false),
       fVerbose(true), fPrimary(false)
 {
@@ -198,7 +214,7 @@ void CMSmagField::ReportVersion()
 }
 
 CMSmagField::CMSmagField(const CMSmagField &right)
-    : // VVectorField(gNumFieldComponents, gFieldChangesEnergy),
+    : VVectorField(gNumFieldComponents, gFieldChangesEnergy),
       fReadData(right.fReadData),
       fVerbose(right.fVerbose), fPrimary(false)
 {
@@ -400,7 +416,6 @@ GEANT_FORCE_INLINE void CMSmagField::GetFieldValue(const Vector3D<Real_v> &pos, 
 
 // This class is thread safe.  So other threads can use the same instance
 //
-/*
 CMSmagField* CMSmagField::CloneOrSafeSelf( bool* pSafe )
 {
    if( pSafe ) *pSafe= true;
@@ -411,5 +426,4 @@ VVectorField* CMSmagField::Clone() const
 {
    return new CMSmagField( *this );
 }
-*/
 #endif
