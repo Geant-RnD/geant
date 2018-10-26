@@ -38,6 +38,8 @@ TaskData::TaskData(size_t nthreads, int maxPerBasket)
   fGeoTrack                       = new TrackGeo_v(4 * maxPerBasket);
   fRndm                           = new RngWrapper;
   fQshare                         = new queue_t(1 << 13);
+
+  fRngProxy                       = new JoiningProxyVecMRG32k3a<vecRng::VectorBackend>(); 
 }
 
 //______________________________________________________________________________
@@ -51,6 +53,7 @@ TaskData::~TaskData()
   delete[] fPathV;
   delete[] fNextpathV;
   delete fRndm;
+  delete fRngProxy;
   VolumePath_t::ReleaseInstance(fPath);
   delete fStackBuffer;
   delete fShuttleBasket;

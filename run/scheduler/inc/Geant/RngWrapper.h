@@ -1,39 +1,81 @@
 #ifndef GEANTV_RNGWRAPPER_H
 #define GEANTV_RNGWRAPPER_H
 
-#include <VecMath/Rng.h>
 #include <VecCore/VecCore>
 #include "Geant/VectorTypes.h"
 
 namespace geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
+// Global using declaration defining geant::RngObject_s and geant::RngObject_v
+
+#define GEANT_RNG_MRG32K3A
+
+#if defined(GEANT_RNG_MRG32K3A)
+
+#include "VecMath/Rng/MRG32k3a.h"
+using RngObject_s  = typename vecRng::MRG32k3a<vecRng::ScalarBackend>;
+using RngObject_v  = typename vecRng::MRG32k3a<vecRng::VectorBackend>; 
+
+#elif defined(GEANT_RNG_THREEFRY)
+
+#include "VecMath/Rng/Threefry.h"
+using RngObject_s  = typename vecRng::Threefry<vecRng::ScalarBackend>;
+using RngObject_v  = typename vecRng::Threefry<vecRng::VectorBackend>; 
+
+#elif defined(GEANT_RNG_PHILOX)
+
+#include "VecMath/Rng/Philox.h"
+using RngObject_s  = typename vecRng::Philox<vecRng::ScalarBackend>;
+using RngObject_v  = typename vecRng::Philox<vecRng::VectorBackend>; 
+
+#endif // Rng engine types
+
+// Global using declaration defining geant::RngState_t and geant::RngStream_t
+
+using RngState_s   = typename RngObject_s::State_t;
+using RngState_v   = typename RngObject_v::State_t;
+using RngStream_t  = size_t;
+
 class RngWrapper {
 public:
   RngWrapper()
   {
-    void *buff     = vecCore::AlignedAlloc(32, sizeof(vecRng::MRG32k3a<vecCore::backend::Scalar>));
-    mrg32k3aScalar = new (buff) vecRng::MRG32k3a<vecCore::backend::Scalar>;
+    void *buff     = vecCore::AlignedAlloc(32, sizeof(RngObject_s));
+    scalarRNG = new (buff) RngObject_s;
 
-    buff        = vecCore::AlignedAlloc(32, sizeof(vecRng::MRG32k3a<VectorBackend>));
-    mrg32k3aVec = new (buff) vecRng::MRG32k3a<VectorBackend>;
+    buff        = vecCore::AlignedAlloc(32, sizeof(RngObject_v));
+    vectorRNG = new (buff) RngObject_v;
 
-    mrg32k3aScalar->Initialize();
-    mrg32k3aVec->Initialize();
+    scalarRNG->Initialize();
+    vectorRNG->Initialize();
   }
 
   ~RngWrapper()
   {
-    mrg32k3aScalar->~MRG32k3a();
-    vecCore::AlignedFree(mrg32k3aScalar);
-    mrg32k3aVec->~MRG32k3a();
-    vecCore::AlignedFree(mrg32k3aVec);
+    vecCore::AlignedFree(scalarRNG);
+    vecCore::AlignedFree(vectorRNG);
   }
 
-  double uniform() { return mrg32k3aScalar->Uniform<vecCore::backend::Scalar>(); }
+  GEANT_FORCE_INLINE
+  RngStream_t GetStreamIndex(RngState_s *state) 
+  { 
+    return scalarRNG->template UniformIndex<vecRng::ScalarBackend>(state); 
+  } 
 
+  RngState_s* GenerateState(size_t streamId); 
+
+  void Join(RngState_s** trackRngState,  int start); 
+
+  void Split(RngState_s** trackRngState,  int start); 
+
+  GEANT_FORCE_INLINE
+  double uniform() { return scalarRNG->Uniform<vecCore::backend::Scalar>(); }
+
+  GEANT_FORCE_INLINE
   double uniform(double a, double b) { return a + (b - a) * uniform(); }
 
+  GEANT_FORCE_INLINE
   void uniform_array(size_t n, double *array, const double min = 0., const double max = 1.)
   {
     for (size_t i = 0; i < n; ++i) {
@@ -41,14 +83,16 @@ public:
     }
   }
 
-  Double_v uniformV() { return mrg32k3aVec->Uniform<VectorBackend>(); }
+  GEANT_FORCE_INLINE
+  Double_v uniformV() { return vectorRNG->Uniform<VectorBackend>(); }
 
-  double Gauss(double mean, double sigma) { return mrg32k3aScalar->Gauss<vecCore::backend::Scalar>(mean, sigma); }
+  double Gauss(double mean, double sigma) { return scalarRNG->Gauss<vecCore::backend::Scalar>(mean, sigma); }
 
 private:
-  vecRng::MRG32k3a<vecCore::backend::Scalar> *mrg32k3aScalar;
-  vecRng::MRG32k3a<VectorBackend> *mrg32k3aVec;
+  RngObject_s *scalarRNG;
+  RngObject_v *vectorRNG;
 };
+
 } // namespace GEANT_IMPL_NAMESPACE
 } // namespace geant
 
