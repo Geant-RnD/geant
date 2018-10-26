@@ -686,13 +686,34 @@ void KleinNishinaComptonModel::SampleSecondaries(LightTrack_v &tracks, geant::Ta
   double *sin2tArr    = td->fPhysicsData->fPhysicsScratchpad.fDoubleArr2; // Used with rejection
 
   if (GetUseSamplingTables()) {
+
+#ifdef RNG_REPRODUCIBLE_MODE
+    //testing without initialization of RNG state from the EventSever - remove this
+    for (int i = 0; i < N ; ++i) {
+      tracks.fRngStates[i] = td->fRndm->GenerateState(i);
+    }
+#endif
+
     for (int i = 0; i < N; i += kVecLenD) {
+
+#ifdef RNG_REPRODUCIBLE_MODE
+      //join      
+      td->fRndm->Join(tracks.fRngStates, i);
+#endif
+
       Double_v ekin = tracks.GetKinEVec(i);
+
       Double_v r1   = td->fRndm->uniformV();
       Double_v r2   = td->fRndm->uniformV();
       Double_v r3   = td->fRndm->uniformV();
+
       Double_v eps  = SampleReducedPhotonEnergyVec(ekin, r1, r2, r3);
       vecCore::Store(eps, epsArr + i);
+
+#ifdef RNG_REPRODUCIBLE_MODE
+      //Split
+      td->fRndm->Split(tracks.fRngStates,i);
+#endif
     }
   } else {
     // Always create fake particle at the end of the input arrays to vector rejection sampling method
@@ -781,6 +802,10 @@ void KleinNishinaComptonModel::SampleSecondaries(LightTrack_v &tracks, geant::Ta
         secondaries.SetGVcode(fSecondaryInternalCode, idx);
         secondaries.SetMass(geant::units::kElectronMassC2, idx);
         secondaries.SetTrackIndex(tracks.GetTrackIndex(i + l), idx);
+#ifdef RNG_REPRODUCIBLE_MODE
+        size_t sid = td->fRndm->GetStreamIndex(tracks.fRngStates[i]);
+        secondaries.SetStreamIndex(sid, idx);
+#endif
       } else {
         Set(enDeposit, l, Get(elEnergy, l));
       }
