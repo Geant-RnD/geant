@@ -25,6 +25,8 @@
 #include "Geant/Propagator.h"
 #include "Geant/Track.h"
 #include "Geant/RngWrapper.h"
+#include "Geant/JoiningProxyVecMRG32k3a.h"
+#include "VecMath/Rng/RngDefs.h"
 
 namespace geantphysics {
 class PhysicsData;
@@ -86,6 +88,8 @@ public:
   BasketCounters *fCounters[kNstages];     /** Counters for stage handlers */
   queue_t *fQshare = nullptr;              /** Queue of exported tracks */
   vector_t<SimulationStage *> fStages;     /** Vector of (possibly local) simulation stages */
+
+  JoiningProxyVecMRG32k3a<vecRng::VectorBackend> *fRngProxy  = nullptr;  /** RNG Proxy for thread */
 
   vector_t<Track *> fTransported1; // Transported tracks in current step
   int fNkeepvol = 0;               /** Number of tracks keeping the same volume */
