@@ -63,7 +63,18 @@ public:
     return scalarRNG->template UniformIndex<vecRng::ScalarBackend>(state); 
   } 
 
-  RngState_s* GenerateState(size_t streamId); 
+  RngState_s const &GenerateState(size_t streamId);
+
+  /** @brief Generate stream id from run/event/primary */
+  RngStream_t GenerateStreamIndex(size_t /*run*/, size_t /*event*/, size_t primary)
+  {
+    return (RngStream_t)primary;
+  }
+
+  void PrintState(RngState_s const &state) { return scalarRNG->PrintState(state); }
+  void PrintState() { return scalarRNG->PrintState(); }
+
+  void PrintState(RngState_v const &state) { return vectorRNG->PrintState(state); }
 
   void Join(RngState_s** trackRngState,  int start); 
 

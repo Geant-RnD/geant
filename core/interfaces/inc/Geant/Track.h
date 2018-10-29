@@ -175,6 +175,7 @@ private:
   double fPhysicsNumOfInteractLengthLeft[kNumPhysicsProcess];
   double fPhysicsInteractLength[kNumPhysicsProcess]; // mfp
 
+  RngStream_t fRngStream   = 0;       /** RNG stream id */
   RngState_s fRngState;               /** Scalar RNG state */
 
 private:
@@ -600,6 +601,11 @@ public:
   GEANT_FORCE_INLINE
   bool Pending() const { return fPending; }
 
+  /** @brief Getter for the RNG stream id */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  RngStream_t &RngStream() { return fRngStream; }
+
   /** @brief Getter for the RNG state */
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
@@ -982,6 +988,16 @@ public:
   VECCORE_ATT_HOST_DEVICE
   GEANT_FORCE_INLINE
   void SetPending(bool flag) { fPending = flag; }
+ 
+  /** @brief Setter for the RNG state */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  void SetRngState(const RngState_s &state) { fRngState = state; }
+
+  /** @brief Setter for the RNG state */
+  VECCORE_ATT_HOST_DEVICE
+  GEANT_FORCE_INLINE
+  void SetRngStream(RngStream_t streamId) { fRngStream = streamId; }
 
   /** @brief Setter for the on boundary pre-step status */
   VECCORE_ATT_HOST_DEVICE

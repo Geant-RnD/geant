@@ -117,6 +117,8 @@ Track &Track::operator=(const Track &other)
     fStage              = other.fStage;
     fIsOnBoundaryPreStp = other.fIsOnBoundaryPreStp;
     fVolume             = other.fVolume;
+    fRngStream          = other.fRngStream;
+    fRngState           = other.fRngState;
 
     // Copy user data
     memcpy(fExtraData, other.fExtraData, TrackDataMgr::GetInstance()->GetDataSize());
@@ -175,6 +177,7 @@ void Track::Clear(const char *)
   fStage       = 0;
   fGeneration  = 0;
   fVolume      = nullptr;
+  fRngStream   = 0;
   fPath->Clear();
   fNextpath->Clear();
 

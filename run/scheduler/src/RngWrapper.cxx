@@ -3,10 +3,10 @@
 namespace geant {
 inline namespace GEANT_IMPL_NAMESPACE {
 
-RngState_s* RngWrapper::GenerateState(size_t streamId)
+RngState_s const &RngWrapper::GenerateState(size_t streamId)
 {
   scalarRNG->Initialize(streamId);
-  return scalarRNG->GetState();
+  return scalarRNG->GetStateRef();
 }
 
 void RngWrapper::Join(RngState_s** trackRngState,  int start)

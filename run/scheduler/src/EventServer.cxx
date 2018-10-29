@@ -335,6 +335,11 @@ Track *EventServer::GetNextTrack(TaskData *td, unsigned int &error)
   Track *track = event->GetPrimary(itr)->Clone(td);
   track->SetEvent(event->GetEvent());
   track->SetEvslot(event->GetSlot());
+  RngStream_t streamId = td->fRndm->GenerateStreamIndex(1 /*run_no*/, event->GetEvent(), track->PrimaryParticleIndex());
+  track->SetRngStream(streamId);
+  const RngState_s &state = td->fRndm->GenerateState(streamId);
+  track->SetRngState(state);
+  td->fRndm->PrintState(track->RngState());
   return track;
 }
 
