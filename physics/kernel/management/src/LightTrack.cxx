@@ -133,7 +133,7 @@ void LightTrack_v::SetTrack(const int i, const LightTrack &aLightTrack)
   fWeightV[i]                 = aLightTrack.GetWeight();
   fStepLengthV[i]             = aLightTrack.GetStepLength();
   fEdepV[i]                   = aLightTrack.GetEnergyDeposit();
-  fStreamIndexV[i]            = aLightTrack.GetStreamIndex();
+  fStreamIndexV[i]            = aLightTrack.GetRngStream();
   fRngStates[i]               = aLightTrack.GetRngState();
   fExtraInfoV[i]              = aLightTrack.GetExtraInfo();
 }
@@ -158,7 +158,7 @@ void LightTrack_v::AddTrack(LightTrack &aLightTrack)
   fWeightV[itrack]                 = aLightTrack.GetWeight();
   fStepLengthV[itrack]             = aLightTrack.GetStepLength();
   fEdepV[itrack]                   = aLightTrack.GetEnergyDeposit();
-  fStreamIndexV[itrack]            = aLightTrack.GetStreamIndex();
+  fStreamIndexV[itrack]            = aLightTrack.GetRngStream();
   fRngStates[itrack]               = aLightTrack.GetRngState();
   fExtraInfoV[itrack]              = aLightTrack.GetExtraInfo();
   fNtracks++;

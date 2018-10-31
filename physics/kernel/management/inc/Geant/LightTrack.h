@@ -153,7 +153,7 @@ public:
   double GetTotalMFP() const { return fIntLen; }
 
   /** Method to get the index of the RNG stream */
-  long long GetStreamIndex() const { return fStreamIndex; }
+  geant::RngStream_t GetRngStream() const { return fStreamIndex; }
 
   /** Method to get the RngState of the track */
   //  geant::BaseRNGState_scalar *GetRngState() const { return fRngState; }
@@ -297,8 +297,8 @@ public:
   void SetTotalMFP(const double val) { fIntLen = val; }
 
   /**
-   * @brief Method that sets the total mean free path i.e. the macroscopic cross section .
-   * @param[in] val Value of the total mean free path in internal [1/length] unit.
+   * @brief Method that sets the stream index
+   * @param[in] val Value of the stream index
    */
   void SetStreamIndex(const geant::RngStream_t val) { fStreamIndex = val; }
 
@@ -506,6 +506,12 @@ public:
   /** Method that returns the pointer to extra information */
   ExtraInfo *GetExtraInfo(int i) const { return fExtraInfoV[i]; }
 
+  /** Method to get the index of the RNG stream */
+  geant::RngStream_t GetRngStream(int i) const { return fStreamIndexV[i]; }
+
+  /** Method to get the RngState of the track */
+  //  geant::BaseRNGState_scalar *GetRngState() const { return fRngState; }
+  geant::RngState_s *GetRngState(int i) const { return fRngStates[i]; }
   //--- Setters ---
 
   /**
@@ -644,6 +650,8 @@ public:
 
   void SetStreamIndex(const geant::RngStream_t val, int i) { fStreamIndexV[i] = val; }
 
+  void SetRngState(geant::RngState_s *state, int i) { fRngStates[i] = state; }
+
   /**
    * @brief Method that sets the pointer to extra information
    * @param aExtraInfo pointer to extra information
@@ -713,6 +721,7 @@ private:
     std::swap(fNintLenV[i], fNintLenV[j]);
     std::swap(fIntLenV[i], fIntLenV[j]);
     std::swap(fStreamIndexV[i], fStreamIndexV[j]);
+    std::swap(fRngStates[i], fRngStates[j]);
     std::swap(fSortKey[i], fSortKey[j]);
     std::swap(fExtraInfoV[i], fExtraInfoV[j]);
   }

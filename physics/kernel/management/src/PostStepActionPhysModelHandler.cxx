@@ -53,6 +53,8 @@ void PostStepActionPhysModelHandler::DoIt(geant::Track *track, geant::Basket &ou
   primaryLT.SetDirX(track->Dx());
   primaryLT.SetDirY(track->Dy());
   primaryLT.SetDirZ(track->Dz());
+  primaryLT.SetStreamIndex(track->RngStream());
+  primaryLT.SetRngState(&track->RngState());
 
   // clean the number of secondary tracks used (in PhysicsData)
   td->fPhysicsData->ClearSecondaries();
@@ -66,6 +68,7 @@ void PostStepActionPhysModelHandler::DoIt(geant::Track *track, geant::Basket &ou
   track->SetP(std::sqrt(newEkin * (newEkin + 2.0 * track->Mass())));
   track->SetDirection(primaryLT.GetDirX(), primaryLT.GetDirY(), primaryLT.GetDirZ());
   track->SetEdep(track->Edep() + primaryLT.GetEnergyDeposit());
+  track->SetRngStream(primaryLT.GetRngStream());
 
   if (newEkin <= 0.) {
     const MaterialCuts *matCut = static_cast<const MaterialCuts *>(
@@ -154,6 +157,8 @@ void PostStepActionPhysModelHandler::DoItVector(geant::Track **gtracks, int N, g
     primaryLTs.SetDirY(track->Dy(), i);
     primaryLTs.SetDirZ(track->Dz(), i);
     primaryLTs.SetTrackIndex(i, i);
+    primaryLTs.SetStreamIndex(i, track->RngStream());
+    primaryLTs.SetRngState(&track->RngState(), i);
   }
   primaryLTs.SetNtracks(N);
 
@@ -170,6 +175,7 @@ void PostStepActionPhysModelHandler::DoItVector(geant::Track **gtracks, int N, g
     track->SetP(std::sqrt(newEkin * (newEkin + 2.0 * track->Mass())));
     track->SetDirection(primaryLTs.GetDirX(i), primaryLTs.GetDirY(i), primaryLTs.GetDirZ(i));
     track->SetEdep(track->Edep() + primaryLTs.GetEnergyDeposit(i));
+    track->SetRngStream(primaryLTs.GetRngStream(i));
 
     //    Assert that photoelectric photons are killed
     if (track->GetPhysicsProcessIndex() == 2 && track->GVcode() == 42) {
